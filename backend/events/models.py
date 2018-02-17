@@ -1,4 +1,5 @@
 from django.db import models
+from locations.models import Location
 
 # Create your models here.
 class Event(models.Model):
@@ -10,7 +11,7 @@ class Event(models.Model):
     end_time = models.DateTimeField()
     # created_by : User
     all_day = models.BooleanField(default=False)
-    # venue : Venue
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
     # body : Body
 
     def __str__(self):
