@@ -4,6 +4,7 @@ from locations.models import Location
 # Create your models here.
 class Event(models.Model):
     id = models.UUIDField(primary_key=True)
+    time_of_creation = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
     image_url = models.CharField(max_length=100)
