@@ -11,7 +11,7 @@ class Event(models.Model):
     end_time = models.DateTimeField()
     # created_by : User
     all_day = models.BooleanField(default=False)
-    venue = models.ForeignKey(Location, on_delete=models.CASCADE)
+    venue = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
     # body : Body
 
     def __str__(self):
