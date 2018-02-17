@@ -8,7 +8,7 @@ class Event(models.Model):
     image_url = models.CharField(max_length=100)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    //created_by : User
+    # created_by : User
     all_day = models.BooleanField(default=False)
-    //venue : Venue
-    //body : Body
+    # venue : Venue
+    # body : Body
