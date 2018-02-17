@@ -12,3 +12,6 @@ class Event(models.Model):
     all_day = models.BooleanField(default=False)
     # venue : Venue
     # body : Body
+
+    def __str__(self):
+        return self.name
