@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Event(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True)
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
     image_url = models.CharField(max_length=100)
