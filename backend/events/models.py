@@ -20,6 +20,7 @@ class Event(models.Model):
         User,
         through='UserEventStatus',
         through_fields=('event', 'user'),
+        blank=True
     )
     # body : Body
 
