@@ -1,6 +1,7 @@
 from django.db import models
-from locations.models import Location
 from uuid import uuid4
+from users.models import User
+from locations.models import Location
 
 # Create your models here.
 class Event(models.Model):
@@ -14,6 +15,12 @@ class Event(models.Model):
     # created_by : User
     all_day = models.BooleanField(default=False)
     venue = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
+
+    followers = models.ManyToManyField(
+        User,
+        through='UserEventStatus',
+        through_fields=('event', 'user'),
+    )
     # body : Body
 
     def __str__(self):
@@ -23,10 +30,9 @@ class UserEventStatus(models.Model):
     id = models.UUIDField(primary_key=True, default = uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
 
-    # Uncomment when user gets implemented
     # Cascading on delete is delibrate here, since the entry
     # makes no sense if the user or event gets deleted
-    # venue = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
