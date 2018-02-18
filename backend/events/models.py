@@ -31,4 +31,4 @@ class UserEventStatus(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
     # Probability of attending the event
-    status = models.IntegerField()
+    status = models.IntegerField(default=0)
