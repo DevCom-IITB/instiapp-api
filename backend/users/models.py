@@ -1,13 +1,9 @@
-from django.db import models
 from __future__ import unicode_literals
-# Create your models here.
-
+from django.db import models
 
 class User(models.Model):
 
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE,blank=True,null=True)
-
+    mapped_user = models.OneToOneField("self", on_delete=models.CASCADE,blank=True,null=True)
    
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
