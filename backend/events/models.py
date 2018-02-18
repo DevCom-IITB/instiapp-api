@@ -18,3 +18,17 @@ class Event(models.Model):
 
     def __str__(self):
         return self.name
+
+class UserEventStatus(models.Model):
+    id = models.UUIDField(primary_key=True, default = uuid4, editable=False)
+    time_of_creation = models.DateTimeField(auto_now_add=True)
+
+    # Uncomment when user gets implemented
+    # Cascading on delete is delibrate here, since the entry
+    # makes no sense if the user or event gets deleted
+    # venue = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+
+    # Probability of attending the event
+    status = models.IntegerField()
