@@ -1,6 +1,6 @@
 from django.db import models
 from uuid import uuid4
-from users.models import User
+from users.models import UserProfile
 from locations.models import Location
 
 # Create your models here.
@@ -17,7 +17,7 @@ class Event(models.Model):
     venue = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
 
     followers = models.ManyToManyField(
-        User,
+        UserProfile,
         through='UserEventStatus',
         through_fields=('event', 'user'),
         blank=True
@@ -33,7 +33,7 @@ class UserEventStatus(models.Model):
 
     # Cascading on delete is delibrate here, since the entry
     # makes no sense if the user or event gets deleted
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 

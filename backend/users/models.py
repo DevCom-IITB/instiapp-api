@@ -6,8 +6,9 @@ from django.utils.crypto import get_random_string
 from django.dispatch import receiver
 import uuid
 
-class Users(models.Model):
+class UserProfile(models.Model):
 
+    # Why is this even here?
     mapped_user = models.OneToOneField("self", on_delete=models.CASCADE,blank=True,null=True)
    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
