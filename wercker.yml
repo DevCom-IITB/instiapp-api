@@ -1,0 +1,16 @@
+box: python
+
+#services:
+    #- wercker/postgresql
+# Build definition
+build:
+  # The steps that will be executed on build
+  steps:
+    # Install requirements
+    - pip-install
+
+    # Run unit tests
+    - script:
+        name: run unit tests
+        code: |
+          python manage.py test -v2
