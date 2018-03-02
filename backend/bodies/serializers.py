@@ -19,9 +19,9 @@ class ChildrenSerializer(serializers.ModelSerializer):
 class BodySerializer(serializers.HyperlinkedModelSerializer):
     'Serializer for Body'
 
-    child = ParentBodyHyperlink(many=True, read_only=True)
-    parent = ChildrenSerializer(many=True, read_only=True)
+    parents = ParentBodyHyperlink(many=True, read_only=True)
+    children = ChildrenSerializer(many=True, read_only=True)
 
     class Meta:
         model = Body
-        fields = ('url', 'id', 'name', 'description', 'image_url', 'parent', 'child')
+        fields = ('url', 'id', 'name', 'description', 'image_url', 'children', 'parents')
