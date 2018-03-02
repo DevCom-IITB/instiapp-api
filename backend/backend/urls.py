@@ -15,7 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from bodies.views import BodyViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('api/bodies', BodyViewSet.as_view({'get':'list', 'post':'create'})),
+    path('api/bodies/<pk>', BodyViewSet.as_view({'get':'retrieve', 'put':'update', 'delete':'destroy'})),
+
 ]
