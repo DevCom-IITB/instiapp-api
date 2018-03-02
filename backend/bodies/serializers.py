@@ -11,11 +11,17 @@ class ParentBodyHyperlink(serializers.HyperlinkedRelatedField):
         url_kwargs = {'pk': obj.parent.pk}
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
+class ChildrenSerializer(serializers.ModelSerializer):
+    ' Serializes children of the body from BodyChildRelation'
+    def to_representation(self, value):
+        return BodySerializer(value.child, context=self.context).data
+
 class BodySerializer(serializers.HyperlinkedModelSerializer):
     'Serializer for Body'
 
     child = ParentBodyHyperlink(many=True, read_only=True)
+    parent = ChildrenSerializer(many=True, read_only=True)
 
     class Meta:
         model = Body
-        fields = ('url', 'id', 'name', 'description', 'image_url', 'child')
+        fields = ('url', 'id', 'name', 'description', 'image_url', 'parent', 'child')
