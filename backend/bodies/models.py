@@ -10,9 +10,15 @@ class Body(models.Model):
     description = models.CharField(max_length=500)
     image_url = models.URLField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
 class BodyChildRelation(models.Model):
     ' Relates a body to one child '
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     parent = models.ForeignKey(Body, on_delete=models.CASCADE, default=uuid4, related_name='parent')
     child = models.ForeignKey(Body, on_delete=models.CASCADE, default=uuid4, related_name='child')
+
+    def __str__(self):
+        return self.parent.name + " --> " + self.child.name
