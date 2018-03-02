@@ -1,20 +1,20 @@
 ' Serializers for Body and BodyChildRelation '
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from bodies.models import Body, BodyChildRelation
+from bodies.models import Body
 
 class ParentBodyHyperlink(serializers.HyperlinkedRelatedField):
     ' Gets hyperlinks for parent bodies from BodyChildRelation'
     view_name = 'body-detail'
 
-    def get_url(self, obj, view_name, request, format):
+    def get_url(self, obj, view_name, request, format): # pylint: disable=redefined-builtin
         url_kwargs = {'pk': obj.parent.pk}
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 class ChildrenSerializer(serializers.ModelSerializer):
     ' Serializes children of the body from BodyChildRelation'
-    def to_representation(self, value):
-        return BodySerializer(value.child, context=self.context).data
+    def to_representation(self, instance):
+        return BodySerializer(instance.child, context=self.context).data
 
 class BodySerializer(serializers.HyperlinkedModelSerializer):
     'Serializer for Body'
