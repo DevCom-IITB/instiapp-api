@@ -21,6 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('api/bodies', BodyViewSet.as_view({'get':'list', 'post':'create'})),
-    path('api/bodies/<pk>', BodyViewSet.as_view({'get':'retrieve', 'put':'update', 'delete':'destroy'})),
+    path('api/bodies/<pk>', BodyViewSet.as_view(
+        {'get':'retrieve', 'put':'update', 'delete':'destroy'}
+    ), name='body-detail'),
 
 ]

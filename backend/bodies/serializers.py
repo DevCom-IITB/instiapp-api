@@ -6,4 +6,4 @@ class BodySerializer(serializers.HyperlinkedModelSerializer):
     'Serialize Body'
     class Meta:
         model = Body
-        fields = ('id', 'name', 'description', 'image_url')
+        fields = ('url', 'id', 'name', 'description', 'image_url')
