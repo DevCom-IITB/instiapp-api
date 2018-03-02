@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'events.apps.EventsConfig',
     'locations.apps.LocationsConfig',
-    'users.apps.UsersConfig'
+    'users.apps.UsersConfig',
+    'bodies.apps.BodiesConfig'
 ]
 
 MIDDLEWARE = [
