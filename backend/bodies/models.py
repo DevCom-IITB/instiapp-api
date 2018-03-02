@@ -8,7 +8,7 @@ class Body(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
-    image_url = models.URLField()
+    image_url = models.URLField(blank=True, null=True)
 
 class BodyChildRelation(models.Model):
     ' Relates a body to one child '
