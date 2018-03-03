@@ -2,7 +2,6 @@
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 from bodies.models import Body
-from events.serializers import EventSerializer
 
 class ParentBodyHyperlink(serializers.HyperlinkedRelatedField):
     ' Gets hyperlinks for parent bodies from BodyChildRelation'
@@ -17,11 +16,21 @@ class ChildrenSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         return BodySerializer(instance.child, context=self.context).data
 
+class BodySerializerMin(serializers.HyperlinkedModelSerializer):
+    ' Minimal serializer for Body '
+
+    class Meta:
+        model = Body
+        fields = ('url', 'id', 'name', 'description', 'image_url')
+
 class BodySerializer(serializers.HyperlinkedModelSerializer):
     'Serializer for Body'
 
+    from events.serializers import EventSerializer
+
     parents = ParentBodyHyperlink(many=True, read_only=True)
     children = ChildrenSerializer(many=True, read_only=True)
+
     events = EventSerializer(many=True, read_only=True)
 
     class Meta:

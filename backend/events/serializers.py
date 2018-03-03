@@ -1,8 +1,6 @@
 ' Serializers for Event '
 from rest_framework import serializers
 from events.models import Event
-from locations.serializers import LocationSerializerMin, LocationSerializer
-from users.serializers import UserProfileSerializer
 
 class FollowersMethods:
     ' Helper methods for followers '
@@ -10,6 +8,7 @@ class FollowersMethods:
         return obj.user_event_statuses.filter(status=s).count()
 
     def get_followers(self, obj, s):
+        from users.serializers import UserProfileSerializer
         return [UserProfileSerializer(x.user, context=self.context).data \
                 for x in obj.user_event_statuses.filter(status=s)]
 
@@ -21,6 +20,8 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
     venue info. Use `EventFullSerializer` if you want information
     on individual users and venues
     '''
+
+    from locations.serializers import LocationSerializerMin
 
     interested_count = serializers.SerializerMethodField()
     get_interested_count = lambda self, obj: FollowersMethods.get_count(self, obj, 1)
@@ -43,6 +44,9 @@ class EventFullSerializer(serializers.HyperlinkedModelSerializer):
     detailed information on venues
     '''
 
+    from bodies.serializers import BodySerializerMin
+    from locations.serializers import LocationSerializer
+
     interested_count = serializers.SerializerMethodField()
     get_interested_count = lambda self, obj: FollowersMethods.get_count(self, obj, 1)
 
@@ -56,6 +60,8 @@ class EventFullSerializer(serializers.HyperlinkedModelSerializer):
     get_going = lambda self, obj: FollowersMethods.get_followers(self, obj, 2)
 
     venues = LocationSerializer(many=True, read_only=True)
+
+    bodies = BodySerializerMin(many=True, read_only=True)
 
     class Meta:
         model = Event
