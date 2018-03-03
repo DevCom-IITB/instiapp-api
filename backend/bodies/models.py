@@ -1,6 +1,7 @@
 ' Model for Body and children'
 from uuid import uuid4
 from django.db import models
+from events.models import Event
 
 class Body(models.Model):
     ' An organization or club which may conduct events '
@@ -9,6 +10,7 @@ class Body(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
     image_url = models.URLField()
+    events = models.ManyToManyField(Event)
 
 class BodyChildRelation(models.Model):
     ' Relates a body to one child '
