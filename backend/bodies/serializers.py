@@ -40,6 +40,8 @@ class BodySerializer(serializers.HyperlinkedModelSerializer):
     from events.serializers import EventSerializer
 
     followers_url = serializers.HyperlinkedIdentityField(view_name='body-followers')
+    followers_count = serializers.SerializerMethodField()
+
     parents = ParentBodyHyperlink(many=True, read_only=True)
     children = ChildrenSerializer(many=True, read_only=True)
 
@@ -48,4 +50,8 @@ class BodySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Body
         fields = ('url', 'id', 'name', 'description', 'image_url', 
-                  'children', 'parents', 'events', 'followers_url')
+                  'children', 'parents', 'events', 'followers_url',
+                  'followers_count')
+
+    def get_followers_count(self, obj):
+        return obj.followers.all().count()
