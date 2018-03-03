@@ -12,7 +12,7 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
         return {'request': self.request}
 
 class BodyFollowersViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    ' API endpoint that allows bodies to be viewed or edited '
+    ' API endpoint that lists followers of bodies '
     queryset = Body.objects.all()
     serializer_class = BodyFollowersSerializer
 
