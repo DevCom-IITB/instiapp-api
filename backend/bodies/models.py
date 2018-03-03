@@ -10,7 +10,7 @@ class Body(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
     image_url = models.URLField(blank=True, null=True)
-    events = models.ManyToManyField(Event)
+    events = models.ManyToManyField(Event, related_name='bodies')
 
     def __str__(self):
         return self.name
