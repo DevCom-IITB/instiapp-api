@@ -48,7 +48,7 @@ class UserEventStatus(models.Model):
 
     # Cascading on delete is delibrate here, since the entry
     # makes no sense if the user or event gets deleted
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default=uuid4, related_name='events')
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default=uuid4, related_name='events_followed')
     event = models.ForeignKey(Event, on_delete=models.CASCADE, default=uuid4, related_name='user_event_statuses')
 
     status = models.IntegerField(default=0)

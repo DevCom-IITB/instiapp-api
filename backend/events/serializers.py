@@ -9,6 +9,7 @@ class FollowersMethods:
 
     def get_followers(self, obj, s):
         from users.serializers import UserProfileSerializer
+        # pylint: disable=maybe-no-member
         return [UserProfileSerializer(x.user, context=self.context).data \
                 for x in obj.user_event_statuses.filter(status=s)]
 
