@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from bodies.views import BodyViewSet
+from events.views import EventViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +26,7 @@ urlpatterns = [
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     ), name='body-detail'),
 
+    path('api/events/<pk>', EventViewSet.as_view(
+        {'get':'retrieve', 'put':'update', 'delete':'destroy'}
+    ), name='event-detail'),
 ]
