@@ -1,3 +1,5 @@
 from django.contrib import admin
+from bodies.models import Body, BodyChildRelation
 
-# Register your models here.
+admin.site.register(Body)
+admin.site.register(BodyChildRelation)
