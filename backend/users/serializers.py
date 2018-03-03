@@ -7,5 +7,4 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ('url', 'id', 'name', 'roll_no', 'profile_pic',
-                  'email', 'year', 'about')
+        fields = ('url', 'id', 'name', 'profile_pic')
