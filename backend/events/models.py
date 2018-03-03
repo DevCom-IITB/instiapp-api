@@ -14,7 +14,7 @@ class Event(models.Model):
     end_time = models.DateTimeField()
     # created_by : User
     all_day = models.BooleanField(default=False)
-    venue = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
+    venues = models.ManyToManyField(Location, related_name='events')
 
     followers = models.ManyToManyField(
         UserProfile,
