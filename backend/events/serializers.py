@@ -5,7 +5,7 @@ from locations.serializers import LocationSerializerMin, LocationSerializer
 from users.serializers import UserProfileSerializer
 
 class FollowersMethods:
-    ' Methods for followers '
+    ' Helper methods for followers '
     def get_count(self, obj, s):
         return obj.user_event_statuses.filter(status=s).count()
 
@@ -14,7 +14,13 @@ class FollowersMethods:
                 for x in obj.user_event_statuses.filter(status=s)]
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
-    'Serializer for Event'
+    '''
+    Serializer for Event
+    This serializer returns only the count of followers in
+    each category, i.e. interested and going and minimal
+    venue info. Use `EventFullSerializer` if you want information
+    on individual users and venues
+    '''
 
     interested_count = serializers.SerializerMethodField()
     get_interested_count = lambda self, obj: FollowersMethods.get_count(self, obj, 1)
@@ -31,7 +37,11 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
                   'interested_count', 'going_count')
 
 class EventFullSerializer(serializers.HyperlinkedModelSerializer):
-    'Serializer for Event with more information (followers, venues etc.)'
+    '''
+    Serializer for Event with more information
+    Returns the entire list of followers in each category and
+    detailed information on venues
+    '''
 
     interested_count = serializers.SerializerMethodField()
     get_interested_count = lambda self, obj: FollowersMethods.get_count(self, obj, 1)
