@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from bodies.views import BodyViewSet
 from events.views import EventViewSet
+from locations.views import LocationViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +30,8 @@ urlpatterns = [
     path('api/events/<pk>', EventViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     ), name='event-detail'),
+
+    path('api/locations/<pk>', LocationViewSet.as_view(
+        {'get':'retrieve', 'put':'update', 'delete':'destroy'}
+    ), name='location-detail'),
 ]

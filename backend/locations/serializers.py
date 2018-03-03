@@ -8,3 +8,10 @@ class LocationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Location
         fields = ('url', 'id', 'name', 'lat', 'lng')
+
+class LocationSerializerMin(serializers.HyperlinkedModelSerializer):
+    ' Minimal serializer for Location '
+
+    class Meta:
+        model = Location
+        fields = ('name', 'url')
