@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from bodies.views import BodyViewSet
+from bodies.views import BodyViewSet, BodyFollowersViewSet
 from events.views import EventViewSet
 from locations.views import LocationViewSet
 from users.views import UserProfileViewSet
@@ -27,6 +27,9 @@ urlpatterns = [
     path('api/bodies/<pk>', BodyViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     ), name='body-detail'),
+    path('api/bodies/<pk>/followers', BodyFollowersViewSet.as_view(
+        {'get':'retrieve'}
+    ), name='body-followers'),
 
     path('api/events/<pk>', EventViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}

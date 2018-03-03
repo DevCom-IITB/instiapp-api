@@ -23,11 +23,23 @@ class BodySerializerMin(serializers.HyperlinkedModelSerializer):
         model = Body
         fields = ('url', 'id', 'name', 'description', 'image_url')
 
+class BodyFollowersSerializer(serializers.HyperlinkedModelSerializer):
+    ' Minimal serializer for Body '
+
+    from users.serializers import UserProfileSerializer
+
+    followers = UserProfileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Body
+        fields = ('url', 'id', 'followers')
+
 class BodySerializer(serializers.HyperlinkedModelSerializer):
     'Serializer for Body'
 
     from events.serializers import EventSerializer
 
+    followers_url = serializers.HyperlinkedIdentityField(view_name='body-followers')
     parents = ParentBodyHyperlink(many=True, read_only=True)
     children = ChildrenSerializer(many=True, read_only=True)
 
@@ -35,4 +47,5 @@ class BodySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Body
-        fields = ('url', 'id', 'name', 'description', 'image_url', 'children', 'parents', 'events')
+        fields = ('url', 'id', 'name', 'description', 'image_url', 
+                  'children', 'parents', 'events', 'followers_url')
