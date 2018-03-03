@@ -18,6 +18,7 @@ from django.urls import path
 from bodies.views import BodyViewSet
 from events.views import EventViewSet
 from locations.views import LocationViewSet
+from users.views import UserProfileViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,4 +35,8 @@ urlpatterns = [
     path('api/locations/<pk>', LocationViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     ), name='location-detail'),
+
+    path('api/users/<pk>', UserProfileViewSet.as_view(
+        {'get':'retrieve', 'put':'update', 'delete':'destroy'}
+    ), name='userprofile-detail'),
 ]
