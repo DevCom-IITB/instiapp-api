@@ -1,7 +1,6 @@
 ' Models for Event and UserEventStatus '
 from uuid import uuid4
 from django.db import models
-from users.models import UserProfile
 from locations.models import Location
 
 class Event(models.Model):
@@ -23,12 +22,6 @@ class Event(models.Model):
     all_day = models.BooleanField(default=False)
     venues = models.ManyToManyField(Location, related_name='events')
 
-    followers = models.ManyToManyField(
-        UserProfile,
-        through='UserEventStatus',
-        through_fields=('event', 'user'),
-        blank=True
-    )
     # body : Body
 
     def __str__(self):
@@ -42,6 +35,8 @@ class UserEventStatus(models.Model):
         `status` - probability of attending the event,
         e.g. 0 - not going, 1 - interested, 2 - going etc.
     '''
+
+    from users.models import UserProfile
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
