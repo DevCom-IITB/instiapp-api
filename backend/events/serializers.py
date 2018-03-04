@@ -69,3 +69,13 @@ class EventFullSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'image_url',
                   'start_time', 'end_time', 'all_day', 'venues', 'bodies',
                   'interested_count', 'going_count', 'interested', 'going')
+
+class EventLocationSerializer(serializers.ModelSerializer):
+
+    from locations.serializers import LocationSerializer
+
+    venues = LocationSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Event
+        fields = ('id', 'name', 'venues')

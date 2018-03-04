@@ -34,6 +34,9 @@ urlpatterns = [
     path('api/events/<pk>', EventViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     ), name='event-detail'),
+    path('api/events-locations', EventViewSet.as_view(
+        {'post':'locations'}
+    )),
 
     path('api/locations/<pk>', LocationViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
