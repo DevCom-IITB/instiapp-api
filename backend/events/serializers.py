@@ -13,7 +13,7 @@ class FollowersMethods:
         return [UserProfileSerializer(x.user, context=self.context).data \
                 for x in obj.user_event_statuses.filter(status=s)]
 
-class EventSerializer(serializers.HyperlinkedModelSerializer):
+class EventSerializer(serializers.ModelSerializer):
     '''
     Serializer for Event
     This serializer returns only the count of followers in
@@ -34,11 +34,11 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('url', 'id', 'name', 'description', 'image_url',
+        fields = ('id', 'name', 'description', 'image_url',
                   'start_time', 'end_time', 'all_day', 'venues', 'bodies',
                   'interested_count', 'going_count')
 
-class EventFullSerializer(serializers.HyperlinkedModelSerializer):
+class EventFullSerializer(serializers.ModelSerializer):
     '''
     Serializer for Event with more information
     Returns the entire list of followers in each category and
@@ -66,6 +66,6 @@ class EventFullSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('url', 'id', 'name', 'description', 'image_url',
+        fields = ('id', 'name', 'description', 'image_url',
                   'start_time', 'end_time', 'all_day', 'venues', 'bodies',
                   'interested_count', 'going_count', 'interested', 'going')
