@@ -2,16 +2,16 @@
 from rest_framework import serializers
 from locations.models import Location
 
-class LocationSerializer(serializers.HyperlinkedModelSerializer):
+class LocationSerializer(serializers.ModelSerializer):
     ' Serializer for Location '
 
     class Meta:
         model = Location
-        fields = ('url', 'id', 'name', 'lat', 'lng')
+        fields = ('id', 'name', 'lat', 'lng')
 
-class LocationSerializerMin(serializers.HyperlinkedModelSerializer):
+class LocationSerializerMin(serializers.ModelSerializer):
     ' Minimal serializer for Location '
 
     class Meta:
         model = Location
-        fields = ('name', 'url')
+        fields = ('id', 'name')
