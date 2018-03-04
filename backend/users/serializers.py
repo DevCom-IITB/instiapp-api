@@ -2,14 +2,14 @@
 from rest_framework import serializers
 from users.models import UserProfile
 
-class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
+class UserProfileSerializer(serializers.ModelSerializer):
     ' Serializer for UserProfile '
 
     class Meta:
         model = UserProfile
-        fields = ('url', 'id', 'name', 'profile_pic')
+        fields = ('id', 'name', 'profile_pic')
 
-class UserProfileFullSerializer(serializers.HyperlinkedModelSerializer):
+class UserProfileFullSerializer(serializers.ModelSerializer):
     ' Full serializer for UserProfile with detailed information and events'
 
     from bodies.serializers import BodySerializerMin
@@ -20,7 +20,7 @@ class UserProfileFullSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ('url', 'id', 'name', 'profile_pic', 'events_interested', 'events_going', 'followed_bodies')
+        fields = ('id', 'name', 'profile_pic', 'events_interested', 'events_going', 'followed_bodies')
 
     def get_events_interested(self, obj):
         from events.serializers import EventSerializer
