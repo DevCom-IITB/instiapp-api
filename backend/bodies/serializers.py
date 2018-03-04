@@ -1,29 +1,20 @@
 ' Serializers for Body and BodyChildRelation '
 from rest_framework import serializers
-from rest_framework.reverse import reverse
 from bodies.models import Body
-
-class ParentBodyHyperlink(serializers.HyperlinkedRelatedField):
-    ' Gets hyperlinks for parent bodies from BodyChildRelation'
-    view_name = 'body-detail'
-
-    def get_url(self, obj, view_name, request, format): # pylint: disable=redefined-builtin
-        url_kwargs = {'pk': obj.parent.pk}
-        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 class ChildrenSerializer(serializers.ModelSerializer):
     ' Serializes children of the body from BodyChildRelation'
     def to_representation(self, instance):
         return BodySerializer(instance.child, context=self.context).data
 
-class BodySerializerMin(serializers.HyperlinkedModelSerializer):
+class BodySerializerMin(serializers.ModelSerializer):
     ' Minimal serializer for Body '
 
     class Meta:
         model = Body
-        fields = ('url', 'id', 'name', 'description', 'image_url')
+        fields = ('id', 'name', 'description', 'image_url')
 
-class BodyFollowersSerializer(serializers.HyperlinkedModelSerializer):
+class BodyFollowersSerializer(serializers.ModelSerializer):
     ' Minimal serializer for Body '
 
     from users.serializers import UserProfileSerializer
@@ -32,26 +23,27 @@ class BodyFollowersSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Body
-        fields = ('url', 'id', 'followers')
+        fields = ('id', 'followers')
 
-class BodySerializer(serializers.HyperlinkedModelSerializer):
+class BodySerializer(serializers.ModelSerializer):
     'Serializer for Body'
 
     from events.serializers import EventSerializer
 
-    followers_url = serializers.HyperlinkedIdentityField(view_name='body-followers')
     followers_count = serializers.SerializerMethodField()
 
-    parents = ParentBodyHyperlink(many=True, read_only=True)
+    parents = serializers.SerializerMethodField()
     children = ChildrenSerializer(many=True, read_only=True)
 
     events = EventSerializer(many=True, read_only=True)
 
     class Meta:
         model = Body
-        fields = ('url', 'id', 'name', 'description', 'image_url', 
-                  'children', 'parents', 'events', 'followers_url',
-                  'followers_count')
+        fields = ('id', 'name', 'description', 'image_url',
+                  'children', 'parents', 'events', 'followers_count')
 
     def get_followers_count(self, obj):
         return obj.followers.all().count()
+
+    def get_parents(self, obj):
+        return [x.parent.id for x in obj.parents.all()]
