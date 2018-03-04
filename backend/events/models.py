@@ -19,6 +19,7 @@ class Event(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     # created_by : User
+    created_by = models.ForeignKey('users.UserProfile', null=True, blank=True, on_delete=models.SET_NULL)
     all_day = models.BooleanField(default=False)
     venues = models.ManyToManyField(Location, related_name='events')
 
