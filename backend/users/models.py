@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.utils.crypto import get_random_string
 from django.dispatch import receiver
-from bodies.models import Body
 
 class UserProfile(models.Model):
     ' Profile of a unique user '
@@ -21,7 +20,7 @@ class UserProfile(models.Model):
     profile_pic = models.URLField(null=True)
     gcm_id = models.IntegerField(null=True)
 
-    followed_bodies = models.ManyToManyField(Body, related_name='followers')
+    followed_bodies = models.ManyToManyField('bodies.Body', related_name='followers')
     # mode_of_login = models.CharField(max_length=1, choices=LOGIN_CHOICES, default='C')
     # college = models.CharField(max_length=200)
     # contact_no = models.CharField(max_length=10, null= True)

@@ -1,7 +1,6 @@
 ' Models for Event and UserEventStatus '
 from uuid import uuid4
 from django.db import models
-from locations.models import Location
 
 class Event(models.Model):
     '''
@@ -18,10 +17,9 @@ class Event(models.Model):
     image_url = models.URLField()
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    # created_by : User
     created_by = models.ForeignKey('users.UserProfile', null=True, blank=True, on_delete=models.SET_NULL)
     all_day = models.BooleanField(default=False)
-    venues = models.ManyToManyField(Location, related_name='events')
+    venues = models.ManyToManyField('locations.Location', related_name='events', null=True, blank=True)
 
     # body : Body
 
@@ -37,14 +35,12 @@ class UserEventStatus(models.Model):
         e.g. 0 - not going, 1 - interested, 2 - going etc.
     '''
 
-    from users.models import UserProfile
-
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
 
     # Cascading on delete is delibrate here, since the entry
     # makes no sense if the user or event gets deleted
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default=uuid4, related_name='events_followed')
+    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE, default=uuid4, related_name='events_followed')
     event = models.ForeignKey(Event, on_delete=models.CASCADE, default=uuid4, related_name='user_event_statuses')
 
     status = models.IntegerField(default=0)
