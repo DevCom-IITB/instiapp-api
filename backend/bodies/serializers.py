@@ -30,7 +30,10 @@ class BodySerializer(serializers.ModelSerializer):
 
     from events.serializers import EventSerializer
 
-    followers_count = serializers.SerializerMethodField()
+    followers_count = serializers.IntegerField(
+        source='followers.count',
+        read_only=True
+    )
 
     parents = serializers.SerializerMethodField()
     children = ChildrenSerializer(many=True, read_only=True)
@@ -41,9 +44,6 @@ class BodySerializer(serializers.ModelSerializer):
         model = Body
         fields = ('id', 'name', 'description', 'image_url',
                   'children', 'parents', 'events', 'followers_count')
-
-    def get_followers_count(self, obj):
-        return obj.followers.all().count()
 
     def get_parents(self, obj):
         return [x.parent.id for x in obj.parents.all()]

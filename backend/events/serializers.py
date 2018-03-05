@@ -77,6 +77,7 @@ class EventFullSerializer(serializers.ModelSerializer):
                   'interested_count', 'going_count', 'interested', 'going')
 
 class UserEventStatusSerializer(serializers.ModelSerializer):
+    ' Serializer for UserEventStatus '
 
     class Meta:
         from events.models import UserEventStatus
