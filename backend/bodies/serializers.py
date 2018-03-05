@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from bodies.models import Body
 
-class ChildrenSerializer(serializers.ModelSerializer):
+class ChildrenSerializer(serializers.Serializer):
     ' Serializes children of the body from BodyChildRelation'
     def to_representation(self, instance):
         return BodySerializer(instance.child, context=self.context).data
