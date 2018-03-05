@@ -19,3 +19,7 @@ class Location(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+         verbose_name = "Location"
+         verbose_name_plural = "Locations"

@@ -29,9 +29,9 @@ class UserProfile(models.Model):
     # first_time_login = models.BooleanField(default=True)
     # unique_token = models.CharField(max_length=32, default=random_32_length_string, editable=False)
 
-    # class Meta:
-    #     verbose_name = "Profile"
-    #     verbose_name_plural = "Profiles"
+    class Meta:
+         verbose_name = "Profile"
+         verbose_name_plural = "Profiles"
 
     def __str__(self):
         return self.name

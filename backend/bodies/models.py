@@ -14,6 +14,10 @@ class Body(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+         verbose_name = "Body"
+         verbose_name_plural = "Bodies"
+
 class BodyChildRelation(models.Model):
     ' Relates a body to one child '
 
@@ -23,3 +27,7 @@ class BodyChildRelation(models.Model):
 
     def __str__(self):
         return self.parent.name + " --> " + self.child.name
+
+    class Meta:
+         verbose_name = "Body-Child Relation"
+         verbose_name_plural = "Body-Child Relations"

@@ -21,10 +21,12 @@ class Event(models.Model):
     all_day = models.BooleanField(default=False)
     venues = models.ManyToManyField('locations.Location', related_name='events', blank=True)
 
-    # body : Body
-
     def __str__(self):
         return self.name
+
+    class Meta:
+         verbose_name = "Event"
+         verbose_name_plural = "Events"
 
 class UserEventStatus(models.Model):
     '''
@@ -44,3 +46,7 @@ class UserEventStatus(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, default=uuid4, related_name='user_event_statuses')
 
     status = models.IntegerField(default=0)
+
+    class Meta:
+         verbose_name = "User-Event Status"
+         verbose_name_plural = "User-Event Statuses"
