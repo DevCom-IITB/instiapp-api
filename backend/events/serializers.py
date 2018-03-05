@@ -76,6 +76,13 @@ class EventFullSerializer(serializers.ModelSerializer):
                   'end_time', 'all_day', 'venues', 'venues_id', 'bodies', 'bodies_id',
                   'interested_count', 'going_count', 'interested', 'going')
 
+class UserEventStatusSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        from events.models import UserEventStatus
+        model = UserEventStatus
+        fields = ('id', 'event', 'user', 'status')
+
 class EventLocationSerializer(serializers.ModelSerializer):
     '''
     Gets event with detailed location info
