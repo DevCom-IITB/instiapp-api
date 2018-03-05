@@ -48,4 +48,7 @@ urlpatterns = [
     path('api/users/<pk>', UserProfileViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     ), name='userprofile-detail'),
+    path('api/users', UserProfileViewSet.as_view(
+        {'get':'list', 'post':'create'}
+    )),
 ]
