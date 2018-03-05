@@ -21,5 +21,5 @@ class Location(models.Model):
         return self.name
 
     class Meta:
-         verbose_name = "Location"
-         verbose_name_plural = "Locations"
+        verbose_name = "Location"
+        verbose_name_plural = "Locations"

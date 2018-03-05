@@ -25,8 +25,8 @@ class Event(models.Model):
         return self.name
 
     class Meta:
-         verbose_name = "Event"
-         verbose_name_plural = "Events"
+        verbose_name = "Event"
+        verbose_name_plural = "Events"
 
 class UserEventStatus(models.Model):
     '''
@@ -48,5 +48,5 @@ class UserEventStatus(models.Model):
     status = models.IntegerField(default=0)
 
     class Meta:
-         verbose_name = "User-Event Status"
-         verbose_name_plural = "User-Event Statuses"
+        verbose_name = "User-Event Status"
+        verbose_name_plural = "User-Event Statuses"
