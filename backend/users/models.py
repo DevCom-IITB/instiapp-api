@@ -10,21 +10,17 @@ from django.dispatch import receiver
 class UserProfile(models.Model):
     ' Profile of a unique user '
 
-    # Why is this even here?
-    mapped_user = models.OneToOneField("self", on_delete=models.CASCADE, blank=True, null=True)
-
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 
     name = models.CharField(max_length=50)
     roll_no = models.CharField(max_length=10, null=True)
     profile_pic = models.URLField(null=True, blank=True)
-    gcm_id = models.IntegerField(null=True, blank=True)
+    fcm_id = models.IntegerField(null=True, blank=True)
 
     followed_bodies = models.ManyToManyField('bodies.Body', related_name='followers', blank=True)
     # mode_of_login = models.CharField(max_length=1, choices=LOGIN_CHOICES, default='C')
-    # college = models.CharField(max_length=200)
-    # contact_no = models.CharField(max_length=10, null= True)
-    email = models.EmailField(null=True,blank=True)
+    contact_no = models.CharField(max_length=10, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
     year = models.IntegerField(default=1, null=True, blank=True)
     # programme_of_study = models.CharField(max_length=20, choices=PROGRAM_CHOICES, null=True)
     about = models.TextField(blank=True, null=True)
