@@ -7,9 +7,9 @@ class Body(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=50)
-    description = models.CharField(max_length=500)
+    description = models.CharField(max_length=500, blank=True)
     image_url = models.URLField(blank=True, null=True)
-    events = models.ManyToManyField('events.Event', related_name='bodies')
+    events = models.ManyToManyField('events.Event', related_name='bodies', blank=True)
 
     def __str__(self):
         return self.name

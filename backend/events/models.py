@@ -13,13 +13,13 @@ class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=50)
-    description = models.CharField(max_length=500)
-    image_url = models.URLField()
+    description = models.CharField(max_length=500, blank=True)
+    image_url = models.URLField(blank=True, null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     created_by = models.ForeignKey('users.UserProfile', null=True, blank=True, on_delete=models.SET_NULL)
     all_day = models.BooleanField(default=False)
-    venues = models.ManyToManyField('locations.Location', related_name='events', null=True, blank=True)
+    venues = models.ManyToManyField('locations.Location', related_name='events', blank=True)
 
     # body : Body
 
