@@ -47,6 +47,8 @@ class EventFullSerializer(serializers.ModelSerializer):
 
     from bodies.serializers import BodySerializerMin
     from locations.serializers import LocationSerializer
+    from locations.models import Location
+    from bodies.models import Body
 
     interested_count = serializers.SerializerMethodField()
     get_interested_count = lambda self, obj: FollowersMethods.get_count(self, obj, 1)
@@ -61,16 +63,24 @@ class EventFullSerializer(serializers.ModelSerializer):
     get_going = lambda self, obj: FollowersMethods.get_followers(self, obj, 2)
 
     venues = LocationSerializer(many=True, read_only=True)
+    venues_id = serializers.PrimaryKeyRelatedField(many=True, read_only=False,
+                                                   queryset=Location.objects.all(), source='venues')
 
     bodies = BodySerializerMin(many=True, read_only=True)
+    bodies_id = serializers.PrimaryKeyRelatedField(many=True, read_only=False,
+                                                   queryset=Body.objects.all(), source='bodies')
 
     class Meta:
         model = Event
-        fields = ('id', 'name', 'description', 'image_url',
-                  'start_time', 'end_time', 'all_day', 'venues', 'bodies',
+        fields = ('id', 'name', 'description', 'image_url', 'start_time',
+                  'end_time', 'all_day', 'venues', 'venues_id', 'bodies', 'bodies_id',
                   'interested_count', 'going_count', 'interested', 'going')
 
 class EventLocationSerializer(serializers.ModelSerializer):
+    '''
+    Gets event with detailed location info
+    Intended use with POST list
+    '''
 
     from locations.serializers import LocationSerializer
 
