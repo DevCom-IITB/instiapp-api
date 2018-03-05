@@ -48,6 +48,9 @@ urlpatterns = [
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     )),
 
+    path('api/locations', LocationViewSet.as_view(
+        {'get':'list', 'post':'create'}
+    )),
     path('api/locations/<pk>', LocationViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     ), name='location-detail'),
