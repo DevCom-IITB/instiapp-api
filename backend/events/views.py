@@ -1,4 +1,4 @@
-' Views for events app '
+"""Views for events app."""
 from uuid import UUID
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -6,12 +6,12 @@ from events.serializers import EventFullSerializer, EventLocationSerializer, Use
 from events.models import Event, UserEventStatus
 
 class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    ' API endpoint that allows events to be viewed or edited '
+    """API endpoint that allows events to be viewed or edited"""
     queryset = Event.objects.all()
     serializer_class = EventFullSerializer
 
     def locations(self, request):
-        ' Endpoint to return event locations of all POSTed events'
+        """Endpoint to return event locations of all POSTed events."""
         try:
             [UUID(x, version=4) for x in request.data]
         except ValueError:
@@ -21,6 +21,6 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         return Response(locs.data)
 
 class UserEventStatusViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    ' API endpoint that allows user-event statuses to be viewed or edited '
+    """API endpoint that allows user-event statuses to be viewed or edited"""
     queryset = UserEventStatus.objects.all()
     serializer_class = UserEventStatusSerializer

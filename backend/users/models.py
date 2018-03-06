@@ -1,14 +1,14 @@
-' Model for UserProfile '
+"""Model for UserProfile."""
 from __future__ import unicode_literals
 from uuid import uuid4
 from django.db import models
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.utils.crypto import get_random_string
-from django.dispatch import receiver
+#from django.contrib.auth.models import User
+#from django.db.models.signals import post_save
+#from django.utils.crypto import get_random_string
+#from django.dispatch import receiver
 
 class UserProfile(models.Model):
-    ' Profile of a unique user '
+    """Profile of a unique user."""
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 
@@ -27,11 +27,12 @@ class UserProfile(models.Model):
     # interests = models.ManyToManyField(Tag)
     # ldap_uid = models.IntegerField(null=True, blank=True)
     # first_time_login = models.BooleanField(default=True)
-    # unique_token = models.CharField(max_length=32, default=random_32_length_string, editable=False)
+    # unique_token = models.CharField(
+    #     max_length=32, default=random_32_length_string, editable=False)
 
     class Meta:
-         verbose_name = "Profile"
-         verbose_name_plural = "Profiles"
+        verbose_name = "Profile"
+        verbose_name_plural = "Profiles"
 
     def __str__(self):
         return self.name
