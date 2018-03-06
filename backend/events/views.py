@@ -2,11 +2,15 @@
 from uuid import UUID
 from rest_framework.response import Response
 from rest_framework import viewsets
-from events.serializers import EventFullSerializer, EventLocationSerializer, UserEventStatusSerializer
-from events.models import Event, UserEventStatus
+from events.serializers import EventFullSerializer
+from events.serializers import EventLocationSerializer
+from events.serializers import UserEventStatusSerializer
+from events.models import Event
+from events.models import UserEventStatus
 
 class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that allows events to be viewed or edited"""
+
     queryset = Event.objects.all()
     serializer_class = EventFullSerializer
 
