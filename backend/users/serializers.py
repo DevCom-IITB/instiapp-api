@@ -30,10 +30,8 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
 
     def get_events_interested(self, obj):
         from events.serializers import EventSerializer
-        return [EventSerializer(x.event, context=self.context).data \
-                for x in obj.events_followed.filter(status=1)]
+        return EventSerializer(obj.followed_events.filter(ues__status=1), many=True).data
 
     def get_events_going(self, obj):
         from events.serializers import EventSerializer
-        return [EventSerializer(x.event, context=self.context).data \
-                for x in obj.events_followed.filter(status=2)]
+        return EventSerializer(obj.followed_events.filter(ues__status=2), many=True).data

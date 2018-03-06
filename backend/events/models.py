@@ -17,9 +17,12 @@ class Event(models.Model):
     image_url = models.URLField(blank=True, null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    created_by = models.ForeignKey('users.UserProfile', null=True, blank=True, on_delete=models.SET_NULL)
+    created_by = models.ForeignKey('users.UserProfile', null=True, blank=True,
+                                   on_delete=models.SET_NULL, related_name='created_events')
     all_day = models.BooleanField(default=False)
     venues = models.ManyToManyField('locations.Location', related_name='events', blank=True)
+    followers = models.ManyToManyField('users.UserProfile', through='UserEventStatus',
+                                       related_name='followed_events', blank=True)
 
     def __str__(self):
         return self.name
@@ -42,8 +45,8 @@ class UserEventStatus(models.Model):
 
     # Cascading on delete is delibrate here, since the entry
     # makes no sense if the user or event gets deleted
-    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE, default=uuid4, related_name='events_followed')
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, default=uuid4, related_name='user_event_statuses')
+    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE, default=uuid4, related_name='ues')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, default=uuid4, related_name='ues')
 
     status = models.IntegerField(default=0)
 

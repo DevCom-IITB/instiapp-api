@@ -5,13 +5,11 @@ from events.models import Event
 class FollowersMethods:
     ' Helper methods for followers '
     def get_count(self, obj, s):
-        return obj.user_event_statuses.filter(status=s).count()
+        return obj.followers.filter(ues__status=s).count()
 
     def get_followers(self, obj, s):
         from users.serializers import UserProfileSerializer
-        # pylint: disable=maybe-no-member
-        return [UserProfileSerializer(x.user, context=self.context).data \
-                for x in obj.user_event_statuses.filter(status=s)]
+        return UserProfileSerializer(obj.followers.filter(ues__status=s), many=True).data
 
 class EventSerializer(serializers.ModelSerializer):
     '''
