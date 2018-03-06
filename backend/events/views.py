@@ -14,7 +14,8 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
     queryset = Event.objects.all()
     serializer_class = EventFullSerializer
 
-    def locations(self, request):
+    @classmethod
+    def locations(cls, request):
         """Endpoint to return event locations of all POSTed events."""
         try:
             [UUID(x, version=4) for x in request.data]
