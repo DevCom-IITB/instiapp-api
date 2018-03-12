@@ -66,8 +66,9 @@ class EventFullSerializer(serializers.ModelSerializer):
     get_going = lambda self, obj: FollowersMethods.get_followers(obj, 2)
 
     venues = LocationSerializer(many=True, read_only=True)
-    venues_id = serializers.PrimaryKeyRelatedField(
-        many=True, read_only=False, queryset=Location.objects.all(), source='venues')
+    venues_names = serializers.SlugRelatedField(
+        many=True, read_only=False, slug_field='name',
+        queryset=Location.objects.all(), source='venues')
 
     bodies = BodySerializerMin(many=True, read_only=True)
     bodies_id = serializers.PrimaryKeyRelatedField(
@@ -76,7 +77,7 @@ class EventFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('id', 'name', 'description', 'image_url', 'start_time',
-                  'end_time', 'all_day', 'venues', 'venues_id', 'bodies', 'bodies_id',
+                  'end_time', 'all_day', 'venues', 'venues_names', 'bodies', 'bodies_id',
                   'interested_count', 'going_count', 'interested', 'going')
 
 class UserEventStatusSerializer(serializers.ModelSerializer):
