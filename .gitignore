@@ -1,3 +1,4 @@
+backend/.vscode
 *.sqlite3
 IITBappenv
 # Byte-compiled / optimized / DLL files
