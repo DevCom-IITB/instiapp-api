@@ -2,6 +2,7 @@
 from uuid import UUID
 from rest_framework.response import Response
 from rest_framework import viewsets
+from events.serializers import EventSerializer
 from events.serializers import EventFullSerializer
 from events.serializers import EventLocationSerializer
 from events.serializers import UserEventStatusSerializer
@@ -24,6 +25,14 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
         locs = EventLocationSerializer(Event.objects.filter(pk__in=request.data), many=True)
         return Response(locs.data)
+
+    @classmethod
+    def list(cls, request): #pylint: disable=unused-argument
+        """Override list method"""
+        queryset = Event.objects.all()
+        serializer = EventSerializer(queryset, many=True)
+        return Response({'count':len(serializer.data), 'data':serializer.data})
+
 
 class UserEventStatusViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that allows user-event statuses to be viewed or edited"""
