@@ -18,7 +18,14 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         user_profile = get_object_or_404(self.queryset, pk=pk)
         event_list = []
         for body in user_profile.followed_bodies.all():
-            event_list.extend(body.events.all())
+            self.get_events_recursive(event_list, body)
 
         events = EventSerializer(event_list, many=True)
         return Response({'count':len(events.data), 'data':events.data})
+
+    @classmethod
+    def get_events_recursive(cls, events, body):
+        """Gets all events from a body recursively."""
+        for child_body_relation in body.children.all():
+            cls.get_events_recursive(events, child_body_relation.child)
+        events.extend(body.events.all())
