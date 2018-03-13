@@ -1,19 +1,18 @@
 """Views for users app."""
 from rest_framework import viewsets
-from users.serializers import UserProfileFullSerializer
-from events.serializers import EventSerializer
-from users.models import UserProfile
-from bodies.serializers import BodySerializer
-from bodies.models import Body
-from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+
+from events.serializers import EventSerializer
+from users.serializers import UserProfileFullSerializer
+from users.models import UserProfile
 
 class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that allows users to be viewed or edited."""
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileFullSerializer
 
-    def followed_bodies_events(self, request, pk=None):
+    def followed_bodies_events(self, request, pk=None):  # pylint: disable=C0103,W0613
         """Endpoint to return all events followed by a user."""
         user_profile = get_object_or_404(self.queryset, pk=pk)
         event_list = []
