@@ -26,6 +26,7 @@ class EventSerializer(serializers.ModelSerializer):
     """
 
     from locations.serializers import LocationSerializerMin
+    from bodies.serializers import BodySerializerMin
 
     interested_count = serializers.SerializerMethodField()
     get_interested_count = lambda self, obj: FollowersMethods.get_count(obj, 1)
@@ -34,6 +35,8 @@ class EventSerializer(serializers.ModelSerializer):
     get_going_count = lambda self, obj: FollowersMethods.get_count(obj, 2)
 
     venues = LocationSerializerMin(many=True, read_only=True)
+
+    bodies = BodySerializerMin(many=True, read_only=True)
 
     class Meta:
         model = Event
