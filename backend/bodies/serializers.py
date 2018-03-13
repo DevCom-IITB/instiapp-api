@@ -14,17 +14,6 @@ class BodySerializerMin(serializers.ModelSerializer):
         model = Body
         fields = ('id', 'name', 'description', 'image_url')
 
-class BodyFollowersSerializer(serializers.ModelSerializer):
-    """Serizlizer with list of followers of body."""
-
-    from users.serializers import UserProfileSerializer
-
-    followers = UserProfileSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Body
-        fields = ('id', 'followers')
-
 class BodySerializer(serializers.ModelSerializer):
     """Serializer for Body."""
 

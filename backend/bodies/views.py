@@ -1,6 +1,6 @@
 """Views for bodies app."""
 from rest_framework import viewsets
-from bodies.serializers import BodyFollowersSerializer
+from bodies.serializers_followers import BodyFollowersSerializer
 from bodies.serializers import BodySerializer
 from bodies.models import Body
 
