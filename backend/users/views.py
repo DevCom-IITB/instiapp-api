@@ -28,4 +28,4 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         """Gets all events from a body recursively."""
         for child_body_relation in body.children.all():
             cls.get_events_recursive(events, child_body_relation.child)
-        events.extend(body.events.all())
+        events.extend(x for x in body.events.all() if x not in events)
