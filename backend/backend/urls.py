@@ -19,6 +19,7 @@ from bodies.views import BodyViewSet, BodyFollowersViewSet
 from events.views import EventViewSet, UserEventStatusViewSet
 from locations.views import LocationViewSet
 from users.views import UserProfileViewSet
+from upload.views import UploadViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -63,5 +64,12 @@ urlpatterns = [
     )),
     path('api/users', UserProfileViewSet.as_view(
         {'get':'list', 'post':'create'}
+    )),
+
+    path('api/upload', UploadViewSet.as_view(
+        {'get':'list', 'post':'create'}
+    )),
+    path('api/upload/<pk>', UploadViewSet.as_view(
+        {'get':'retrieve', 'delete':'destroy'}
     )),
 ]

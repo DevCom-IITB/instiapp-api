@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'events.apps.EventsConfig',
     'locations.apps.LocationsConfig',
     'users.apps.UsersConfig',
-    'bodies.apps.BodiesConfig'
+    'bodies.apps.BodiesConfig',
+    'upload.apps.UploadConfig',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,6 @@ REST_FRAMEWORK = {
         #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+MEDIA_ROOT = './upload/static/upload'
+MEDIA_URL = 'http://localhost:8000/static/upload/'
