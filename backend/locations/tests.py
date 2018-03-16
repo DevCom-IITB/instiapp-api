@@ -5,6 +5,9 @@ from locations.models import Location
 
 class LocationTestCase(APITestCase):
     """Check if we can create locations."""
+
+    test_location_id = None
+
     def setUp(self):
         url = '/api/locations'
         data = {
@@ -15,10 +18,11 @@ class LocationTestCase(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
         response.close()
+        self.test_location_id = response.data['id']
 
     def test_event_link(self):
         """Test if events can be linked."""
-        test_location = Location.objects.get(name='TestLocation1')
+        test_location = Location.objects.get(id=self.test_location_id)
 
         url = '/api/events'
         data = {
@@ -32,5 +36,5 @@ class LocationTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         response.close()
 
-        test_event = Event.objects.get(name='TestEvent1')
+        test_event = Event.objects.get(id=response.data['id'])
         self.assertEqual(test_event.venues.get(id=test_location.id), test_location)
