@@ -51,5 +51,5 @@ class BodyTestCase(APITestCase):
 
         test_event = Event.objects.get(name='TestEvent1')
         self.assertEqual(test_event.name, 'TestEvent1')
-        self.assertEqual(test_event.bodies.all()[0].name, 'TestBody1')
-        self.assertEqual(test_event.bodies.all()[1].name, 'TestBody2')
+        self.assertEqual(test_event.bodies.get(id=test_body.id), test_body)
+        self.assertEqual(test_event.bodies.get(id=test_body2.id), test_body2)
