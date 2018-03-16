@@ -29,7 +29,7 @@ class LocationTestCase(APITestCase):
             "name": "TestEvent1",
             "start_time": "2017-03-04T18:48:47Z",
             "end_time": "2018-03-04T18:48:47Z",
-            "venues_names": [test_location.name],
+            "venue_names": [test_location.name],
             "bodies_id": []
         }
         response = self.client.post(url, data, format='json')
