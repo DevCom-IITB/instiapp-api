@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from users.models import UserProfile
 import requests
 
 class LoginViewSet(viewsets.ViewSet): 
@@ -30,9 +31,15 @@ class LoginViewSet(viewsets.ViewSet):
         except User.DoesNotExist:
             user = User.objects.create_user(username)
 
+        try:
+            user_profile = UserProfile.objects.get(user=user)
+        except UserProfile.DoesNotExist:
+            user_profile = UserProfile.objects.create(user=user, name='iitbuser')
+
         return Response({
             'response': response.content,
             'content': profile_response.content,
             'at':response_json['access_token'],
-            'user': user.username
+            'user': user.username,
+            'user_profile': user_profile.name
             })
