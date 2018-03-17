@@ -8,14 +8,20 @@ from rest_framework.response import Response
 from users.models import UserProfile
 from users.serializers import UserProfileFullSerializer
 
+# pylint: disable=C0301
+
+# Note: These are dummies
+HOST = 'http://localhost:8000/'
+CLIENT_ID = 'vR1pU7wXWyve1rUkg0fMS6StL1Kr6paoSmRIiLXJ'
+CLIENT_ID_SECRET_BASE64 = 'dlIxcFU3d1hXeXZlMXJVa2cwZk1TNlN0TDFLcjZwYW9TbVJJaUxYSjpaR2J6cHR2dXlVZmh1d3NVWHZqdXJRSEhjMU51WXFmbDJrSjRmSm90YWhyc2tuYklxa2o1NUNKdDc0UktQMllwaXlabHpXaGVZWXNiNGpKVG1RMFVEZUU4M1B6bVViNzRaUjJCakhhYkVqWVJPVEwxSnIxY1ZwTWdZTzFiOWpPWQ=='
+
 class LoginViewSet(viewsets.ViewSet):
     """Viewset to handle logging in and out, and getting the current user's profile."""
 
     @classmethod
     def login_page(cls, request):   # pylint: disable=W0613
         """Temporary method to redirect to login page."""
-        # pylint: disable=C0301
-        return redirect('https://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id=vR1pU7wXWyve1rUkg0fMS6StL1Kr6paoSmRIiLXJ&response_type=code&scope=basic profile picture sex ldap phone insti_address program secondary_emails&redirect_uri=http://localhost:8000/api/login')
+        return redirect('https://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id=' + CLIENT_ID + '&response_type=code&scope=basic profile picture sex ldap phone insti_address program secondary_emails&redirect_uri=' + HOST + 'api/login')
 
     @classmethod
     def login(cls, request):
@@ -27,15 +33,14 @@ class LoginViewSet(viewsets.ViewSet):
             return HttpResponse(status=400, content="{?code} is required")
 
         # Construt post data to get token
-        # pylint: disable=C0301
-        post_data = 'code=' + auth_code + '&redirect_uri=http://localhost:8000/api/login&grant_type=authorization_code'
+        post_data = 'code=' + auth_code + '&redirect_uri=' + HOST + 'api/login&grant_type=authorization_code'
 
         # Get our access token
         response = requests.post(
             'https://gymkhana.iitb.ac.in/sso/oauth/token/',
             data=post_data,
             headers={
-                "Authorization": "Basic dlIxcFU3d1hXeXZlMXJVa2cwZk1TNlN0TDFLcjZwYW9TbVJJaUxYSjpaR2J6cHR2dXlVZmh1d3NVWHZqdXJRSEhjMU51WXFmbDJrSjRmSm90YWhyc2tuYklxa2o1NUNKdDc0UktQMllwaXlabHpXaGVZWXNiNGpKVG1RMFVEZUU4M1B6bVViNzRaUjJCakhhYkVqWVJPVEwxSnIxY1ZwTWdZTzFiOWpPWQ==",
+                "Authorization": "Basic " + CLIENT_ID_SECRET_BASE64,
                 "Content-Type": "application/x-www-form-urlencoded"
             })
         response_json = response.json()
