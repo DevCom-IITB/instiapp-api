@@ -15,11 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from bodies.views import BodyViewSet, BodyFollowersViewSet
-from events.views import EventViewSet, UserEventStatusViewSet
+
+from bodies.views import BodyViewSet
+from bodies.views import BodyFollowersViewSet
+from events.views import EventViewSet
+from events.views import UserEventStatusViewSet
 from locations.views import LocationViewSet
-from users.views import UserProfileViewSet
 from upload.views import UploadViewSet
+from users.views import UserProfileViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
