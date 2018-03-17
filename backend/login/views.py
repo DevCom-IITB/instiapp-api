@@ -20,13 +20,13 @@ CLIENT_ID_SECRET_BASE64 = 'dlIxcFU3d1hXeXZlMXJVa2cwZk1TNlN0TDFLcjZwYW9TbVJJaUxYS
 class LoginViewSet(viewsets.ViewSet):
     """Viewset to handle logging in and out, and getting the current user's profile."""
 
-    @classmethod
-    def login_page(cls, request):   # pylint: disable=W0613
+    @staticmethod
+    def login_page(request):   # pylint: disable=W0613
         """Temporary method to redirect to login page."""
         return redirect('https://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id=' + CLIENT_ID + '&response_type=code&scope=basic profile picture sex ldap phone insti_address program secondary_emails&redirect_uri=' + HOST + 'api/login')
 
-    @classmethod
-    def login(cls, request):
+    @staticmethod
+    def login(request):
         """Logs in the user using the {?code} query parameter"""
 
         # Check if we have the auth code
@@ -120,8 +120,8 @@ class LoginViewSet(viewsets.ViewSet):
             'profile': UserProfileFullSerializer(user_profile).data
         })
 
-    @classmethod
-    def get_user(cls, request):
+    @staticmethod
+    def get_user(request):
         """Get the session and user's profile."""
 
         # Check if the user is authenticated
@@ -143,8 +143,8 @@ class LoginViewSet(viewsets.ViewSet):
             'profile': profile_serialized.data
         })
 
-    @classmethod
-    def logout(cls, request):
+    @staticmethod
+    def logout(request):
         """Log out the user."""
 
         # Delete the session key if we can
