@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from users.models import UserProfile
+from users.serializers import UserProfileFullSerializer
 
 class LoginViewSet(viewsets.ViewSet): 
     def login(self, request):
@@ -53,13 +54,15 @@ class LoginViewSet(viewsets.ViewSet):
 
         try:
             user_profile = UserProfile.objects.get(user__username=username)
+            profile_serialized = UserProfileFullSerializer(user_profile)
         except UserProfile.DoesNotExist:
             return HttpResponse(status=500, content="UserProfile doesn't exist")
 
         return Response({
             'sessionid': request.session.session_key,
             'user': username,
-            'profile_id': user_profile.id
+            'profile_id': user_profile.id,
+            'profile': profile_serialized.data
         })
 
     def logout(self, request):
