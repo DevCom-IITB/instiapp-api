@@ -108,6 +108,7 @@ class LoginViewSet(viewsets.ViewSet):
 
         # Log in the user
         request.session['username'] = username
+        request.session.save()
 
         # Return the session id
         return Response({
