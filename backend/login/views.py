@@ -3,6 +3,8 @@ import requests
 from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.contrib.auth import login
+from django.contrib.auth import logout
 from rest_framework import viewsets
 from rest_framework.response import Response
 from users.models import UserProfile
@@ -107,7 +109,7 @@ class LoginViewSet(viewsets.ViewSet):
         user_profile.save()
 
         # Log in the user
-        request.session['username'] = username
+        login(request, user)
         request.session.save()
 
         # Return the session id
@@ -122,15 +124,13 @@ class LoginViewSet(viewsets.ViewSet):
     def get_user(cls, request):
         """Get the session and user's profile."""
 
-        # Check if the user is logged in
-        if 'username' in request.session:
-            username = request.session['username']
-        else:
+        # Check if the user is authenticated
+        if not request.user.is_authenticated:
             return HttpResponse(status=401, content="Not logged in")
 
         # Check if the user has a profile
         try:
-            user_profile = UserProfile.objects.get(user__username=username)
+            user_profile = UserProfile.objects.get(user=request.user)
             profile_serialized = UserProfileFullSerializer(user_profile)
         except UserProfile.DoesNotExist:
             return HttpResponse(status=500, content="UserProfile doesn't exist")
@@ -138,7 +138,7 @@ class LoginViewSet(viewsets.ViewSet):
         # Return the details and nested profile
         return Response({
             'sessionid': request.session.session_key,
-            'user': username,
+            'user': request.user.username,
             'profile_id': user_profile.id,
             'profile': profile_serialized.data
         })
@@ -149,7 +149,7 @@ class LoginViewSet(viewsets.ViewSet):
 
         # Delete the session key if we can
         try:
-            del request.session['username']
+            logout(request)
         except KeyError:
             pass
         return HttpResponse('Logged out successfully')
