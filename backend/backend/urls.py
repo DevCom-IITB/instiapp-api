@@ -80,4 +80,5 @@ urlpatterns = [
     path('api/login', LoginViewSet.as_view({'get':'login'})),
     path('api/login/get-user', LoginViewSet.as_view({'get':'get_user'})),
     path('api/logout', LoginViewSet.as_view({'get':'logout'})),
+    path('api/login-page', LoginViewSet.as_view({'get':'login_page'})),
 ]

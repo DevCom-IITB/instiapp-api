@@ -1,14 +1,21 @@
 """Login Viewset."""
 import requests
-from rest_framework import viewsets
-from rest_framework.response import Response
+from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from rest_framework import viewsets
+from rest_framework.response import Response
 from users.models import UserProfile
 from users.serializers import UserProfileFullSerializer
 
 class LoginViewSet(viewsets.ViewSet):
     """Viewset to handle logging in and out, and getting the current user's profile."""
+
+    @classmethod
+    def login_page(cls, request):   # pylint: disable=W0613
+        """Temporary method to redirect to login page."""
+        # pylint: disable=C0301
+        return redirect('https://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id=vR1pU7wXWyve1rUkg0fMS6StL1Kr6paoSmRIiLXJ&response_type=code&scope=basic profile picture sex ldap phone insti_address program secondary_emails&redirect_uri=http://localhost:8000/api/login')
 
     @classmethod
     def login(cls, request):
@@ -21,7 +28,7 @@ class LoginViewSet(viewsets.ViewSet):
 
         # Construt post data to get token
         # pylint: disable=C0301
-        post_data = 'code=' + auth_code + '&redirect_uri=http://localhost:8000/go&grant_type=authorization_code'
+        post_data = 'code=' + auth_code + '&redirect_uri=http://localhost:8000/api/login&grant_type=authorization_code'
 
         # Get our access token
         response = requests.post(
@@ -101,7 +108,8 @@ class LoginViewSet(viewsets.ViewSet):
         return Response({
             'sessionid': request.session.session_key,
             'user': user.username,
-            'profile_id': user_profile.id
+            'profile_id': user_profile.id,
+            'profile': UserProfileFullSerializer(user_profile).data
         })
 
     @classmethod
