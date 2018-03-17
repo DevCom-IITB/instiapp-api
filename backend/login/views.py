@@ -42,7 +42,7 @@ class LoginViewSet(viewsets.ViewSet):
             headers={
                 "Authorization": "Basic " + CLIENT_ID_SECRET_BASE64,
                 "Content-Type": "application/x-www-form-urlencoded"
-            })
+            }, verify=False)
         response_json = response.json()
 
         # Check that we have the access token
@@ -57,7 +57,7 @@ class LoginViewSet(viewsets.ViewSet):
             'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number',
             headers={
                 "Authorization": "Bearer " + response_json['access_token'],
-            })
+            }, verify=False)
         profile_json = profile_response.json()
 
         # Print the profile for debugging
