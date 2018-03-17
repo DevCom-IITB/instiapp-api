@@ -1,12 +1,13 @@
+"""Login Viewset"""
+import requests
 from rest_framework import viewsets
 from rest_framework.response import Response
-from django.shortcuts import render
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 from users.models import UserProfile
-import requests
 
 class LoginViewSet(viewsets.ViewSet): 
-    def go(self, request):
+    def login(self, request):
         post_data = 'code=' + request.GET.get('code') + '&redirect_uri=http://localhost:8000/go&grant_type=authorization_code'
         response = requests.post(
             'https://gymkhana.iitb.ac.in/sso/oauth/token/',
@@ -36,10 +37,34 @@ class LoginViewSet(viewsets.ViewSet):
         except UserProfile.DoesNotExist:
             user_profile = UserProfile.objects.create(user=user, name='iitbuser')
 
+        request.session['username'] = username
+
         return Response({
-            'response': response.content,
-            'content': profile_response.content,
-            'at':response_json['access_token'],
+            'sessionid': request.session.session_key,
             'user': user.username,
-            'user_profile': user_profile.name
-            })
+            'profile_id': user_profile.id
+        })
+
+    def get_user(self, request):
+        if 'username' in request.session:
+            username = request.session['username']
+        else:
+            return HttpResponse(status=401, content="Not logged in")
+
+        try:
+            user_profile = UserProfile.objects.get(user__username=username)
+        except UserProfile.DoesNotExist:
+            return HttpResponse(status=500, content="UserProfile doesn't exist")
+
+        return Response({
+            'sessionid': request.session.session_key,
+            'user': username,
+            'profile_id': user_profile.id
+        })
+
+    def logout(self, request):
+        try:
+            del request.session['username']
+        except KeyError:
+            pass
+        return HttpResponse('Logged out successfully')

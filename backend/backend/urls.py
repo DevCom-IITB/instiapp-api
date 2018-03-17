@@ -77,7 +77,7 @@ urlpatterns = [
         {'get':'retrieve', 'delete':'destroy'}
     )),
 
-    path('api/login', LoginViewSet.as_view(
-        {'get':'go'}
-    )),
+    path('api/login', LoginViewSet.as_view({'get':'login'})),
+    path('api/login/get-user', LoginViewSet.as_view({'get':'get_user'})),
+    path('api/logout', LoginViewSet.as_view({'get':'logout'})),
 ]
