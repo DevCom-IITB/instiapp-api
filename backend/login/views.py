@@ -21,5 +21,18 @@ class LoginViewSet(viewsets.ViewSet):
             headers={
                 "Authorization": "Bearer " + response_json['access_token'],
             })
+        profile_json = profile_response.json()
 
-        return Response({'response': response.content, 'content': profile_response.content, 'at':response_json['access_token']})
+        username = str(profile_json['id'])
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            user = User.objects.create_user(username)
+
+        return Response({
+            'response': response.content,
+            'content': profile_response.content,
+            'at':response_json['access_token'],
+            'user': user.username
+            })
