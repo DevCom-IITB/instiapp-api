@@ -98,6 +98,11 @@ class LoginViewSet(viewsets.ViewSet):
         # Fill in some special parameters
         if 'first_name' in profile_json and 'last_name' in profile_json:
             user_profile.name = profile_json['first_name'] + ' ' + profile_json['last_name']
+            user.first_name = profile_json['first_name']
+            user.last_name = profile_json['last_name']
+
+        if 'email' in profile_json:
+            user.email = profile_json['email']
 
         if 'contacts' in profile_json and profile_json['contacts']:
             user_profile.contact_no = profile_json['contacts'][0]['number']
@@ -106,6 +111,7 @@ class LoginViewSet(viewsets.ViewSet):
             user_profile.profile_pic = 'https://gymkhana.iitb.ac.in' + profile_json['profile_picture']
 
         # Save the profile
+        user.save()
         user_profile.save()
 
         # Log in the user
