@@ -9,7 +9,7 @@ from events.serializers import UserEventStatusSerializer
 from events.models import Event
 from events.models import UserEventStatus
 from roles.helpers import user_has_privilege
-from roles.helpers import forbidden_no_privileges
+from roles.helpers import forbidden_no_privileges, diff_set
 
 class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that allows events to be viewed or edited"""
@@ -41,6 +41,32 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
             if not user_has_privilege(request.user.profile, bodyid, 'AddE'):
                 return forbidden_no_privileges()
         return super().create(request)
+
+    def update(self, request, pk):
+        """Updates an existing event if the user has privileges."""
+        # Get difference in bodies
+        event = Event.objects.get(id=request.data['id'])
+        old_bodies_id = [str(x.id) for x in event.bodies.all()]
+        new_bodies_id = [str(x) for x in request.data['bodies_id']]
+        added_bodies = diff_set(new_bodies_id, old_bodies_id)
+        removed_bodies = diff_set(old_bodies_id, new_bodies_id)
+
+        # Check if user can add events for new bodies
+        for bodyid in added_bodies:
+            if not user_has_privilege(request.user.profile, bodyid, 'AddE'):
+                return forbidden_no_privileges()
+
+        # Check if user can remove events for old bodies
+        for bodyid in removed_bodies:
+            if not user_has_privilege(request.user.profile, bodyid, 'DelE'):
+                return forbidden_no_privileges()
+
+        # Check if the user can update event for new bodies
+        for bodyid in new_bodies_id:
+            if not user_has_privilege(request.user.profile, bodyid, 'UpdE'):
+                return forbidden_no_privileges()
+
+        return super().update(request, pk)
 
 
 class UserEventStatusViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors

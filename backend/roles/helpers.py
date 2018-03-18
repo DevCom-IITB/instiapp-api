@@ -14,3 +14,8 @@ def user_has_privilege(profile, bodyid, privilege):
         if not privilege in role.permissions:
             return False
     return True
+
+def diff_set(first, second):
+    """Difference between two lists."""
+    second = set(second)
+    return [item for item in first if item not in second]
