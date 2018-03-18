@@ -1,7 +1,6 @@
 """Login Viewset."""
 import requests
 from django.shortcuts import redirect
-from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.contrib.auth import logout
@@ -33,7 +32,7 @@ class LoginViewSet(viewsets.ViewSet):
         # Check if we have the auth code
         auth_code = request.GET.get('code')
         if auth_code is None:
-            return HttpResponse(status=400, content="{?code} is required")
+            return Response({"error" : "{?code} is required"}, status=400)
 
         # Construt post data to get token
         redir = request.GET.get('redir')
@@ -55,9 +54,7 @@ class LoginViewSet(viewsets.ViewSet):
         # Check that we have the access token
         if not 'access_token' in response_json:
             print(response.content)
-            if 'error' in response_json:
-                return HttpResponse(status=400, content=response_json['error'])
-            return HttpResponse(status=400, content='Getting auth token failed')
+            return Response(response_json, status=400)
 
         # Get the user's profile
         profile_response = requests.get(
@@ -72,9 +69,7 @@ class LoginViewSet(viewsets.ViewSet):
 
         # Check if we got at least the user's SSO id
         if not 'id' in profile_json:
-            if 'error' in profile_response:
-                return HttpResponse(status=400, content=profile_response['error'])
-            return HttpResponse(status=400, content='Getting profile failed')
+            return Response(profile_response, status=400)
 
         username = str(profile_json['id'])
 
@@ -111,14 +106,14 @@ class LoginViewSet(viewsets.ViewSet):
 
         # Check if the user is authenticated
         if not request.user.is_authenticated:
-            return HttpResponse(status=401, content="Not logged in")
+            return Response({"error":"not logged in"}, status=401)
 
         # Check if the user has a profile
         try:
             user_profile = UserProfile.objects.get(user=request.user)
             profile_serialized = UserProfileFullSerializer(user_profile)
         except UserProfile.DoesNotExist:
-            return HttpResponse(status=500, content="UserProfile doesn't exist")
+            return Response({'message': "UserProfile doesn't exist"}, status=500)
 
         # Return the details and nested profile
         return Response({
@@ -137,4 +132,4 @@ class LoginViewSet(viewsets.ViewSet):
             logout(request)
         except KeyError:
             pass
-        return HttpResponse('Logged out successfully')
+        return Response({'message': 'logged out'})
