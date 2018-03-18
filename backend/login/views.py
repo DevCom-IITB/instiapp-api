@@ -36,7 +36,11 @@ class LoginViewSet(viewsets.ViewSet):
             return HttpResponse(status=400, content="{?code} is required")
 
         # Construt post data to get token
-        post_data = 'code=' + auth_code + '&redirect_uri=' + HOST + 'api/login&grant_type=authorization_code'
+        redir = request.GET.get('redir')
+        if redir is None:
+            post_data = 'code=' + auth_code + '&redirect_uri=' + HOST + 'api/login&grant_type=authorization_code'
+        else:
+            post_data = 'code=' + auth_code + '&redirect_uri=' + redir + '&grant_type=authorization_code'
 
         # Get our access token
         response = requests.post(
