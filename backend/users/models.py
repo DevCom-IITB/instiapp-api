@@ -23,6 +23,8 @@ class UserProfile(models.Model):
     year = models.IntegerField(default=1, null=True, blank=True)
     about = models.TextField(blank=True, null=True)
 
+    roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
+
     class Meta:
         verbose_name = "Profile"
         verbose_name_plural = "Profiles"
