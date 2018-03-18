@@ -45,7 +45,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
     def update(self, request, pk):
         """Updates an existing event if the user has privileges."""
         # Get difference in bodies
-        event = Event.objects.get(id=request.data['id'])
+        event = Event.objects.get(id=pk)
         old_bodies_id = [str(x.id) for x in event.bodies.all()]
         new_bodies_id = [str(x) for x in request.data['bodies_id']]
         added_bodies = diff_set(new_bodies_id, old_bodies_id)
@@ -68,6 +68,13 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
         return super().update(request, pk)
 
+    def destroy(self, request, pk):
+        """Delete an existing event if the user has privileges."""
+        event = Event.objects.get(id=pk)
+        for body in event.bodies.all():
+            if not user_has_privilege(request.user.profile, str(body.id), 'DelE'):
+                return forbidden_no_privileges()
+        return super().destroy(request, pk)
 
 class UserEventStatusViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that allows user-event statuses to be viewed or edited"""
