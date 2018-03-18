@@ -8,6 +8,8 @@ from events.serializers import EventLocationSerializer
 from events.serializers import UserEventStatusSerializer
 from events.models import Event
 from events.models import UserEventStatus
+from roles.helpers import user_has_privilege
+from roles.helpers import forbidden_no_privileges
 
 class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that allows events to be viewed or edited"""
@@ -32,6 +34,13 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         queryset = Event.objects.all()
         serializer = EventSerializer(queryset, many=True)
         return Response({'count':len(serializer.data), 'data':serializer.data})
+
+    def create(self, request):
+        """Create a new event if the user has privileges."""
+        for bodyid in request.data['bodies_id']:
+            if not user_has_privilege(request.user.profile, bodyid, 'AddE'):
+                return forbidden_no_privileges()
+        return super().create(request)
 
 
 class UserEventStatusViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
