@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'bodies.apps.BodiesConfig',
     'upload.apps.UploadConfig',
+    'roles.apps.RolesConfig',
 ]
 
 MIDDLEWARE = [
