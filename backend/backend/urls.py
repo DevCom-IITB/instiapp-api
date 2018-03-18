@@ -23,6 +23,7 @@ from events.views import UserEventStatusViewSet
 from locations.views import LocationViewSet
 from upload.views import UploadViewSet
 from users.views import UserProfileViewSet
+from login.views import LoginViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -75,4 +76,9 @@ urlpatterns = [
     path('api/upload/<pk>', UploadViewSet.as_view(
         {'get':'retrieve', 'delete':'destroy'}
     )),
+
+    path('api/login', LoginViewSet.as_view({'get':'login'})),
+    path('api/login/get-user', LoginViewSet.as_view({'get':'get_user'})),
+    path('api/logout', LoginViewSet.as_view({'get':'logout'})),
+    path('api/login-page', LoginViewSet.as_view({'get':'login_page'})),
 ]
