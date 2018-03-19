@@ -29,7 +29,7 @@ class BodyRole(models.Model):
         return self.name
 
 
-INSTUTUTE_PERMISSION_CHOICES = (
+INSTITUTE_PERMISSION_CHOICES = (
     ('AddB', 'Add Body'),
     ('DelB', 'Delete Body'),
     ('BodyChild', 'Modify Body-Child Relations'),
@@ -43,7 +43,7 @@ class InstituteRole(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=50)
-    permissions = MultiSelectField(choices=INSTUTUTE_PERMISSION_CHOICES)
+    permissions = MultiSelectField(choices=INSTITUTE_PERMISSION_CHOICES)
 
     class Meta:
         verbose_name = "Institute Role"
