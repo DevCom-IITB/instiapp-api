@@ -27,3 +27,10 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
         if not user_has_privilege(request.user.profile, str(body.id), 'Role'):
             return forbidden_no_privileges()
         return super().update(request, pk)
+
+    def destroy(self, request, pk):
+        """Deletes an existing body role if the user has privileges."""
+        bodyid = str(BodyRole.objects.get(id=pk).body.id)
+        if not user_has_privilege(request.user.profile, bodyid, 'Role'):
+            return forbidden_no_privileges()
+        return super().destroy(request, pk)
