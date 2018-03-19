@@ -62,13 +62,13 @@ urlpatterns = [
     ), name='location-detail'),
 
     path('api/users/<pk>', UserProfileViewSet.as_view(
-        {'get':'retrieve', 'put':'update', 'delete':'destroy'}
+        {'get':'retrieve'}
     ), name='userprofile-detail'),
     path('api/users/<pk>/followed_bodies_events', UserProfileViewSet.as_view(
         {'get':'followed_bodies_events'}
     )),
     path('api/users', UserProfileViewSet.as_view(
-        {'get':'list', 'post':'create'}
+        {'get':'list'}
     )),
 
     path('api/upload', UploadViewSet.as_view(
