@@ -26,3 +26,19 @@ def diff_set(first, second):
     """Difference between two lists."""
     second = set(second)
     return [item for item in first if item not in second]
+
+def login_required_ajax(f):
+    """
+    Just make sure the user is authenticated to access a certain ajax view
+
+    Otherwise return a HttpResponse 401 - authentication required
+    instead of the 302 redirect of the original Django decorator
+    """
+    def wrapper(*args, **kw):
+        """Wrapper after checking if authenticated."""
+        if args[1].user.is_authenticated:
+            return f(*args, **kw)
+        else:
+            return Response({'error': 'unauthenticated'}, status=401)
+
+    return wrapper
