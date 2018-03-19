@@ -83,6 +83,12 @@ class EventFullSerializer(serializers.ModelSerializer):
                   'end_time', 'all_day', 'venues', 'venue_names', 'bodies', 'bodies_id',
                   'interested_count', 'going_count', 'interested', 'going')
 
+    def create(self, validated_data):
+        result = super().create(validated_data)
+        result.created_by = self.context['request'].user.profile
+        result.save()
+        return result
+
 class UserEventStatusSerializer(serializers.ModelSerializer):
     """Serializer for UserEventStatus."""
 
