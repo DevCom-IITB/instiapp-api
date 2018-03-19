@@ -55,3 +55,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         ues.status = status
         ues.save()
         return Response(status=204)
+
+    def get_my_events(self, request):
+        """Gets events created by current user."""
+        events = Event.objects.filter(created_by=request.user.profile)
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data)
