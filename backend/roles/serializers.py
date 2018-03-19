@@ -10,7 +10,7 @@ class RoleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BodyRole
-        fields = ('id', 'name', 'inheritable', 'body', 'permissions')
+        fields = ('id', 'name', 'inheritable', 'body', 'permissions', 'users')
 
 class InstituteRoleSerializer(serializers.ModelSerializer):
 
