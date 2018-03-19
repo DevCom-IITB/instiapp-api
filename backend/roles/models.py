@@ -35,6 +35,7 @@ INSTITUTE_PERMISSION_CHOICES = (
     ('BodyChild', 'Modify Body-Child Relations'),
     ('Location', 'Full control over locations'),
     ('Role', 'Modify Institute Roles'),
+    ('RoleB', 'Modify roles for any body'),
 )
 
 class InstituteRole(models.Model):
