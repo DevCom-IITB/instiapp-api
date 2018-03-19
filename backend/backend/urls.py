@@ -86,4 +86,7 @@ urlpatterns = [
     path('api/roles', BodyRoleViewSet.as_view(
         {'get':'list', 'post':'create'}
     )),
+    path('api/roles/<pk>', BodyRoleViewSet.as_view(
+        {'get':'retrieve', 'put':'update', 'delete':'destroy'}
+    )),
 ]
