@@ -24,6 +24,8 @@ class UserProfile(models.Model):
     about = models.TextField(blank=True, null=True)
 
     roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
+    institute_roles = models.ManyToManyField(
+        'roles.InstituteRole', related_name='users', blank=True)
 
     class Meta:
         verbose_name = "Profile"
