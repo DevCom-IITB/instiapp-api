@@ -11,8 +11,16 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
     queryset = BodyRole.objects.all()
     serializer_class = RoleSerializer
 
+    def create(self, request):
+        """Creates a body role if the user has privileges."""
+        if not request.data['body']:
+            return Response({"body": "body is required"}, status=400)
+        if not user_has_privilege(request.user.profile, request.data['body'], 'Role'):
+            return forbidden_no_privileges()
+        return super().create(request)
+
     def update(self, request, pk):
-        """Updates an existing body if the user has privileges."""
+        """Updates an existing body role if the user has privileges."""
         body = BodyRole.objects.get(id=pk).body
         if request.data['body'] != str(body.id):
             return Response({'error': 'body is immutable'}, status=400)
