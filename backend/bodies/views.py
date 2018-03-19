@@ -33,6 +33,12 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
             return forbidden_no_privileges()
         return super().update(request, pk)
 
+    def destroy(self, request, pk):
+        """Deletes an existing body if the user has privileges."""
+        if not user_has_insti_privilege(request.user.profile, 'DelB'):
+            return forbidden_no_privileges()
+        return super().destroy(request, pk)
+
 class BodyFollowersViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that lists followers of bodies."""
     queryset = Body.objects.all()
