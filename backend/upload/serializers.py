@@ -11,3 +11,9 @@ class UploadedImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = UploadedImage
         fields = ('id', 'picture')
+
+    def create(self, validated_data):
+        result = super().create(validated_data)
+        result.uploaded_by = self.context['request'].user.profile
+        result.save()
+        return result

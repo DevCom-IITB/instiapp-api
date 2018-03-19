@@ -9,6 +9,9 @@ class UploadViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancesto
     queryset = UploadedImage.objects.all()
     serializer_class = UploadedImageSerializer
 
+    def get_serializer_context(self):
+        return {'request': self.request}
+
     @login_required_ajax
     def create(self, request):
         """Upload an image."""
