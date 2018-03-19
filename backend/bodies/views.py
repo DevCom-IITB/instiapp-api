@@ -6,7 +6,6 @@ from bodies.serializers import BodySerializer
 from bodies.serializers import BodySerializerMin
 from bodies.models import Body
 from roles.helpers import user_has_privilege
-from roles.helpers import user_has_insti_privilege
 from roles.helpers import forbidden_no_privileges
 from roles.helpers import login_required_ajax
 from roles.helpers import insti_permission_required
