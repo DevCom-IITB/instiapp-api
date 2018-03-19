@@ -6,6 +6,7 @@ from bodies.serializers import BodySerializer
 from bodies.serializers import BodySerializerMin
 from bodies.models import Body
 from roles.helpers import user_has_privilege
+from roles.helpers import user_has_insti_privilege
 from roles.helpers import forbidden_no_privileges
 
 class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
@@ -19,6 +20,12 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
         queryset = Body.objects.all()
         serializer = BodySerializerMin(queryset, many=True)
         return Response(serializer.data)
+
+    def create(self, request):
+        """Creates body if the user has institute privileges."""
+        if not user_has_insti_privilege(request.user.profile, 'AddB'):
+            return forbidden_no_privileges()
+        return super().create(request)
 
     def update(self, request, pk):
         """Updates an existing body if the user has privileges."""
