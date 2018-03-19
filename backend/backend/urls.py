@@ -84,6 +84,7 @@ urlpatterns = [
     path('api/login-page', LoginViewSet.as_view({'get':'login_page'})),
 
     path('api/user-me', UserProfileViewSet.as_view({'get':'retrieve_me', 'put':'update_me'})),
+    path('api/user-me/ues/<event_pk>/<status>', UserProfileViewSet.as_view({'get':'set_ues_me'})),
 
     path('api/roles', BodyRoleViewSet.as_view(
         {'get':'list', 'post':'create'}

@@ -3,6 +3,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
+from events.models import UserEventStatus
+from events.models import Event
 from events.serializers import EventSerializer
 from users.serializers import UserProfileFullSerializer
 from users.models import UserProfile
@@ -40,3 +42,16 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
             return Response({'error': 'validation failed'})
         serializer.save()
         return request.user.profile
+
+    def set_ues_me(self, request, event_pk, status):
+        """Creates or updates a UserEventStatus for the current user."""
+        if not request.user.profile.followed_events.filter(id=event_pk).exists():
+            get_event = Event.objects.get(id=event_pk)
+            UserEventStatus.objects.create(
+                event=get_event, user=request.user.profile, status=status)
+            return Response(status=204)
+
+        ues = UserEventStatus.objects.get(event__id=event_pk, user=request.user.profile)
+        ues.status = status
+        ues.save()
+        return Response(status=204)
