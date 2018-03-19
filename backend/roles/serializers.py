@@ -17,5 +17,5 @@ class InstituteRoleSerializer(serializers.ModelSerializer):
     permissions = serializers.MultipleChoiceField(choices=INSTITUTE_PERMISSION_CHOICES)
 
     class Meta:
-        model = BodyRole
+        model = InstituteRole
         fields = ('id', 'name', 'permissions')
