@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from users.models import UserProfile
 from roles.serializers import RoleSerializer
+from roles.serializers import InstituteRoleSerializer
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for UserProfile."""
@@ -27,12 +28,14 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         many=True, read_only=False, queryset=Body.objects.all(), source='followed_bodies')
 
     roles = RoleSerializer(many=True, read_only=True)
+    institute_roles = InstituteRoleSerializer(many=True, read_only=True)
 
     class Meta:
         model = UserProfile
         fields = ('id', 'name', 'profile_pic', 'events_interested',
                   'events_going', 'email', 'year', 'roll_no', 'contact_no',
-                  'about', 'followed_bodies', 'followed_bodies_id', 'roles')
+                  'about', 'followed_bodies', 'followed_bodies_id', 'roles',
+                  'institute_roles')
 
     @staticmethod
     def get_events(obj, status):
