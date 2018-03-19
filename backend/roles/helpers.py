@@ -42,3 +42,15 @@ def login_required_ajax(f):
             return Response({'error': 'unauthenticated'}, status=401)
 
     return wrapper
+
+def insti_permission_required(permission):
+    """Check for institute permission."""
+    def real_decorator(f):
+        @login_required_ajax
+        def wrapper(*args, **kw):
+            if user_has_insti_privilege(args[1].user.profile, permission):
+                return f(*args, **kw)
+            else:
+                return forbidden_no_privileges()
+        return wrapper
+    return real_decorator
