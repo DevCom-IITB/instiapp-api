@@ -8,6 +8,7 @@ from events.models import Event
 from events.serializers import EventSerializer
 from users.serializers import UserProfileFullSerializer
 from users.models import UserProfile
+from roles.helpers import login_required_ajax
 
 class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that allows users to be viewed or edited."""
@@ -31,10 +32,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
             cls.get_events_recursive(events, child_body_relation.child)
         events.extend(x for x in body.events.all() if x not in events)
 
+    @login_required_ajax
     def retrieve_me(self, request):
         """Retrieves the logged-in user's profile."""
         return Response(UserProfileFullSerializer(request.user.profile).data)
 
+    @login_required_ajax
     def update_me(self, request):
         """Update the logged-in user's profile."""
         serializer = UserProfileFullSerializer(request.user.profile, data=request.data)
@@ -43,6 +46,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         serializer.save()
         return request.user.profile
 
+    @login_required_ajax
     def set_ues_me(self, request, event_pk, status):
         """Creates or updates a UserEventStatus for the current user."""
         if not request.user.profile.followed_events.filter(id=event_pk).exists():
@@ -56,6 +60,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         ues.save()
         return Response(status=204)
 
+    @login_required_ajax
     def get_my_events(self, request):
         """Gets events created by current user."""
         events = Event.objects.filter(created_by=request.user.profile)

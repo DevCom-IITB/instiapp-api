@@ -8,6 +8,7 @@ from bodies.models import Body
 from roles.helpers import user_has_privilege
 from roles.helpers import user_has_insti_privilege
 from roles.helpers import forbidden_no_privileges
+from roles.helpers import login_required_ajax
 
 class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that allows bodies to be viewed or edited."""
@@ -21,18 +22,21 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
         serializer = BodySerializerMin(queryset, many=True)
         return Response(serializer.data)
 
+    @login_required_ajax
     def create(self, request):
         """Creates body if the user has institute privileges."""
         if not user_has_insti_privilege(request.user.profile, 'AddB'):
             return forbidden_no_privileges()
         return super().create(request)
 
+    @login_required_ajax
     def update(self, request, pk):
         """Updates an existing body if the user has privileges."""
         if not user_has_privilege(request.user.profile, pk, 'UpdB'):
             return forbidden_no_privileges()
         return super().update(request, pk)
 
+    @login_required_ajax
     def destroy(self, request, pk):
         """Deletes an existing body if the user has privileges."""
         if not user_has_insti_privilege(request.user.profile, 'DelB'):

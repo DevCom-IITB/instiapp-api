@@ -9,6 +9,7 @@ from events.serializers import UserEventStatusSerializer
 from events.models import Event
 from events.models import UserEventStatus
 from roles.helpers import user_has_privilege
+from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
 
 class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
@@ -38,6 +39,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         serializer = EventSerializer(queryset, many=True)
         return Response({'count':len(serializer.data), 'data':serializer.data})
 
+    @login_required_ajax
     def create(self, request):
         """Create a new event if the user has privileges."""
         for bodyid in request.data['bodies_id']:
@@ -45,6 +47,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
                 return forbidden_no_privileges()
         return super().create(request)
 
+    @login_required_ajax
     def update(self, request, pk):
         """Updates an existing event if the user has privileges."""
         # Get difference in bodies
@@ -71,6 +74,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
         return super().update(request, pk)
 
+    @login_required_ajax
     def destroy(self, request, pk):
         """Delete an existing event if the user has privileges."""
         event = Event.objects.get(id=pk)

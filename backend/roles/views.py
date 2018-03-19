@@ -5,6 +5,7 @@ from roles.models import BodyRole
 from roles.serializers import RoleSerializer
 from roles.helpers import user_has_privilege
 from roles.helpers import user_has_insti_privilege
+from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
 
 class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
@@ -12,6 +13,7 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
     queryset = BodyRole.objects.all()
     serializer_class = RoleSerializer
 
+    @login_required_ajax
     def create(self, request):
         """Creates a body role if the user has privileges."""
         if user_has_insti_privilege(request.user.profile, 'RoleB'):
@@ -23,6 +25,7 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
             return forbidden_no_privileges()
         return super().create(request)
 
+    @login_required_ajax
     def update(self, request, pk):
         """Updates an existing body role if the user has privileges."""
         if user_has_insti_privilege(request.user.profile, 'RoleB'):
@@ -35,6 +38,7 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
             return forbidden_no_privileges()
         return super().update(request, pk)
 
+    @login_required_ajax
     def destroy(self, request, pk):
         """Deletes an existing body role if the user has privileges."""
         if user_has_insti_privilege(request.user.profile, 'RoleB'):
