@@ -28,3 +28,15 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         for child_body_relation in body.children.all():
             cls.get_events_recursive(events, child_body_relation.child)
         events.extend(x for x in body.events.all() if x not in events)
+
+    def retrieve_me(self, request):
+        """Retrieves the logged-in user's profile."""
+        return Response(UserProfileFullSerializer(request.user.profile).data)
+
+    def update_me(self, request):
+        """Update the logged-in user's profile."""
+        serializer = UserProfileFullSerializer(request.user.profile, data=request.data)
+        if not serializer.is_valid():
+            return Response({'error': 'validation failed'})
+        serializer.save()
+        return request.user.profile
