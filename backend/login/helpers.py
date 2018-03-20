@@ -10,7 +10,7 @@ def fill_models_from_sso(user_profile, user, profile_json):
             'mobile': 'contact_no',
             'roll_number': 'roll_no'}.items():
 
-        if response_key in profile_json:
+        if response_key in profile_json and profile_json[response_key] is not None:
             setattr(user_profile, data_key, profile_json[response_key])
 
     # Fill in some special parameters
