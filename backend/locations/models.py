@@ -15,7 +15,7 @@ class Location(models.Model):
     name = models.CharField(max_length=50)
     lat = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     lng = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
-    resuable = models.BooleanField(default=False)
+    reusable = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
