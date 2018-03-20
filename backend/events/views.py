@@ -67,8 +67,8 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
             if not user_has_privilege(request.user.profile, bodyid, 'DelE'):
                 return forbidden_no_privileges()
 
-        # Check if the user can update event for any of the new bodies
-        for bodyid in new_bodies_id:
+        # Check if the user can update event for any of the old bodies
+        for bodyid in old_bodies_id:
             if user_has_privilege(request.user.profile, bodyid, 'UpdE'):
                 return super().update(request, pk)
 
