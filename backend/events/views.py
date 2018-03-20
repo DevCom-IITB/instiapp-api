@@ -67,12 +67,13 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
             if not user_has_privilege(request.user.profile, bodyid, 'DelE'):
                 return forbidden_no_privileges()
 
-        # Check if the user can update event for new bodies
+        # Check if the user can update event for any of the new bodies
         for bodyid in new_bodies_id:
-            if not user_has_privilege(request.user.profile, bodyid, 'UpdE'):
-                return forbidden_no_privileges()
+            if user_has_privilege(request.user.profile, bodyid, 'UpdE'):
+                return super().update(request, pk)
 
-        return super().update(request, pk)
+        return forbidden_no_privileges()
+
 
     @login_required_ajax
     def destroy(self, request, pk):
