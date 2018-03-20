@@ -23,6 +23,8 @@ class EventTestCase(APITestCase):
 
         self.body_1_role = BodyRole.objects.create(
             name="Body1Role", body=self.test_body_1, permissions='AddE,UpdE,DelE')
+        self.body_2_role = BodyRole.objects.create(
+            name="Body2Role", body=self.test_body_2, permissions='AddE')
         self.user.profile.roles.add(self.body_1_role)
 
     def test_events_list(self):
@@ -50,7 +52,13 @@ class EventTestCase(APITestCase):
         self.assertEqual(test_event.name, 'TestEvent1')
         self.assertEqual(test_event.bodies.get(id=self.test_body_1.id), self.test_body_1)
 
-        # Check that bodies cannot be created without roles
+        # Check that events cannot be created without roles
         data['bodies_id'] = [str(self.test_body_1.id), str(self.test_body_2.id)]
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 403)
+
+        # Check that events can be created with roles
+        self.user.profile.roles.add(self.body_2_role)
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.user.profile.roles.remove(self.body_2_role)
