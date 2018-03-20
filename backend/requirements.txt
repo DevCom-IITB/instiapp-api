@@ -5,3 +5,4 @@ django-filter==1.1.0
 Pillow==5.0.0
 django-extra-fields==0.9
 django-multiselectfield==0.1.8
+coverage
