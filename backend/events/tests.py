@@ -11,7 +11,6 @@ class EventTestCase(APITestCase):
     test_body_2 = None
     user = None
     body_1_role = None
-    body_2_role = None
 
     def setUp(self):
         # Fake authenticate
@@ -23,8 +22,6 @@ class EventTestCase(APITestCase):
 
         self.body_1_role = BodyRole.objects.create(
             name="Body1Role", body=self.test_body_1, permissions='AddE,UpdE,DelE')
-        self.body_2_role = BodyRole.objects.create(
-            name="Body2Role", body=self.test_body_2, permissions='AddE')
         self.user.profile.roles.add(self.body_1_role)
 
     def test_events_list(self):
@@ -58,7 +55,31 @@ class EventTestCase(APITestCase):
         self.assertEqual(response.status_code, 403)
 
         # Check that events can be created with roles
-        self.user.profile.roles.add(self.body_2_role)
+        body_2_role = BodyRole.objects.create(
+            name="Body2Role", body=self.test_body_2, permissions='AddE')
+        self.user.profile.roles.add(body_2_role)
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
-        self.user.profile.roles.remove(self.body_2_role)
+        self.user.profile.roles.remove(body_2_role)
+
+    def test_event_deletion(self):
+        """Check if events can be deleted with priveleges."""
+        now = "2018-03-05T06:00:00Z"
+        event = Event.objects.create(
+            name="TestEvent", start_time=now, end_time=now)
+        self.test_body_1.events.add(event)
+        self.test_body_2.events.add(event)
+
+        url = '/api/events/' + str(event.id)
+
+        # Check that events cannot be deleted without role for body_2
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Check that events can be deleted with roles for both bodies
+        body_2_role = BodyRole.objects.create(
+            name="Body2Role", body=self.test_body_2, permissions='DelE')
+        self.user.profile.roles.add(body_2_role)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 204)
+        self.user.profile.roles.remove(body_2_role)
