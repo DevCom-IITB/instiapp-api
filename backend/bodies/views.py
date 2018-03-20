@@ -17,26 +17,22 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
 
     @classmethod
     def list(cls, request): #pylint: disable=unused-argument
-        """Override list method"""
         queryset = Body.objects.all()
         serializer = BodySerializerMin(queryset, many=True)
         return Response(serializer.data)
 
     @insti_permission_required('AddB')
     def create(self, request):
-        """Creates body if the user has institute privileges."""
         return super().create(request)
 
     @login_required_ajax
     def update(self, request, pk):
-        """Updates an existing body if the user has privileges."""
         if not user_has_privilege(request.user.profile, pk, 'UpdB'):
             return forbidden_no_privileges()
         return super().update(request, pk)
 
     @insti_permission_required('DelB')
     def destroy(self, request, pk):
-        """Deletes an existing body if the user has privileges."""
         return super().destroy(request, pk)
 
 class BodyFollowersViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors

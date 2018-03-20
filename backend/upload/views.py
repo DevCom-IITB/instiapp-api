@@ -14,10 +14,8 @@ class UploadViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancesto
 
     @login_required_ajax
     def create(self, request):
-        """Upload an image."""
         return super().create(request)
 
     @login_required_ajax
     def destroy(self, request, pk):
-        """Delete an image entry."""
         return super().destroy(request, pk)

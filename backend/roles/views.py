@@ -15,7 +15,6 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
 
     @login_required_ajax
     def create(self, request):
-        """Creates a body role if the user has privileges."""
         if user_has_insti_privilege(request.user.profile, 'RoleB'):
             return super().create(request)
 
@@ -27,7 +26,6 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
 
     @login_required_ajax
     def update(self, request, pk):
-        """Updates an existing body role if the user has privileges."""
         if user_has_insti_privilege(request.user.profile, 'RoleB'):
             return super().update(request, pk)
 
@@ -40,7 +38,6 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
 
     @login_required_ajax
     def destroy(self, request, pk):
-        """Deletes an existing body role if the user has privileges."""
         if user_has_insti_privilege(request.user.profile, 'RoleB'):
             return super().destroy(request, pk)
 

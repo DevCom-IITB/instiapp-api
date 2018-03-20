@@ -35,14 +35,12 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
     @classmethod
     def list(cls, request): #pylint: disable=unused-argument
-        """Override list method"""
         queryset = Event.objects.all()
         serializer = EventSerializer(queryset, many=True)
         return Response({'count':len(serializer.data), 'data':serializer.data})
 
     @login_required_ajax
     def create(self, request):
-        """Create a new event if the user has privileges."""
         if all([user_has_privilege(request.user.profile, id, 'AddE')
                 for id in request.data['bodies_id']]):
 
@@ -54,7 +52,6 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
     @login_required_ajax
     def update(self, request, pk):
-        """Updates an existing event if the user has privileges."""
         # Get difference in bodies
         event = Event.objects.get(id=pk)
         old_bodies_id = [str(x.id) for x in event.bodies.all()]
@@ -93,7 +90,6 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
     @login_required_ajax
     def destroy(self, request, pk):
-        """Delete an existing event if the user has privileges."""
         event = Event.objects.get(id=pk)
         if all([user_has_privilege(request.user.profile, str(body.id), 'DelE')
                 for body in event.bodies.all()]):
