@@ -48,6 +48,11 @@ class BodyTestCase(APITestCase):
         response.close()
         self.test_body_2_id = response.data['id']
 
+    def test_bodies_list(self):
+        """Test if bodies can be listed."""
+        url = '/api/bodies'
+        self.assertEqual(self.client.get(url).status_code, 200)
+
     def test_bodies_created(self):
         """Test if bodies was properly created."""
         test_body = Body.objects.get(id=self.test_body_1_id)
@@ -95,30 +100,3 @@ class BodyTestCase(APITestCase):
         response = self.client.delete(url)
         print(response.data)
         self.assertEqual(response.status_code, 204)
-
-    def test_event_creation(self):
-        """Test if events can be created for the body."""
-
-        test_body_1 = Body.objects.get(id=self.test_body_1_id)
-
-        # Test simple body creation
-        url = '/api/events'
-        data = {
-            "name": "TestEvent1",
-            "start_time": "2017-03-04T18:48:47Z",
-            "end_time": "2018-03-04T18:48:47Z",
-            "venue_names": [],
-            "bodies_id": [self.test_body_1_id]
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, 201)
-        response.close()
-
-        test_event = Event.objects.get(id=response.data['id'])
-        self.assertEqual(test_event.name, 'TestEvent1')
-        self.assertEqual(test_event.bodies.get(id=test_body_1.id), test_body_1)
-
-        # Check that bodies cannot be created without roles
-        data['bodies_id'] = [self.test_body_1_id, self.test_body_2_id]
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, 403)
