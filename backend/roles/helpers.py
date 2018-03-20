@@ -15,12 +15,7 @@ def user_has_insti_privilege(profile, privilege):
 
 def check_roles(roles, privilege):
     """Private helper function."""
-    if not roles:
-        return False
-    for role in roles:
-        if privilege in role.permissions:
-            return True
-    return False
+    return any([(privilege in role.permissions) for role in roles])
 
 def diff_set(first, second):
     """Difference between two lists."""
