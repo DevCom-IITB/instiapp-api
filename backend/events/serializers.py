@@ -70,8 +70,10 @@ class EventFullSerializer(serializers.ModelSerializer):
 
     venues = LocationSerializer(many=True, read_only=True)
     venue_names = serializers.SlugRelatedField(
-        many=True, read_only=False, slug_field='name',
-        queryset=Location.objects.all(), source='venues')
+        many=True, read_only=True, slug_field='name', source='venues')
+    venue_ids = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=False, source='venues',
+        queryset=Location.objects.all(), required=False)
 
     bodies = BodySerializerMin(many=True, read_only=True)
     bodies_id = serializers.PrimaryKeyRelatedField(
@@ -81,7 +83,13 @@ class EventFullSerializer(serializers.ModelSerializer):
         model = Event
         fields = ('id', 'name', 'description', 'image_url', 'start_time',
                   'end_time', 'all_day', 'venues', 'venue_names', 'bodies', 'bodies_id',
-                  'interested_count', 'going_count', 'interested', 'going')
+                  'interested_count', 'going_count', 'interested', 'going', 'venue_ids')
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        # Remove unnecessary fields
+        result.pop('venue_ids')
+        return result
 
     def create(self, validated_data):
         result = super().create(validated_data)

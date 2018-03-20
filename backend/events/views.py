@@ -11,6 +11,7 @@ from events.models import UserEventStatus
 from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
+from locations.helpers import create_unreusable_locations
 
 class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that allows events to be viewed or edited"""
@@ -44,7 +45,11 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         """Create a new event if the user has privileges."""
         if all([user_has_privilege(request.user.profile, id, 'AddE')
                 for id in request.data['bodies_id']]):
+
+            # Fill in ids of venues
+            request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])
             return super().create(request)
+
         return forbidden_no_privileges()
 
     @login_required_ajax
@@ -53,7 +58,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         # Get difference in bodies
         event = Event.objects.get(id=pk)
         old_bodies_id = [str(x.id) for x in event.bodies.all()]
-        new_bodies_id = [str(x) for x in request.data['bodies_id']]
+        new_bodies_id = request.data['bodies_id']
         added_bodies = diff_set(new_bodies_id, old_bodies_id)
         removed_bodies = diff_set(old_bodies_id, new_bodies_id)
 
@@ -70,6 +75,17 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
             [user_has_privilege(request.user.profile, id, 'UpdE') for id in old_bodies_id])
 
         if can_add_events and can_del_events and can_update:
+            # Create added unreusable venues, unlink deleted ones
+            old_venue_names = [x.name for x in event.venues.all()]
+            new_venue_names = request.data['venue_names']
+            added_venues = diff_set(new_venue_names, old_venue_names)
+            common_venues = list(set(old_venue_names).intersection(new_venue_names))
+
+            common_venue_ids = [str(x.id) for x in event.venues.filter(name__in=common_venues)]
+            added_venue_ids = create_unreusable_locations(added_venues)
+
+            request.data['venue_ids'] = added_venue_ids + common_venue_ids
+
             return super().update(request, pk)
 
         return forbidden_no_privileges()
