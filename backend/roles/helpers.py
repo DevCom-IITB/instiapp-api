@@ -25,7 +25,7 @@ def diff_set(first, second):
     second = set(second)
     return [item for item in first if item not in second]
 
-def login_required_ajax(f):
+def login_required_ajax(func):
     """
     Just make sure the user is authenticated to access a certain ajax view
 
@@ -35,23 +35,21 @@ def login_required_ajax(f):
     def wrapper(*args, **kw):
         """Wrapper after checking if authenticated."""
         if args[1].user.is_authenticated:
-            return f(*args, **kw)
-        else:
-            return Response({
-                'message': 'unauthenticated',
-                'detail': 'Log in to continue!'
-            }, status=401)
+            return func(*args, **kw)
+        return Response({
+            'message': 'unauthenticated',
+            'detail': 'Log in to continue!'
+        }, status=401)
 
     return wrapper
 
 def insti_permission_required(permission):
     """Check for institute permission."""
-    def real_decorator(f):
+    def real_decorator(func):
         @login_required_ajax
         def wrapper(*args, **kw):
             if user_has_insti_privilege(args[1].user.profile, permission):
-                return f(*args, **kw)
-            else:
-                return forbidden_no_privileges()
+                return func(*args, **kw)
+            return forbidden_no_privileges()
         return wrapper
     return real_decorator
