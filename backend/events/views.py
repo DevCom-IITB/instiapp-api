@@ -42,10 +42,10 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
     @login_required_ajax
     def create(self, request):
         """Create a new event if the user has privileges."""
-        for bodyid in request.data['bodies_id']:
-            if not user_has_privilege(request.user.profile, bodyid, 'AddE'):
-                return forbidden_no_privileges()
-        return super().create(request)
+        if all([user_has_privilege(request.user.profile, id, 'AddE')
+                for id in request.data['bodies_id']]):
+            return super().create(request)
+        return forbidden_no_privileges()
 
     @login_required_ajax
     def update(self, request, pk):
@@ -58,19 +58,19 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         removed_bodies = diff_set(old_bodies_id, new_bodies_id)
 
         # Check if user can add events for new bodies
-        for bodyid in added_bodies:
-            if not user_has_privilege(request.user.profile, bodyid, 'AddE'):
-                return forbidden_no_privileges()
+        can_add_events = all(
+            [user_has_privilege(request.user.profile, id, 'AddE') for id in added_bodies])
 
-        # Check if user can remove events for old bodies
-        for bodyid in removed_bodies:
-            if not user_has_privilege(request.user.profile, bodyid, 'DelE'):
-                return forbidden_no_privileges()
+        # Check if user can remove events for removed
+        can_del_events = all(
+            [user_has_privilege(request.user.profile, id, 'DelE') for id in removed_bodies])
 
         # Check if the user can update event for any of the old bodies
-        for bodyid in old_bodies_id:
-            if user_has_privilege(request.user.profile, bodyid, 'UpdE'):
-                return super().update(request, pk)
+        can_update = any(
+            [user_has_privilege(request.user.profile, id, 'UpdE') for id in old_bodies_id])
+
+        if can_add_events and can_del_events and can_update:
+            return super().update(request, pk)
 
         return forbidden_no_privileges()
 
@@ -79,10 +79,11 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
     def destroy(self, request, pk):
         """Delete an existing event if the user has privileges."""
         event = Event.objects.get(id=pk)
-        for body in event.bodies.all():
-            if not user_has_privilege(request.user.profile, str(body.id), 'DelE'):
-                return forbidden_no_privileges()
-        return super().destroy(request, pk)
+        if all([user_has_privilege(request.user.profile, str(body.id), 'DelE')
+                for body in event.bodies.all()]):
+            return super().destroy(request, pk)
+
+        return forbidden_no_privileges()
 
 class UserEventStatusViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """API endpoint that allows user-event statuses to be viewed or edited"""
