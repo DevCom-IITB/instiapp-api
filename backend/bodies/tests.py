@@ -79,6 +79,23 @@ class BodyTestCase(APITestCase):
         test_body = Body.objects.get(id=self.test_body_1_id)
         self.assertEqual(test_body.name, 'TestBody1Upd')
 
+    def test_body_deletion(self):
+        """Test if body can be deleted with insti role."""
+        body = Body.objects.create(name="TestBody3")
+        url = '/api/bodies/' + str(body.id)
+        print(url)
+
+        # Try without priveleges
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Try with priveleges
+        self.insti_role.permissions += ['DelB']
+        self.insti_role.save()
+        response = self.client.delete(url)
+        print(response.data)
+        self.assertEqual(response.status_code, 204)
+
     def test_event_creation(self):
         """Test if events can be created for the body."""
 
