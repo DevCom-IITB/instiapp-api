@@ -94,6 +94,40 @@ class EventTestCase(APITestCase):
         event = Event.objects.get(id=event.id)
         self.assertEqual(event.name, 'TestEventUpdated')
 
+        # Check that with both bodies, the event can still be updated
+        self.test_body_2.events.add(event)
+        data['bodies_id'] = [str(self.test_body_1.id), str(self.test_body_2.id)]
+        data['name'] = 'TestEventUpdated2'
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        event = Event.objects.get(id=event.id)
+        self.assertEqual(event.name, 'TestEventUpdated2')
+
+        # Check that user cannot remove body without role
+        data['bodies_id'] = [str(self.test_body_1.id)]
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Check that user can remove body with role
+        data['bodies_id'] = [str(self.test_body_2.id)]
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        # Check that user cannot add body without roles for both
+        data['bodies_id'] = [str(self.test_body_1.id), str(self.test_body_2.id)]
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Check that user can change bodies with roles for both
+        print([x.name for x in event.bodies.all()])
+        body_2_role = BodyRole.objects.create(
+            name="Body2Role", body=self.test_body_2, permissions=['UpdE', 'DelE'])
+        self.user.profile.roles.add(body_2_role)
+        data['bodies_id'] = [str(self.test_body_1.id)]
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.user.profile.roles.remove(body_2_role)
+
     def test_event_deletion(self):
         """Check if events can be deleted with priveleges."""
         now = "2018-03-05T06:00:00Z"
