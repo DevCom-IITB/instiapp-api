@@ -26,7 +26,7 @@ class EventTestCase(APITestCase):
         self.body_1_role = BodyRole.objects.create(
             name="Body1Role", body=self.test_body_1, permissions='AddE,UpdE,DelE')
         self.user.profile.roles.add(self.body_1_role)
-        
+
         self.update_test_event = Event.objects.create(
             name='TestEventUpdated', start_time='2017-03-04T18:48:47Z',
             end_time='2018-03-04T18:48:47Z')

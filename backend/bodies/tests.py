@@ -1,7 +1,6 @@
 """Unit tests for Body."""
 from rest_framework.test import APITestCase
 from bodies.models import Body
-from events.models import Event
 from roles.models import InstituteRole
 from roles.models import BodyRole
 from login.tests import get_new_user
