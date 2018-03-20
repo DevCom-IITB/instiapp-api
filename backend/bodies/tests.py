@@ -2,14 +2,26 @@
 from rest_framework.test import APITestCase
 from bodies.models import Body
 from events.models import Event
+from roles.models import InstituteRole
+from roles.models import BodyRole
+from login.tests import get_new_user
 
 class BodyTestCase(APITestCase):
     """Check if we can create bodies and link events."""
-
     test_body_1_id = None
     test_body_2_id = None
+    user = None
 
     def setUp(self):
+        # Fake authenticate
+        self.user = get_new_user()
+        self.client.force_authenticate(self.user) # pylint: disable=E1101
+
+        insti_role = InstituteRole.objects.create(
+            name='TestInstiRole',
+            permissions=['AddB'])
+        self.user.profile.institute_roles.add(insti_role)
+
         url = '/api/bodies'
         data = {
             'name': 'TestBody1',
@@ -19,6 +31,11 @@ class BodyTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         response.close()
         self.test_body_1_id = response.data['id']
+
+        test_body_1 = Body.objects.get(id=self.test_body_1_id)
+        body_1_role = BodyRole.objects.create(
+            name="Body1Role", body=test_body_1, permissions='AddE')
+        self.user.profile.roles.add(body_1_role)
 
         data = {
             'name': 'TestBody2',
@@ -51,7 +68,7 @@ class BodyTestCase(APITestCase):
             "start_time": "2017-03-04T18:48:47Z",
             "end_time": "2018-03-04T18:48:47Z",
             "venue_names": [],
-            "bodies_id": [self.test_body_1_id, self.test_body_2_id]
+            "bodies_id": [self.test_body_1_id]
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
@@ -60,4 +77,3 @@ class BodyTestCase(APITestCase):
         test_event = Event.objects.get(id=response.data['id'])
         self.assertEqual(test_event.name, 'TestEvent1')
         self.assertEqual(test_event.bodies.get(id=test_body_1.id), test_body_1)
-        self.assertEqual(test_event.bodies.get(id=test_body_2.id), test_body_2)
