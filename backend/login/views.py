@@ -1,6 +1,7 @@
 """Login Viewset."""
 import requests
 from django.shortcuts import redirect
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.contrib.auth import logout
@@ -12,18 +13,13 @@ from users.serializers import UserProfileFullSerializer
 
 # pylint: disable=C0301
 
-# Note: These are dummies
-HOST = 'http://localhost:8000/'
-CLIENT_ID = 'vR1pU7wXWyve1rUkg0fMS6StL1Kr6paoSmRIiLXJ'
-CLIENT_ID_SECRET_BASE64 = 'dlIxcFU3d1hXeXZlMXJVa2cwZk1TNlN0TDFLcjZwYW9TbVJJaUxYSjpaR2J6cHR2dXlVZmh1d3NVWHZqdXJRSEhjMU51WXFmbDJrSjRmSm90YWhyc2tuYklxa2o1NUNKdDc0UktQMllwaXlabHpXaGVZWXNiNGpKVG1RMFVEZUU4M1B6bVViNzRaUjJCakhhYkVqWVJPVEwxSnIxY1ZwTWdZTzFiOWpPWQ=='
-
 class LoginViewSet(viewsets.ViewSet):
     """Viewset to handle logging in and out, and getting the current user's profile."""
 
     @staticmethod
     def login_page(request):   # pylint: disable=W0613
         """Temporary method to redirect to login page."""
-        return redirect('https://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id=' + CLIENT_ID + '&response_type=code&scope=basic profile picture sex ldap phone insti_address program secondary_emails&redirect_uri=' + HOST + 'api/login')
+        return redirect('https://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id=' + settings.SSO_CLIENT_ID + '&response_type=code&scope=basic profile picture sex ldap phone insti_address program secondary_emails&redirect_uri=' + settings.HOST_FOR_SSO + 'api/login')
 
     @staticmethod
     def login(request):
@@ -37,16 +33,16 @@ class LoginViewSet(viewsets.ViewSet):
         # Construt post data to get token
         redir = request.GET.get('redir')
         if redir is None:
-            post_data = 'code=' + auth_code + '&redirect_uri=' + HOST + 'api/login&grant_type=authorization_code'
+            post_data = 'code=' + auth_code + '&redirect_uri=' + settings.HOST_FOR_SSO + 'api/login&grant_type=authorization_code'
         else:
             post_data = 'code=' + auth_code + '&redirect_uri=' + redir + '&grant_type=authorization_code'
 
         # Get our access token
         response = requests.post(
-            'https://gymkhana.iitb.ac.in/sso/oauth/token/',
+            settings.SSO_TOKEN_URL,
             data=post_data,
             headers={
-                "Authorization": "Basic " + CLIENT_ID_SECRET_BASE64,
+                "Authorization": "Basic " + settings.SSO_CLIENT_ID_SECRET_BASE64,
                 "Content-Type": "application/x-www-form-urlencoded"
             }, verify=False)
         response_json = response.json()
@@ -58,7 +54,7 @@ class LoginViewSet(viewsets.ViewSet):
 
         # Get the user's profile
         profile_response = requests.get(
-            'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number',
+            settings.SSO_PROFILE_URL,
             headers={
                 "Authorization": "Bearer " + response_json['access_token'],
             }, verify=False)

@@ -1,4 +1,4 @@
-"""Settings for dev environment."""
+"""Settings for test environment."""
 
 # pylint: disable=W0401, W0614
 from backend.settings_base import *
