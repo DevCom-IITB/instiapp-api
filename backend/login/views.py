@@ -32,7 +32,7 @@ class LoginViewSet(viewsets.ViewSet):
         # Check if we have the auth code
         auth_code = request.GET.get('code')
         if auth_code is None:
-            return Response({"error" : "{?code} is required"}, status=400)
+            return Response({"message" : "{?code} is required"}, status=400)
 
         # Construt post data to get token
         redir = request.GET.get('redir')
@@ -106,7 +106,7 @@ class LoginViewSet(viewsets.ViewSet):
 
         # Check if the user is authenticated
         if not request.user.is_authenticated:
-            return Response({"error":"not logged in"}, status=401)
+            return Response({"message":"not logged in"}, status=401)
 
         # Check if the user has a profile
         try:

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+"""Viewsets for bodies."""
 from rest_framework import viewsets
 from rest_framework.response import Response
 from roles.models import BodyRole
@@ -31,7 +31,10 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
 
         body = BodyRole.objects.get(id=pk).body
         if request.data['body'] != str(body.id):
-            return Response({'error': 'body is immutable'}, status=400)
+            return Response({
+                'message': 'body is immutable',
+                'detail': 'Body cannot be changed. Create a new role.'
+            }, status=400)
         if not user_has_privilege(request.user.profile, str(body.id), 'Role'):
             return forbidden_no_privileges()
         return super().update(request, pk)

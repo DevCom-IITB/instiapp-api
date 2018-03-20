@@ -3,7 +3,10 @@ from rest_framework.response import Response
 
 def forbidden_no_privileges():
     """Forbidden due to insufficient privileges."""
-    return Response({"error": "insufficient privileges"}, status=403)
+    return Response({
+        "message": "insufficient privileges",
+        "detail": "You have insufficient priveleges to perform this action."
+    }, status=403)
 
 def user_has_privilege(profile, bodyid, privilege):
     """Returns true if UserProfile has the privilege."""
@@ -34,7 +37,10 @@ def login_required_ajax(f):
         if args[1].user.is_authenticated:
             return f(*args, **kw)
         else:
-            return Response({'error': 'unauthenticated'}, status=401)
+            return Response({
+                'message': 'unauthenticated',
+                'detail': 'Log in to continue!'
+            }, status=401)
 
     return wrapper
 
