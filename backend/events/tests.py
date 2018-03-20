@@ -11,6 +11,9 @@ class EventTestCase(APITestCase):
     test_body_2 = None
     user = None
     body_1_role = None
+    update_test_event = None
+    update_event_data = None
+    update_url = None
 
     def setUp(self):
         # Fake authenticate
@@ -23,6 +26,13 @@ class EventTestCase(APITestCase):
         self.body_1_role = BodyRole.objects.create(
             name="Body1Role", body=self.test_body_1, permissions='AddE,UpdE,DelE')
         self.user.profile.roles.add(self.body_1_role)
+        
+        self.update_test_event = Event.objects.create(
+            name='TestEventUpdated', start_time='2017-03-04T18:48:47Z',
+            end_time='2018-03-04T18:48:47Z')
+        url = '/api/events/' + str(self.update_test_event.id)
+        self.update_event_data = self.client.get(url).data
+        self.update_url = '/api/events/' + str(self.update_test_event.id)
 
     def test_events_list(self):
         """Test if events can be listed."""
@@ -63,70 +73,72 @@ class EventTestCase(APITestCase):
         self.user.profile.roles.remove(body_2_role)
 
     def test_event_update(self):
-        """Check if events can be updated with priveleges."""
-        now = "2018-03-05T06:00:00Z"
-
-        # Create an event for body_2
-        event = Event.objects.create(
-            name="TestEvent", start_time=now, end_time=now)
-        self.test_body_2.events.add(event)
-
-        data = {
-            "name": "TestEventUpdated",
-            "start_time": "2017-03-04T18:48:47Z",
-            "end_time": "2018-03-04T18:48:47Z",
-            "venue_names": [],
-            "bodies_id": [str(self.test_body_2.id)]
-        }
-
-        url = '/api/events/' + str(event.id)
-
-        # Check that an unrelated event cannot be updated
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 403)
-
-        # Change the event to body_1 only and test if it can be updated now
-        self.test_body_1.events.add(event)
-        self.test_body_2.events.remove(event)
-        data['bodies_id'] = [str(self.test_body_1.id)]
-        response = self.client.put(url, data, format='json')
+        """Event can be updated."""
+        self.test_body_1.events.add(self.update_test_event)
+        self.update_event_data['bodies_id'] = [str(self.test_body_1.id)]
+        response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 200)
-        event = Event.objects.get(id=event.id)
-        self.assertEqual(event.name, 'TestEventUpdated')
+        self.test_body_1.events.remove(self.update_test_event)
 
-        # Check that with both bodies, the event can still be updated
-        self.test_body_2.events.add(event)
-        data['bodies_id'] = [str(self.test_body_1.id), str(self.test_body_2.id)]
-        data['name'] = 'TestEventUpdated2'
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 200)
-        event = Event.objects.get(id=event.id)
-        self.assertEqual(event.name, 'TestEventUpdated2')
-
-        # Check that user cannot remove body without role
-        data['bodies_id'] = [str(self.test_body_1.id)]
-        response = self.client.put(url, data, format='json')
+    def test_event_update2(self):
+        """Check that an unrelated event cannot be updated."""
+        self.test_body_2.events.add(self.update_test_event)
+        self.update_event_data['bodies_id'] = [str(self.test_body_2.id)]
+        response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 403)
+        self.test_body_2.events.remove(self.update_test_event)
 
-        # Check that user can remove body with role
-        data['bodies_id'] = [str(self.test_body_2.id)]
-        response = self.client.put(url, data, format='json')
+    def test_event_update3(self):
+        """Check if event with multiple bodies can be updated while
+        having permissions for any one of them."""
+        self.test_body_1.events.add(self.update_test_event)
+        self.test_body_2.events.add(self.update_test_event)
+        self.update_event_data['bodies_id'] = [
+            str(self.test_body_1.id), str(self.test_body_2.id)]
+        response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 200)
+        self.test_body_1.events.remove(self.update_test_event)
+        self.test_body_2.events.remove(self.update_test_event)
 
-        # Check that user cannot add body without roles for both
-        data['bodies_id'] = [str(self.test_body_1.id), str(self.test_body_2.id)]
-        response = self.client.put(url, data, format='json')
+    def test_event_update4(self):
+        """Confirm body cannot be removed without role."""
+        self.test_body_1.events.add(self.update_test_event)
+        self.test_body_2.events.add(self.update_test_event)
+        self.update_event_data['bodies_id'] = [str(self.test_body_1.id)]
+        response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 403)
+        self.test_body_1.events.remove(self.update_test_event)
+        self.test_body_2.events.remove(self.update_test_event)
 
-        # Check that user can change bodies with roles for both
-        print([x.name for x in event.bodies.all()])
+    def test_event_update5(self):
+        """Confirm body can be removed with role."""
+        self.test_body_1.events.add(self.update_test_event)
+        self.test_body_2.events.add(self.update_test_event)
+        self.update_event_data['bodies_id'] = [str(self.test_body_2.id)]
+        response = self.client.put(self.update_url, self.update_event_data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.test_body_1.events.remove(self.update_test_event)
+        self.test_body_2.events.remove(self.update_test_event)
+
+    def test_event_update6(self):
+        """Check that user cannot add body without roles for both."""
+        self.test_body_1.events.add(self.update_test_event)
+        self.update_event_data['bodies_id'] = [str(self.test_body_1.id), str(self.test_body_2.id)]
+        response = self.client.put(self.update_url, self.update_event_data, format='json')
+        self.assertEqual(response.status_code, 403)
+        self.test_body_1.events.remove(self.update_test_event)
+
+    def test_event_update7(self):
+        """Check that user can change bodies with roles for both."""
+        self.test_body_1.events.add(self.update_test_event)
         body_2_role = BodyRole.objects.create(
             name="Body2Role", body=self.test_body_2, permissions=['UpdE', 'DelE'])
         self.user.profile.roles.add(body_2_role)
-        data['bodies_id'] = [str(self.test_body_1.id)]
-        response = self.client.put(url, data, format='json')
+        self.update_event_data['bodies_id'] = [str(self.test_body_1.id)]
+        response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 200)
         self.user.profile.roles.remove(body_2_role)
+        self.test_body_1.events.remove(self.update_test_event)
 
     def test_event_deletion(self):
         """Check if events can be deleted with priveleges."""
