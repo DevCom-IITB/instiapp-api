@@ -2,5 +2,6 @@ Django==2.0.2
 djangorestframework==3.7.7
 markdown==2.6.11
 django-filter==1.1.0
-pillow
-django-extra-fields
+Pillow==5.0.0
+django-extra-fields==0.9
+django-multiselectfield==0.1.8
