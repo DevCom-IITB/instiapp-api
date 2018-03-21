@@ -47,14 +47,22 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         return request.user.profile
 
     @login_required_ajax
-    def set_ues_me(self, request, event_pk, status):
+    def set_ues_me(self, request, event_pk):
         """Creates or updates a UserEventStatus for the current user."""
+
+        # Get status from query paramter
+        status = request.GET.get('status')
+        if status is None:
+            return Response({"message" : "status is required"}, status=400)
+
+        # Create new UserEventStatus if not existing
         if not request.user.profile.followed_events.filter(id=event_pk).exists():
             get_event = Event.objects.get(id=event_pk)
             UserEventStatus.objects.create(
                 event=get_event, user=request.user.profile, status=status)
             return Response(status=204)
 
+        # Update existing UserEventStatus
         ues = UserEventStatus.objects.get(event__id=event_pk, user=request.user.profile)
         ues.status = status
         ues.save()
