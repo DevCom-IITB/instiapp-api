@@ -19,7 +19,6 @@ from django.urls import path
 from bodies.views import BodyViewSet
 from bodies.views import BodyFollowersViewSet
 from events.views import EventViewSet
-from events.views import UserEventStatusViewSet
 from locations.views import LocationViewSet
 from upload.views import UploadViewSet
 from users.views import UserProfileViewSet
@@ -45,13 +44,6 @@ urlpatterns = [
     ), name='event-detail'),
     path('api/events-locations', EventViewSet.as_view(
         {'post':'locations'}
-    )),
-
-    path('api/events-users', UserEventStatusViewSet.as_view(
-        {'get':'list', 'post':'create'}
-    )),
-    path('api/events-users/<pk>', UserEventStatusViewSet.as_view(
-        {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     )),
 
     path('api/locations', LocationViewSet.as_view(

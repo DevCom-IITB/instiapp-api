@@ -96,8 +96,3 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
             return super().destroy(request, pk)
 
         return forbidden_no_privileges()
-
-class UserEventStatusViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    """API endpoint that allows user-event statuses to be viewed or edited"""
-    queryset = UserEventStatus.objects.all()
-    serializer_class = UserEventStatusSerializer
