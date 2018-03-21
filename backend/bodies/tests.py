@@ -87,7 +87,6 @@ class BodyTestCase(APITestCase):
         """Test if body can be deleted with insti role."""
         body = Body.objects.create(name="TestBody3")
         url = '/api/bodies/' + str(body.id)
-        print(url)
 
         # Try without priveleges
         response = self.client.delete(url)
@@ -97,5 +96,4 @@ class BodyTestCase(APITestCase):
         self.insti_role.permissions += ['DelB']
         self.insti_role.save()
         response = self.client.delete(url)
-        print(response.data)
         self.assertEqual(response.status_code, 204)
