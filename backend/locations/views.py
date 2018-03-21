@@ -1,5 +1,6 @@
 """Views for locations app."""
 from rest_framework import viewsets
+from rest_framework.response import Response
 from locations.serializers import LocationSerializer
 from locations.models import Location
 from roles.helpers import insti_permission_required
@@ -12,6 +13,11 @@ class LocationViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
     """API endpoint that allows events to be viewed or edited."""
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
+
+    def list(self, request):
+        # List only reusable locations
+        queryset = Location.objects.filter(reusable=True)
+        return Response(LocationSerializer(queryset, many=True).data)
 
     @insti_permission_required('Location')
     def create(self, request):
