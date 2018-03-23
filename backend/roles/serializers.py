@@ -3,7 +3,8 @@ from roles.models import BodyRole
 from roles.models import InstituteRole
 from roles.models import PERMISSION_CHOICES
 from roles.models import INSTITUTE_PERMISSION_CHOICES
-from bodies.serializers import BodySerializerMin
+from bodies.serializer_min import BodySerializerMin
+from users.serializers import UserProfileSerializer
 
 class RoleSerializer(serializers.ModelSerializer):
 
@@ -13,6 +14,14 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = BodyRole
         fields = ('id', 'name', 'inheritable', 'body', 'body_detail', 'permissions', 'users')
+
+class RoleSerializerMin(serializers.ModelSerializer):
+
+    users_detail = UserProfileSerializer(many=True, read_only=True, source='users')
+
+    class Meta:
+        model = BodyRole
+        fields = ('id', 'name', 'body', 'users_detail')
 
 class InstituteRoleSerializer(serializers.ModelSerializer):
 

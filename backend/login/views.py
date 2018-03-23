@@ -9,7 +9,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from login.helpers import fill_models_from_sso
 from users.models import UserProfile
-from users.serializers import UserProfileFullSerializer
+from users.serializer_full import UserProfileFullSerializer
 
 # pylint: disable=C0301
 

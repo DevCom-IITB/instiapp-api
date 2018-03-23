@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from bodies.serializers_followers import BodyFollowersSerializer
 from bodies.serializers import BodySerializer
-from bodies.serializers import BodySerializerMin
+from bodies.serializer_min import BodySerializerMin
 from bodies.models import Body
 from roles.helpers import user_has_privilege
 from roles.helpers import forbidden_no_privileges

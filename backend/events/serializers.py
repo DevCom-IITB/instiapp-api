@@ -26,7 +26,7 @@ class EventSerializer(serializers.ModelSerializer):
     """
 
     from locations.serializers import LocationSerializerMin
-    from bodies.serializers import BodySerializerMin
+    from bodies.serializer_min import BodySerializerMin
 
     interested_count = serializers.SerializerMethodField()
     get_interested_count = lambda self, obj: FollowersMethods.get_count(obj, 1)
@@ -51,7 +51,7 @@ class EventFullSerializer(serializers.ModelSerializer):
     detailed information on venues.
     """
 
-    from bodies.serializers import BodySerializerMin
+    from bodies.serializer_min import BodySerializerMin
     from locations.serializers import LocationSerializer
     from locations.models import Location
     from bodies.models import Body

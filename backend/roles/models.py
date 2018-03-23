@@ -17,7 +17,7 @@ class BodyRole(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=50)
-    body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE)
+    body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE, related_name='roles')
     inheritable = models.BooleanField(default=False)
     permissions = MultiSelectField(choices=PERMISSION_CHOICES)
 

@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from events.models import UserEventStatus
 from events.models import Event
 from events.serializers import EventSerializer
-from users.serializers import UserProfileFullSerializer
+from users.serializer_full import UserProfileFullSerializer
 from users.models import UserProfile
 from roles.helpers import login_required_ajax
 
