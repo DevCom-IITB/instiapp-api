@@ -84,6 +84,11 @@ class LoginViewSet(viewsets.ViewSet):
         # Fill models with new data
         fill_models_from_sso(user_profile, user, profile_json)
 
+        fcm_id = request.GET.get('fcm_id')
+        if fcm_id is not None:
+            user_profile.fcm_id = fcm_id
+            user_profile.save()
+
         # Log in the user
         login(request, user)
         request.session.save()
