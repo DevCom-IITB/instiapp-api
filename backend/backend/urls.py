@@ -24,6 +24,7 @@ from upload.views import UploadViewSet
 from users.views import UserProfileViewSet
 from login.views import LoginViewSet
 from roles.views import BodyRoleViewSet
+import prerender.views as pr
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -88,4 +89,6 @@ urlpatterns = [
     path('api/roles/<pk>', BodyRoleViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     )),
+
+    path('user-details/<pk>', pr.user_details),
 ]

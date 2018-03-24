@@ -19,3 +19,5 @@ SSO_CLIENT_ID_SECRET_BASE64 = 'dlIxcFU3d1hXeXZlMXJVa2cwZk1TNlN0TDFLcjZwYW9TbVJJa
 
 MEDIA_ROOT = './upload/static/upload'
 MEDIA_URL = 'http://localhost:8000/static/upload/'
+
+USER_AVATAR_URL = '/static/upload/useravatar.jpg'
