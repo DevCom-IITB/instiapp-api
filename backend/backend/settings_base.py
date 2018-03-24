@@ -116,3 +116,5 @@ STATIC_URL = '/static/'
 REST_FRAMEWORK = {
 
 }
+
+PRERENDER_TITLE = 'IITB App'

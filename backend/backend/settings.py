@@ -6,6 +6,8 @@ from backend.settings_base import *
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'lu3+xlyjj940k46e!h$wp#_l5^g4eb4zr(*a286=o6!@di8cbg'
 
+BASE_URL = 'http://localhost:4200'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
