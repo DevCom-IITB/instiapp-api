@@ -31,9 +31,8 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         locs = EventLocationSerializer(Event.objects.filter(pk__in=request.data), many=True)
         return Response(locs.data)
 
-    @classmethod
-    def list(cls, request): #pylint: disable=unused-argument
-        queryset = Event.objects.all()
+    def list(self, request): #pylint: disable=unused-argument
+        queryset = self.queryset.filter(archived=False)
         serializer = EventSerializer(queryset, many=True)
         return Response({'count':len(serializer.data), 'data':serializer.data})
 
