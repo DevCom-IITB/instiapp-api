@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>{{settings.PRERENDER_TITLE}}</title>
+    <meta name="description" content="{{event.name}} - {{event.start_time}}">
+    <meta property="og:description" content="{{event.name}} - {{event.start_time}}" />
+
+    <meta property="og:title" content="{{event.name}}" />
+    <meta property="og:type" content="event" />
+    <meta property="og:url" content="{{settings.BASE_URL}}/event-details/{{event.id}}" />
+    <meta property="og:image" content="{{event.image_url}}" />
+    <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
+
+    <meta property="og:start_time" content="{{event.start_time.isoformat}}" />
+    <meta property="og:end_time" content="{{event.end_time.isoformat}}" />
+</head>
+
+<body>
+
+<h2>{{event.name}}</h2>
+<img style="width:350px" src="{{event.image_url}}"><br>
+
+<span>{{event.start_time}} to {{event.end_time}}</span><br>
+{% for venue in event.venues.all  %}
+- {{venue.name}}
+{% endfor %}
+<br><br>
+
+<span style="white-space: pre">{{event.description}}</span>
+
+<h4>Conducted by:</h4>
+{% for body in event.bodies.all  %}
+{{body.name}}<br>
+{% endfor %}
+
+</body>
+</html>

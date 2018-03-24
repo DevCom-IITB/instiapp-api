@@ -91,4 +91,5 @@ urlpatterns = [
     )),
 
     path('user-details/<pk>', pr.user_details),
+    path('event-details/<pk>', pr.event_details),
 ]
