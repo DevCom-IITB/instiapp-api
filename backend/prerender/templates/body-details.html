@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>{{settings.PRERENDER_TITLE}}</title>
+    <meta name="description" content="{{body.short_description}}">
+    <meta property="og:description" content="{{body.short_description}}" />
+
+    <meta property="og:title" content="{{body.name}}" />
+    <meta property="og:type" content="organization" />
+    <meta property="og:url" content="{{settings.BASE_URL}}/body-details/{{body.id}}" />
+    <meta property="og:image" content="{{body.image_url}}" />
+    <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
+</head>
+
+<body>
+
+<h2>{{body.name}}</h2>
+{{body.short_description}}<br>
+<br>
+{{body.description}}<br>
+<br>
+
+<img style="width:250px" src="{{body.image_url}}"><br>
+<br>
+
+<h3>Events</h3>
+{% for event in body.events.all  %}
+{{event.name}}, {{event.start_time}} to {{event.end_time}}<br>
+{% endfor %}
+
+<h3>People</h3>
+{% for role in body.roles.all  %}
+    <h4>{{role.name}}</h4>
+    {% for user in role.users.all  %}
+        {{user.name}}<br>
+    {% endfor %}
+{% endfor %}
+
+</body>
+</html>

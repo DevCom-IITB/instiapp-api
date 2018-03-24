@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from users.models import UserProfile
 from events.models import Event
+from bodies.models import Body
 
 def user_details(request, pk):
     profile = get_object_or_404(UserProfile.objects, pk=pk)
@@ -17,4 +18,9 @@ def user_details(request, pk):
 def event_details(request, pk):
     event = get_object_or_404(Event.objects, pk=pk)
     rendered = render_to_string('event-details.html', {'event': event, 'settings': settings})
+    return HttpResponse(rendered)
+
+def body_details(request, pk):
+    body = get_object_or_404(Body.objects, pk=pk)
+    rendered = render_to_string('body-details.html', {'body': body, 'settings': settings})
     return HttpResponse(rendered)
