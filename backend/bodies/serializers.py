@@ -28,7 +28,7 @@ class BodySerializer(serializers.ModelSerializer):
         model = Body
         fields = ('id', 'name', 'short_description', 'description', 'image_url',
                   'children', 'parents', 'events', 'followers_count',
-                  'roles')
+                  'roles', 'website_url')
 
     @classmethod
     def get_parents(cls, obj):

@@ -9,6 +9,7 @@ class Body(models.Model):
     name = models.CharField(max_length=50)
     short_description = models.CharField(max_length=50, blank=True)
     description = models.CharField(max_length=500, blank=True)
+    website_url = models.URLField(blank=True, null=True)
     image_url = models.URLField(blank=True, null=True)
     events = models.ManyToManyField('events.Event', related_name='bodies', blank=True)
 

@@ -7,4 +7,4 @@ class BodySerializerMin(serializers.ModelSerializer):
 
     class Meta:
         model = Body
-        fields = ('id', 'name', 'short_description', 'description', 'image_url')
+        fields = ('id', 'name', 'short_description', 'website_url', 'image_url')
