@@ -11,10 +11,9 @@ TIME_L_END = 1.2                         # Lambda for exponential of ended penal
 BODY_FOLLOWING_BONUS = 300               # Bonus if the body is followed
 TIME_DEP_BODY_FOLLOWING_BONUS = 800      # Bonus if the body is followed dependent on time
 
-def get_prioritized(queryset, profile):
+def get_prioritized(queryset, request):
     now = timezone.now()
 
-    print("")
     for event in queryset:
         event.weight = BASE
 
@@ -33,13 +32,11 @@ def get_prioritized(queryset, profile):
         start_time_points = WEIGHT_START_TIME * start_time_factor
         event.weight += int(start_time_points)
 
-        for body in event.bodies.all():
-            if body in profile.followed_bodies.all():
-                event.weight += int(
-                    BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_FOLLOWING_BONUS * start_time_factor))
-
-        print(event.name, event.weight, event.start_time)
-
-    print("")
+        if request.user.is_authenticated:
+            profile = request.user.profile
+            for body in event.bodies.all():
+                if body in profile.followed_bodies.all():
+                    event.weight += int(
+                        BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_FOLLOWING_BONUS * start_time_factor))
 
     return sorted(queryset, key=lambda event: event.weight, reverse=True)

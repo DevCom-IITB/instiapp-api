@@ -35,8 +35,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
     def list(self, request): #pylint: disable=unused-argument
         queryset = self.queryset.filter(archived=False)
-        if request.user.is_authenticated:
-            queryset = get_prioritized(queryset, request.user.profile)
+        queryset = get_prioritized(queryset, request)
 
         serializer = EventSerializer(queryset, many=True)
         data = serializer.data
