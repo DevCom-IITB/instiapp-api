@@ -5,9 +5,7 @@ from rest_framework import viewsets
 from events.serializers import EventSerializer
 from events.serializers import EventFullSerializer
 from events.serializers import EventLocationSerializer
-from events.serializers import UserEventStatusSerializer
 from events.models import Event
-from events.models import UserEventStatus
 from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
