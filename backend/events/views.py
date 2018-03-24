@@ -1,7 +1,9 @@
 """Views for events app."""
 from uuid import UUID
+from collections import OrderedDict
 from rest_framework.response import Response
 from rest_framework import viewsets
+from events.prioritizer import get_prioritized
 from events.serializers import EventSerializer
 from events.serializers import EventFullSerializer
 from events.serializers import EventLocationSerializer
@@ -33,8 +35,13 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
     def list(self, request): #pylint: disable=unused-argument
         queryset = self.queryset.filter(archived=False)
+        if request.user.is_authenticated:
+            queryset = get_prioritized(queryset, request.user.profile)
+
         serializer = EventSerializer(queryset, many=True)
-        return Response({'count':len(serializer.data), 'data':serializer.data})
+        data = serializer.data
+
+        return Response({'count':len(data), 'data':data})
 
     @login_required_ajax
     def create(self, request):

@@ -42,7 +42,7 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = ('id', 'name', 'description', 'image_url',
                   'start_time', 'end_time', 'all_day', 'venues', 'bodies',
-                  'interested_count', 'going_count', 'website_url')
+                  'interested_count', 'going_count', 'website_url', 'weight')
 
 class EventFullSerializer(serializers.ModelSerializer):
     """Serializer for Event with more information.

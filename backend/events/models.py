@@ -26,6 +26,8 @@ class Event(models.Model):
 
     archived = models.BooleanField(default=False)
 
+    weight = 0
+
     def __str__(self):
         return self.name
 
