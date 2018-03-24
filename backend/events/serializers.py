@@ -42,7 +42,7 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = ('id', 'name', 'description', 'image_url',
                   'start_time', 'end_time', 'all_day', 'venues', 'bodies',
-                  'interested_count', 'going_count')
+                  'interested_count', 'going_count', 'website_url')
 
 class EventFullSerializer(serializers.ModelSerializer):
     """Serializer for Event with more information.
@@ -83,7 +83,8 @@ class EventFullSerializer(serializers.ModelSerializer):
         model = Event
         fields = ('id', 'name', 'description', 'image_url', 'start_time',
                   'end_time', 'all_day', 'venues', 'venue_names', 'bodies', 'bodies_id',
-                  'interested_count', 'going_count', 'interested', 'going', 'venue_ids')
+                  'interested_count', 'going_count', 'interested', 'going', 'venue_ids',
+                  'website_url')
 
     def to_representation(self, instance):
         result = super().to_representation(instance)

@@ -14,6 +14,7 @@ class Event(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500, blank=True)
     image_url = models.URLField(blank=True, null=True)
+    website_url = models.URLField(blank=True, null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     created_by = models.ForeignKey('users.UserProfile', null=True, blank=True,
