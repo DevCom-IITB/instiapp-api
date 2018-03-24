@@ -99,7 +99,9 @@ class EventFullSerializer(serializers.ModelSerializer):
         return result
 
 class UserEventStatusSerializer(serializers.ModelSerializer):
-    """Serializer for UserEventStatus."""
+    """DEPRECATED
+
+    Serializer for UserEventStatus."""
 
     class Meta:
         from events.models import UserEventStatus
