@@ -32,7 +32,7 @@
 
 <h4>Conducted by:</h4>
 {% for body in event.bodies.all  %}
-{{body.name}}<br>
+<a href="/body-details/{{body.id}}">{{body.name}}</a><br>
 {% endfor %}
 
 </body>
