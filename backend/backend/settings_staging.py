@@ -11,7 +11,7 @@ BASE_URL = 'https://evenire.radialapps.com'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['temp-iitb.radialpps.com']
+ALLOWED_HOSTS = ['temp-iitb.radialapps.com']
 
 SSO_TOKEN_URL = 'https://gymkhana.iitb.ac.in/sso/oauth/token/'
 SSO_PROFILE_URL = 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number'
