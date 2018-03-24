@@ -5,15 +5,34 @@ from roles.models import PERMISSION_CHOICES
 from roles.models import INSTITUTE_PERMISSION_CHOICES
 from bodies.serializer_min import BodySerializerMin
 from users.serializers import UserProfileSerializer
+from events.serializers import EventSerializer
 
 class RoleSerializer(serializers.ModelSerializer):
+    """Role Serializer"""
 
     permissions = serializers.MultipleChoiceField(choices=PERMISSION_CHOICES)
+    body_detail = BodySerializerMin(read_only=True, source='body')
+    users_detail = UserProfileSerializer(many=True, read_only=True, source='users')
+
+    class Meta:
+        model = BodyRole
+        fields = ('id', 'name', 'inheritable', 'body', 'body_detail',
+                  'permissions', 'users', 'users_detail')
+
+class RoleSerializerWithEvents(serializers.ModelSerializer):
+    """Role Serializer with nested events of bodies"""
+
+    permissions = serializers.MultipleChoiceField(choices=PERMISSION_CHOICES)
+    events = serializers.SerializerMethodField()
     body_detail = BodySerializerMin(read_only=True, source='body')
 
     class Meta:
         model = BodyRole
-        fields = ('id', 'name', 'inheritable', 'body', 'body_detail', 'permissions', 'users')
+        fields = ('id', 'name', 'inheritable', 'body', 'body_detail',
+                  'permissions', 'events')
+
+    def get_events(self, obj):
+        return EventSerializer(obj.body.events.all(), many=True).data
 
 class RoleSerializerMin(serializers.ModelSerializer):
 
