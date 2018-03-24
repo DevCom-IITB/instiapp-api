@@ -8,7 +8,8 @@ def fill_models_from_sso(user_profile, user, profile_json):
             'first_name': 'name',
             'email': 'email',
             'mobile': 'contact_no',
-            'roll_number': 'roll_no'}.items():
+            'roll_number': 'roll_no',
+            'username': 'ldap_id'}.items():
 
         if response_key in profile_json and profile_json[response_key] is not None:
             setattr(user_profile, data_key, profile_json[response_key])

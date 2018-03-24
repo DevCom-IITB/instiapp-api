@@ -28,7 +28,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'profile_pic', 'events_interested',
                   'events_going', 'email', 'year', 'roll_no', 'contact_no',
                   'about', 'followed_bodies', 'followed_bodies_id', 'roles',
-                  'institute_roles', 'website_url')
+                  'institute_roles', 'website_url', 'ldap_id')
 
     @staticmethod
     def get_events(obj, status):
