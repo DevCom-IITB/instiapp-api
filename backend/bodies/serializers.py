@@ -26,7 +26,7 @@ class BodySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Body
-        fields = ('id', 'name', 'description', 'image_url',
+        fields = ('id', 'name', 'short_description', 'description', 'image_url',
                   'children', 'parents', 'events', 'followers_count',
                   'roles')
 
