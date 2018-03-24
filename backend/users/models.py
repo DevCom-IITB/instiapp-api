@@ -22,6 +22,7 @@ class UserProfile(models.Model):
     email = models.EmailField(null=True, blank=True)
     year = models.IntegerField(default=1, null=True, blank=True)
     about = models.TextField(blank=True, null=True)
+    website_url = models.URLField(blank=True, null=True)
 
     roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
     institute_roles = models.ManyToManyField(
