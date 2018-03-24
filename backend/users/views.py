@@ -57,7 +57,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
 
         # Create new UserEventStatus if not existing
         if not request.user.profile.followed_events.filter(id=event_pk).exists():
-            get_event = Event.objects.get(id=event_pk)
+            get_event = get_object_or_404(Event.objects.all(), pk=event_pk)
             UserEventStatus.objects.create(
                 event=get_event, user=request.user.profile, status=status)
             return Response(status=204)
