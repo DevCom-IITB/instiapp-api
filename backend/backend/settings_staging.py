@@ -22,4 +22,4 @@ SSO_CLIENT_ID_SECRET_BASE64 = 'dlIxcFU3d1hXeXZlMXJVa2cwZk1TNlN0TDFLcjZwYW9TbVJJa
 MEDIA_ROOT = './upload/static/upload'
 MEDIA_URL = 'https://temp-iitb.radialapps.com/static/upload/'
 
-USER_AVATAR_URL = 'https://evenire.radialapps.com/assets/useravatar.jpg'
+USER_AVATAR_URL = '/static/upload/useravatar.jpg'
