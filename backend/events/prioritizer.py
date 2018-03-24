@@ -3,7 +3,7 @@ from django.utils import timezone
 import math
 
 BASE = 1000                              # Base points
-FINISHED_PENALTY = 900                   # Direct penalty if event is done
+FINISHED_PENALTY = 600                   # Direct penalty if event is done
 WEIGHT_START_TIME = 800                  # Weight of time from event start
 WEIGHT_END_TIME = 800                    # Weight of time from event end
 TIME_SD = 2.5                            # Standard deviation of time distribution
