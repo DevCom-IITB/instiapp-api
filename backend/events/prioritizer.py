@@ -33,7 +33,7 @@ def get_prioritized(queryset, request):
         start_time_points = WEIGHT_START_TIME * start_time_factor
         event.weight += int(start_time_points)
 
-        if request.user.is_authenticated:
+        if request.user.is_authenticated and hasattr(request.user, 'profile'):
             profile = request.user.profile
             body_bonus = 0
             for body in event.bodies.all():
