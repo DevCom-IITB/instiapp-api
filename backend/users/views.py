@@ -44,7 +44,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         if not serializer.is_valid():
             return Response({'error': 'validation failed'})
         serializer.save()
-        return request.user.profile
+        return Response(serializer.data)
 
     @login_required_ajax
     def set_ues_me(self, request, event_pk):
