@@ -8,8 +8,9 @@ WEIGHT_START_TIME = 800                  # Weight of time from event start
 WEIGHT_END_TIME = 800                    # Weight of time from event end
 TIME_SD = 2.5                            # Standard deviation of time distribution
 TIME_L_END = 1.2                         # Lambda for exponential of ended penalty
-BODY_FOLLOWING_BONUS = 300               # Bonus if the body is followed
-TIME_DEP_BODY_FOLLOWING_BONUS = 800      # Bonus if the body is followed dependent on time
+BODY_FOLLOWING_BONUS = 200               # Bonus if the body is followed
+TIME_DEP_BODY_BONUS = 800                # Bonus if the body is followed dependent on time
+BODY_BONUS_MAX = 800                     # Maximum bonus for followed bodies
 
 def get_prioritized(queryset, request):
     now = timezone.now()
@@ -34,9 +35,12 @@ def get_prioritized(queryset, request):
 
         if request.user.is_authenticated:
             profile = request.user.profile
+            body_bonus = 0
             for body in event.bodies.all():
+                if body_bonus >= BODY_BONUS_MAX:
+                    break
                 if body in profile.followed_bodies.all():
-                    event.weight += int(
-                        BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_FOLLOWING_BONUS * start_time_factor))
+                    body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * start_time_factor))
+            event.weight += body_bonus
 
     return sorted(queryset, key=lambda event: event.weight, reverse=True)
