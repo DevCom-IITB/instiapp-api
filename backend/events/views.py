@@ -1,6 +1,8 @@
 """Views for events app."""
 from uuid import UUID
 from collections import OrderedDict
+from datetime import date
+from datetime import timedelta
 from rest_framework.response import Response
 from rest_framework import viewsets
 from events.prioritizer import get_prioritized
@@ -34,7 +36,8 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         return Response(locs.data)
 
     def list(self, request): #pylint: disable=unused-argument
-        queryset = self.queryset.filter(archived=False)
+        queryset = self.queryset.filter(
+            archived=False, end_time__gte=date.today() - timedelta(days=3))
         queryset = get_prioritized(queryset, request)
 
         serializer = EventSerializer(queryset, many=True)
