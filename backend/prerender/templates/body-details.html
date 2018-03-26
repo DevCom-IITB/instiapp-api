@@ -26,7 +26,7 @@
 <br>
 
 <h3>Events</h3>
-{% for event in body.events.all  %}
+{% for event in events  %}
 <a href="/event-details/{{event.id}}">{{event.name}}</a>, {{event.start_time}} to {{event.end_time}}<br>
 {% endfor %}
 

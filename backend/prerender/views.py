@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from users.models import UserProfile
 from events.models import Event
+from events.prioritizer import get_fresh_prioritized_events
 from bodies.models import Body
 
 def user_details(request, pk):
@@ -22,5 +23,11 @@ def event_details(request, pk):
 
 def body_details(request, pk):
     body = get_object_or_404(Body.objects, pk=pk)
-    rendered = render_to_string('body-details.html', {'body': body, 'settings': settings})
+    events = get_fresh_prioritized_events(body.events, request)
+
+    rendered = render_to_string('body-details.html', {
+        'body': body,
+        'settings': settings,
+        'events': events,
+    })
     return HttpResponse(rendered)
