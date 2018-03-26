@@ -1,6 +1,6 @@
 """Full serializer for UserProfile with detailed information and events."""
 from rest_framework import serializers
-from events.prioritizer import get_fresh_prioritized_events
+from events.prioritizer import get_r_fresh_prioritized_events
 from users.models import UserProfile
 from roles.serializers import RoleSerializer
 from roles.serializers import InstituteRoleSerializer
@@ -35,5 +35,5 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     def get_events(obj, status, request):
         """Returns serialized events for given status."""
         from events.serializers import EventSerializer
-        return EventSerializer(get_fresh_prioritized_events(
+        return EventSerializer(get_r_fresh_prioritized_events(
             obj.followed_events.filter(ues__status=status), request), many=True).data
