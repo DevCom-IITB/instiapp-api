@@ -6,6 +6,7 @@ from roles.models import INSTITUTE_PERMISSION_CHOICES
 from bodies.serializer_min import BodySerializerMin
 from users.serializers import UserProfileSerializer
 from events.serializers import EventSerializer
+from events.prioritizer import get_r_fresh_prioritized_events
 
 class RoleSerializer(serializers.ModelSerializer):
     """Role Serializer"""
@@ -32,7 +33,8 @@ class RoleSerializerWithEvents(serializers.ModelSerializer):
                   'permissions', 'events')
 
     def get_events(self, obj):
-        return EventSerializer(obj.body.events.all(), many=True).data
+        return EventSerializer(get_r_fresh_prioritized_events(
+            obj.body.events.all(), self.context['request']), many=True).data
 
 class RoleSerializerMin(serializers.ModelSerializer):
 

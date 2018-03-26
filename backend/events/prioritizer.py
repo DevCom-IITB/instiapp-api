@@ -47,10 +47,15 @@ def get_prioritized(queryset, request):
 
     return sorted(queryset, key=lambda event: event.weight, reverse=True)
 
-def get_fresh_events(queryset):
+def get_fresh_events(queryset, delta=3):
     """Gets events after removing stale ones."""
     return queryset.filter(
-        archived=False, end_time__gte=date.today() - timedelta(days=3))
+        archived=False, end_time__gte=date.today() - timedelta(days=delta))
 
 def get_fresh_prioritized_events(queryset, request):
+    """Gets fresh events with prioritization."""
     return get_prioritized(get_fresh_events(queryset), request)
+
+def get_r_fresh_prioritized_events(queryset, request):
+    """Get relatively fresh events with prioritization. Very old events are removed."""
+    return get_prioritized(get_fresh_events(queryset, 30), request)

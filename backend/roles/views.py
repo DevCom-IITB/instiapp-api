@@ -53,4 +53,5 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
     @login_required_ajax
     def get_my_roles(self, request):
         """Get roles with nested events."""
-        return Response(RoleSerializerWithEvents(request.user.profile.roles, many=True).data)
+        return Response(RoleSerializerWithEvents(
+            request.user.profile.roles, many=True, context={'request':request}).data)
