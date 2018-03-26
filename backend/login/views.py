@@ -98,7 +98,8 @@ class LoginViewSet(viewsets.ViewSet):
             'sessionid': request.session.session_key,
             'user': user.username,
             'profile_id': user_profile.id,
-            'profile': UserProfileFullSerializer(user_profile).data
+            'profile': UserProfileFullSerializer(
+                user_profile, context={'request': request}).data
         })
 
     @staticmethod
@@ -112,7 +113,8 @@ class LoginViewSet(viewsets.ViewSet):
         # Check if the user has a profile
         try:
             user_profile = UserProfile.objects.get(user=request.user)
-            profile_serialized = UserProfileFullSerializer(user_profile)
+            profile_serialized = UserProfileFullSerializer(
+                user_profile, context={'request': request})
         except UserProfile.DoesNotExist:
             return Response({'message': "UserProfile doesn't exist"}, status=500)
 

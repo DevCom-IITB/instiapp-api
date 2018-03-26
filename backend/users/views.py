@@ -15,6 +15,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileFullSerializer
 
+    def get_serializer_context(self):
+        return {'request': self.request}
+
     def followed_bodies_events(self, request, pk=None):  # pylint: disable=C0103,W0613
         """Endpoint to return all events followed by a user."""
         user_profile = get_object_or_404(self.queryset, pk=pk)
@@ -35,7 +38,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
     @login_required_ajax
     def retrieve_me(self, request):
         """Retrieves the logged-in user's profile."""
-        return Response(UserProfileFullSerializer(request.user.profile).data)
+        return Response(UserProfileFullSerializer(
+            request.user.profile, context=self.get_serializer_context()).data)
 
     @login_required_ajax
     def update_me(self, request):
