@@ -1,6 +1,8 @@
 """Event prioritizer."""
 from django.utils import timezone
 import math
+from datetime import date
+from datetime import timedelta
 
 BASE = 1000                              # Base points
 FINISHED_PENALTY = 600                   # Direct penalty if event is done
@@ -44,3 +46,11 @@ def get_prioritized(queryset, request):
             event.weight += body_bonus
 
     return sorted(queryset, key=lambda event: event.weight, reverse=True)
+
+def get_fresh_events(queryset):
+    """Gets events after removing stale ones."""
+    return queryset.filter(
+        archived=False, end_time__gte=date.today() - timedelta(days=3))
+
+def get_fresh_prioritized_events(queryset, request):
+    return get_prioritized(get_fresh_events(queryset), request)
