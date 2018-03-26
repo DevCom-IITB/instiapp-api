@@ -44,6 +44,7 @@ class InstituteRole(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=50)
+    description = models.CharField(max_length=100, blank=True)
     permissions = MultiSelectField(choices=INSTITUTE_PERMISSION_CHOICES)
 
     class Meta:
