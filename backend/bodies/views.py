@@ -15,6 +15,9 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     queryset = Body.objects.all()
     serializer_class = BodySerializer
 
+    def get_serializer_context(self):
+        return {'request': self.request}
+
     @classmethod
     def list(cls, request): #pylint: disable=unused-argument
         queryset = Body.objects.all()

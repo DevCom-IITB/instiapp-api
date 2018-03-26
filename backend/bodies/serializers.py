@@ -1,5 +1,6 @@
 """Serializers for Body and BodyChildRelation."""
 from rest_framework import serializers
+from events.prioritizer import get_r_fresh_prioritized_events
 from bodies.models import Body
 from bodies.serializer_min import BodySerializerMin
 
@@ -11,7 +12,6 @@ class ChildrenSerializer(serializers.Serializer):   # pylint: disable=W0223
 class BodySerializer(serializers.ModelSerializer):
     """Serializer for Body."""
 
-    from events.serializers import EventSerializer
     from roles.serializers import RoleSerializerMin
 
     followers_count = serializers.IntegerField(
@@ -21,7 +21,7 @@ class BodySerializer(serializers.ModelSerializer):
     parents = serializers.SerializerMethodField()
     children = ChildrenSerializer(many=True, read_only=True)
 
-    events = EventSerializer(many=True, read_only=True)
+    events = serializers.SerializerMethodField()
     roles = RoleSerializerMin(many=True, read_only=True)
 
     class Meta:
@@ -34,3 +34,9 @@ class BodySerializer(serializers.ModelSerializer):
     def get_parents(cls, obj):
         """Gets a list of ids of parents of a Body."""
         return [x.parent.id for x in obj.parents.all()]
+
+    def get_events(self, obj):
+        """Gets filtred events."""
+        from events.serializers import EventSerializer
+        return EventSerializer(get_r_fresh_prioritized_events(
+            obj.events, self.context['request']), many=True, read_only=True).data
