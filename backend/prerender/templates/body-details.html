@@ -30,9 +30,15 @@
 <a href="/event-details/{{event.id}}">{{event.name}}</a>, {{event.start_time}} to {{event.end_time}}<br>
 {% endfor %}
 
+<!-- cbr is ChildBodyRelation -->
 <h3>Children</h3>
-{% for child in body.children.all  %}
-<a href="/body-details/{{child.child.id}}">{{child.child.name}}</a><br>
+{% for cbr in body.children.all  %}
+<a href="/body-details/{{cbr.child.id}}">{{cbr.child.name}}</a><br>
+{% endfor %}
+
+<h3>Part of</h3>
+{% for cbr in body.parents.all  %}
+<a href="/body-details/{{cbr.parent.id}}">{{cbr.parent.name}}</a><br>
 {% endfor %}
 
 <h3>People</h3>
