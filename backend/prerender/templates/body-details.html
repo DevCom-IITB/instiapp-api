@@ -30,6 +30,11 @@
 <a href="/event-details/{{event.id}}">{{event.name}}</a>, {{event.start_time}} to {{event.end_time}}<br>
 {% endfor %}
 
+<h3>Children</h3>
+{% for child in body.children.all  %}
+<a href="/body-details/{{child.child.id}}">{{child.child.name}}</a><br>
+{% endfor %}
+
 <h3>People</h3>
 {% for role in body.roles.all  %}
     <h4>{{role.name}}</h4>
