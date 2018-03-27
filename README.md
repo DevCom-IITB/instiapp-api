@@ -4,6 +4,7 @@ Backend API in Django for the to-be comprehensive app for managing, finding and 
 [![TravisCI](https://api.travis-ci.org/wncc/IITBapp.svg?branch=master)](https://travis-ci.org/wncc/IITBapp)
 [![Coverage Status](https://coveralls.io/repos/github/wncc/IITBapp/badge.svg?branch=master)](https://coveralls.io/github/wncc/IITBapp?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7e6a386dbec649c99aa6a10218cc3768)](https://www.codacy.com/app/pulsejet/IITBapp?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wncc/IITBapp&amp;utm_campaign=Badge_Grade)
+[![Requirements Status](https://requires.io/github/wncc/IITBapp/requirements.svg?branch=master)](https://requires.io/github/wncc/IITBapp/requirements/?branch=master)
 
 The API spec can be found at [Apiary](https://iitbapp1.docs.apiary.io/)
 
