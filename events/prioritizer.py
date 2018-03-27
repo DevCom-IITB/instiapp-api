@@ -1,7 +1,6 @@
 """Event prioritizer."""
 from django.utils import timezone
 import math
-from datetime import date
 from datetime import timedelta
 
 BASE = 1000                              # Base points
@@ -50,7 +49,7 @@ def get_prioritized(queryset, request):
 def get_fresh_events(queryset, delta=3):
     """Gets events after removing stale ones."""
     return queryset.filter(
-        archived=False, end_time__gte=date.today() - timedelta(days=delta))
+        archived=False, end_time__gte=timezone.now() - timedelta(days=delta))
 
 def get_fresh_prioritized_events(queryset, request):
     """Gets fresh events with prioritization."""
