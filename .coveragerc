@@ -1,3 +1,5 @@
 [run]
 omit =
     login/test_server.py
+    backend/settings*
+    manage.py
