@@ -6,7 +6,7 @@ python:
   - 3.6
 
 before_install:
-  - export DJANGO_SETTINGS_MODULE=backend.settings_test.py
+  - export DJANGO_SETTINGS_MODULE=backend.settings_test
   - export PIP_USE_MIRRORS=true
 
 install:
