@@ -1,10 +1,8 @@
+"""Test cases for users app."""
 from django.utils import timezone
 from rest_framework.test import APITestCase
 from events.models import Event
-from locations.models import Location
 from bodies.models import Body
-from roles.models import BodyRole
-from roles.models import InstituteRole
 from login.tests import get_new_user
 
 class UserTestCase(APITestCase):
