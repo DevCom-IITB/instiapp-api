@@ -1,9 +1,9 @@
-Django==2.0.2
+Django==2.0.3
 djangorestframework==3.7.7
 markdown==2.6.11
 django-filter==1.1.0
 Pillow==5.0.0
-django-extra-fields==0.9
+django-extra-fields==0.10
 django-multiselectfield==0.1.8
 coverage==4.5.1
 requests==2.18.4
