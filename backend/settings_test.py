@@ -13,8 +13,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-SSO_TOKEN_URL = 'https://gymkhana.iitb.ac.in/sso/oauth/token/'
-SSO_PROFILE_URL = 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number'
+SSO_TOKEN_URL = 'http://localhost/CODE_TOKEN/'
+SSO_PROFILE_URL = 'http://localhost'
 HOST_FOR_SSO = 'http://localhost:8000/'
 SSO_CLIENT_ID = 'vR1pU7wXWyve1rUkg0fMS6StL1Kr6paoSmRIiLXJ'
 SSO_CLIENT_ID_SECRET_BASE64 = 'dlIxcFU3d1hXeXZlMXJVa2cwZk1TNlN0TDFLcjZwYW9TbVJJaUxYSjpaR2J6cHR2dXlVZmh1d3NVWHZqdXJRSEhjMU51WXFmbDJrSjRmSm90YWhyc2tuYklxa2o1NUNKdDc0UktQMllwaXlabHpXaGVZWXNiNGpKVG1RMFVEZUU4M1B6bVViNzRaUjJCakhhYkVqWVJPVEwxSnIxY1ZwTWdZTzFiOWpPWQ=='
