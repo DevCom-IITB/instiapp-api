@@ -42,7 +42,7 @@ class S(BaseHTTPRequestHandler):
         else:
             self.wfile.write(b'{"error":"auth test failed"}')
 
-def run(server_class=HTTPServer, handler_class=S, port=80):
+def run(server_class=HTTPServer, handler_class=S, port=33000):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print('Starting httpd...')
