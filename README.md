@@ -1,6 +1,8 @@
 # IITB App
 Backend API in Django for the to-be comprehensive app for managing, finding and enjoying life at Indian Institute of Technology, Bombay!
 
+[![TravisCI](https://api.travis-ci.org/wncc/IITBapp.svg?branch=master)](https://travis-ci.org/wncc/IITBapp)
+
 The API spec can be found at [Apiary](https://iitbapp1.docs.apiary.io/)
 
 Google's [Python Style Guide](https://google.github.io/styleguide/pyguide.html) is followed upto a certain extent in all modules.
