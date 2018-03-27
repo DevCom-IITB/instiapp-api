@@ -1,4 +1,5 @@
 """Unit tests for Location."""
+from django.utils import timezone
 from rest_framework.test import APITestCase
 from events.models import Event
 from locations.models import Location
@@ -64,4 +65,37 @@ class LocationTestCase(APITestCase):
         self.user.profile.institute_roles.add(self.insti_role)
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
+        self.user.profile.institute_roles.remove(self.insti_role)
+
+    def test_location_update(self):
+        """Test if location can be updated with body role or insti role."""
+
+        location = Location.objects.create(
+            name='TestLocation', reusable=False)
+        body = Body.objects.create(name="TestBody1")
+        event = Event.objects.create(start_time=timezone.now(), end_time=timezone.now())
+        body.events.add(event)
+        event.venues.add(location)
+
+        url = '/api/locations/' + str(location.id)
+        data = {
+            "name": "L2"
+        }
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        role = BodyRole.objects.create(
+            name="Body1Role", body=body, permissions='UpdE')
+        self.user.profile.roles.add(role)
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        data["reusable"] = "true"
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+        self.user.profile.roles.remove(role)
+
+        self.user.profile.institute_roles.add(self.insti_role)
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
         self.user.profile.institute_roles.remove(self.insti_role)
