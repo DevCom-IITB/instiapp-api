@@ -14,7 +14,8 @@ class LocationViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
-    def list(self, request):
+    @staticmethod
+    def list(request):
         # List only reusable locations
         queryset = Location.objects.filter(reusable=True)
         return Response(LocationSerializer(queryset, many=True).data)

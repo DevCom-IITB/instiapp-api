@@ -44,14 +44,16 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
     @login_required_ajax
     def update_me(self, request):
         """Update the logged-in user's profile."""
-        serializer = UserProfileFullSerializer(request.user.profile, data=request.data)
+        serializer = UserProfileFullSerializer(
+            request.user.profile, data=request.data, context=self.get_serializer_context())
         if not serializer.is_valid():
             return Response({'error': 'validation failed'})
         serializer.save()
         return Response(serializer.data)
 
+    @classmethod
     @login_required_ajax
-    def set_ues_me(self, request, event_pk):
+    def set_ues_me(cls, request, event_pk):
         """Creates or updates a UserEventStatus for the current user."""
 
         # Get status from query paramter
@@ -72,8 +74,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         ues.save()
         return Response(status=204)
 
+    @classmethod
     @login_required_ajax
-    def get_my_events(self, request):
+    def get_my_events(cls, request):
         """Gets events created by current user."""
         events = Event.objects.filter(created_by=request.user.profile)
         serializer = EventSerializer(events, many=True)
