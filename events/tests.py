@@ -1,4 +1,5 @@
 """Unit tests for Events."""
+from django.utils import timezone
 from rest_framework.test import APITestCase
 from bodies.models import Body
 from events.models import Event
@@ -28,16 +29,21 @@ class EventTestCase(APITestCase):
         self.user.profile.roles.add(self.body_1_role)
 
         self.update_test_event = Event.objects.create(
-            name='TestEventUpdated', start_time='2017-03-04T18:48:47Z',
-            end_time='2018-03-04T18:48:47Z')
+            name='TestEventUpdated', start_time=timezone.now(),
+            end_time=timezone.now())
         url = '/api/events/' + str(self.update_test_event.id)
         self.update_event_data = self.client.get(url).data
         self.update_url = '/api/events/' + str(self.update_test_event.id)
 
+        Event.objects.create(
+            name='TestEvent2', start_time=timezone.now(), end_time=timezone.now())
+
     def test_events_list(self):
         """Test if events can be listed."""
         url = '/api/events'
-        self.assertEqual(self.client.get(url).status_code, 200)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(response.data['data'][0]['weight'], 0)
 
     def test_event_creation(self):
         """Test if events can be created for the body."""
@@ -46,8 +52,8 @@ class EventTestCase(APITestCase):
         url = '/api/events'
         data = {
             "name": "TestEvent1",
-            "start_time": "2017-03-04T18:48:47Z",
-            "end_time": "2018-03-04T18:48:47Z",
+            "start_time": timezone.now(),
+            "end_time": timezone.now(),
             "venue_names": [],
             "bodies_id": [str(self.test_body_1.id)]
         }
@@ -142,7 +148,7 @@ class EventTestCase(APITestCase):
 
     def test_event_deletion(self):
         """Check if events can be deleted with priveleges."""
-        now = "2018-03-05T06:00:00Z"
+        now = timezone.now()
         event = Event.objects.create(
             name="TestEvent", start_time=now, end_time=now)
         self.test_body_1.events.add(event)
