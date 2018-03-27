@@ -1,6 +1,5 @@
 """Views for events app."""
 from uuid import UUID
-from collections import OrderedDict
 from rest_framework.response import Response
 from rest_framework import viewsets
 from events.prioritizer import get_fresh_prioritized_events
