@@ -3,3 +3,4 @@ omit =
     login/test_server.py
     backend/settings*
     manage.py
+    backend/wsgi.py
