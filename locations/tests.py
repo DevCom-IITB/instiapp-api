@@ -70,8 +70,7 @@ class LocationTestCase(APITestCase):
     def test_location_update(self):
         """Test if location can be updated with body role or insti role."""
 
-        location = Location.objects.create(
-            name='TestLocation', reusable=False)
+        location = Location.objects.create(name='TL', reusable=False)
         body = Body.objects.create(name="TestBody1")
         event = Event.objects.create(start_time=timezone.now(), end_time=timezone.now())
         body.events.add(event)
@@ -98,4 +97,18 @@ class LocationTestCase(APITestCase):
         self.user.profile.institute_roles.add(self.insti_role)
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 200)
+        self.user.profile.institute_roles.remove(self.insti_role)
+
+    def test_location_delete(self):
+        """Check if location can be deleted with insti role."""
+
+        location = Location.objects.create(name='TL', reusable=False)
+        url = '/api/locations/' + str(location.id)
+
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        self.user.profile.institute_roles.add(self.insti_role)
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, 204)
         self.user.profile.institute_roles.remove(self.insti_role)
