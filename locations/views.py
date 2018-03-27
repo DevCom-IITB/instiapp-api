@@ -32,8 +32,9 @@ class LocationViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
 
         # Disallow modifying reusable locations or marking reusable
         location = Location.objects.get(id=pk)
-        if (request.data['reusable'] != location.reusable) or location.reusable:
-            return forbidden_no_privileges()
+        if 'reusable' in request.data:
+            if (request.data['reusable'] != location.reusable) or location.reusable:
+                return forbidden_no_privileges()
 
         # Check if user has update privileges for each associated event
         for event in location.events.all():
