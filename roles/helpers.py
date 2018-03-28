@@ -1,5 +1,6 @@
 """Helper functions for implementing roles."""
 from rest_framework.response import Response
+from bodies.models import Body
 
 def forbidden_no_privileges():
     """Forbidden due to insufficient privileges."""
@@ -9,8 +10,13 @@ def forbidden_no_privileges():
     }, status=403)
 
 def user_has_privilege(profile, bodyid, privilege):
-    """Returns true if UserProfile has the privilege."""
-    return check_roles(profile.roles.all().filter(body__id=bodyid), privilege)
+    """Returns true if UserProfile has or has inherited the privilege."""
+    body = Body.objects.get(pk=bodyid)
+    parents = get_parents_recursive(body, [])
+    for role in profile.roles.all().filter(body__in=parents):
+        if (role.body == body or role.inheritable) and privilege in role.permissions:
+            return True
+    return False
 
 def user_has_insti_privilege(profile, privilege):
     """Returns true if UserProfile has the institute privilege."""
@@ -19,6 +25,13 @@ def user_has_insti_privilege(profile, privilege):
 def check_roles(roles, privilege):
     """Private helper function."""
     return any([(privilege in role.permissions) for role in roles])
+
+def get_parents_recursive(body, parents):
+    """Get array of parents. Includes the body itself."""
+    for child_body_relation in body.parents.all():
+        get_parents_recursive(child_body_relation.parent, parents)
+    parents.append(body)
+    return parents
 
 def diff_set(first, second):
     """Difference between two lists."""
