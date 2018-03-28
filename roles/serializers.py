@@ -14,11 +14,25 @@ class RoleSerializer(serializers.ModelSerializer):
     permissions = serializers.MultipleChoiceField(choices=PERMISSION_CHOICES)
     body_detail = BodySerializerMin(read_only=True, source='body')
     users_detail = UserProfileSerializer(many=True, read_only=True, source='users')
+    bodies = serializers.SerializerMethodField()
 
     class Meta:
         model = BodyRole
-        fields = ('id', 'name', 'inheritable', 'body', 'body_detail',
+        fields = ('id', 'name', 'inheritable', 'body', 'body_detail', 'bodies',
                   'permissions', 'users', 'users_detail')
+
+    @classmethod
+    def get_bodies(cls, obj):
+        if not obj.inheritable:
+            return BodySerializerMin([obj.body], many=True).data
+        return BodySerializerMin(cls.get_children_recursive(obj.body, []), many=True).data
+
+    @classmethod
+    def get_children_recursive(cls, body, children=[]):
+        for child_body_relation in body.children.all():
+            cls.get_children_recursive(child_body_relation.child, children)
+        children.append(body)
+        return children
 
 class RoleSerializerWithEvents(serializers.ModelSerializer):
     """Role Serializer with nested events of bodies"""
