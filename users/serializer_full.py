@@ -14,10 +14,10 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField()
 
     events_interested = serializers.SerializerMethodField()
-    get_events_interested = lambda self, obj: self.get_events(obj, 1, self.context['request'])
+    get_events_interested = lambda self, obj: self.get_events(obj, 1)
 
     events_going = serializers.SerializerMethodField()
-    get_events_going = lambda self, obj: self.get_events(obj, 2, self.context['request'])
+    get_events_going = lambda self, obj: self.get_events(obj, 2)
 
     followed_bodies = BodySerializerMin(many=True, read_only=True)
     followed_bodies_id = serializers.PrimaryKeyRelatedField(
@@ -34,13 +34,14 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
                   'institute_roles', 'website_url', 'ldap_id')
 
     def get_email(self, obj):
-        if 'request' in self.context and self.context['request'].user.is_authenticated:
+        """Gets the email only if a user is logged in."""
+        if self.context['request'].user.is_authenticated:
             return obj.email
         return 'N/A'
 
-    @staticmethod
-    def get_events(obj, status, request):
+    def get_events(self, obj, status):
         """Returns serialized events for given status."""
         from events.serializers import EventSerializer
+        request = self.context['request']
         return EventSerializer(get_r_fresh_prioritized_events(
             obj.followed_events.filter(ues__status=status), request), many=True).data
