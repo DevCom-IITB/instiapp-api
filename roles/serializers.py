@@ -23,12 +23,14 @@ class RoleSerializer(serializers.ModelSerializer):
 
     @classmethod
     def get_bodies(cls, obj):
+        """Gets bodies including children if inheritable."""
         if not obj.inheritable:
             return BodySerializerMin([obj.body], many=True).data
         return BodySerializerMin(cls.get_children_recursive(obj.body, []), many=True).data
 
     @classmethod
-    def get_children_recursive(cls, body, children=[]):
+    def get_children_recursive(cls, body, children):
+        """Returns an array including a body and its children."""
         for child_body_relation in body.children.all():
             cls.get_children_recursive(child_body_relation.child, children)
         children.append(body)
