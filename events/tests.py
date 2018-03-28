@@ -2,6 +2,7 @@
 from django.utils import timezone
 from rest_framework.test import APITestCase
 from bodies.models import Body
+from bodies.models import BodyChildRelation
 from events.models import Event
 from roles.models import BodyRole
 from login.tests import get_new_user
@@ -145,6 +146,32 @@ class EventTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.user.profile.roles.remove(body_2_role)
         self.test_body_1.events.remove(self.update_test_event)
+
+    def test_event_update8(self):
+        """Check that user can update event with inherited permission."""
+        # Body 2 is the parent of 1
+        self.test_body_1.events.add(self.update_test_event)
+
+        body_2_role = BodyRole.objects.create(
+            name="Body2Role", body=self.test_body_2,
+            permissions=['UpdE', 'DelE'], inheritable=True)
+        self.user.profile.roles.remove(self.body_1_role)
+        self.user.profile.roles.add(body_2_role)
+
+        # Check before adding child body relation
+        self.update_event_data['description'] = "NEW DESCRIPTION"
+        response = self.client.put(self.update_url, self.update_event_data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Add relation and test again
+        BodyChildRelation.objects.create(parent=self.test_body_2, child=self.test_body_1)
+
+        response = self.client.put(self.update_url, self.update_event_data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        self.user.profile.roles.remove(body_2_role)
+        self.test_body_1.events.remove(self.update_test_event)
+        self.user.profile.roles.add(self.body_1_role)
 
     def test_event_deletion(self):
         """Check if events can be deleted with priveleges."""
