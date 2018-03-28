@@ -77,7 +77,6 @@ class EventTestCase(APITestCase):
         self.user.profile.roles.add(body_2_role)
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
-        self.user.profile.roles.remove(body_2_role)
 
     def test_event_update(self):
         """Event can be updated."""
@@ -85,7 +84,6 @@ class EventTestCase(APITestCase):
         self.update_event_data['bodies_id'] = [str(self.test_body_1.id)]
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 200)
-        self.test_body_1.events.remove(self.update_test_event)
 
     def test_event_update2(self):
         """Check that an unrelated event cannot be updated."""
@@ -93,7 +91,6 @@ class EventTestCase(APITestCase):
         self.update_event_data['bodies_id'] = [str(self.test_body_2.id)]
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 403)
-        self.test_body_2.events.remove(self.update_test_event)
 
     def test_event_update3(self):
         """Check if event with multiple bodies can be updated while
@@ -104,8 +101,6 @@ class EventTestCase(APITestCase):
             str(self.test_body_1.id), str(self.test_body_2.id)]
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 200)
-        self.test_body_1.events.remove(self.update_test_event)
-        self.test_body_2.events.remove(self.update_test_event)
 
     def test_event_update4(self):
         """Confirm body cannot be removed without role."""
@@ -114,8 +109,6 @@ class EventTestCase(APITestCase):
         self.update_event_data['bodies_id'] = [str(self.test_body_1.id)]
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 403)
-        self.test_body_1.events.remove(self.update_test_event)
-        self.test_body_2.events.remove(self.update_test_event)
 
     def test_event_update5(self):
         """Confirm body can be removed with role."""
@@ -124,8 +117,6 @@ class EventTestCase(APITestCase):
         self.update_event_data['bodies_id'] = [str(self.test_body_2.id)]
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 200)
-        self.test_body_1.events.remove(self.update_test_event)
-        self.test_body_2.events.remove(self.update_test_event)
 
     def test_event_update6(self):
         """Check that user cannot add body without roles for both."""
@@ -133,7 +124,6 @@ class EventTestCase(APITestCase):
         self.update_event_data['bodies_id'] = [str(self.test_body_1.id), str(self.test_body_2.id)]
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 403)
-        self.test_body_1.events.remove(self.update_test_event)
 
     def test_event_update7(self):
         """Check that user can change bodies with roles for both."""
@@ -144,8 +134,6 @@ class EventTestCase(APITestCase):
         self.update_event_data['bodies_id'] = [str(self.test_body_1.id)]
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 200)
-        self.user.profile.roles.remove(body_2_role)
-        self.test_body_1.events.remove(self.update_test_event)
 
     def test_event_update8(self):
         """Check that user can update event with inherited permission."""
@@ -169,10 +157,6 @@ class EventTestCase(APITestCase):
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 200)
 
-        self.user.profile.roles.remove(body_2_role)
-        self.test_body_1.events.remove(self.update_test_event)
-        self.user.profile.roles.add(self.body_1_role)
-
     def test_event_deletion(self):
         """Check if events can be deleted with priveleges."""
         now = timezone.now()
@@ -193,4 +177,3 @@ class EventTestCase(APITestCase):
         self.user.profile.roles.add(body_2_role)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
-        self.user.profile.roles.remove(body_2_role)
