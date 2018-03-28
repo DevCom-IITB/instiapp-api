@@ -11,6 +11,8 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     from bodies.serializer_min import BodySerializerMin
     from bodies.models import Body
 
+    email = serializers.SerializerMethodField()
+
     events_interested = serializers.SerializerMethodField()
     get_events_interested = lambda self, obj: self.get_events(obj, 1, self.context['request'])
 
@@ -30,6 +32,11 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
                   'events_going', 'email', 'year', 'roll_no', 'contact_no',
                   'about', 'followed_bodies', 'followed_bodies_id', 'roles',
                   'institute_roles', 'website_url', 'ldap_id')
+
+    def get_email(self, obj):
+        if 'request' in self.context and self.context['request'].user.is_authenticated:
+            return obj.email
+        return 'N/A'
 
     @staticmethod
     def get_events(obj, status, request):
