@@ -8,7 +8,7 @@ class Body(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=50)
     short_description = models.CharField(max_length=50, blank=True)
-    description = models.CharField(max_length=500, blank=True)
+    description = models.TextField(blank=True)
     website_url = models.URLField(blank=True, null=True)
     image_url = models.URLField(blank=True, null=True)
 
