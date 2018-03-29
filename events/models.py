@@ -13,6 +13,7 @@ class Event(models.Model):
     time_of_creation = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500, blank=True)
+    bodies = models.ManyToManyField('bodies.Body', related_name='events', blank=True)
     image_url = models.URLField(blank=True, null=True)
     website_url = models.URLField(blank=True, null=True)
     start_time = models.DateTimeField()
