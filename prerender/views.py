@@ -31,3 +31,12 @@ def body_details(request, pk):
         'events': events,
     })
     return HttpResponse(rendered)
+
+def body_tree(request, pk):
+    body = get_object_or_404(Body.objects, pk=pk)
+
+    rendered = render_to_string('body-tree.html', {
+        'body': body,
+        'settings': settings,
+    })
+    return HttpResponse(rendered)

@@ -1,0 +1,12 @@
+<a href="/body-details/{{body.id}}">{{body.name}}</a><br>
+<img src="{{body.image_url}}" class="image" style="height: 50px"/>
+
+<ul>
+{% for cbr in body.children.all  %}
+    <li>
+        {%with body=cbr.child template_name="body-tree-data.html" %}
+            {%include template_name%}
+        {%endwith%}
+    </li>
+{% endfor %}
+</ul>

@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>{{settings.PRERENDER_TITLE}} Body Tree</title>
+
+    <script>
+        function toggleImages() {
+            var img = document.getElementsByClassName('image');
+            for (var i = 0; i < img.length; i++) {
+                if (img[i].style.display === 'inline') {
+                    img[i].style.display = 'none';
+                } else {
+                    img[i].style.display = 'inline';
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .image {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>{{body.name}}</h2>
+
+<button onclick="toggleImages()">Toggle Images</button><br><br>
+
+{%with body=body settings=settings template_name="body-tree-data.html" %}
+    {%include template_name%}
+{%endwith%}
+
+</body>
+</html>
