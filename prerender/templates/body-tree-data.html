@@ -1,5 +1,7 @@
-<a href="/body-details/{{body.id}}">{{body.name}}</a><br>
-<img src="{{body.image_url}}" class="image" style="height: 50px"/>
+<a href="/body-details/{{body.id}}">
+    {{body.name}}<br>
+    <img src="{{body.image_url}}" class="image" style="height: 50px"/>
+</a>
 
 <ul>
 {% for cbr in body.children.all  %}
