@@ -26,7 +26,7 @@ class BodyRole(models.Model):
         verbose_name_plural = "Body Roles"
 
     def __str__(self):
-        return self.name
+        return self.body.name + " " + self.name
 
 
 INSTITUTE_PERMISSION_CHOICES = (
