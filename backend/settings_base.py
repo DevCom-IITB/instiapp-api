@@ -121,3 +121,12 @@ REST_FRAMEWORK = {
 PRERENDER_TITLE = 'InstiApp'
 
 PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
+
+LDAP_USERNAME = None
+LDAP_PASSWORD = None
+
+if 'LDAP_USERNAME' in os.environ and 'LDAP_PASSWORD' in os.environ:
+    LDAP_USERNAME = os.environ['LDAP_USERNAME']
+    LDAP_PASSWORD = os.environ['LDAP_PASSWORD']
+else:
+    print('WARN: LDAP username and password not present in environment.')
