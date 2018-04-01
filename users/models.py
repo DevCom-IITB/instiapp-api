@@ -16,7 +16,7 @@ class UserProfile(models.Model):
     roll_no = models.CharField(max_length=10, null=True, blank=True)
     ldap_id = models.CharField(max_length=50, null=True, blank=True)
     profile_pic = models.URLField(null=True, blank=True)
-    fcm_id = models.CharField(max_length=50, null=True, blank=True)
+    fcm_id = models.CharField(max_length=200, null=True, blank=True)
 
     followed_bodies = models.ManyToManyField('bodies.Body', related_name='followers', blank=True)
     contact_no = models.CharField(max_length=10, null=True, blank=True)
