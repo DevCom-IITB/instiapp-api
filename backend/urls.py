@@ -24,6 +24,7 @@ from upload.views import UploadViewSet
 from users.views import UserProfileViewSet
 from login.views import LoginViewSet
 from roles.views import BodyRoleViewSet
+from placements.views import PlacementBlogViewset
 import prerender.views as pr
 
 urlpatterns = [
@@ -89,6 +90,8 @@ urlpatterns = [
     path('api/roles/<pk>', BodyRoleViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     )),
+
+    path('api/placement-blog', PlacementBlogViewset.as_view({'get':'list'})),
 
     path('user-details/<pk>', pr.user_details),
     path('event-details/<pk>', pr.event_details),

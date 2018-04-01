@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'bodies.apps.BodiesConfig',
     'upload.apps.UploadConfig',
     'roles.apps.RolesConfig',
+    'placements.apps.PlacementsConfig',
 ]
 
 MIDDLEWARE = [
@@ -118,3 +119,5 @@ REST_FRAMEWORK = {
 }
 
 PRERENDER_TITLE = 'InstiApp'
+
+PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
