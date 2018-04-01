@@ -14,3 +14,7 @@ class UploadedImage(models.Model):
     class Meta:
         verbose_name = "Uploaded Image"
         verbose_name_plural = "Uploaded Images"
+        ordering = ("-time_of_creation",)
+
+    def __str__(self):
+        return str(self.time_of_creation)

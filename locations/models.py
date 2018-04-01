@@ -23,3 +23,4 @@ class Location(models.Model):
     class Meta:
         verbose_name = "Location"
         verbose_name_plural = "Locations"
+        ordering = ("name",)

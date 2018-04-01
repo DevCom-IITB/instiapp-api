@@ -24,6 +24,7 @@ class BodyRole(models.Model):
     class Meta:
         verbose_name = "Body Role"
         verbose_name_plural = "Body Roles"
+        ordering = ("body__name",)
 
     def __str__(self):
         return self.body.name + " " + self.name
