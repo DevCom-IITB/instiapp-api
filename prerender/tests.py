@@ -2,6 +2,7 @@
 from django.utils import timezone
 from rest_framework.test import APITestCase
 from bodies.models import Body
+from bodies.models import BodyChildRelation
 from events.models import Event
 from users.models import UserProfile
 
@@ -49,3 +50,20 @@ class PrerenderTestCase(APITestCase):
         response = self.client.get(url)
         self.assertContains(response, self.test_event.name)
         self.assertContains(response, self.test_body.name)
+
+    def test_tree(self):
+        body1 = Body.objects.create(name="Body1")
+        body2 = Body.objects.create(name="Body2")
+        body11 = Body.objects.create(name="Body11")
+
+        BodyChildRelation.objects.create(parent=self.test_body, child=body1)
+        BodyChildRelation.objects.create(parent=self.test_body, child=body2)
+        BodyChildRelation.objects.create(parent=body1, child=body11)
+
+        url = '/body-tree/' + str(self.test_body.id)
+        response = self.client.get(url)
+
+        self.assertContains(response, self.test_body.name)
+        self.assertContains(response, body1.name)
+        self.assertContains(response, body2.name)
+        self.assertContains(response, body11.name)
