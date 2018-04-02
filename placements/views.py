@@ -8,7 +8,8 @@ from roles.helpers import login_required_ajax
 
 class PlacementBlogViewset(viewsets.ViewSet):
 
+    @classmethod
     @login_required_ajax
-    def list(self, request):
+    def list(cls, request):
         return Response(PlacementBlogEntrySerializer(PlacementBlogEntry.objects.filter(
             published__gte=timezone.now() - timedelta(days=15)), many=True).data)
