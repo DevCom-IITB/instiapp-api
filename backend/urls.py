@@ -44,9 +44,6 @@ urlpatterns = [
     path('api/events/<pk>', EventViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     ), name='event-detail'),
-    path('api/events-locations', EventViewSet.as_view(
-        {'post':'locations'}
-    )),
 
     path('api/locations', LocationViewSet.as_view(
         {'get':'list', 'post':'create'}
@@ -57,9 +54,6 @@ urlpatterns = [
 
     path('api/users/<pk>', UserProfileViewSet.as_view(
         {'get':'retrieve'}
-    ), name='userprofile-detail'),
-    path('api/users/<pk>/followed_bodies_events', UserProfileViewSet.as_view(
-        {'get':'followed_bodies_events'}
     )),
     path('api/users', UserProfileViewSet.as_view(
         {'get':'list'}

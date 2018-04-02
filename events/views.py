@@ -21,17 +21,6 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
     def get_serializer_context(self):
         return {'request': self.request}
 
-    @classmethod
-    def locations(cls, request):
-        """Endpoint to return event locations of all POSTed events."""
-        try:
-            [UUID(x, version=4) for x in request.data]
-        except ValueError:
-            return Response("Bad Request", status=400)
-
-        locs = EventLocationSerializer(Event.objects.filter(pk__in=request.data), many=True)
-        return Response(locs.data)
-
     def list(self, request): #pylint: disable=unused-argument
         queryset = get_fresh_prioritized_events(self.queryset, request)
 
