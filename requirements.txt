@@ -1,11 +1,11 @@
-Django==2.0.3
-djangorestframework==3.7.7
+Django==2.0.4
+djangorestframework==3.8.0
 markdown==2.6.11
 django-filter==1.1.0
-Pillow==5.0.0
+Pillow==5.1.0
 django-extra-fields==0.10
 django-multiselectfield==0.1.8
 coverage==4.5.1
 requests==2.18.4
-feedparser
-python-dateutil
+feedparser==5.2.1
+python-dateutil==2.7.2
