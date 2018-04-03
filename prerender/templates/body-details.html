@@ -9,7 +9,7 @@
 
     <meta property="og:title" content="{{body.name}}" />
     <meta property="og:type" content="organization" />
-    <meta property="og:url" content="{{settings.BASE_URL}}/body-details/{{body.str_id}}" />
+    <meta property="og:url" content="{{settings.BASE_URL}}/org/{{body.str_id}}" />
     <meta property="og:image" content="{{body.image_url}}" />
     <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
 </head>
@@ -27,25 +27,25 @@
 
 <h3>Events</h3>
 {% for event in events  %}
-<a href="/event-details/{{event.id}}">{{event.name}}</a>, {{event.start_time}} to {{event.end_time}}<br>
+<a href="/event/{{event.id}}">{{event.name}}</a>, {{event.start_time}} to {{event.end_time}}<br>
 {% endfor %}
 
 <!-- cbr is ChildBodyRelation -->
 <h3>Children</h3>
 {% for cbr in body.children.all  %}
-<a href="/body-details/{{cbr.child.str_id}}">{{cbr.child.name}}</a><br>
+<a href="/org/{{cbr.child.str_id}}">{{cbr.child.name}}</a><br>
 {% endfor %}
 
 <h3>Part of</h3>
 {% for cbr in body.parents.all  %}
-<a href="/body-details/{{cbr.parent.str_id}}">{{cbr.parent.name}}</a><br>
+<a href="/org/{{cbr.parent.str_id}}">{{cbr.parent.name}}</a><br>
 {% endfor %}
 
 <h3>People</h3>
 {% for role in body.roles.all  %}
     <h4>{{role.name}}</h4>
     {% for user in role.users.all  %}
-        <a href="/user-details/{{user.id}}">{{user.name}}</a><br>
+        <a href="/user/{{user.id}}">{{user.name}}</a><br>
     {% endfor %}
 {% endfor %}
 

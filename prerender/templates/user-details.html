@@ -9,7 +9,7 @@
 
     <meta property="og:title" content="{{profile.name}}" />
     <meta property="og:type" content="profile" />
-    <meta property="og:url" content="{{settings.BASE_URL}}/user-details/{{profile.id}}" />
+    <meta property="og:url" content="{{settings.BASE_URL}}/user/{{profile.id}}" />
     <meta property="og:image" content="{{profile.profile_pic}}" />
     <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
 </head>
@@ -24,7 +24,7 @@
 <br>
 
 {% for role in profile.roles.all  %}
-<a href="/body-details/{{role.body.id}}">{{role.body.name}}</a> {{ role.name }}<br>
+<a href="/org/{{role.body.str_id}}">{{role.body.name}}</a> {{ role.name }}<br>
 {% endfor %}
 
 </body>

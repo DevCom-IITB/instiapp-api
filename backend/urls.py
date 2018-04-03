@@ -87,8 +87,13 @@ urlpatterns = [
 
     path('api/placement-blog', PlacementBlogViewset.as_view({'get':'list'})),
 
+    path('user/<pk>', pr.user_details),
+    path('event/<pk>', pr.event_details),
+    path('org/<pk>', pr.body_details),
+    path('body-tree/<pk>', pr.body_tree),
+
+    # -------------- DEPRECATED -------------- #
     path('user-details/<pk>', pr.user_details),
     path('event-details/<pk>', pr.event_details),
     path('body-details/<pk>', pr.body_details),
-    path('body-tree/<pk>', pr.body_tree),
 ]
