@@ -1,6 +1,7 @@
 """Models for Event and UserEventStatus."""
 from uuid import uuid4
 from django.db import models
+from helpers.misc import get_url_friendly
 
 class Event(models.Model):
     """An event to be associated with one or more Bodies.
@@ -10,6 +11,8 @@ class Event(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    str_id = models.CharField(max_length=58, editable=False)
+
     time_of_creation = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
@@ -31,6 +34,10 @@ class Event(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
+        super(Event, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Event"

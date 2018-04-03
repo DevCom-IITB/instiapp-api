@@ -1,6 +1,7 @@
 """Models for Body and their children (BodyChildRelation)."""
 from uuid import uuid4
 from django.db import models
+from helpers.misc import get_url_friendly
 
 class Body(models.Model):
     """An organization or club which may conduct events."""
@@ -15,8 +16,7 @@ class Body(models.Model):
     image_url = models.URLField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        temp = "-".join(self.name.lower().split())
-        self.str_id = "".join(c for c in temp if c.isalnum() or c == "-")
+        self.str_id = get_url_friendly(self.name)
         super(Body, self).save(*args, **kwargs)
 
     def __str__(self):

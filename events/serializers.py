@@ -40,7 +40,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('id', 'name', 'description', 'image_url',
+        fields = ('id', 'str_id', 'name', 'description', 'image_url',
                   'start_time', 'end_time', 'all_day', 'venues', 'bodies',
                   'interested_count', 'going_count', 'website_url', 'weight')
 
@@ -81,7 +81,7 @@ class EventFullSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('id', 'name', 'description', 'image_url', 'start_time',
+        fields = ('id', 'str_id', 'name', 'description', 'image_url', 'start_time',
                   'end_time', 'all_day', 'venues', 'venue_names', 'bodies', 'bodies_id',
                   'interested_count', 'going_count', 'interested', 'going', 'venue_ids',
                   'website_url')
