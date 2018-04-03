@@ -1,4 +1,5 @@
 """Views for users app."""
+from uuid import UUID
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -17,6 +18,15 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
 
     def get_serializer_context(self):
         return {'request': self.request}
+
+    def retrieve(self, request, pk):
+        try:
+            UUID(pk, version=4)
+            return super().retrieve(self, request, pk)
+        except ValueError:
+            profile = get_object_or_404(UserProfile.objects.all(), ldap_id=pk)
+            return Response(UserProfileFullSerializer(
+                profile, context={'request': request}).data)
 
     @login_required_ajax
     def retrieve_me(self, request):

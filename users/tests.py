@@ -3,6 +3,7 @@ from django.utils import timezone
 from rest_framework.test import APITestCase
 from events.models import Event
 from bodies.models import Body
+from users.models import UserProfile
 from login.tests import get_new_user
 
 class UserTestCase(APITestCase):
@@ -16,6 +17,23 @@ class UserTestCase(APITestCase):
         self.user = get_new_user()
         self.client.force_authenticate(self.user) # pylint: disable=E1101
         self.test_body = Body.objects.create(name="test")
+
+    def test_get_user(self):
+        """Check the /api/users/<pk> API."""
+
+        profile = UserProfile.objects.create(name="TestUser", ldap_id="tu")
+
+        # Test GET with UUID
+        url = '/api/users/' + str(profile.id)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], profile.name)
+
+        # Test GET with LDAP ID
+        url = '/api/users/' + profile.ldap_id
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], profile.name)
 
     def test_user_me(self):
         """Check the /api/user-me API."""
