@@ -9,7 +9,7 @@
 
     <meta property="og:title" content="{{body.name}}" />
     <meta property="og:type" content="organization" />
-    <meta property="og:url" content="{{settings.BASE_URL}}/body-details/{{body.id}}" />
+    <meta property="og:url" content="{{settings.BASE_URL}}/body-details/{{body.str_id}}" />
     <meta property="og:image" content="{{body.image_url}}" />
     <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
 </head>
@@ -33,12 +33,12 @@
 <!-- cbr is ChildBodyRelation -->
 <h3>Children</h3>
 {% for cbr in body.children.all  %}
-<a href="/body-details/{{cbr.child.id}}">{{cbr.child.name}}</a><br>
+<a href="/body-details/{{cbr.child.str_id}}">{{cbr.child.name}}</a><br>
 {% endfor %}
 
 <h3>Part of</h3>
 {% for cbr in body.parents.all  %}
-<a href="/body-details/{{cbr.parent.id}}">{{cbr.parent.name}}</a><br>
+<a href="/body-details/{{cbr.parent.str_id}}">{{cbr.parent.name}}</a><br>
 {% endfor %}
 
 <h3>People</h3>

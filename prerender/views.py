@@ -1,4 +1,5 @@
 """Views for prerendered content for SEO."""
+from uuid import UUID
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
@@ -9,7 +10,12 @@ from events.prioritizer import get_fresh_prioritized_events
 from bodies.models import Body
 
 def user_details(request, pk):
-    profile = get_object_or_404(UserProfile.objects, pk=pk)
+    try:
+        UUID(pk, version=4)
+        profile = get_object_or_404(UserProfile.objects, pk=pk)
+    except ValueError:
+        profile = get_object_or_404(UserProfile.objects.all(), ldap_id=pk)
+
     if profile.profile_pic is None:
         profile.profile_pic = settings.USER_AVATAR_URL
 
@@ -22,7 +28,12 @@ def event_details(request, pk):
     return HttpResponse(rendered)
 
 def body_details(request, pk):
-    body = get_object_or_404(Body.objects, pk=pk)
+    try:
+        UUID(pk, version=4)
+        body = get_object_or_404(Body.objects, pk=pk)
+    except ValueError:
+        body = get_object_or_404(Body.objects.all(), str_id=pk)
+
     events = get_fresh_prioritized_events(body.events, request)
 
     rendered = render_to_string('body-details.html', {
