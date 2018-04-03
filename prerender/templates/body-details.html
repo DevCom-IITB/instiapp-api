@@ -45,7 +45,13 @@
 {% for role in body.roles.all  %}
     <h4>{{role.name}}</h4>
     {% for user in role.users.all  %}
+
+    {% if user.ldap_id %}
+        <a href="/user/{{user.ldap_id}}">{{user.name}}</a><br>
+    {% else %}
         <a href="/user/{{user.id}}">{{user.name}}</a><br>
+    {% endif %}
+
     {% endfor %}
 {% endfor %}
 
