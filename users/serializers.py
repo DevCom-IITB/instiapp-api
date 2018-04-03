@@ -7,4 +7,4 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ('id', 'name', 'profile_pic')
+        fields = ('id', 'name', 'profile_pic', 'ldap_id')
