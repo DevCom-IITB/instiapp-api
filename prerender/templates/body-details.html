@@ -27,7 +27,7 @@
 
 <h3>Events</h3>
 {% for event in events  %}
-<a href="/event/{{event.id}}">{{event.name}}</a>, {{event.start_time}} to {{event.end_time}}<br>
+<a href="/event/{{event.str_id}}">{{event.name}}</a>, {{event.start_time}} to {{event.end_time}}<br>
 {% endfor %}
 
 <!-- cbr is ChildBodyRelation -->

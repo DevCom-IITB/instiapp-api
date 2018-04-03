@@ -23,7 +23,12 @@ def user_details(request, pk):
     return HttpResponse(rendered)
 
 def event_details(request, pk):
-    event = get_object_or_404(Event.objects, pk=pk)
+    try:
+        UUID(pk, version=4)
+        event = get_object_or_404(Event.objects, pk=pk)
+    except ValueError:
+        event = get_object_or_404(Event.objects, str_id=pk)
+
     rendered = render_to_string('event-details.html', {'event': event, 'settings': settings})
     return HttpResponse(rendered)
 
