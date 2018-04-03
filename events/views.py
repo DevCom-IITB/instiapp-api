@@ -2,6 +2,7 @@
 from uuid import UUID
 from rest_framework.response import Response
 from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
 from events.prioritizer import get_fresh_prioritized_events
 from events.serializers import EventSerializer
 from events.serializers import EventFullSerializer
@@ -19,6 +20,14 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
     def get_serializer_context(self):
         return {'request': self.request}
+
+    def retrieve(self, request, pk):
+        try:
+            UUID(pk, version=4)
+            return super().retrieve(self, request, pk)
+        except ValueError:
+            event = get_object_or_404(Event.objects.all(), str_id=pk)
+            return Response(EventFullSerializer(event).data)
 
     def list(self, request): #pylint: disable=unused-argument
         queryset = get_fresh_prioritized_events(self.queryset, request)

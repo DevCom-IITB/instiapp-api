@@ -46,6 +46,21 @@ class EventTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreater(response.data['data'][0]['weight'], 0)
 
+    def test_event_get(self):
+        """Test getting the event with id or str_id."""
+        event = Event.objects.create(name="Test #Event 123!",
+                                     start_time=timezone.now(), end_time=timezone.now())
+
+        url = '/api/events/' + str(event.id)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], event.name)
+
+        url = '/api/events/test-event-123-' + str(event.id)[:8]
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], event.name)
+
     def test_event_creation(self):
         """Test if events can be created for the body."""
 
