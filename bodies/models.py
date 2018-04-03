@@ -6,11 +6,18 @@ class Body(models.Model):
     """An organization or club which may conduct events."""
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    str_id = models.CharField(max_length=50, editable=False)
+
     name = models.CharField(max_length=50)
     short_description = models.CharField(max_length=50, blank=True)
     description = models.TextField(blank=True)
     website_url = models.URLField(blank=True, null=True)
     image_url = models.URLField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        temp = "-".join(self.name.lower().split())
+        self.str_id = "".join(c for c in temp if c.isalnum() or c == "-")
+        super(Body, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name

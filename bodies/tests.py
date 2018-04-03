@@ -47,6 +47,20 @@ class BodyTestCase(APITestCase):
         response.close()
         self.test_body_2_id = response.data['id']
 
+    def test_body_get(self):
+        """Test getting the body with id or str_id."""
+        body = Body.objects.create(name="Test #Body 123!")
+
+        url = '/api/bodies/' + str(body.id)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], body.name)
+
+        url = '/api/bodies/test-body-123'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], body.name)
+
     def test_bodies_list(self):
         """Test if bodies can be listed."""
         url = '/api/bodies'
