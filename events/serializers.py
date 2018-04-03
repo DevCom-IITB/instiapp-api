@@ -97,27 +97,3 @@ class EventFullSerializer(serializers.ModelSerializer):
         result.created_by = self.context['request'].user.profile
         result.save()
         return result
-
-class UserEventStatusSerializer(serializers.ModelSerializer):
-    """DEPRECATED
-
-    Serializer for UserEventStatus."""
-
-    class Meta:
-        from events.models import UserEventStatus
-        model = UserEventStatus
-        fields = ('id', 'event', 'user', 'status')
-
-class EventLocationSerializer(serializers.ModelSerializer):
-    """Gets event with detailed location info.
-
-    Intended for use only with POST list.
-    """
-
-    from locations.serializers import LocationSerializer
-
-    venues = LocationSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Event
-        fields = ('id', 'name', 'venues')

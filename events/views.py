@@ -5,7 +5,6 @@ from rest_framework import viewsets
 from events.prioritizer import get_fresh_prioritized_events
 from events.serializers import EventSerializer
 from events.serializers import EventFullSerializer
-from events.serializers import EventLocationSerializer
 from events.models import Event
 from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
