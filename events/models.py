@@ -11,7 +11,7 @@ class Event(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    str_id = models.CharField(max_length=58, editable=False)
+    str_id = models.CharField(max_length=58, editable=False, null=True)
 
     time_of_creation = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=50)

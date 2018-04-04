@@ -7,7 +7,7 @@ class Body(models.Model):
     """An organization or club which may conduct events."""
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    str_id = models.CharField(max_length=50, editable=False)
+    str_id = models.CharField(max_length=50, editable=False, null=True)
 
     name = models.CharField(max_length=50)
     short_description = models.CharField(max_length=50, blank=True)
