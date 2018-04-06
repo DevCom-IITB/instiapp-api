@@ -17,3 +17,7 @@ install:
 script:
   - coverage run --source ./ manage.py test -v2
   - coveralls
+
+cache:
+  directories:
+    - $HOME/.cache/pip
