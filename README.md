@@ -2,7 +2,7 @@
 Backend API in Django for the to-be comprehensive app for managing, finding and enjoying life at Indian Institute of Technology, Bombay!
 
 [![TravisCI](https://api.travis-ci.org/wncc/IITBapp.svg?branch=master)](https://travis-ci.org/wncc/IITBapp)
-[![Coverage Status](https://coveralls.io/repos/github/wncc/IITBapp/badge.svg?branch=master)](https://coveralls.io/github/wncc/IITBapp?branch=master)
+[![codecov](https://codecov.io/gh/wncc/IITBapp/branch/master/graph/badge.svg)](https://codecov.io/gh/wncc/IITBapp)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7e6a386dbec649c99aa6a10218cc3768)](https://www.codacy.com/app/pulsejet/IITBapp?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wncc/IITBapp&amp;utm_campaign=Badge_Grade)
 [![Requirements Status](https://requires.io/github/wncc/IITBapp/requirements.svg?branch=master)](https://requires.io/github/wncc/IITBapp/requirements/?branch=master)
 
