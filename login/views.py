@@ -123,7 +123,7 @@ class LoginViewSet(viewsets.ViewSet):
 
     @staticmethod
     def logout(request):
-        """Log out the user."""        
+        """Log out the user."""
 
         logout(request)
         return Response({'message': 'logged out'})
