@@ -1,6 +1,5 @@
 """Login Viewset."""
 import requests
-from django.shortcuts import redirect
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import login
