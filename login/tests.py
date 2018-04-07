@@ -38,6 +38,11 @@ class LoginTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 400)
 
+        # Try to log in with bad code
+        url = 'http://localhost/api/login?code=BAD_TEST_CODE&redir=REDIRECT_URI&fcm_id=testfcm'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
+
         # Try to log in
         url = 'http://localhost/api/login?code=TEST_CODE&redir=REDIRECT_URI&fcm_id=testfcm'
         response = self.client.get(url, format='json')
