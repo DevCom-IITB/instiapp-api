@@ -30,7 +30,23 @@ class LocationTestCase(APITestCase):
             name="InstiRole", permissions='Location')
 
         self.reusable_test_location = Location.objects.create(
-            name='TestLocation1', reusable=True)
+            name='ReusableTestLocation', reusable=True)
+
+    def test_location_other(self):
+        """Check misc paramters of Location"""
+        self.assertEqual(str(self.reusable_test_location),
+                         self.reusable_test_location.name)
+
+    def test_location_get(self):
+        """Check that only reusable locations are listed in get."""
+        # Non reusable location
+        Location.objects.create(name='TestLocation1', reusable=False)
+
+        url = '/api/locations'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], str(self.reusable_test_location.id))
 
     def test_event_link(self):
         """Test if events can be linked."""
