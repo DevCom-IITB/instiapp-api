@@ -124,4 +124,11 @@ class RoleTestCase(APITestCase):
         self.assertEqual(response.status_code, 204)
         self.user.profile.institute_roles.remove(self.instirole)
 
-    
+    def test_my_roles(self):
+        """Test /api/user-me/roles."""
+
+        self.user.profile.roles.add(self.bodyrole)
+        url = '/api/user-me/roles'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], str(self.bodyrole.id))
