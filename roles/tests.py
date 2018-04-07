@@ -64,4 +64,36 @@ class RoleTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.user.profile.institute_roles.remove(self.instirole)
 
-        
+    def test_update_body_role(self):
+        """Check we can create roles."""
+
+        url = '/api/roles/' + str(self.bodyrole.id)
+        data = {
+            "id": str(self.bodyrole.id),
+            "name": "Updated Role",
+            "body": str(self.body.id),
+            "permissions": ['Role', 'AddE'],
+            "users": []
+        }
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Check with body role
+        self.user.profile.roles.add(self.bodyrole)
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        # Test validation
+        body2 = Body.objects.create(name="Body2")
+        data['body'] = str(body2.id)
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+        data['body'] = str(self.body.id)
+
+        self.user.profile.roles.remove(self.bodyrole)
+
+        # Check with institute role
+        self.user.profile.institute_roles.add(self.instirole)
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.user.profile.institute_roles.remove(self.instirole)
