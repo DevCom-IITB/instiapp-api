@@ -94,3 +94,11 @@ class UserTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], str(event.id))
+
+    def test_get_noauth(self):
+        """Test privacy with no auth."""
+        self.client.logout()
+        profile = UserProfile.objects.create(name="TestUser", email="user@user.com")
+        url = '/api/users/' + str(profile.id)
+        response = self.client.get(url, format='json')
+        self.assertNotEqual(response.data['email'], profile.email)
