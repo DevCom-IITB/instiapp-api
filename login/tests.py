@@ -23,7 +23,7 @@ class LoginTestCase(APITestCase):
         time.sleep(1)
 
         # Try to log in
-        url = 'http://localhost/api/login?code=TEST_CODE&redir=REDIRECT_URI'
+        url = 'http://localhost/api/login?code=TEST_CODE&redir=REDIRECT_URI&fcm_id=testfcm'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['profile']['name'], "First Name Last Name")
