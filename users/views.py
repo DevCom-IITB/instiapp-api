@@ -40,7 +40,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         serializer = UserProfileFullSerializer(
             request.user.profile, data=request.data, context=self.get_serializer_context())
         if not serializer.is_valid():
-            return Response({'error': 'validation failed'})
+            return Response({'error': 'validation failed'}, status=400)
         serializer.save()
         return Response(serializer.data)
 
