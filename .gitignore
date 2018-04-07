@@ -1,5 +1,6 @@
 .vscode
 upload/static
+htmlcov
 *.sqlite3
 IITBappenv
 # Byte-compiled / optimized / DLL files

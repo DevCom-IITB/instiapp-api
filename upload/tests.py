@@ -29,6 +29,9 @@ class UploadTestCase(APITestCase):
         img = UploadedImage.objects.get(pk=img_id)
         self.assertIn('.gif', str(img.picture))
 
+        # Check __str__
+        self.assertEqual(str(img), str(img.time_of_creation))
+
         # Test delete
         url = '/api/upload/' + img_id
         response = self.client.delete(url, format='json')

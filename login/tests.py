@@ -22,8 +22,29 @@ class LoginTestCase(APITestCase):
         mock_server = Popen(['python', 'login/test_server.py'])
         time.sleep(1)
 
+        # Check validation
+        # Without code
+        url = 'http://localhost/api/login?redir=REDIRECT_URI'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
+
+        # Without redir
+        url = 'http://localhost/api/login?code=TEST_CODE'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
+
+        # Try to log in with wrong code
+        url = 'http://localhost/api/login?code=T_CODE&redir=REDIRECT_URI'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
+
+        # Try to log in with bad code
+        url = 'http://localhost/api/login?code=BAD_TEST_CODE&redir=REDIRECT_URI&fcm_id=testfcm'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
+
         # Try to log in
-        url = 'http://localhost/api/login?code=TEST_CODE&redir=REDIRECT_URI'
+        url = 'http://localhost/api/login?code=TEST_CODE&redir=REDIRECT_URI&fcm_id=testfcm'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['profile']['name'], "First Name Last Name")
@@ -40,3 +61,16 @@ class LoginTestCase(APITestCase):
         url = 'http://localhost/api/logout'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
+
+        # Try get-user after logout
+        url = 'http://localhost/api/login/get-user'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 401)
+
+        # Try get-user without profile
+        user = User.objects.get(username='3')
+        self.client.force_authenticate(user) # pylint: disable=E1101
+        user.profile.delete()
+        url = 'http://localhost/api/login/get-user'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 500)

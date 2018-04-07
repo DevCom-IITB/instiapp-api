@@ -42,11 +42,13 @@ class RoleSerializerWithEvents(serializers.ModelSerializer):
     permissions = serializers.MultipleChoiceField(choices=PERMISSION_CHOICES)
     events = serializers.SerializerMethodField()
     body_detail = BodySerializerMin(read_only=True, source='body')
+    bodies = serializers.SerializerMethodField()
+    get_bodies = lambda self, obj: RoleSerializer.get_bodies(obj)
 
     class Meta:
         model = BodyRole
         fields = ('id', 'name', 'inheritable', 'body', 'body_detail',
-                  'permissions', 'events')
+                  'bodies', 'permissions', 'events')
 
     def get_events(self, obj):
         return EventSerializer(get_r_fresh_prioritized_events(

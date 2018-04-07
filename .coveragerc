@@ -4,3 +4,4 @@ omit =
     backend/settings*
     manage.py
     backend/wsgi.py
+    */migrations/*

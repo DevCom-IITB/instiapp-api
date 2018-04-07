@@ -23,6 +23,9 @@ class UserTestCase(APITestCase):
 
         profile = UserProfile.objects.create(name="TestUser", ldap_id="tu")
 
+        # Check __str__
+        self.assertEqual(str(profile), profile.name)
+
         # Test GET with UUID
         url = '/api/users/' + str(profile.id)
         response = self.client.get(url, format='json')
@@ -53,6 +56,14 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.user.profile.followed_bodies.all()[0], self.test_body)
 
+        # Check validation
+        data = {
+            "followed_bodies_id": [str(self.test_body.id), "my-invalid-uid"]
+        }
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('error', response.data)
+
         event = Event.objects.create(
             start_time=timezone.now(), end_time=timezone.now(), created_by=self.user.profile)
 
@@ -73,8 +84,21 @@ class UserTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.data['events_going'][0]['id'], str(event.id))
 
+        # Check marking validation
+        url = '/api/user-me/ues/' + str(event.id)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
+
         # Check self events
         url = '/api/user-me/events'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], str(event.id))
+
+    def test_get_noauth(self):
+        """Test privacy with no auth."""
+        self.client.logout()
+        profile = UserProfile.objects.create(name="TestUser", email="user@user.com")
+        url = '/api/users/' + str(profile.id)
+        response = self.client.get(url, format='json')
+        self.assertNotEqual(response.data['email'], profile.email)
