@@ -19,7 +19,7 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
         if user_has_insti_privilege(request.user.profile, 'RoleB'):
             return super().create(request)
 
-        if not request.data['body']:
+        if not 'body' in request.data or not request.data['body']:
             return Response({"body": "body is required"}, status=400)
         if not user_has_privilege(request.user.profile, request.data['body'], 'Role'):
             return forbidden_no_privileges()
