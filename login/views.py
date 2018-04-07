@@ -17,11 +17,6 @@ class LoginViewSet(viewsets.ViewSet):
     """Viewset to handle logging in and out, and getting the current user's profile."""
 
     @staticmethod
-    def login_page(request):   # pylint: disable=W0613
-        """Temporary method to redirect to login page."""
-        return redirect('https://gymkhana.iitb.ac.in/sso/oauth/authorize/?client_id=' + settings.SSO_CLIENT_ID + '&response_type=code&scope=basic profile picture sex ldap phone insti_address program secondary_emails&redirect_uri=' + settings.HOST_FOR_SSO + 'api/login')
-
-    @staticmethod
     def login(request):
         """Logs in the user using the {?code} query parameter"""
 
@@ -33,9 +28,9 @@ class LoginViewSet(viewsets.ViewSet):
         # Construt post data to get token
         redir = request.GET.get('redir')
         if redir is None:
-            post_data = 'code=' + auth_code + '&redirect_uri=' + settings.HOST_FOR_SSO + 'api/login&grant_type=authorization_code'
-        else:
-            post_data = 'code=' + auth_code + '&redirect_uri=' + redir + '&grant_type=authorization_code'
+            return Response({"message" : "{?redir} is required"}, status=400)
+
+        post_data = 'code=' + auth_code + '&redirect_uri=' + redir + '&grant_type=authorization_code'
 
         # Get our access token
         response = requests.post(
