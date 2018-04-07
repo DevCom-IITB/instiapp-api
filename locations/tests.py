@@ -33,7 +33,7 @@ class LocationTestCase(APITestCase):
             name='ReusableTestLocation', reusable=True)
 
     def test_location_other(self):
-        """Check misc paramters of Location"""
+        """Check misc parameters of Location"""
         self.assertEqual(str(self.reusable_test_location),
                          self.reusable_test_location.name)
 
