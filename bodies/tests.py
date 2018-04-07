@@ -1,6 +1,7 @@
 """Unit tests for Body."""
 from rest_framework.test import APITestCase
 from bodies.models import Body
+from bodies.models import BodyChildRelation
 from roles.models import InstituteRole
 from roles.models import BodyRole
 from login.tests import get_new_user
@@ -46,6 +47,15 @@ class BodyTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         response.close()
         self.test_body_2_id = response.data['id']
+
+    def test_body_other(self):
+        """Check misc paramters of Body"""
+        body = Body.objects.create(name="TestBody")
+        child = Body.objects.create(name="ChildBody")
+        cbr = BodyChildRelation.objects.create(parent=body, child=child)
+
+        self.assertEqual(str(body), body.name)
+        self.assertEqual(str(cbr), body.name + " --> " + child.name)
 
     def test_body_get(self):
         """Test getting the body with id or str_id."""
