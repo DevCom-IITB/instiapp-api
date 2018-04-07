@@ -1,4 +1,5 @@
 """Unit tests for Events."""
+from datetime import timedelta
 from django.utils import timezone
 from rest_framework.test import APITestCase
 from bodies.models import Body
@@ -30,14 +31,72 @@ class EventTestCase(APITestCase):
         self.user.profile.roles.add(self.body_1_role)
 
         self.update_test_event = Event.objects.create(
-            name='TestEventUpdated', start_time=timezone.now(),
-            end_time=timezone.now())
+            name='TestEventUpdated', start_time=timezone.now() - timedelta(days=1),
+            end_time=timezone.now() - timedelta(days=1))
         url = '/api/events/' + str(self.update_test_event.id)
         self.update_event_data = self.client.get(url).data
         self.update_url = '/api/events/' + str(self.update_test_event.id)
 
-        Event.objects.create(
-            name='TestEvent2', start_time=timezone.now(), end_time=timezone.now())
+        Event.objects.create(name='TestEvent2', start_time=timezone.now() - timedelta(days=1),
+                             end_time=timezone.now() - timedelta(days=1))
+
+    def test_event_other(self):
+        """Check misc paramters of Event"""
+        self.assertEqual(str(self.update_test_event), self.update_test_event.name)
+
+    def test_event_prioritizer(self):
+        """Test the event prioritizer."""
+
+        # Events in future. event1 after event3 after event2. event4 in past
+
+        event1 = Event.objects.create(name="Event1",
+                                      start_time=timezone.now() + timedelta(days=2),
+                                      end_time=timezone.now() + timedelta(days=2))
+
+        event2 = Event.objects.create(name="Event2",
+                                      start_time=timezone.now() + timedelta(hours=4),
+                                      end_time=timezone.now() + timedelta(hours=5))
+
+        event3 = Event.objects.create(name="Event3",
+                                      start_time=timezone.now() + timedelta(hours=15),
+                                      end_time=timezone.now() + timedelta(hours=16))
+
+        event4 = Event.objects.create(name="Event4",
+                                      start_time=timezone.now() - timedelta(hours=5),
+                                      end_time=timezone.now() - timedelta(hours=4))
+
+        url = '/api/events'
+        response = self.client.get(url)
+        self.assertEqual(response.data['data'][0]['id'], str(event2.id))
+        self.assertEqual(response.data['data'][1]['id'], str(event3.id))
+        self.assertEqual(response.data['data'][2]['id'], str(event1.id))
+        self.assertEqual(response.data['data'][3]['id'], str(event4.id))
+
+        # Check followed bodies priorities
+        body1 = Body.objects.create(name="TestBody1")
+        body2 = Body.objects.create(name="TestBody2")
+        body3 = Body.objects.create(name="TestBody3")
+        body4 = Body.objects.create(name="TestBody4")
+        body5 = Body.objects.create(name="TestBody5")
+        self.user.profile.followed_bodies.add(body1, body2, body3, body4, body5)
+
+        # After the user is following  a body of event 3, it should bump up
+        event3.bodies.add(body1)
+
+        response = self.client.get(url)
+        self.assertEqual(response.data['data'][0]['id'], str(event3.id))
+        self.assertEqual(response.data['data'][1]['id'], str(event2.id))
+        self.assertEqual(response.data['data'][2]['id'], str(event1.id))
+        self.assertEqual(response.data['data'][3]['id'], str(event4.id))
+
+        # Test the cap on followed bodies bonus
+        event1.bodies.add(body1, body2, body3, body4, body5)
+
+        response = self.client.get(url)
+        self.assertEqual(response.data['data'][0]['id'], str(event3.id))
+        self.assertEqual(response.data['data'][1]['id'], str(event1.id))
+        self.assertEqual(response.data['data'][2]['id'], str(event2.id))
+        self.assertEqual(response.data['data'][3]['id'], str(event4.id))
 
     def test_events_list(self):
         """Test if events can be listed."""
