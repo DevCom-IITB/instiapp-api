@@ -123,11 +123,7 @@ class LoginViewSet(viewsets.ViewSet):
 
     @staticmethod
     def logout(request):
-        """Log out the user."""
+        """Log out the user."""        
 
-        # Delete the session key if we can
-        try:
-            logout(request)
-        except KeyError:
-            pass
+        logout(request)
         return Response({'message': 'logged out'})
