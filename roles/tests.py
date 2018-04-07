@@ -1,6 +1,7 @@
 """Unit tests for Roles."""
 from rest_framework.test import APITestCase
 from bodies.models import Body
+from bodies.models import BodyChildRelation
 from roles.models import BodyRole
 from roles.models import InstituteRole
 from login.tests import get_new_user
@@ -20,7 +21,7 @@ class RoleTestCase(APITestCase):
 
         self.body = Body.objects.create(name="Body1")
         self.bodyrole = BodyRole.objects.create(
-            name="Role", body=self.body, permissions=['Role'])
+            name="Role", body=self.body, permissions=['Role'], inheritable=True)
         self.instirole = InstituteRole.objects.create(
             name="InstiRole", permissions=['RoleB'])
 
@@ -127,8 +128,18 @@ class RoleTestCase(APITestCase):
     def test_my_roles(self):
         """Test /api/user-me/roles."""
 
+        non_inheritable_role = BodyRole.objects.create(
+            name="NIR", body=self.body, inheritable=False, permissions=['AddE'])
+        self.user.profile.roles.add(non_inheritable_role)
+
         self.user.profile.roles.add(self.bodyrole)
+        body1 = Body.objects.create(name="Body1")
+        BodyChildRelation.objects.create(parent=self.body, child=body1)
+        body11 = Body.objects.create(name="Body11")
+        BodyChildRelation.objects.create(parent=body1, child=body11)
+        body111 = Body.objects.create(name="Body111")
+        BodyChildRelation.objects.create(parent=body11, child=body111)
+
         url = '/api/user-me/roles'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]['id'], str(self.bodyrole.id))
