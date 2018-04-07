@@ -61,3 +61,16 @@ class LoginTestCase(APITestCase):
         url = 'http://localhost/api/logout'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
+
+        # Try get-user after logout
+        url = 'http://localhost/api/login/get-user'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 401)
+
+        # Try get-user without profile
+        user = User.objects.get(username='3')
+        self.client.force_authenticate(user) # pylint: disable=E1101
+        user.profile.delete()
+        url = 'http://localhost/api/login/get-user'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 500)
