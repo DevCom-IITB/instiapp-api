@@ -4,6 +4,19 @@ from rest_framework.test import APITestCase
 from placements.models import BlogEntry
 from login.tests import get_new_user
 
+def test_blog(obj, url, count):
+    """Helper for testing authenticated blog endpoints."""
+    # Try without authentication
+    response = obj.client.get(url)
+    obj.assertEqual(response.status_code, 401)
+
+    # Try after authentication
+    user = get_new_user()
+    obj.client.force_authenticate(user) # pylint: disable=E1101
+    response = obj.client.get(url)
+    obj.assertEqual(response.status_code, 200)
+    obj.assertEqual(len(response.data), count)
+
 class PlacementsTestCase(APITestCase):
     """Test placements endpoints."""
 
@@ -23,30 +36,8 @@ class PlacementsTestCase(APITestCase):
 
     def test_placement_get(self):
         """Check auth before getting placements."""
-
-        # Try without authentication
-        url = '/api/placement-blog'
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 401)
-
-        # Try after authentication
-        user = get_new_user()
-        self.client.force_authenticate(user) # pylint: disable=E1101
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        test_blog(self, '/api/placement-blog', 2)
 
     def test_training_get(self):
         """Check auth before getting training blog."""
-
-        # Try without authentication
-        url = '/api/training-blog'
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 401)
-
-        # Try after authentication
-        user = get_new_user()
-        self.client.force_authenticate(user) # pylint: disable=E1101
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 3)
+        test_blog(self, '/api/training-blog', 3)
