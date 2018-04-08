@@ -1,4 +1,5 @@
 """Unit tests for Placements."""
+from django.conf import settings
 from rest_framework.test import APITestCase
 from placements.models import BlogEntry
 from login.tests import get_new_user
@@ -11,8 +12,8 @@ class PlacementsTestCase(APITestCase):
 
     def setUp(self):
         # Create dummies
-        self.entry1 = BlogEntry.objects.create(title="Entry1")
-        self.entry2 = BlogEntry.objects.create(title="Entry2")
+        self.entry1 = BlogEntry.objects.create(title="PEntry1", blog_url=settings.PLACEMENTS_URL)
+        self.entry2 = BlogEntry.objects.create(title="PEntry2", blog_url=settings.PLACEMENTS_URL)
 
     def test_placement_other(self):
         """Check misc parameters of Placement."""
