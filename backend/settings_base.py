@@ -121,6 +121,7 @@ REST_FRAMEWORK = {
 PRERENDER_TITLE = 'InstiApp'
 
 PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
+TRAINING_BLOG_URL = 'http://placements.iitb.ac.in/trainingblog/?feed=rss2'
 
 LDAP_USERNAME = None
 LDAP_PASSWORD = None

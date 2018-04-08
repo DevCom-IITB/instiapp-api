@@ -84,7 +84,8 @@ urlpatterns = [
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
     )),
 
-    path('api/placement-blog', PlacementBlogViewset.as_view({'get':'list'})),
+    path('api/placement-blog', PlacementBlogViewset.as_view({'get':'placement_blog'})),
+    path('api/training-blog', PlacementBlogViewset.as_view({'get':'training_blog'})),
 
     path('user/<pk>', pr.user_details),
     path('event/<pk>', pr.event_details),
