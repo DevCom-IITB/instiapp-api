@@ -1,6 +1,6 @@
 """Unit tests for Placements."""
 from rest_framework.test import APITestCase
-from placements.models import PlacementBlogEntry
+from placements.models import BlogEntry
 from login.tests import get_new_user
 
 class PlacementsTestCase(APITestCase):
@@ -11,8 +11,8 @@ class PlacementsTestCase(APITestCase):
 
     def setUp(self):
         # Create dummies
-        self.entry1 = PlacementBlogEntry.objects.create(title="Entry1")
-        self.entry2 = PlacementBlogEntry.objects.create(title="Entry2")
+        self.entry1 = BlogEntry.objects.create(title="Entry1")
+        self.entry2 = BlogEntry.objects.create(title="Entry2")
 
     def test_placement_other(self):
         """Check misc parameters of Placement."""

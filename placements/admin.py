@@ -1,4 +1,4 @@
 from django.contrib import admin
-from placements.models import PlacementBlogEntry
+from placements.models import BlogEntry
 
-admin.site.register(PlacementBlogEntry)
+admin.site.register(BlogEntry)
