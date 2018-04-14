@@ -13,7 +13,7 @@ from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
 
 class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    """Event Endpoint."""
+    """Event"""
 
     queryset = Event.objects.all()
     serializer_class = EventFullSerializer

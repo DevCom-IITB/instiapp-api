@@ -12,7 +12,7 @@ from users.models import UserProfile
 from roles.helpers import login_required_ajax
 
 class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    """API endpoint that allows users to be viewed or edited."""
+    """UserProfile"""
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileFullSerializer
 
@@ -30,13 +30,13 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
 
     @login_required_ajax
     def retrieve_me(self, request):
-        """Retrieves the logged-in user's profile."""
+        """Get current user."""
         return Response(UserProfileFullSerializer(
             request.user.profile, context=self.get_serializer_context()).data)
 
     @login_required_ajax
     def update_me(self, request):
-        """Update the logged-in user's profile."""
+        """Update current user."""
         serializer = UserProfileFullSerializer(
             request.user.profile, data=request.data, context=self.get_serializer_context())
         if not serializer.is_valid():
@@ -47,7 +47,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
     @classmethod
     @login_required_ajax
     def set_ues_me(cls, request, event_pk):
-        """Creates or updates a UserEventStatus for the current user."""
+        """Set UES for current user.
+        This will create or update if record exists."""
 
         # Get status from query paramter
         status = request.GET.get('status')
@@ -70,7 +71,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
     @classmethod
     @login_required_ajax
     def get_my_events(cls, request):
-        """Gets events created by current user."""
+        """Current user's created events."""
         events = Event.objects.filter(created_by=request.user.profile)
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)

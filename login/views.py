@@ -13,11 +13,12 @@ from users.serializer_full import UserProfileFullSerializer
 # pylint: disable=C0301
 
 class LoginViewSet(viewsets.ViewSet):
-    """Viewset to handle logging in and out, and getting the current user's profile."""
+    """Login"""
 
     @staticmethod
     def login(request):
-        """Logs in the user using the {?code} query parameter"""
+        """Log in.
+        Uses the `code` and `redir` query parameters."""
 
         # Check if we have the auth code
         auth_code = request.GET.get('code')
@@ -98,7 +99,7 @@ class LoginViewSet(viewsets.ViewSet):
 
     @staticmethod
     def get_user(request):
-        """Get the session and user's profile."""
+        """Get session and profile."""
 
         # Check if the user is authenticated
         if not request.user.is_authenticated:
@@ -122,7 +123,7 @@ class LoginViewSet(viewsets.ViewSet):
 
     @staticmethod
     def logout(request):
-        """Log out the user."""
+        """Log out."""
 
         logout(request)
         return Response({'message': 'logged out'})

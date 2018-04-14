@@ -5,7 +5,7 @@ from upload.models import UploadedImage
 from roles.helpers import login_required_ajax
 
 class UploadViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    """API endpoint that allows files to be uploaded."""
+    """Upload"""
     queryset = UploadedImage.objects.all()
     serializer_class = UploadedImageSerializer
 
@@ -14,8 +14,10 @@ class UploadViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancesto
 
     @login_required_ajax
     def create(self, request):
+        """Upload file."""
         return super().create(request)
 
     @login_required_ajax
     def destroy(self, request, pk):
+        """Delete file entry."""
         return super().destroy(request, pk)
