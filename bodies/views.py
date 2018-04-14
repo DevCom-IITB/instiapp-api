@@ -14,7 +14,7 @@ from roles.helpers import login_required_ajax
 from roles.helpers import insti_permission_required
 
 class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    """API endpoint that allows bodies to be viewed or edited."""
+    """Body"""
     queryset = Body.objects.all()
     serializer_class = BodySerializer
 
@@ -28,6 +28,9 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
         return Response(serializer.data)
 
     def retrieve(self, request, pk):
+        """Get Body.
+        Retrieve by `uuid` or `str_id`."""
+
         try:
             UUID(pk, version=4)
             return super().retrieve(self, request, pk)
@@ -38,19 +41,28 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
 
     @insti_permission_required('AddB')
     def create(self, request):
+        """Create Body.
+        Needs the `AddB` Institute Role permission."""
+
         return super().create(request)
 
     @login_required_ajax
     def update(self, request, pk):
+        """Update Body.
+        Needs the `UpdB` permission."""
+
         if not user_has_privilege(request.user.profile, pk, 'UpdB'):
             return forbidden_no_privileges()
         return super().update(request, pk)
 
     @insti_permission_required('DelB')
     def destroy(self, request, pk):
+        """Delete Body.
+        Needs the `DelB` institute permission."""
+
         return super().destroy(request, pk)
 
 class BodyFollowersViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    """API endpoint that lists followers of bodies."""
+    """List followers of body."""
     queryset = Body.objects.all()
     serializer_class = BodyFollowersSerializer

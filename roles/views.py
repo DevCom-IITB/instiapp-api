@@ -10,7 +10,7 @@ from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
 
 class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    """API endpoint that allows roles to be viewed or edited."""
+    """Body Role"""
     queryset = BodyRole.objects.all()
     serializer_class = RoleSerializer
 

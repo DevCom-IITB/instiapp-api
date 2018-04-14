@@ -19,8 +19,8 @@
           }
         },
         "parameters": [],
-        "description": "API endpoint that allows bodies to be viewed or edited.",
-        "summary": "API endpoint that allows bodies to be viewed or edited.",
+        "description": "Body",
+        "summary": "Body",
         "tags": [
           "bodies"
         ]
@@ -66,8 +66,8 @@
             }
           }
         ],
-        "description": "API endpoint that allows bodies to be viewed or edited.",
-        "summary": "API endpoint that allows bodies to be viewed or edited.",
+        "description": "Create Body.\nNeeds the `AddB` Institute Role permission.",
+        "summary": "Create Body.",
         "consumes": [
           "application/json"
         ],
@@ -93,8 +93,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that allows bodies to be viewed or edited.",
-        "summary": "API endpoint that allows bodies to be viewed or edited.",
+        "description": "Get Body.\nRetrieve by `uuid` or `str_id`.",
+        "summary": "Get Body.",
         "tags": [
           "bodies"
         ]
@@ -147,8 +147,8 @@
             }
           }
         ],
-        "description": "API endpoint that allows bodies to be viewed or edited.",
-        "summary": "API endpoint that allows bodies to be viewed or edited.",
+        "description": "Update Body.\nNeeds the `UpdB` permission.",
+        "summary": "Update Body.",
         "consumes": [
           "application/json"
         ],
@@ -172,8 +172,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that allows bodies to be viewed or edited.",
-        "summary": "API endpoint that allows bodies to be viewed or edited.",
+        "description": "Delete Body.\nNeeds the `DelB` institute permission.",
+        "summary": "Delete Body.",
         "tags": [
           "bodies"
         ]
@@ -196,8 +196,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that lists followers of bodies.",
-        "summary": "API endpoint that lists followers of bodies.",
+        "description": "List followers of body.",
+        "summary": "List followers of body.",
         "tags": [
           "bodies"
         ]
@@ -212,8 +212,8 @@
           }
         },
         "parameters": [],
-        "description": "API endpoint that allows events to be viewed or edited",
-        "summary": "API endpoint that allows events to be viewed or edited",
+        "description": "List Events.\nList fresh events prioritized for the current user.",
+        "summary": "List Events.",
         "tags": [
           "events"
         ]
@@ -284,8 +284,8 @@
             }
           }
         ],
-        "description": "API endpoint that allows events to be viewed or edited",
-        "summary": "API endpoint that allows events to be viewed or edited",
+        "description": "Create Event.\nNeeds `AddE` permission for each body to be associated.",
+        "summary": "Create Event.",
         "consumes": [
           "application/json"
         ],
@@ -311,8 +311,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that allows events to be viewed or edited",
-        "summary": "API endpoint that allows events to be viewed or edited",
+        "description": "Get Event.\nGet by `uuid` or `str_id`",
+        "summary": "Get Event.",
         "tags": [
           "events"
         ]
@@ -390,8 +390,8 @@
             }
           }
         ],
-        "description": "API endpoint that allows events to be viewed or edited",
-        "summary": "API endpoint that allows events to be viewed or edited",
+        "description": "Update Event.\nNeeds BodyRole with `UpdE` for at least one associated body.\nDisassociating bodies from the event requires the `DelE` \npermission and associating needs `AddE`",
+        "summary": "Update Event.",
         "consumes": [
           "application/json"
         ],
@@ -415,8 +415,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that allows events to be viewed or edited",
-        "summary": "API endpoint that allows events to be viewed or edited",
+        "description": "Delete Event.\nNeeds `DelE` permission for all associated bodies.",
+        "summary": "Delete Event.",
         "tags": [
           "events"
         ]
@@ -431,8 +431,8 @@
           }
         },
         "parameters": [],
-        "description": "List only reusable locations.",
-        "summary": "List only reusable locations.",
+        "description": "List reusable locations.",
+        "summary": "List reusable locations.",
         "tags": [
           "locations"
         ]
@@ -474,8 +474,8 @@
             }
           }
         ],
-        "description": "Create a Location. Needs 'Location' institute permission.",
-        "summary": "Create a Location. Needs 'Location' institute permission.",
+        "description": "Create a Location.\nNeeds 'Location' institute permission.",
+        "summary": "Create a Location.",
         "consumes": [
           "application/json"
         ],
@@ -501,8 +501,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that allows events to be viewed or edited.",
-        "summary": "API endpoint that allows events to be viewed or edited.",
+        "description": "Location",
+        "summary": "Location",
         "tags": [
           "locations"
         ]
@@ -551,8 +551,8 @@
             }
           }
         ],
-        "description": "Update if the user has insti permission or BodyRole if the location is not reusable.",
-        "summary": "Update if the user has insti permission or BodyRole if the location is not reusable.",
+        "description": "Update Location.\nThis requires the user to have the 'Location' institute permission\nor BodyRole for the event using the location if the it is not reusable.",
+        "summary": "Update Location.",
         "consumes": [
           "application/json"
         ],
@@ -576,8 +576,8 @@
             "type": "string"
           }
         ],
-        "description": "Delete a location (needs 'Location' institute permission).",
-        "summary": "Delete a location (needs 'Location' institute permission).",
+        "description": "Delete a Location.\nNeeds 'Location' institute permission.",
+        "summary": "Delete a Location.",
         "tags": [
           "locations"
         ]
@@ -592,8 +592,8 @@
           }
         },
         "parameters": [],
-        "description": "Logs in the user using the {?code} query parameter",
-        "summary": "Logs in the user using the {?code} query parameter"
+        "description": "Log in.\nUses the `code` and `redir` query parameters.",
+        "summary": "Log in."
       }
     },
     "/api/login/get-user": {
@@ -605,8 +605,8 @@
           }
         },
         "parameters": [],
-        "description": "Get the session and user's profile.",
-        "summary": "Get the session and user's profile.",
+        "description": "Get session and profile.",
+        "summary": "Get session and profile.",
         "tags": [
           "login"
         ]
@@ -621,8 +621,8 @@
           }
         },
         "parameters": [],
-        "description": "Log out the user.",
-        "summary": "Log out the user."
+        "description": "Log out.",
+        "summary": "Log out."
       }
     },
     "/api/placement-blog": {
@@ -633,7 +633,9 @@
             "description": ""
           }
         },
-        "parameters": []
+        "parameters": [],
+        "description": "Get Placement Blog.",
+        "summary": "Get Placement Blog."
       }
     },
     "/api/roles": {
@@ -645,8 +647,8 @@
           }
         },
         "parameters": [],
-        "description": "API endpoint that allows roles to be viewed or edited.",
-        "summary": "API endpoint that allows roles to be viewed or edited.",
+        "description": "Body Role",
+        "summary": "Body Role",
         "tags": [
           "roles"
         ]
@@ -701,8 +703,8 @@
             }
           }
         ],
-        "description": "API endpoint that allows roles to be viewed or edited.",
-        "summary": "API endpoint that allows roles to be viewed or edited.",
+        "description": "Body Role",
+        "summary": "Body Role",
         "consumes": [
           "application/json"
         ],
@@ -728,8 +730,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that allows roles to be viewed or edited.",
-        "summary": "API endpoint that allows roles to be viewed or edited.",
+        "description": "Body Role",
+        "summary": "Body Role",
         "tags": [
           "roles"
         ]
@@ -791,8 +793,8 @@
             }
           }
         ],
-        "description": "API endpoint that allows roles to be viewed or edited.",
-        "summary": "API endpoint that allows roles to be viewed or edited.",
+        "description": "Body Role",
+        "summary": "Body Role",
         "consumes": [
           "application/json"
         ],
@@ -816,8 +818,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that allows roles to be viewed or edited.",
-        "summary": "API endpoint that allows roles to be viewed or edited.",
+        "description": "Body Role",
+        "summary": "Body Role",
         "tags": [
           "roles"
         ]
@@ -831,7 +833,9 @@
             "description": ""
           }
         },
-        "parameters": []
+        "parameters": [],
+        "description": "Get Training Blog.",
+        "summary": "Get Training Blog."
       }
     },
     "/api/upload": {
@@ -843,8 +847,8 @@
           }
         },
         "parameters": [],
-        "description": "API endpoint that allows files to be uploaded.",
-        "summary": "API endpoint that allows files to be uploaded.",
+        "description": "Upload",
+        "summary": "Upload",
         "tags": [
           "upload"
         ]
@@ -874,8 +878,8 @@
             }
           }
         ],
-        "description": "API endpoint that allows files to be uploaded.",
-        "summary": "API endpoint that allows files to be uploaded.",
+        "description": "Upload file.",
+        "summary": "Upload file.",
         "consumes": [
           "application/json"
         ],
@@ -901,8 +905,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that allows files to be uploaded.",
-        "summary": "API endpoint that allows files to be uploaded.",
+        "description": "Upload",
+        "summary": "Upload",
         "tags": [
           "upload"
         ]
@@ -923,8 +927,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that allows files to be uploaded.",
-        "summary": "API endpoint that allows files to be uploaded.",
+        "description": "Delete file entry.",
+        "summary": "Delete file entry.",
         "tags": [
           "upload"
         ]
@@ -939,8 +943,8 @@
           }
         },
         "parameters": [],
-        "description": "Retrieves the logged-in user's profile.",
-        "summary": "Retrieves the logged-in user's profile.",
+        "description": "Get current user.",
+        "summary": "Get current user.",
         "tags": [
           "user-me"
         ]
@@ -1005,8 +1009,8 @@
             }
           }
         ],
-        "description": "Update the logged-in user's profile.",
-        "summary": "Update the logged-in user's profile.",
+        "description": "Update current user.",
+        "summary": "Update current user.",
         "consumes": [
           "application/json"
         ],
@@ -1071,8 +1075,8 @@
             }
           }
         ],
-        "description": "Update the logged-in user's profile.",
-        "summary": "Update the logged-in user's profile.",
+        "description": "Update current user.",
+        "summary": "Update current user.",
         "consumes": [
           "application/json"
         ],
@@ -1090,8 +1094,8 @@
           }
         },
         "parameters": [],
-        "description": "Gets events created by current user.",
-        "summary": "Gets events created by current user.",
+        "description": "Current user's created events.",
+        "summary": "Current user's created events.",
         "tags": [
           "user-me"
         ]
@@ -1130,8 +1134,8 @@
             "type": "string"
           }
         ],
-        "description": "Creates or updates a UserEventStatus for the current user.",
-        "summary": "Creates or updates a UserEventStatus for the current user.",
+        "description": "Set UES for current user.\nThis will create or update if record exists.",
+        "summary": "Set UES for current user.",
         "tags": [
           "user-me"
         ]
@@ -1146,8 +1150,8 @@
           }
         },
         "parameters": [],
-        "description": "API endpoint that allows users to be viewed or edited.",
-        "summary": "API endpoint that allows users to be viewed or edited.",
+        "description": "UserProfile",
+        "summary": "UserProfile",
         "tags": [
           "users"
         ]
@@ -1170,8 +1174,8 @@
             "type": "string"
           }
         ],
-        "description": "API endpoint that allows users to be viewed or edited.",
-        "summary": "API endpoint that allows users to be viewed or edited.",
+        "description": "UserProfile",
+        "summary": "UserProfile",
         "tags": [
           "users"
         ]

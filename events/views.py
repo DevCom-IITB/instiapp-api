@@ -13,7 +13,7 @@ from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
 
 class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
-    """API endpoint that allows events to be viewed or edited"""
+    """Event"""
 
     queryset = Event.objects.all()
     serializer_class = EventFullSerializer
@@ -22,6 +22,9 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         return {'request': self.request}
 
     def retrieve(self, request, pk):
+        """Get Event.
+        Get by `uuid` or `str_id`"""
+
         try:
             UUID(pk, version=4)
             return super().retrieve(self, request, pk)
@@ -30,6 +33,8 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
             return Response(EventFullSerializer(event).data)
 
     def list(self, request): #pylint: disable=unused-argument
+        """List Events.
+        List fresh events prioritized for the current user."""
         queryset = get_fresh_prioritized_events(self.queryset, request)
 
         serializer = EventSerializer(queryset, many=True)
@@ -39,6 +44,9 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
     @login_required_ajax
     def create(self, request):
+        """Create Event.
+        Needs `AddE` permission for each body to be associated."""
+
         if all([user_has_privilege(request.user.profile, id, 'AddE')
                 for id in request.data['bodies_id']]):
 
@@ -50,6 +58,11 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
     @login_required_ajax
     def update(self, request, pk):
+        """Update Event.
+        Needs BodyRole with `UpdE` for at least one associated body.
+        Disassociating bodies from the event requires the `DelE`
+        permission and associating needs `AddE`"""
+
         # Get difference in bodies
         event = Event.objects.get(id=pk)
         old_bodies_id = [str(x.id) for x in event.bodies.all()]
@@ -88,6 +101,9 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
     @login_required_ajax
     def destroy(self, request, pk):
+        """Delete Event.
+        Needs `DelE` permission for all associated bodies."""
+
         event = Event.objects.get(id=pk)
         if all([user_has_privilege(request.user.profile, str(body.id), 'DelE')
                 for body in event.bodies.all()]):
