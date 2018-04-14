@@ -1,0 +1,1186 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "InstiApp API",
+    "description": "",
+    "version": ""
+  },
+  "host": "localhost",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/api/bodies": {
+      "get": {
+        "operationId": "bodies_list",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "API endpoint that allows bodies to be viewed or edited.",
+        "summary": "API endpoint that allows bodies to be viewed or edited.",
+        "tags": [
+          "bodies"
+        ]
+      },
+      "post": {
+        "operationId": "bodies_create",
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "",
+                  "type": "string"
+                },
+                "short_description": {
+                  "description": "",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "",
+                  "type": "string"
+                },
+                "image_url": {
+                  "description": "",
+                  "type": "string"
+                },
+                "website_url": {
+                  "description": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        ],
+        "description": "API endpoint that allows bodies to be viewed or edited.",
+        "summary": "API endpoint that allows bodies to be viewed or edited.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "bodies"
+        ]
+      }
+    },
+    "/api/bodies/{id}": {
+      "get": {
+        "operationId": "bodies_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Body.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that allows bodies to be viewed or edited.",
+        "summary": "API endpoint that allows bodies to be viewed or edited.",
+        "tags": [
+          "bodies"
+        ]
+      },
+      "put": {
+        "operationId": "bodies_update",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Body.",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "",
+                  "type": "string"
+                },
+                "short_description": {
+                  "description": "",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "",
+                  "type": "string"
+                },
+                "image_url": {
+                  "description": "",
+                  "type": "string"
+                },
+                "website_url": {
+                  "description": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        ],
+        "description": "API endpoint that allows bodies to be viewed or edited.",
+        "summary": "API endpoint that allows bodies to be viewed or edited.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "bodies"
+        ]
+      },
+      "delete": {
+        "operationId": "bodies_delete",
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Body.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that allows bodies to be viewed or edited.",
+        "summary": "API endpoint that allows bodies to be viewed or edited.",
+        "tags": [
+          "bodies"
+        ]
+      }
+    },
+    "/api/bodies/{id}/followers": {
+      "get": {
+        "operationId": "bodies_followers_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Body.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that lists followers of bodies.",
+        "summary": "API endpoint that lists followers of bodies.",
+        "tags": [
+          "bodies"
+        ]
+      }
+    },
+    "/api/events": {
+      "get": {
+        "operationId": "events_list",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "API endpoint that allows events to be viewed or edited",
+        "summary": "API endpoint that allows events to be viewed or edited",
+        "tags": [
+          "events"
+        ]
+      },
+      "post": {
+        "operationId": "events_create",
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "",
+                  "type": "string"
+                },
+                "image_url": {
+                  "description": "",
+                  "type": "string"
+                },
+                "start_time": {
+                  "description": "",
+                  "type": "string"
+                },
+                "end_time": {
+                  "description": "",
+                  "type": "string"
+                },
+                "all_day": {
+                  "description": "",
+                  "type": "boolean"
+                },
+                "bodies_id": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "venue_ids": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "website_url": {
+                  "description": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "start_time",
+                "end_time",
+                "bodies_id"
+              ]
+            }
+          }
+        ],
+        "description": "API endpoint that allows events to be viewed or edited",
+        "summary": "API endpoint that allows events to be viewed or edited",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "events"
+        ]
+      }
+    },
+    "/api/events/{id}": {
+      "get": {
+        "operationId": "events_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Event.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that allows events to be viewed or edited",
+        "summary": "API endpoint that allows events to be viewed or edited",
+        "tags": [
+          "events"
+        ]
+      },
+      "put": {
+        "operationId": "events_update",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Event.",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "",
+                  "type": "string"
+                },
+                "image_url": {
+                  "description": "",
+                  "type": "string"
+                },
+                "start_time": {
+                  "description": "",
+                  "type": "string"
+                },
+                "end_time": {
+                  "description": "",
+                  "type": "string"
+                },
+                "all_day": {
+                  "description": "",
+                  "type": "boolean"
+                },
+                "bodies_id": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "venue_ids": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "website_url": {
+                  "description": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "start_time",
+                "end_time",
+                "bodies_id"
+              ]
+            }
+          }
+        ],
+        "description": "API endpoint that allows events to be viewed or edited",
+        "summary": "API endpoint that allows events to be viewed or edited",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "events"
+        ]
+      },
+      "delete": {
+        "operationId": "events_delete",
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Event.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that allows events to be viewed or edited",
+        "summary": "API endpoint that allows events to be viewed or edited",
+        "tags": [
+          "events"
+        ]
+      }
+    },
+    "/api/locations": {
+      "get": {
+        "operationId": "locations_list",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "List only reusable locations.",
+        "summary": "List only reusable locations.",
+        "tags": [
+          "locations"
+        ]
+      },
+      "post": {
+        "operationId": "locations_create",
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "",
+                  "type": "string"
+                },
+                "lat": {
+                  "description": "",
+                  "type": "number"
+                },
+                "lng": {
+                  "description": "",
+                  "type": "number"
+                },
+                "reusable": {
+                  "description": "",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        ],
+        "description": "Create a Location. Needs 'Location' institute permission.",
+        "summary": "Create a Location. Needs 'Location' institute permission.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "locations"
+        ]
+      }
+    },
+    "/api/locations/{id}": {
+      "get": {
+        "operationId": "locations_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Location.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that allows events to be viewed or edited.",
+        "summary": "API endpoint that allows events to be viewed or edited.",
+        "tags": [
+          "locations"
+        ]
+      },
+      "put": {
+        "operationId": "locations_update",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Location.",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "",
+                  "type": "string"
+                },
+                "lat": {
+                  "description": "",
+                  "type": "number"
+                },
+                "lng": {
+                  "description": "",
+                  "type": "number"
+                },
+                "reusable": {
+                  "description": "",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        ],
+        "description": "Update if the user has insti permission or BodyRole if the location is not reusable.",
+        "summary": "Update if the user has insti permission or BodyRole if the location is not reusable.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "locations"
+        ]
+      },
+      "delete": {
+        "operationId": "locations_delete",
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Location.",
+            "type": "string"
+          }
+        ],
+        "description": "Delete a location (needs 'Location' institute permission).",
+        "summary": "Delete a location (needs 'Location' institute permission).",
+        "tags": [
+          "locations"
+        ]
+      }
+    },
+    "/api/login": {
+      "get": {
+        "operationId": "login_0",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "Logs in the user using the {?code} query parameter",
+        "summary": "Logs in the user using the {?code} query parameter"
+      }
+    },
+    "/api/login/get-user": {
+      "get": {
+        "operationId": "login_get_user",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "Get the session and user's profile.",
+        "summary": "Get the session and user's profile.",
+        "tags": [
+          "login"
+        ]
+      }
+    },
+    "/api/logout": {
+      "get": {
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "Log out the user.",
+        "summary": "Log out the user."
+      }
+    },
+    "/api/placement-blog": {
+      "get": {
+        "operationId": "placement_blog",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/api/roles": {
+      "get": {
+        "operationId": "roles_list",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "API endpoint that allows roles to be viewed or edited.",
+        "summary": "API endpoint that allows roles to be viewed or edited.",
+        "tags": [
+          "roles"
+        ]
+      },
+      "post": {
+        "operationId": "roles_create",
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "",
+                  "type": "string"
+                },
+                "inheritable": {
+                  "description": "",
+                  "type": "boolean"
+                },
+                "body": {
+                  "description": "",
+                  "type": "string"
+                },
+                "permissions": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "users": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "body",
+                "permissions",
+                "users"
+              ]
+            }
+          }
+        ],
+        "description": "API endpoint that allows roles to be viewed or edited.",
+        "summary": "API endpoint that allows roles to be viewed or edited.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "roles"
+        ]
+      }
+    },
+    "/api/roles/{id}": {
+      "get": {
+        "operationId": "roles_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Body Role.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that allows roles to be viewed or edited.",
+        "summary": "API endpoint that allows roles to be viewed or edited.",
+        "tags": [
+          "roles"
+        ]
+      },
+      "put": {
+        "operationId": "roles_update",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Body Role.",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "",
+                  "type": "string"
+                },
+                "inheritable": {
+                  "description": "",
+                  "type": "boolean"
+                },
+                "body": {
+                  "description": "",
+                  "type": "string"
+                },
+                "permissions": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "users": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "body",
+                "permissions",
+                "users"
+              ]
+            }
+          }
+        ],
+        "description": "API endpoint that allows roles to be viewed or edited.",
+        "summary": "API endpoint that allows roles to be viewed or edited.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "roles"
+        ]
+      },
+      "delete": {
+        "operationId": "roles_delete",
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Body Role.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that allows roles to be viewed or edited.",
+        "summary": "API endpoint that allows roles to be viewed or edited.",
+        "tags": [
+          "roles"
+        ]
+      }
+    },
+    "/api/training-blog": {
+      "get": {
+        "operationId": "training_blog",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/api/upload": {
+      "get": {
+        "operationId": "upload_list",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "API endpoint that allows files to be uploaded.",
+        "summary": "API endpoint that allows files to be uploaded.",
+        "tags": [
+          "upload"
+        ]
+      },
+      "post": {
+        "operationId": "upload_create",
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "picture": {
+                  "description": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "picture"
+              ]
+            }
+          }
+        ],
+        "description": "API endpoint that allows files to be uploaded.",
+        "summary": "API endpoint that allows files to be uploaded.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "upload"
+        ]
+      }
+    },
+    "/api/upload/{id}": {
+      "get": {
+        "operationId": "upload_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Uploaded Image.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that allows files to be uploaded.",
+        "summary": "API endpoint that allows files to be uploaded.",
+        "tags": [
+          "upload"
+        ]
+      },
+      "delete": {
+        "operationId": "upload_delete",
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Uploaded Image.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that allows files to be uploaded.",
+        "summary": "API endpoint that allows files to be uploaded.",
+        "tags": [
+          "upload"
+        ]
+      }
+    },
+    "/api/user-me": {
+      "get": {
+        "operationId": "user-me_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "Retrieves the logged-in user's profile.",
+        "summary": "Retrieves the logged-in user's profile.",
+        "tags": [
+          "user-me"
+        ]
+      },
+      "put": {
+        "operationId": "user-me_update",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "",
+                  "type": "string"
+                },
+                "profile_pic": {
+                  "description": "",
+                  "type": "string"
+                },
+                "year": {
+                  "description": "",
+                  "type": "integer"
+                },
+                "roll_no": {
+                  "description": "",
+                  "type": "string"
+                },
+                "contact_no": {
+                  "description": "",
+                  "type": "string"
+                },
+                "about": {
+                  "description": "",
+                  "type": "string"
+                },
+                "followed_bodies_id": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "website_url": {
+                  "description": "",
+                  "type": "string"
+                },
+                "ldap_id": {
+                  "description": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "followed_bodies_id"
+              ]
+            }
+          }
+        ],
+        "description": "Update the logged-in user's profile.",
+        "summary": "Update the logged-in user's profile.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "user-me"
+        ]
+      },
+      "patch": {
+        "operationId": "user-me_partial_update",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "",
+                  "type": "string"
+                },
+                "profile_pic": {
+                  "description": "",
+                  "type": "string"
+                },
+                "year": {
+                  "description": "",
+                  "type": "integer"
+                },
+                "roll_no": {
+                  "description": "",
+                  "type": "string"
+                },
+                "contact_no": {
+                  "description": "",
+                  "type": "string"
+                },
+                "about": {
+                  "description": "",
+                  "type": "string"
+                },
+                "followed_bodies_id": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "website_url": {
+                  "description": "",
+                  "type": "string"
+                },
+                "ldap_id": {
+                  "description": "",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Update the logged-in user's profile.",
+        "summary": "Update the logged-in user's profile.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "user-me"
+        ]
+      }
+    },
+    "/api/user-me/events": {
+      "get": {
+        "operationId": "user-me_get_my_events",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "Gets events created by current user.",
+        "summary": "Gets events created by current user.",
+        "tags": [
+          "user-me"
+        ]
+      }
+    },
+    "/api/user-me/roles": {
+      "get": {
+        "operationId": "user-me_get_my_roles",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "Get roles with nested events.",
+        "summary": "Get roles with nested events.",
+        "tags": [
+          "user-me"
+        ]
+      }
+    },
+    "/api/user-me/ues/{event_pk}": {
+      "get": {
+        "operationId": "user-me_set_ues_me",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "event_pk",
+            "required": true,
+            "in": "path",
+            "description": "",
+            "type": "string"
+          }
+        ],
+        "description": "Creates or updates a UserEventStatus for the current user.",
+        "summary": "Creates or updates a UserEventStatus for the current user.",
+        "tags": [
+          "user-me"
+        ]
+      }
+    },
+    "/api/users": {
+      "get": {
+        "operationId": "users_list",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "API endpoint that allows users to be viewed or edited.",
+        "summary": "API endpoint that allows users to be viewed or edited.",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "operationId": "users_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Profile.",
+            "type": "string"
+          }
+        ],
+        "description": "API endpoint that allows users to be viewed or edited.",
+        "summary": "API endpoint that allows users to be viewed or edited.",
+        "tags": [
+          "users"
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "basic": {
+      "type": "basic"
+    }
+  }
+}

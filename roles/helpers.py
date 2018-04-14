@@ -38,6 +38,12 @@ def diff_set(first, second):
     second = set(second)
     return [item for item in first if item not in second]
 
+def add_doc(value):
+    def _doc(func):
+        func.__doc__ = value
+        return func
+    return _doc
+
 def login_required_ajax(func):
     """
     Just make sure the user is authenticated to access a certain ajax view
@@ -45,8 +51,8 @@ def login_required_ajax(func):
     Otherwise return a HttpResponse 401 - authentication required
     instead of the 302 redirect of the original Django decorator
     """
+    @add_doc(func.__doc__)
     def wrapper(*args, **kw):
-        """Wrapper after checking if authenticated."""
         if args[1].user.is_authenticated:
             return func(*args, **kw)
         return Response({
@@ -60,6 +66,7 @@ def insti_permission_required(permission):
     """Check for institute permission."""
     def real_decorator(func):
         @login_required_ajax
+        @add_doc(func.__doc__)
         def wrapper(*args, **kw):
             if user_has_insti_privilege(args[1].user.profile, permission):
                 return func(*args, **kw)

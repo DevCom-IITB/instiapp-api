@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from rest_framework_swagger.views import get_swagger_view
 
 from bodies.views import BodyViewSet
 from bodies.views import BodyFollowersViewSet
@@ -91,6 +92,8 @@ urlpatterns = [
     path('event/<pk>', pr.event_details),
     path('org/<pk>', pr.body_details),
     path('body-tree/<pk>', pr.body_tree),
+
+    path('docs/', get_swagger_view(title='InstiApp API')),
 
     # -------------- DEPRECATED -------------- #
     path('user-details/<pk>', pr.user_details),
