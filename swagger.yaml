@@ -1,0 +1,531 @@
+host: localhost
+info: {description: '', title: InstiApp API, version: ''}
+paths:
+  /api/bodies:
+    get:
+      description: API endpoint that allows bodies to be viewed or edited.
+      operationId: bodies_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows bodies to be viewed or edited.
+      tags: [bodies]
+    post:
+      consumes: [application/json]
+      description: API endpoint that allows bodies to be viewed or edited.
+      operationId: bodies_create
+      parameters:
+      - in: body
+        name: data
+        schema:
+          properties:
+            description: {description: '', type: string}
+            image_url: {description: '', type: string}
+            name: {description: '', type: string}
+            short_description: {description: '', type: string}
+            website_url: {description: '', type: string}
+          required: [name]
+          type: object
+      responses:
+        '201': {description: ''}
+      summary: API endpoint that allows bodies to be viewed or edited.
+      tags: [bodies]
+  /api/bodies/{id}:
+    delete:
+      description: API endpoint that allows bodies to be viewed or edited.
+      operationId: bodies_delete
+      parameters:
+      - {description: A UUID string identifying this Body., in: path, name: id, required: true,
+        type: string}
+      responses:
+        '204': {description: ''}
+      summary: API endpoint that allows bodies to be viewed or edited.
+      tags: [bodies]
+    get:
+      description: API endpoint that allows bodies to be viewed or edited.
+      operationId: bodies_read
+      parameters:
+      - {description: A UUID string identifying this Body., in: path, name: id, required: true,
+        type: string}
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows bodies to be viewed or edited.
+      tags: [bodies]
+    put:
+      consumes: [application/json]
+      description: API endpoint that allows bodies to be viewed or edited.
+      operationId: bodies_update
+      parameters:
+      - {description: A UUID string identifying this Body., in: path, name: id, required: true,
+        type: string}
+      - in: body
+        name: data
+        schema:
+          properties:
+            description: {description: '', type: string}
+            image_url: {description: '', type: string}
+            name: {description: '', type: string}
+            short_description: {description: '', type: string}
+            website_url: {description: '', type: string}
+          required: [name]
+          type: object
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows bodies to be viewed or edited.
+      tags: [bodies]
+  /api/bodies/{id}/followers:
+    get:
+      description: API endpoint that lists followers of bodies.
+      operationId: bodies_followers_read
+      parameters:
+      - {description: A UUID string identifying this Body., in: path, name: id, required: true,
+        type: string}
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that lists followers of bodies.
+      tags: [bodies]
+  /api/events:
+    get:
+      description: API endpoint that allows events to be viewed or edited
+      operationId: events_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows events to be viewed or edited
+      tags: [events]
+    post:
+      consumes: [application/json]
+      description: API endpoint that allows events to be viewed or edited
+      operationId: events_create
+      parameters:
+      - in: body
+        name: data
+        schema:
+          properties:
+            all_day: {description: '', type: boolean}
+            bodies_id:
+              description: ''
+              items: {type: string}
+              type: array
+            description: {description: '', type: string}
+            end_time: {description: '', type: string}
+            image_url: {description: '', type: string}
+            name: {description: '', type: string}
+            start_time: {description: '', type: string}
+            venue_ids:
+              description: ''
+              items: {type: string}
+              type: array
+            website_url: {description: '', type: string}
+          required: [name, start_time, end_time, bodies_id]
+          type: object
+      responses:
+        '201': {description: ''}
+      summary: API endpoint that allows events to be viewed or edited
+      tags: [events]
+  /api/events/{id}:
+    delete:
+      description: API endpoint that allows events to be viewed or edited
+      operationId: events_delete
+      parameters:
+      - {description: A UUID string identifying this Event., in: path, name: id, required: true,
+        type: string}
+      responses:
+        '204': {description: ''}
+      summary: API endpoint that allows events to be viewed or edited
+      tags: [events]
+    get:
+      description: API endpoint that allows events to be viewed or edited
+      operationId: events_read
+      parameters:
+      - {description: A UUID string identifying this Event., in: path, name: id, required: true,
+        type: string}
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows events to be viewed or edited
+      tags: [events]
+    put:
+      consumes: [application/json]
+      description: API endpoint that allows events to be viewed or edited
+      operationId: events_update
+      parameters:
+      - {description: A UUID string identifying this Event., in: path, name: id, required: true,
+        type: string}
+      - in: body
+        name: data
+        schema:
+          properties:
+            all_day: {description: '', type: boolean}
+            bodies_id:
+              description: ''
+              items: {type: string}
+              type: array
+            description: {description: '', type: string}
+            end_time: {description: '', type: string}
+            image_url: {description: '', type: string}
+            name: {description: '', type: string}
+            start_time: {description: '', type: string}
+            venue_ids:
+              description: ''
+              items: {type: string}
+              type: array
+            website_url: {description: '', type: string}
+          required: [name, start_time, end_time, bodies_id]
+          type: object
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows events to be viewed or edited
+      tags: [events]
+  /api/locations:
+    get:
+      description: List only reusable locations.
+      operationId: locations_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: List only reusable locations.
+      tags: [locations]
+    post:
+      consumes: [application/json]
+      description: Create a Location. Needs 'Location' institute permission.
+      operationId: locations_create
+      parameters:
+      - in: body
+        name: data
+        schema:
+          properties:
+            lat: {description: '', type: number}
+            lng: {description: '', type: number}
+            name: {description: '', type: string}
+            reusable: {description: '', type: boolean}
+          required: [name]
+          type: object
+      responses:
+        '201': {description: ''}
+      summary: Create a Location. Needs 'Location' institute permission.
+      tags: [locations]
+  /api/locations/{id}:
+    delete:
+      description: Delete a location (needs 'Location' institute permission).
+      operationId: locations_delete
+      parameters:
+      - {description: A UUID string identifying this Location., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '204': {description: ''}
+      summary: Delete a location (needs 'Location' institute permission).
+      tags: [locations]
+    get:
+      description: API endpoint that allows events to be viewed or edited.
+      operationId: locations_read
+      parameters:
+      - {description: A UUID string identifying this Location., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows events to be viewed or edited.
+      tags: [locations]
+    put:
+      consumes: [application/json]
+      description: Update if the user has insti permission or BodyRole if the location
+        is not reusable.
+      operationId: locations_update
+      parameters:
+      - {description: A UUID string identifying this Location., in: path, name: id,
+        required: true, type: string}
+      - in: body
+        name: data
+        schema:
+          properties:
+            lat: {description: '', type: number}
+            lng: {description: '', type: number}
+            name: {description: '', type: string}
+            reusable: {description: '', type: boolean}
+          required: [name]
+          type: object
+      responses:
+        '200': {description: ''}
+      summary: Update if the user has insti permission or BodyRole if the location
+        is not reusable.
+      tags: [locations]
+  /api/login:
+    get:
+      description: Logs in the user using the {?code} query parameter
+      operationId: login_0
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Logs in the user using the {?code} query parameter
+  /api/login/get-user:
+    get:
+      description: Get the session and user's profile.
+      operationId: login_get_user
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Get the session and user's profile.
+      tags: [login]
+  /api/logout:
+    get:
+      description: Log out the user.
+      operationId: logout
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Log out the user.
+  /api/placement-blog:
+    get:
+      operationId: placement_blog
+      parameters: []
+      responses:
+        '200': {description: ''}
+  /api/roles:
+    get:
+      description: API endpoint that allows roles to be viewed or edited.
+      operationId: roles_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows roles to be viewed or edited.
+      tags: [roles]
+    post:
+      consumes: [application/json]
+      description: API endpoint that allows roles to be viewed or edited.
+      operationId: roles_create
+      parameters:
+      - in: body
+        name: data
+        schema:
+          properties:
+            body: {description: '', type: string}
+            inheritable: {description: '', type: boolean}
+            name: {description: '', type: string}
+            permissions:
+              description: ''
+              items: {type: string}
+              type: array
+            users:
+              description: ''
+              items: {type: string}
+              type: array
+          required: [name, body, permissions, users]
+          type: object
+      responses:
+        '201': {description: ''}
+      summary: API endpoint that allows roles to be viewed or edited.
+      tags: [roles]
+  /api/roles/{id}:
+    delete:
+      description: API endpoint that allows roles to be viewed or edited.
+      operationId: roles_delete
+      parameters:
+      - {description: A UUID string identifying this Body Role., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '204': {description: ''}
+      summary: API endpoint that allows roles to be viewed or edited.
+      tags: [roles]
+    get:
+      description: API endpoint that allows roles to be viewed or edited.
+      operationId: roles_read
+      parameters:
+      - {description: A UUID string identifying this Body Role., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows roles to be viewed or edited.
+      tags: [roles]
+    put:
+      consumes: [application/json]
+      description: API endpoint that allows roles to be viewed or edited.
+      operationId: roles_update
+      parameters:
+      - {description: A UUID string identifying this Body Role., in: path, name: id,
+        required: true, type: string}
+      - in: body
+        name: data
+        schema:
+          properties:
+            body: {description: '', type: string}
+            inheritable: {description: '', type: boolean}
+            name: {description: '', type: string}
+            permissions:
+              description: ''
+              items: {type: string}
+              type: array
+            users:
+              description: ''
+              items: {type: string}
+              type: array
+          required: [name, body, permissions, users]
+          type: object
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows roles to be viewed or edited.
+      tags: [roles]
+  /api/training-blog:
+    get:
+      operationId: training_blog
+      parameters: []
+      responses:
+        '200': {description: ''}
+  /api/upload:
+    get:
+      description: API endpoint that allows files to be uploaded.
+      operationId: upload_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows files to be uploaded.
+      tags: [upload]
+    post:
+      consumes: [application/json]
+      description: API endpoint that allows files to be uploaded.
+      operationId: upload_create
+      parameters:
+      - in: body
+        name: data
+        schema:
+          properties:
+            picture: {description: '', type: string}
+          required: [picture]
+          type: object
+      responses:
+        '201': {description: ''}
+      summary: API endpoint that allows files to be uploaded.
+      tags: [upload]
+  /api/upload/{id}:
+    delete:
+      description: API endpoint that allows files to be uploaded.
+      operationId: upload_delete
+      parameters:
+      - {description: A UUID string identifying this Uploaded Image., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '204': {description: ''}
+      summary: API endpoint that allows files to be uploaded.
+      tags: [upload]
+    get:
+      description: API endpoint that allows files to be uploaded.
+      operationId: upload_read
+      parameters:
+      - {description: A UUID string identifying this Uploaded Image., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows files to be uploaded.
+      tags: [upload]
+  /api/user-me:
+    get:
+      description: Retrieves the logged-in user's profile.
+      operationId: user-me_read
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Retrieves the logged-in user's profile.
+      tags: [user-me]
+    patch:
+      consumes: [application/json]
+      description: Update the logged-in user's profile.
+      operationId: user-me_partial_update
+      parameters:
+      - in: body
+        name: data
+        schema:
+          properties:
+            about: {description: '', type: string}
+            contact_no: {description: '', type: string}
+            followed_bodies_id:
+              description: ''
+              items: {type: string}
+              type: array
+            ldap_id: {description: '', type: string}
+            name: {description: '', type: string}
+            profile_pic: {description: '', type: string}
+            roll_no: {description: '', type: string}
+            website_url: {description: '', type: string}
+            year: {description: '', type: integer}
+          type: object
+      responses:
+        '200': {description: ''}
+      summary: Update the logged-in user's profile.
+      tags: [user-me]
+    put:
+      consumes: [application/json]
+      description: Update the logged-in user's profile.
+      operationId: user-me_update
+      parameters:
+      - in: body
+        name: data
+        schema:
+          properties:
+            about: {description: '', type: string}
+            contact_no: {description: '', type: string}
+            followed_bodies_id:
+              description: ''
+              items: {type: string}
+              type: array
+            ldap_id: {description: '', type: string}
+            name: {description: '', type: string}
+            profile_pic: {description: '', type: string}
+            roll_no: {description: '', type: string}
+            website_url: {description: '', type: string}
+            year: {description: '', type: integer}
+          required: [followed_bodies_id]
+          type: object
+      responses:
+        '200': {description: ''}
+      summary: Update the logged-in user's profile.
+      tags: [user-me]
+  /api/user-me/events:
+    get:
+      description: Gets events created by current user.
+      operationId: user-me_get_my_events
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Gets events created by current user.
+      tags: [user-me]
+  /api/user-me/roles:
+    get:
+      description: Get roles with nested events.
+      operationId: user-me_get_my_roles
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Get roles with nested events.
+      tags: [user-me]
+  /api/user-me/ues/{event_pk}:
+    get:
+      description: Creates or updates a UserEventStatus for the current user.
+      operationId: user-me_set_ues_me
+      parameters:
+      - {description: '', in: path, name: event_pk, required: true, type: string}
+      responses:
+        '200': {description: ''}
+      summary: Creates or updates a UserEventStatus for the current user.
+      tags: [user-me]
+  /api/users:
+    get:
+      description: API endpoint that allows users to be viewed or edited.
+      operationId: users_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows users to be viewed or edited.
+      tags: [users]
+  /api/users/{id}:
+    get:
+      description: API endpoint that allows users to be viewed or edited.
+      operationId: users_read
+      parameters:
+      - {description: A UUID string identifying this Profile., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '200': {description: ''}
+      summary: API endpoint that allows users to be viewed or edited.
+      tags: [users]
+schemes: [http]
+securityDefinitions:
+  basic: {type: basic}
+swagger: '2.0'
