@@ -16,16 +16,18 @@ class LocationViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
 
     @staticmethod
     def list(request):
-        # List only reusable locations
+        """List only reusable locations."""
         queryset = Location.objects.filter(reusable=True)
         return Response(LocationSerializer(queryset, many=True).data)
 
     @insti_permission_required('Location')
     def create(self, request):
+        """Create a Location. Needs 'Location' institute permission."""
         return super().create(request)
 
     @login_required_ajax
     def update(self, request, pk):
+        """Update if the user has insti permission or BodyRole if the location is not reusable."""
         # Allow insti privelege to do anything
         if user_has_insti_privilege(request.user.profile, 'Location'):
             return super().update(request, pk)
@@ -47,4 +49,5 @@ class LocationViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
 
     @insti_permission_required('Location')
     def destroy(self, request, pk):
+        """Delete a location (needs 'Location' institute permission)."""
         return super().destroy(request, pk)
