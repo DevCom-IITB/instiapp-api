@@ -60,7 +60,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
     def update(self, request, pk):
         """Update Event.
         Needs BodyRole with `UpdE` for at least one associated body.
-        Disassociating bodies from the event requires the `DelE` 
+        Disassociating bodies from the event requires the `DelE`
         permission and associating needs `AddE`"""
 
         # Get difference in bodies
