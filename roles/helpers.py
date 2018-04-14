@@ -53,7 +53,6 @@ def login_required_ajax(func):
     """
     @add_doc(func.__doc__)
     def wrapper(*args, **kw):
-        #__doc__ = func.__doc__
         if args[1].user.is_authenticated:
             return func(*args, **kw)
         return Response({
