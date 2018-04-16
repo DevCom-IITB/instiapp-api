@@ -18,7 +18,7 @@ If you are modifying the API, make sure you regenerate `docs` by running `python
 ### Contributing
 Pull requests are welcome, but make sure the following criteria are satisfied
 * If you are (possibly) breaking an existing feature, state this explicitly in the PR description
-* Commit messages should be in present tense, descriptive and relevant. If unsure, have a look at the model message [here](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
+* Commit messages should be in present tense, descriptive and relevant, closely following the [GNOME Commit Message Guidelines](https://wiki.gnome.org/Git/CommitMessages). Adding a tag to the message is optional (for now). Commits should not have git tags unless they indicate a version change.
 * Documentation should be updated when the API is modified
 * All required status checks must pass. Barring exceptional cases, relevant tests should be added/updated whenever necessary.
 * Barring exceptional cases, Codacy should not report any new issues
