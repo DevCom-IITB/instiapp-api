@@ -14,3 +14,15 @@ Master branch of this repository is continuously deployed at [staging](https://t
 Static OpenAPI specification can be found at the [project page](https://wncc.github.io/IITBapp/), at [Apiary](https://iitbapp1.docs.apiary.io/) or at `http://server/docs/`
 
 If you are modifying the API, make sure you regenerate `docs` by running `python manage.py swagger`
+
+### Contributing
+Pull requests are welcome, but make sure the following criteria are satisfied
+* If you are (possibly) breaking an existing feature, state this explicitly in the PR description
+* Commit messages should be in present tense, descriptive and relevant. If unsure, have a look at the model message [here](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
+* Documentation should be updated when the API is modified
+* All required status checks must pass. Barring exceptional cases, relevant tests should be added/updated whenever necessary.
+* Barring exceptional cases, Codacy should not report any new issues
+* Follow the general style of the project. Badly written or undocumented code might be rejected
+* If you are proposing a new model or modifications to an existing one, create an issue first, explaining why it is useful
+* Outdated, unsupported or closed-source libraries should not be used
+* Be nice!
