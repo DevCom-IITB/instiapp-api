@@ -1,4 +1,4 @@
-# IITB App
+# InstiApp
 Backend API in Django for the to-be comprehensive app for managing, finding and enjoying life at Indian Institute of Technology, Bombay!
 
 [![TravisCI](https://api.travis-ci.org/wncc/IITBapp.svg?branch=master)](https://travis-ci.org/wncc/IITBapp)
@@ -11,7 +11,7 @@ Google's [Python Style Guide](https://google.github.io/styleguide/pyguide.html) 
 Master branch of this repository is continuously deployed at [staging](https://temp-iitb.radialapps.com/).
 
 ### Documentation
-Static OpenAPI specification can be found at the [project page](https://wncc.github.io/IITBapp/), at [Apiary](https://iitbapp1.docs.apiary.io/) or at `http://server/docs/`
+Static OpenAPI specification can be found at the [project page](https://wncc.github.io/IITBapp/), at [Apiary](https://instiapp.docs.apiary.io/) or at `http://server/docs/`
 
 If you are modifying the API, make sure you regenerate `docs` by running `python manage.py swagger`
 
