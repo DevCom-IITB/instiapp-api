@@ -24,6 +24,9 @@ class UserProfile(models.Model):
     year = models.IntegerField(default=1, null=True, blank=True)
     about = models.TextField(blank=True, null=True)
     website_url = models.URLField(blank=True, null=True)
+    department_name = models.CharField(max_length=200, null=True, blank=True)
+    degree = models.CharField(max_length=200, null=True, blank=True)
+    graduation_year = models.IntegerField(default=1958, null=True, blank=True)
 
     roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
     institute_roles = models.ManyToManyField(
