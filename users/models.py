@@ -21,9 +21,14 @@ class UserProfile(models.Model):
     followed_bodies = models.ManyToManyField('bodies.Body', related_name='followers', blank=True)
     contact_no = models.CharField(max_length=10, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
-    year = models.IntegerField(default=1, null=True, blank=True)
     about = models.TextField(blank=True, null=True)
     website_url = models.URLField(blank=True, null=True)
+    department = models.CharField(max_length=10, null=True, blank=True)
+    department_name = models.CharField(max_length=200, null=True, blank=True)
+    degree = models.CharField(max_length=200, null=True, blank=True)
+    degree_name = models.CharField(max_length=200, null=True, blank=True)
+    join_year = models.IntegerField(null=True, blank=True)
+    graduation_year = models.IntegerField(null=True, blank=True)
 
     roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
     institute_roles = models.ManyToManyField(

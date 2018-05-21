@@ -32,6 +32,20 @@ def fill_models_from_sso(user_profile, user, profile_json):
         if profile_json['profile_picture'] is not None:
             user_profile.profile_pic = 'https://gymkhana.iitb.ac.in' + profile_json['profile_picture']
 
+    # Fill in program details
+    if 'program' in profile_json:
+        for field in [
+            'join_year',
+            'department',
+            'department_name',
+            'degree',
+            'degree_name',
+            'graduation_year']:
+
+            if profile_json['program'][field] is not None:
+                setattr(user_profile, field, profile_json['program'][field])
+
+
     # Save the profile
     user.save()
     user_profile.save()
