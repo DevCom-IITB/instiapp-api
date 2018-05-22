@@ -62,6 +62,11 @@ class LoginViewSet(viewsets.ViewSet):
         if not 'id' in profile_json:
             return Response(profile_response, status=400)
 
+        # Check that we have basic details like name and roll no.
+        required_fields = ['first_name', 'roll_number']
+        if not all([(field in profile_json) for field in required_fields]):
+            return Response({'message': 'Name and roll_number not present'}, status=403)
+
         username = str(profile_json['id'])
 
         # Check if the User exists, otherwise create a new object
