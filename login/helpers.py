@@ -47,8 +47,8 @@ def fill_models_from_sso(user_profile, user, profile_json):
                 
     if 'insti_address' in profile_json:
         if profile_json['insti_address']['room'] is not None and profile_json['insti_address']['hostel'] is not None:
-            user_profile.hostel=profile_json['insti_address']['hostel']
-            user_profile.room=(profile_json['insti_address']['room'])
+            user_profile.hostel = profile_json['insti_address']['hostel']
+            user_profile.room = (profile_json['insti_address']['room'])
 
 
 
