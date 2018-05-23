@@ -43,6 +43,11 @@ class LoginTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 400)
 
+        # Try to log in with insufficient SSO privileges
+        url = 'http://localhost/api/login?code=TEST_CODE_LP&redir=REDIRECT_URI&fcm_id=testfcm'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 403)
+
         # Try to log in
         url = 'http://localhost/api/login?code=TEST_CODE&redir=REDIRECT_URI&fcm_id=testfcm'
         response = self.client.get(url, format='json')
