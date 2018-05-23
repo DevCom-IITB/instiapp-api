@@ -33,8 +33,8 @@ class UserProfile(models.Model):
     roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
     institute_roles = models.ManyToManyField(
         'roles.InstituteRole', related_name='users', blank=True)
-    hostel = models.TextField(blank=True, null=True)
-    room = models.TextField(default=1, null=True, blank=True)
+    hostel = models.CharField(max_length=100, null=True, blank=True)
+    room = models.CharField(max_length=10, null=True, blank=True)
 
     class Meta:
         verbose_name = "Profile"
