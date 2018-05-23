@@ -64,6 +64,8 @@ class LoginTestCase(APITestCase):
         self.assertEqual(user.email, "username@iitb.ac.in")
         self.assertEqual(user.department, "DEPARTMENT")
         self.assertEqual(user.join_year, 2012)
+        self.assertEqual(user.hostel, "HOSTEL")
+        self.assertEqual(user.room, "room_number")
 
         # Terminate our server
         mock_server.terminate()
