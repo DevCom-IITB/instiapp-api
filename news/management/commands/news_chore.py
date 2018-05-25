@@ -33,12 +33,15 @@ def fill_blog(url, body):
         # Fill the db entry
         if 'title' in entry:
             db_entry.title = entry['title']
-        if 'content' in entry and entry['content']:
-            db_entry.content = entry['content'][0]['value']
+        if 'description' in entry:
+            db_entry.content = entry['description']
         if 'link' in entry:
             db_entry.link = entry['link']
         if 'published' in entry:
             db_entry.published = parse(entry['published'])
+        if 'content' in entry and db_entry.content == "":
+            # Fill in content only if we don't have description
+            db_entry.content = entry['content'][0]['value']
 
         db_entry.save()
 
