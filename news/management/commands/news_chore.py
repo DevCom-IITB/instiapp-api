@@ -3,7 +3,8 @@ import feedparser
 import requests
 from dateutil.parser import parse
 from django.core.management.base import BaseCommand, CommandError
-from news.models import NewsEntry, NewsSource
+from news.models import NewsEntry
+from bodies.models import Body
 
 def fill_blog(url, body):
     response = requests.get(url)
@@ -53,11 +54,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Run the chore."""
 
-        for source in NewsSource.objects.all():
+        for body in Body.objects.all():
+            if body.blog_url is None or body.blog_url == "":
+                continue
+
             try:
-                print("Aggregating for ", source.body.name, " - ", end="")
-                fill_blog(source.blog_url, source.body)
-                print("OK")
+                print("Aggregating for", body.name, "- ", end="", flush=True)
+                fill_blog(body.blog_url, body)
+                print("")
             except Exception:
                 print("Failed!")
 

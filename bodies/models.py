@@ -14,6 +14,7 @@ class Body(models.Model):
     description = models.TextField(blank=True)
     website_url = models.URLField(blank=True, null=True)
     image_url = models.URLField(blank=True, null=True)
+    blog_url = models.URLField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         self.str_id = get_url_friendly(self.name)
