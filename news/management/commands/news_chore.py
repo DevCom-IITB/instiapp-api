@@ -1,10 +1,14 @@
 """Chore to aggregate news from all bodies."""
 import feedparser
 import requests
+import urllib3
 from dateutil.parser import parse
 from django.core.management.base import BaseCommand, CommandError
 from news.models import NewsEntry
 from bodies.models import Body
+
+# Disable log garbage due to Insecure warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def fill_blog(url, body):
     response = requests.get(url, verify=False)
