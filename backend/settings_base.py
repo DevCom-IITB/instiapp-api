@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'upload.apps.UploadConfig',
     'roles.apps.RolesConfig',
     'placements.apps.PlacementsConfig',
+    'news.apps.NewsConfig',
 ]
 
 MIDDLEWARE = [
