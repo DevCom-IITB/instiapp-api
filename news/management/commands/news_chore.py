@@ -7,7 +7,7 @@ from news.models import NewsEntry
 from bodies.models import Body
 
 def fill_blog(url, body):
-    response = requests.get(url)
+    response = requests.get(url, verify=False)
     feeds = feedparser.parse(response.content)
 
     if not feeds['feed']:
