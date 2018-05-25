@@ -23,3 +23,18 @@ class NewsEntry(models.Model):
         verbose_name = "News Entry"
         verbose_name_plural = "News Entries"
         ordering = ("-published",)
+
+class NewsSource(models.Model):
+    """A single entry on a news blog."""
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    body = models.OneToOneField(Body, on_delete=models.CASCADE)
+    title = models.CharField(max_length=300, blank=True)
+    blog_url = models.URLField(null=True)
+
+    def __str__(self):
+        return self.body.name
+
+    class Meta:
+        verbose_name = "News Source"
+        verbose_name_plural = "News Sources"
