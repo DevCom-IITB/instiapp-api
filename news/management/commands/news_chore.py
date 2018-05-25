@@ -12,6 +12,10 @@ def fill_blog(url, body):
     if not feeds['feed']:
         raise CommandError('NEWS CHORE FAILED')
 
+    # Log number of new entries
+    existing_entries = 0
+    new_entries = 0
+
     for entry in feeds['entries']:
         # Try to get an entry existing
         guid = entry['id']
@@ -20,9 +24,11 @@ def fill_blog(url, body):
         # Reuse if entry exists, create new otherwise
         if db_entries.exists():
             db_entry = db_entries[0]
+            existing_entries += 1
         else:
             db_entry = NewsEntry.objects.create(guid=guid, body=body)
             db_entry.blog_url = url
+            new_entries += 1
 
         # Fill the db entry
         if 'title' in entry:
@@ -36,6 +42,8 @@ def fill_blog(url, body):
 
         db_entry.save()
 
+    print("(+" + str(new_entries) + ", " + str(existing_entries) + ") ", end="")
+
 class Command(BaseCommand):
     help = 'Updates the placement blog database'
 
@@ -43,6 +51,11 @@ class Command(BaseCommand):
         """Run the chore."""
 
         for source in NewsSource.objects.all():
-            fill_blog(source.blog_url, source.body)
+            try:
+                print("Aggregating for ", source.body.name, " - ", end="")
+                fill_blog(source.blog_url, source.body)
+                print("OK")
+            except Exception:
+                print("Failed!")
 
         self.stdout.write(self.style.SUCCESS('News Chore completed successfully'))
