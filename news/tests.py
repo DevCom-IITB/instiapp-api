@@ -27,7 +27,14 @@ class NewsTestCase(APITestCase):
 
     def test_news_get(self):
         """Test news feed API."""
+        # Check without query params
         url = '/api/news'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 5)
+
+        # Check with query params
+        url = '/api/news?from=1&num=2'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
