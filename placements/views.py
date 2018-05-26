@@ -15,7 +15,7 @@ class PlacementBlogViewset(viewsets.ViewSet):
         """Get Placement Blog."""
         return Response(BlogEntrySerializer(BlogEntry.objects.filter(
             published__gte=timezone.now() - timedelta(days=15),
-            blog_url=settings.PLACEMENTS_URL), many=True).data)
+            blog_url=settings.PLACEMENTS_URL)[0:100], many=True).data)
 
     @classmethod
     @login_required_ajax
@@ -23,4 +23,4 @@ class PlacementBlogViewset(viewsets.ViewSet):
         """Get Training Blog."""
         return Response(BlogEntrySerializer(BlogEntry.objects.filter(
             published__gte=timezone.now() - timedelta(days=15),
-            blog_url=settings.TRAINING_BLOG_URL), many=True).data)
+            blog_url=settings.TRAINING_BLOG_URL)[0:100], many=True).data)
