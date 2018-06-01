@@ -23,3 +23,27 @@ class NewsEntry(models.Model):
         verbose_name = "News Entry"
         verbose_name_plural = "News Entries"
         ordering = ("-published",)
+
+class UserNewsReaction(models.Model):
+    """ Reaction:
+            0 - Like
+            1 - Love
+            2 - Haha
+            3 - Wow
+            4 - Sad
+            5 - Angry
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    time_of_creation = models.DateTimeField(auto_now_add=True)
+
+    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE,
+                             default=uuid4, related_name='unr')
+    news = models.ForeignKey(NewsEntry, on_delete=models.CASCADE,
+                             default=uuid4, related_name='unr')
+
+    reaction = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name = "User-News Reaction"
+        verbose_name_plural = "User-News Reactions"
