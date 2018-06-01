@@ -11,4 +11,5 @@ class NewsFeedViewset(viewsets.ViewSet):
         """Get News feed."""
         from_i, num = query_from_num(request, 30)
         return Response(NewsEntrySerializer(
-            NewsEntry.objects.all()[from_i : from_i + num], many=True).data)
+            NewsEntry.objects.all()[from_i : from_i + num], many=True,
+            context={'request': request}).data)
