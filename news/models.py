@@ -15,6 +15,8 @@ class NewsEntry(models.Model):
     link = models.CharField(max_length=200, blank=True)
     published = models.DateTimeField(default=now)
     blog_url = models.URLField(null=True)
+    reacted_by = models.ManyToManyField('users.UserProfile', through='UserNewsReaction',
+                                       related_name='news_reactions', blank=True)
 
     def __str__(self):
         return self.title
@@ -23,3 +25,27 @@ class NewsEntry(models.Model):
         verbose_name = "News Entry"
         verbose_name_plural = "News Entries"
         ordering = ("-published",)
+
+class UserNewsReaction(models.Model):
+    """ Reaction:
+            0 - Like
+            1 - Love
+            2 - Haha
+            3 - Wow
+            4 - Sad
+            5 - Angry
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    time_of_creation = models.DateTimeField(auto_now_add=True)
+
+    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE,
+                             default=uuid4, related_name='unr')
+    news = models.ForeignKey(NewsEntry, on_delete=models.CASCADE,
+                             default=uuid4, related_name='unr')
+
+    reaction = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name = "User-News Reaction"
+        verbose_name_plural = "User-News Reactions"
