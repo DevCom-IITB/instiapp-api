@@ -21,6 +21,7 @@ paths:
         name: data
         schema:
           properties:
+            blog_url: {description: '', type: string}
             description: {description: '', type: string}
             image_url: {description: '', type: string}
             name: {description: '', type: string}
@@ -70,6 +71,7 @@ paths:
         name: data
         schema:
           properties:
+            blog_url: {description: '', type: string}
             description: {description: '', type: string}
             image_url: {description: '', type: string}
             name: {description: '', type: string}
@@ -162,9 +164,13 @@ paths:
       tags: [events]
     put:
       consumes: [application/json]
-      description: "Update Event.\nNeeds BodyRole with `UpdE` for at least one associated\
-        \ body.\nDisassociating bodies from the event requires the `DelE` \npermission\
-        \ and associating needs `AddE`"
+      description: 'Update Event.
+
+        Needs BodyRole with `UpdE` for at least one associated body.
+
+        Disassociating bodies from the event requires the `DelE`
+
+        permission and associating needs `AddE`'
       operationId: events_update
       parameters:
       - {description: A UUID string identifying this Event., in: path, name: id, required: true,
@@ -299,6 +305,14 @@ paths:
       responses:
         '200': {description: ''}
       summary: Log out.
+  /api/news:
+    get:
+      description: Get Feed.
+      operationId: news_feed
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Get Feed.
   /api/placement-blog:
     get:
       description: Get Placement Blog.
@@ -474,7 +488,6 @@ paths:
             profile_pic: {description: '', type: string}
             roll_no: {description: '', type: string}
             website_url: {description: '', type: string}
-            year: {description: '', type: integer}
           type: object
       responses:
         '200': {description: ''}
@@ -500,7 +513,6 @@ paths:
             profile_pic: {description: '', type: string}
             roll_no: {description: '', type: string}
             website_url: {description: '', type: string}
-            year: {description: '', type: integer}
           required: [followed_bodies_id]
           type: object
       responses:

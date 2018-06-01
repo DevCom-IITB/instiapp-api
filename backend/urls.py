@@ -26,6 +26,7 @@ from users.views import UserProfileViewSet
 from login.views import LoginViewSet
 from roles.views import BodyRoleViewSet
 from placements.views import PlacementBlogViewset
+from news.views import NewsFeedViewset
 import prerender.views as pr
 
 urlpatterns = [
@@ -75,6 +76,7 @@ urlpatterns = [
         {'get':'retrieve_me', 'put':'update_me', 'patch':'update_me'}
     )),
     path('api/user-me/ues/<event_pk>', UserProfileViewSet.as_view({'get':'set_ues_me'})),
+    path('api/user-me/unr/<news_pk>', UserProfileViewSet.as_view({'get':'set_unr_me'})),
     path('api/user-me/events', UserProfileViewSet.as_view({'get':'get_my_events'})),
     path('api/user-me/roles', BodyRoleViewSet.as_view({'get':'get_my_roles'})),
 
@@ -87,6 +89,8 @@ urlpatterns = [
 
     path('api/placement-blog', PlacementBlogViewset.as_view({'get':'placement_blog'})),
     path('api/training-blog', PlacementBlogViewset.as_view({'get':'training_blog'})),
+
+    path('api/news', NewsFeedViewset.as_view({'get':'news_feed'})),
 
     path('user/<pk>', pr.user_details),
     path('event/<pk>', pr.event_details),

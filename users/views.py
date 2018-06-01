@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404
 from events.models import UserEventStatus
 from events.models import Event
 from events.serializers import EventSerializer
+from news.models import UserNewsReaction
+from news.models import NewsEntry
 from users.serializer_full import UserProfileFullSerializer
 from users.models import UserProfile
 from roles.helpers import login_required_ajax
@@ -66,6 +68,33 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         ues = UserEventStatus.objects.get(event__id=event_pk, user=request.user.profile)
         ues.status = status
         ues.save()
+        return Response(status=204)
+
+    @classmethod
+    @login_required_ajax
+    def set_unr_me(cls, request, news_pk):
+        """Set UNR(User News Reaction) for current user.
+        This will create or update if record exists."""
+
+        # Get reaction from query parameter
+        reaction = request.GET.get('reaction')
+        if reaction is None:
+            return Response({"message": "reaction is required"}, status=400)
+
+        # Get existing record if it exists
+        unr = UserNewsReaction.objects.filter(news__id=news_pk, user=request.user.profile)
+
+        # Create new UserNewsReaction if not existing
+        if not unr.exists():
+            get_news = get_object_or_404(NewsEntry.objects.all(), pk=news_pk)
+            UserNewsReaction.objects.create(
+                news=get_news, user=request.user.profile, reaction=reaction)
+            return Response(status=204)
+
+        # Update existing UserNewsReaction
+        unr = unr[0]
+        unr.reaction = reaction
+        unr.save()
         return Response(status=204)
 
     @classmethod
