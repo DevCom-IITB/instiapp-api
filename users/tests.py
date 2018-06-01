@@ -3,6 +3,7 @@ from django.utils import timezone
 from rest_framework.test import APITestCase
 from events.models import Event
 from news.models import NewsEntry
+from news.models import UserNewsReaction
 from bodies.models import Body
 from users.models import UserProfile
 from login.tests import get_new_user
@@ -90,17 +91,22 @@ class UserTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 400)
 
+        # Make dummy news entry
         news = NewsEntry.objects.create(body=self.test_body)
 
         # Check reacting Like
         url = '/api/user-me/unr/' + str(news.id) + '?reaction=0'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 204)
+        unr = UserNewsReaction.objects.get(news__id=news.id, user=self.user.profile)
+        self.assertEqual(unr.reaction, 0)
 
         # Check reacting Angry
         url = '/api/user-me/unr/' + str(news.id) + '?reaction=5'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 204)
+        unr = UserNewsReaction.objects.get(news__id=news.id, user=self.user.profile)
+        self.assertEqual(unr.reaction, 5)
 
         # Check reacting validation
         url = '/api/user-me/unr/' + str(news.id)

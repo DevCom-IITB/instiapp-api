@@ -81,15 +81,18 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         if reaction is None:
             return Response({"message": "reaction is required"}, status=400)
 
+        # Get existing record if it exists
+        unr = UserNewsReaction.objects.filter(news__id=news_pk, user=request.user.profile)
+
         # Create new UserNewsReaction if not existing
-        if not UserNewsReaction.objects.filter(id=news_pk).exists():
+        if not unr.exists():
             get_news = get_object_or_404(NewsEntry.objects.all(), pk=news_pk)
             UserNewsReaction.objects.create(
                 news=get_news, user=request.user.profile, reaction=reaction)
             return Response(status=204)
 
         # Update existing UserNewsReaction
-        unr = UserNewsReaction.objects.get(news__id=news_pk, user=request.user.profile)
+        unr = unr[0]
         unr.reaction = reaction
         unr.save()
         return Response(status=204)
