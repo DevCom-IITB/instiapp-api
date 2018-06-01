@@ -76,6 +76,7 @@ urlpatterns = [
         {'get':'retrieve_me', 'put':'update_me', 'patch':'update_me'}
     )),
     path('api/user-me/ues/<event_pk>', UserProfileViewSet.as_view({'get':'set_ues_me'})),
+    path('api/user-me/unr/<news_pk>', UserProfileViewSet.as_view({'get':'set_unr_me'})),
     path('api/user-me/events', UserProfileViewSet.as_view({'get':'get_my_events'})),
     path('api/user-me/roles', BodyRoleViewSet.as_view({'get':'get_my_roles'})),
 

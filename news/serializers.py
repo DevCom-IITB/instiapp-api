@@ -7,6 +7,13 @@ class NewsEntrySerializer(serializers.ModelSerializer):
     """Serializer for NewsEntry."""
     body = BodySerializerMin()
 
+    reactions_count = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_reactions_count(obj):
+        """Get number of user reactions on news item."""
+        return {t : obj.reacted_by.filter(unr__reaction=t).count() for t in range(0, 6)}
+
     class Meta:
         model = NewsEntry
-        fields = ('id', 'guid', 'link', 'title', 'content', 'published', 'body')
+        fields = ('id', 'guid', 'link', 'title', 'content', 'published', 'body', 'reactions_count')
