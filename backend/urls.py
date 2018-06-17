@@ -91,8 +91,6 @@ urlpatterns = [
 
     path('api/news', NewsFeedViewset.as_view({'get':'news_feed'})),
 
-    path('api/mess/<pk>',MessMenuViewSet.as_view('get':'list','put':'update'))
-
     path('user/<pk>', pr.user_details),
     path('event/<pk>', pr.event_details),
     path('org/<pk>', pr.body_details),
