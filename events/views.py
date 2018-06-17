@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from events.prioritizer import get_fresh_prioritized_events
+from events.prioritizer import get_prioritized
 from events.serializers import EventSerializer
 from events.serializers import EventFullSerializer
 from events.models import Event
@@ -35,7 +36,18 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
     def list(self, request): #pylint: disable=unused-argument
         """List Events.
         List fresh events prioritized for the current user."""
-        queryset = get_fresh_prioritized_events(self.queryset, request)
+
+        # Check for date filtered query params
+        start = request.GET.get('start')
+        end = request.GET.get('end')
+
+        if start is not None and end is not None:
+            # Try date-filtered if we have the params
+            queryset = get_prioritized(self.queryset.filter(
+                start_time__range=(start, end)), request)
+        else:
+            # Respond with recent events
+            queryset = get_fresh_prioritized_events(self.queryset, request)
 
         serializer = EventSerializer(queryset, many=True)
         data = serializer.data
