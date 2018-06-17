@@ -1,6 +1,7 @@
 """Models for Uploaded Images."""
 from uuid import uuid4
 from django.db import models
+from PIL import Image
 
 class UploadedImage(models.Model):
     """An uploaded file."""
@@ -16,5 +17,35 @@ class UploadedImage(models.Model):
         verbose_name_plural = "Uploaded Images"
         ordering = ("-time_of_creation",)
 
+    def save(self, *args, **kwargs):
+        # Super
+        saved = super(UploadedImage, self).save(*args, **kwargs)
+
+        # Resize Image
+        if self.pk and self.picture:
+            self.resize(self.picture.path)
+
+        return saved
+
     def __str__(self):
         return str(self.time_of_creation)
+
+    @staticmethod
+    def resize(path):
+        """Resize image."""
+        # Maximum Dimension
+        MAX_DIM = 800
+
+        # Load image
+        image = Image.open(path)
+        (width, height) = image.size
+
+        # Resize
+        factor = min(MAX_DIM / height, MAX_DIM / width)
+        if factor >= 0.85:
+            return
+        size = (int(width * factor), int(height * factor))
+        image = image.resize(size, Image.ANTIALIAS)
+
+        # Save
+        image.save(path)
