@@ -105,6 +105,11 @@ class EventTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreater(response.data['data'][0]['weight'], 0)
 
+        url = '/api/events?start=2017-05-17T08:10:35.599Z&end=2017-06-17T08:10:35.599Z'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['data']), 0)
+
     def test_event_get(self):
         """Test getting the event with id or str_id."""
         event = Event.objects.create(name="Test #Event 123!",
