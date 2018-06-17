@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework_swagger.views import get_swagger_view
 
-from bodies.views import BodyViewSet
+from bodies.views import BodyRoleViewSetSet
 from bodies.views import BodyFollowersViewSet
 from events.views import EventViewSet
 from locations.views import LocationViewSet
@@ -90,6 +90,8 @@ urlpatterns = [
     path('api/training-blog', PlacementBlogViewset.as_view({'get':'training_blog'})),
 
     path('api/news', NewsFeedViewset.as_view({'get':'news_feed'})),
+
+    path('api/mess/<pk>',MessMenuViewSet.as_view('get':'list','put':'update'))
 
     path('user/<pk>', pr.user_details),
     path('event/<pk>', pr.event_details),
