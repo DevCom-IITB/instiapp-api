@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework_swagger.views import get_swagger_view
 
-from bodies.views import BodyRoleViewSetSet
+from bodies.views import BodyViewSet
 from bodies.views import BodyFollowersViewSet
 from events.views import EventViewSet
 from locations.views import LocationViewSet

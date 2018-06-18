@@ -1,15 +1,21 @@
+"""Mess menu models."""
+from uuid import uuid4
 from django.db import models
 
-
-class MenuDetails(models.Model):
-	day = models.CharField(max_length=10,blank=True)
-	breakfast = models.TextField(blank=True)
-	lunch = models.TextField(blank=True)
-	snacks = models.TextField(blank=True)
-	dinner = models.TextField(blank=True)
-	hostel = models.CharField(max_length=40,blank=True)
-
 class Hostel(models.Model):
-	hostel = models.CharField(max_length=40,blank=True)
-	WeeklyMenu = models.ForeignKey(self.MenuDetails, on_delete=models.CASCADE)
-# Create your models here.
+    """Entry for each hostel."""
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    name = models.CharField(max_length=40, blank=True)
+
+class MenuEntry(models.Model):
+    """Menu entries for a single day-hostel pair."""
+    # Meta
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE, related_name='mess')
+    day = models.IntegerField()
+
+    # Menu
+    breakfast = models.TextField(blank=True)
+    lunch = models.TextField(blank=True)
+    snacks = models.TextField(blank=True)
+    dinner = models.TextField(blank=True)

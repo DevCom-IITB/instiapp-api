@@ -1,4 +1,7 @@
 from django.contrib import admin
+from messmenu.models import Hostel
+from messmenu.models import MenuEntry
 
 # Register your models here.
-admin.site.Register(MenuDetails,Hostel)
+admin.site.register(Hostel)
+admin.site.register(MenuEntry)
