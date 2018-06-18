@@ -7,6 +7,9 @@ class Hostel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=40, blank=True)
 
+    def __str__ (self):
+        return self.name
+
 class MenuEntry(models.Model):
     """Menu entries for a single day-hostel pair."""
     # Meta
@@ -19,3 +22,6 @@ class MenuEntry(models.Model):
     lunch = models.TextField(blank=True)
     snacks = models.TextField(blank=True)
     dinner = models.TextField(blank=True)
+
+    def __str__ (self):
+        return self.hostel.name + ' - ' + str(self.day)
