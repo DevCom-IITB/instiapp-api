@@ -10,6 +10,9 @@ class Hostel(models.Model):
     def __str__ (self):
         return self.name
 
+    class Meta:
+        ordering = ("name",)
+
 class MenuEntry(models.Model):
     """Menu entries for a single day-hostel pair."""
     # Meta
