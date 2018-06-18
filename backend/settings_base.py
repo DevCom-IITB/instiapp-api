@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'roles.apps.RolesConfig',
     'placements.apps.PlacementsConfig',
     'news.apps.NewsConfig',
+    'messmenu.apps.MessmenuConfig',
 ]
 
 MIDDLEWARE = [
