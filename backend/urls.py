@@ -27,6 +27,7 @@ from login.views import LoginViewSet
 from roles.views import BodyRoleViewSet
 from placements.views import PlacementBlogViewset
 from news.views import NewsFeedViewset
+from messmenu.views import get_mess
 from other.views import OtherViewset
 import prerender.views as pr
 
@@ -92,6 +93,8 @@ urlpatterns = [
     path('api/training-blog', PlacementBlogViewset.as_view({'get':'training_blog'})),
 
     path('api/news', NewsFeedViewset.as_view({'get':'news_feed'})),
+
+    path('api/mess', get_mess),
 
     path('api/search', OtherViewset.as_view({'get':'search'})),
 
