@@ -7,6 +7,7 @@ class Hostel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=40, blank=True)
     short_name = models.CharField(max_length=25, blank=True)
+    long_name = models.CharField(max_length=100, blank=True)
     mess_gsheet = models.URLField(null=True, blank=True)
 
     def __str__ (self):
