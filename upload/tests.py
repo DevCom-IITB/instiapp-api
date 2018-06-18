@@ -12,7 +12,7 @@ class UploadTestCase(APITestCase):
         # Try without authentication
         url = '/api/upload'
         data = {
-            "picture": "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+            "picture": open('./upload/b64img.txt', 'r').read()
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 401)
@@ -27,7 +27,7 @@ class UploadTestCase(APITestCase):
         # Check if extension was guessed right
         img_id = response.data['id']
         img = UploadedImage.objects.get(pk=img_id)
-        self.assertIn('.gif', str(img.picture))
+        self.assertIn('.png', str(img.picture))
 
         # Check __str__
         self.assertEqual(str(img), str(img.time_of_creation))
