@@ -6,6 +6,14 @@ class Hostel(models.Model):
     """Entry for each hostel."""
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=40, blank=True)
+    short_name = models.CharField(max_length=25, blank=True)
+    mess_gsheet = models.URLField(null=True, blank=True)
+
+    def __str__ (self):
+        return self.name
+
+    class Meta:
+        ordering = ("name",)
 
 class MenuEntry(models.Model):
     """Menu entries for a single day-hostel pair."""
@@ -19,3 +27,6 @@ class MenuEntry(models.Model):
     lunch = models.TextField(blank=True)
     snacks = models.TextField(blank=True)
     dinner = models.TextField(blank=True)
+
+    def __str__ (self):
+        return self.hostel.name + ' - ' + str(self.day)
