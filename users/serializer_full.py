@@ -31,7 +31,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'profile_pic', 'events_interested',
                   'events_going', 'email', 'roll_no', 'contact_no',
                   'about', 'followed_bodies', 'followed_bodies_id', 'roles',
-                  'institute_roles', 'website_url', 'ldap_id')
+                  'institute_roles', 'website_url', 'ldap_id', 'hostel')
 
     def get_email(self, obj):
         """Gets the email only if a user is logged in."""
