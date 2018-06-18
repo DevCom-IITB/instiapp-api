@@ -15,10 +15,10 @@ def update_day(sheet, day, hostel):
         menu = menu[0]
 
     # Fill in the mess!
-    menu.breakfast = sheet.cell(2, day + 1).value
-    menu.lunch = sheet.cell(3, day + 1).value
-    menu.snacks = sheet.cell(4, day + 1).value
-    menu.dinner = sheet.cell(5, day + 1).value
+    menu.breakfast = sheet[1][day]
+    menu.lunch = sheet[2][day]
+    menu.snacks = sheet[3][day]
+    menu.dinner = sheet[4][day]
 
     # Commit
     menu.save()
@@ -28,9 +28,12 @@ def fetch_hostel(client, hostel):
     # Open Google sheet
     sheet = client.open_by_url(hostel.mess_gsheet).sheet1
 
+    # Read
+    vals = sheet.get_all_values()
+
     # Update all days
     for i in range(1, 8):
-        update_day(sheet, i, hostel)
+        update_day(vals, i, hostel)
 
 class Command(BaseCommand):
     help = 'Fetches mess menus from Google'
