@@ -14,4 +14,4 @@ class HostelSerializer(serializers.ModelSerializer):
     mess = MenuEntrySerializer(many=True, read_only=True)
     class Meta:
         model = Hostel
-        fields = ('id', 'name', 'mess')
+        fields = ('id', 'name', 'short_name', 'long_name', 'mess')
