@@ -6,6 +6,8 @@ class Hostel(models.Model):
     """Entry for each hostel."""
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=40, blank=True)
+    short_name = models.CharField(max_length=25, blank=True)
+    mess_gsheet = models.URLField(null=True, blank=True)
 
     def __str__ (self):
         return self.name
