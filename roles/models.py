@@ -10,7 +10,7 @@ PERMISSION_CHOICES = (
     ('UpdB', 'Update Body'),
     ('Role', 'Modify Roles'),
 )
-"""priorities are integer values. Lower integer value indicates higher priority"""
+
 class BodyRole(models.Model):
     """A role for a bodywhich can be granted to multiple users."""
 
