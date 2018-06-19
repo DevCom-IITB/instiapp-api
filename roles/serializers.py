@@ -62,7 +62,7 @@ class RoleSerializerMin(serializers.ModelSerializer):
 
     users_detail = UserProfileSerializer(many=True, read_only=True, source='users')
     priority = serializers.IntegerField();
-    
+
     class Meta:
         ordering = ('priority')
         model = BodyRole
