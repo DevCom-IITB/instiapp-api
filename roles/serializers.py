@@ -19,7 +19,7 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = BodyRole
         fields = ('id', 'name', 'inheritable', 'body', 'body_detail', 'bodies',
-                  'permissions', 'users', 'users_detail')
+                  'permissions', 'users', 'users_detail', 'priority')
 
     @classmethod
     def get_bodies(cls, obj):
@@ -48,7 +48,7 @@ class RoleSerializerWithEvents(serializers.ModelSerializer):
     class Meta:
         model = BodyRole
         fields = ('id', 'name', 'inheritable', 'body', 'body_detail',
-                  'bodies', 'permissions', 'events')
+                  'bodies', 'permissions', 'events', 'priority')
 
     def get_events(self, obj):
         return EventSerializer(get_r_fresh_prioritized_events(
@@ -60,7 +60,7 @@ class RoleSerializerMin(serializers.ModelSerializer):
 
     class Meta:
         model = BodyRole
-        fields = ('id', 'name', 'body', 'users_detail')
+        fields = ('id', 'name', 'body', 'users_detail', 'priority')
 
 class InstituteRoleSerializer(serializers.ModelSerializer):
 
