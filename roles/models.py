@@ -10,7 +10,7 @@ PERMISSION_CHOICES = (
     ('UpdB', 'Update Body'),
     ('Role', 'Modify Roles'),
 )
-
+"""priorities are integer values. Lower integer value indicates higher priority"""
 class BodyRole(models.Model):
     """A role for a bodywhich can be granted to multiple users."""
 
@@ -20,6 +20,7 @@ class BodyRole(models.Model):
     body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE, related_name='roles')
     inheritable = models.BooleanField(default=False)
     permissions = MultiSelectField(choices=PERMISSION_CHOICES)
+    priority = models.IntegerField(null=True,blank=True)
 
     class Meta:
         verbose_name = "Body Role"
@@ -47,7 +48,7 @@ class InstituteRole(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=100, blank=True)
     permissions = MultiSelectField(choices=INSTITUTE_PERMISSION_CHOICES)
-
+    
     class Meta:
         verbose_name = "Institute Role"
         verbose_name_plural = "Institute Roles"

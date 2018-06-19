@@ -11,14 +11,16 @@ from events.prioritizer import get_r_fresh_prioritized_events
 class RoleSerializer(serializers.ModelSerializer):
     """Role Serializer"""
 
+    priority = serializers.IntegerField();
     permissions = serializers.MultipleChoiceField(choices=PERMISSION_CHOICES)
     body_detail = BodySerializerMin(read_only=True, source='body')
     users_detail = UserProfileSerializer(many=True, read_only=True, source='users')
     bodies = serializers.SerializerMethodField()
 
     class Meta:
+        ordering=('priority')
         model = BodyRole
-        fields = ('id', 'name', 'inheritable', 'body', 'body_detail', 'bodies',
+        fields = ('priority','id', 'name', 'inheritable', 'body', 'body_detail', 'bodies',
                   'permissions', 'users', 'users_detail')
 
     @classmethod
@@ -39,6 +41,7 @@ class RoleSerializer(serializers.ModelSerializer):
 class RoleSerializerWithEvents(serializers.ModelSerializer):
     """Role Serializer with nested events of bodies"""
 
+    priority = serializers.IntegerField();
     permissions = serializers.MultipleChoiceField(choices=PERMISSION_CHOICES)
     events = serializers.SerializerMethodField()
     body_detail = BodySerializerMin(read_only=True, source='body')
@@ -46,8 +49,9 @@ class RoleSerializerWithEvents(serializers.ModelSerializer):
     get_bodies = lambda self, obj: RoleSerializer.get_bodies(obj)
 
     class Meta:
+        ordering = ('priority')
         model = BodyRole
-        fields = ('id', 'name', 'inheritable', 'body', 'body_detail',
+        fields = ('priority','id', 'name', 'inheritable', 'body', 'body_detail',
                   'bodies', 'permissions', 'events')
 
     def get_events(self, obj):
