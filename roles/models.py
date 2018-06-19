@@ -20,12 +20,12 @@ class BodyRole(models.Model):
     body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE, related_name='roles')
     inheritable = models.BooleanField(default=False)
     permissions = MultiSelectField(choices=PERMISSION_CHOICES)
-    priority = models.IntegerField(null=True,blank=True)
+    priority = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "Body Role"
         verbose_name_plural = "Body Roles"
-        ordering = ("body__name",)
+        ordering = ("body__name", "priority")
 
     def __str__(self):
         return self.body.name + " " + self.name
