@@ -48,7 +48,7 @@ class InstituteRole(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=100, blank=True)
     permissions = MultiSelectField(choices=INSTITUTE_PERMISSION_CHOICES)
-    
+
     class Meta:
         verbose_name = "Institute Role"
         verbose_name_plural = "Institute Roles"
