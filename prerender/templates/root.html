@@ -4,13 +4,13 @@
 <head>
     <meta charset="utf-8">
     <title>{{settings.PRERENDER_TITLE}}</title>
-    <meta name="description" content="{{body.short_description}}">
-    <meta property="og:description" content="{{body.short_description}}" />
+    <meta name="description" content="{{settings.PRERENDER_DESCRIPTION}}">
+    <meta property="og:description" content="{{settings.PRERENDER_DESCRIPTION}}" />
 
-    <meta property="og:title" content="{{body.name}}" />
-    <meta property="og:type" content="organization" />
-    <meta property="og:url" content="{{settings.BASE_URL}}/org/{{body.str_id}}" />
-    <meta property="og:image" content="{{body.image_url}}" />
+    <meta property="og:title" content="{{settings.PRERENDER_TITLE}}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{settings.BASE_URL}}" />
+    <meta property="og:image" content="{{settings.LOGO_URL}}" />
     <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
 </head>
 
