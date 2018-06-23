@@ -8,11 +8,6 @@ from login.tests import get_new_user
 
 class BodyTestCase(APITestCase):
     """Check if we can create bodies and link events."""
-    test_body_1_id = None
-    test_body_2_id = None
-    user = None
-    insti_role = None
-    body_1_role = None
 
     def setUp(self):
         # Fake authenticate

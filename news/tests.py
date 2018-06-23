@@ -8,10 +8,6 @@ from login.tests import get_new_user
 class NewsTestCase(APITestCase):
     """Test news endpoints."""
 
-    entry1 = None
-    source1 = None
-    user = None
-
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()

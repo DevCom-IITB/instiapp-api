@@ -10,13 +10,6 @@ from login.tests import get_new_user
 
 class EventTestCase(APITestCase):
     """Check if we can create bodies and link events."""
-    test_body_1 = None
-    test_body_2 = None
-    user = None
-    body_1_role = None
-    update_test_event = None
-    update_event_data = None
-    update_url = None
 
     def setUp(self):
         # Fake authenticate
