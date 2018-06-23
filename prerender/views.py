@@ -6,12 +6,18 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from users.models import UserProfile
 from events.models import Event
+from news.models import NewsEntry
 from events.prioritizer import get_fresh_prioritized_events
 from bodies.models import Body
 
 def root(request):
     events = get_fresh_prioritized_events(Event.objects.all(), request)
     rendered = render_to_string('root.html', {'events': events, 'settings': settings})
+    return HttpResponse(rendered)
+
+def news(request):
+    news = NewsEntry.objects.all()[0 : 20]
+    rendered = render_to_string('news.html', {'news': news, 'settings': settings})
     return HttpResponse(rendered)
 
 def user_details(request, pk):

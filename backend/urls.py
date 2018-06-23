@@ -101,11 +101,13 @@ urlpatterns = [
     # -------------- PRERENDER --------------- #
     path('', pr.root),
     path('feed', pr.root),
+    path('news', pr.news),
     path('user/<pk>', pr.user_details),
     path('event/<pk>', pr.event_details),
     path('org/<pk>', pr.body_details),
     path('body-tree/<pk>', pr.body_tree),
 
+    # -------------- DOCS -------------------- #
     path('docs/', get_swagger_view(title='InstiApp API')),
 
     # -------------- DEPRECATED -------------- #
