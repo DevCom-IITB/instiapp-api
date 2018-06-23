@@ -16,8 +16,9 @@
 
 <body>
 
-<h2>Explore</h2>
-Find Organizations, Events and People
+Find Organizations, Events and People<br>
+{%include "links.html" %}
+
 <ul>
 {% for body in bodies %}
     <li>
@@ -32,8 +33,6 @@ Find Organizations, Events and People
     </li>
 {% endfor %}
 </ul>
-
-{%include "links.html" %}
 
 </body>
 </html>
