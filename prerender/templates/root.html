@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>{{settings.PRERENDER_TITLE}}</title>
+    <meta name="description" content="{{body.short_description}}">
+    <meta property="og:description" content="{{body.short_description}}" />
+
+    <meta property="og:title" content="{{body.name}}" />
+    <meta property="og:type" content="organization" />
+    <meta property="og:url" content="{{settings.BASE_URL}}/org/{{body.str_id}}" />
+    <meta property="og:image" content="{{body.image_url}}" />
+    <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
+</head>
+
+<body>
+
+<h2>Events</h2>
+<ul>
+{% for event in events  %}
+    <li>
+        <a href="/event/{{event.str_id}}">{{event.name}}</a>, {{event.start_time}} to {{event.end_time}}
+        {% if event.website_url  %}
+            - <a href="{{event.website_url}}">{{event.name}} Website</a>
+        {% endif %}
+        <br>
+
+        {% for body in event.bodies.all  %}
+            <a href="/org/{{body.str_id}}">{{body.name}}</a>
+            {% if body.website_url  %}
+            - <a href="{{body.website_url}}">{{body.name}} Website</a>
+            {% endif %}
+            <br>
+        {% endfor %}
+        <img style="width:250px" src="{{event.image_url}}"><br>
+    </li>
+{% endfor %}
+</ul>
+
+</body>
+</html>
