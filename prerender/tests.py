@@ -4,6 +4,7 @@ from rest_framework.test import APITestCase
 from bodies.models import Body
 from bodies.models import BodyChildRelation
 from events.models import Event
+from news.models import NewsEntry
 from users.models import UserProfile
 
 class PrerenderTestCase(APITestCase):
@@ -25,6 +26,9 @@ class PrerenderTestCase(APITestCase):
         self.test_body.events.add(event2)
         self.test_event = event1
 
+        self.news1 = NewsEntry.objects.create(guid="https://test.com", title="NewsIsGreat",
+                        body=self.test_body, blog_url="https://blog", link="https://blog-item")
+
     def test_root(self):
         """Root page prerender test."""
 
@@ -34,6 +38,17 @@ class PrerenderTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.test_event.name)
         self.assertContains(response, self.test_event.bodies.all()[0].name)
+
+    def test_news(self):
+        """Test news prerender."""
+
+        url = '/news'
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.news1.title)
+        self.assertContains(response, self.news1.link)
+        self.assertContains(response, self.test_body.name)
 
     def test_user_details(self):
         """Test user-details prerender."""
