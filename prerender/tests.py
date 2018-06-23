@@ -10,10 +10,6 @@ from users.models import UserProfile
 class PrerenderTestCase(APITestCase):
     """Check if prerender is working."""
 
-    test_profile = None
-    test_body = None
-    test_event = None
-
     def setUp(self):
         self.test_profile = UserProfile.objects.create(
             name="TestUser", email="my@email.com", roll_no="10000001", ldap_id='ldap')

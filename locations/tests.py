@@ -11,11 +11,6 @@ from login.tests import get_new_user
 class LocationTestCase(APITestCase):
     """Check if we can create locations."""
 
-    test_body_1 = None
-    reusable_test_location = None
-    user = None
-    insti_role = None
-
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()

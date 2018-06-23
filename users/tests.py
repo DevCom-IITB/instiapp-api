@@ -9,9 +9,6 @@ from login.tests import get_new_user
 class UserTestCase(APITestCase):
     """Unit tests for users."""
 
-    user = None
-    test_body = None
-
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()
