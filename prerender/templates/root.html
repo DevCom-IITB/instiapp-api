@@ -33,7 +33,7 @@
             {% endif %}
             <br>
         {% endfor %}
-        <img style="width:250px" src="{{event.image_url}}"><br>
+        <a href="/event/{{event.str_id}}"><img style="width:250px" src="{{event.image_url}}"></a><br>
     </li>
 {% endfor %}
 </ul>
