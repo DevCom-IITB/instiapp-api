@@ -27,23 +27,26 @@ class PrerenderTestCase(APITestCase):
 
     def test_root(self):
         """Root page prerender test."""
-
         url = '/'
         response = self.client.get(url)
-
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.test_event.name)
         self.assertContains(response, self.test_event.bodies.all()[0].name)
 
     def test_news(self):
         """Test news prerender."""
-
         url = '/news'
         response = self.client.get(url)
-
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.news1.title)
         self.assertContains(response, self.news1.link)
+        self.assertContains(response, self.test_body.name)
+
+    def test_explore(self):
+        """Test explore prerender."""
+        url = '/explore'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.test_body.name)
 
     def test_user_details(self):
