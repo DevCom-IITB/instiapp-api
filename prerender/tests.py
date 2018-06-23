@@ -25,6 +25,16 @@ class PrerenderTestCase(APITestCase):
         self.test_body.events.add(event2)
         self.test_event = event1
 
+    def test_root(self):
+        """Root page prerender test."""
+
+        url = '/'
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.test_event.name)
+        self.assertContains(response, self.test_event.bodies.all()[0].name)
+
     def test_user_details(self):
         """Test user-details prerender."""
 
