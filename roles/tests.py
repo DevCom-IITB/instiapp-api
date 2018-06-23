@@ -9,11 +9,6 @@ from login.tests import get_new_user
 class RoleTestCase(APITestCase):
     """Tests for roles."""
 
-    user = None
-    body = None
-    bodyrole = None
-    instirole = None
-
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()

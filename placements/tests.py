@@ -20,8 +20,6 @@ def test_blog(obj, url, count):
 class PlacementsTestCase(APITestCase):
     """Test placements endpoints."""
 
-    entry1 = None
-
     def setUp(self):
         # Create dummies
         self.entry1 = BlogEntry.objects.create(title="PEntry1", blog_url=settings.PLACEMENTS_URL)
