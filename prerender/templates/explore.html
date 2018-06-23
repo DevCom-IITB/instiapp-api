@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Explore | {{settings.PRERENDER_TITLE}}</title>
+    <meta name="description" content="Find Organizations, Events and People">
+    <meta property="og:description" content="Find Organizations, Events and People" />
+
+    <meta property="og:title" content="Explore | {{settings.PRERENDER_TITLE}}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{settings.BASE_URL}}/explore" />
+    <meta property="og:image" content="{{settings.LOGO_URL}}" />
+    <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
+</head>
+
+<body>
+
+<h2>Explore</h2>
+Find Organizations, Events and People
+<ul>
+{% for body in bodies %}
+    <li>
+        <b><a href="/org/{{body.str_id}}">{{body.name}}</a></b><br>
+        {{body.short_description}}<br>
+        {% if body.image_url %}
+            <a href="/org/{{body.str_id}}">
+                <img style="width:100px;" src="{{body.image_url}}">
+            </a><br>
+        {% endif %}
+        <br>
+    </li>
+{% endfor %}
+</ul>
+
+{%include "links.html" %}
+
+</body>
+</html>

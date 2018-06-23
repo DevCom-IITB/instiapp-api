@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>News | {{settings.PRERENDER_TITLE}}</title>
+    <meta name="description" content="News at {{settings.PRERENDER_DESCRIPTION}}">
+    <meta property="og:description" content="News at {{settings.PRERENDER_DESCRIPTION}}" />
+
+    <meta property="og:title" content="News | {{settings.PRERENDER_TITLE}}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{settings.BASE_URL}}/news" />
+    <meta property="og:image" content="{{settings.LOGO_URL}}" />
+    <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
+</head>
+
+<body>
+
+<h2>News</h2>
+<ul>
+{% for entry in news  %}
+    <li>
+        <b><a href="{{entry.link}}">{{entry.title}}</b></a><br>
+        {{entry.published}}<br>
+        <a href="/org/{{entry.body.str_id}}">{{entry.body.name}}</a><br>
+        <p>{{entry.content | safe }}</p>
+        <br>
+    </li>
+{% endfor %}
+</ul>
+
+{%include "links.html" %}
+
+</body>
+</html>

@@ -7,7 +7,23 @@ from django.conf import settings
 from users.models import UserProfile
 from events.models import Event
 from events.prioritizer import get_fresh_prioritized_events
+from news.models import NewsEntry
 from bodies.models import Body
+
+def root(request):
+    events = get_fresh_prioritized_events(Event.objects.all(), request)
+    rendered = render_to_string('root.html', {'events': events, 'settings': settings})
+    return HttpResponse(rendered)
+
+def news(request):
+    news_items = NewsEntry.objects.all()[0 : 20]
+    rendered = render_to_string('news.html', {'news': news_items, 'settings': settings})
+    return HttpResponse(rendered)
+
+def explore(request):
+    bodies = Body.objects.all()
+    rendered = render_to_string('explore.html', {'bodies': bodies, 'settings': settings})
+    return HttpResponse(rendered)
 
 def user_details(request, pk):
     try:
