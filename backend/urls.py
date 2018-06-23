@@ -100,6 +100,7 @@ urlpatterns = [
 
     # -------------- PRERENDER --------------- #
     path('', pr.root),
+    path('feed', pr.root),
     path('user/<pk>', pr.user_details),
     path('event/<pk>', pr.event_details),
     path('org/<pk>', pr.body_details),
