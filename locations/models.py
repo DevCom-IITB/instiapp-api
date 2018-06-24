@@ -14,10 +14,10 @@ class Location(models.Model):
     time_of_creation = models.DateTimeField(auto_now_add=True)
 
     name = models.CharField(max_length=150)
-    short_name = models.CharField(max_length=50, blank=True, null=True)
+    short_name = models.CharField(max_length=80, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL)
-    parent_relation = models.CharField(max_length=20, blank=True, null=True)
+    parent_relation = models.CharField(max_length=50, blank=True, null=True)
     group_id = models.IntegerField(blank=True, null=True)
 
     pixel_x = models.IntegerField(blank=True, null=True)
