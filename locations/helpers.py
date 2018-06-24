@@ -1,4 +1,5 @@
 """Helpers for locations."""
+from django.db.models import Q
 from locations.models import Location
 
 def create_unreusable_locations(loc_list):
@@ -11,9 +12,9 @@ def create_unreusable_locations(loc_list):
 
     # Reuse reusable venues, add new otherwise
     for loc_name in loc_list:
-        locs = Location.objects.filter(name=loc_name)
+        locs = Location.objects.filter(Q(name=loc_name) | Q(short_name=loc_name))
         if locs.count() == 0 or not locs[0].reusable:
-            new_loc = Location.objects.create(name=loc_name)
+            new_loc = Location.objects.create(name=loc_name, short_name=loc_name)
             new_loc.save()
             loc_ids.append(str(new_loc.id))
         else:

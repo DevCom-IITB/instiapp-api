@@ -25,12 +25,12 @@ class LocationTestCase(APITestCase):
             name="InstiRole", permissions='Location')
 
         self.reusable_test_location = Location.objects.create(
-            name='ReusableTestLocation', reusable=True)
+            name='ReusableTestLocation', short_name='RTL', reusable=True)
 
     def test_location_other(self):
         """Check misc parameters of Location"""
         self.assertEqual(str(self.reusable_test_location),
-                         self.reusable_test_location.name)
+                 self.reusable_test_location.short_name + ' - ' + self.reusable_test_location.name)
 
     def test_location_get(self):
         """Check that only reusable locations are listed in get."""
