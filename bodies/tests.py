@@ -116,3 +116,39 @@ class BodyTestCase(APITestCase):
         self.insti_role.save()
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
+
+    def test_body_follow(self):
+        """Test if body follow API works."""
+
+        body = Body.objects.create(name="TestBody3")
+        url = '/api/bodies/' + str(body.id) + '/follow'
+
+        # No query
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        url += '?action='
+
+        # Invalid Action
+        response = self.client.get(url + 'k')
+        self.assertEqual(response.status_code, 400)
+
+        # Follow
+        response = self.client.get(url + '1')
+        self.assertEqual(response.status_code, 204)
+        self.assertIn(body, self.user.profile.followed_bodies.all())
+
+        # Check user_follows
+        response = self.client.get('/api/bodies/' + str(body.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['user_follows'], True)
+
+        # Unfollow
+        response = self.client.get(url + '0')
+        self.assertEqual(response.status_code, 204)
+        self.assertNotIn(body, self.user.profile.followed_bodies.all())
+
+        # Check user_follows
+        response = self.client.get('/api/bodies/' + str(body.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['user_follows'], False)
