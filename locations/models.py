@@ -27,7 +27,7 @@ class Location(models.Model):
     reusable = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.short_name + ' - ' + self.name
+        return (self.short_name if self.short_name else '') + ' - ' + self.name
 
     class Meta:
         verbose_name = "Location"
