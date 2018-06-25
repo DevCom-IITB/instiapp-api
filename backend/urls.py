@@ -41,6 +41,9 @@ urlpatterns = [
     path('api/bodies/<pk>/followers', BodyFollowersViewSet.as_view(
         {'get':'retrieve'}
     ), name='body-followers'),
+    path('api/bodies/<pk>/follow', BodyViewSet.as_view(
+        {'get':'follow'}
+    )),
 
     path('api/events', EventViewSet.as_view(
         {'get':'list', 'post':'create'}

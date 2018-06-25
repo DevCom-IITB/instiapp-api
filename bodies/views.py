@@ -32,11 +32,7 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
         Retrieve by `uuid` or `str_id`."""
 
         # Try UUID or fall back to str_id
-        try:
-            UUID(pk, version=4)
-            body = get_object_or_404(Body.objects.all(), id=pk)
-        except ValueError:
-            body = get_object_or_404(Body.objects.all(), str_id=pk)
+        body = self.get_body(pk)
 
         # Add user_follows to response
         serialized = BodySerializer(body, context={'request': request}).data
@@ -66,6 +62,36 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
         Needs the `DelB` institute permission."""
 
         return super().destroy(request, pk)
+
+    @login_required_ajax
+    def follow(self, request, pk):
+        """Follow or unfollow a body {?action}=0,1"""
+
+        body = self.get_body(pk)
+
+        # Get query param
+        value = request.GET.get("action")
+        if value is None:
+            return Response({"message": "{?action} is required"}, status=400)
+
+        # Check possible actions
+        if value == "0":
+            request.user.profile.followed_bodies.remove(body)
+        elif value == "1":
+            request.user.profile.followed_bodies.add(body)
+        else:
+            return Response({"message": "Invalid Action"}, status=400)
+
+        return Response(status=204)
+
+    @staticmethod
+    def get_body(pk):
+        """Get a body from pk uuid or strid."""
+        try:
+            UUID(pk, version=4)
+            return get_object_or_404(Body.objects.all(), id=pk)
+        except ValueError:
+            return get_object_or_404(Body.objects.all(), str_id=pk)
 
 class BodyFollowersViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """List followers of body."""
