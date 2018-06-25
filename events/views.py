@@ -8,6 +8,7 @@ from events.prioritizer import get_prioritized
 from events.serializers import EventSerializer
 from events.serializers import EventFullSerializer
 from events.models import Event
+from events.models import UserEventStatus
 from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
@@ -26,12 +27,12 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         """Get Event.
         Get by `uuid` or `str_id`"""
 
-        try:
-            UUID(pk, version=4)
-            return super().retrieve(self, request, pk)
-        except ValueError:
-            event = get_object_or_404(Event.objects.all(), str_id=pk)
-            return Response(EventFullSerializer(event).data)
+        event = self.get_event(pk)
+        serialized = EventFullSerializer(event).data
+        if request.user.is_authenticated:
+            ues = UserEventStatus.objects.filter(user=request.user.profile, event=event)
+            serialized['user_ues'] = ues[0].status if ues.exists() else 0
+        return Response(serialized)
 
     def list(self, request): #pylint: disable=unused-argument
         """List Events.
@@ -76,7 +77,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         permission and associating needs `AddE`"""
 
         # Get difference in bodies
-        event = Event.objects.get(id=pk)
+        event = self.get_event(pk)
         old_bodies_id = [str(x.id) for x in event.bodies.all()]
         new_bodies_id = request.data['bodies_id']
         added_bodies = diff_set(new_bodies_id, old_bodies_id)
@@ -116,9 +117,18 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         """Delete Event.
         Needs `DelE` permission for all associated bodies."""
 
-        event = Event.objects.get(id=pk)
+        event = self.get_event(pk)
         if all([user_has_privilege(request.user.profile, str(body.id), 'DelE')
                 for body in event.bodies.all()]):
             return super().destroy(request, pk)
 
         return forbidden_no_privileges()
+
+    @staticmethod
+    def get_event(pk):
+        """Get an event from pk uuid or strid."""
+        try:
+            UUID(pk, version=4)
+            return get_object_or_404(Event.objects.all(), id=pk)
+        except ValueError:
+            return get_object_or_404(Event.objects.all(), str_id=pk)
