@@ -31,13 +31,18 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
         """Get Body.
         Retrieve by `uuid` or `str_id`."""
 
+        # Try UUID or fall back to str_id
         try:
             UUID(pk, version=4)
-            return super().retrieve(self, request, pk)
+            body = get_object_or_404(Body.objects.all(), id=pk)
         except ValueError:
             body = get_object_or_404(Body.objects.all(), str_id=pk)
-            return Response(BodySerializer(
-                body, context={'request': request}).data)
+
+        # Add user_follows to response
+        serialized = BodySerializer(body, context={'request': request}).data
+        serialized['user_follows'] = request.user.is_authenticated and \
+            body in request.user.profile.followed_bodies.all()
+        return Response(serialized)
 
     @insti_permission_required('AddB')
     def create(self, request):
