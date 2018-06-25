@@ -1,6 +1,7 @@
 """Serializers for Event."""
 from rest_framework import serializers
 from events.models import Event
+from events.models import UserEventStatus
 
 class FollowersMethods:
     """Helper methods for followers."""
@@ -15,6 +16,18 @@ class FollowersMethods:
         """Get serialized followers with specified status."""
         from users.serializers import UserProfileSerializer
         return UserProfileSerializer(obj.followers.filter(ues__status=status), many=True).data
+
+    @staticmethod
+    def get_user_ues(slf, obj):
+        """Get UES for current user or 0."""
+        # May not always want this
+        if 'request' not in slf.context:
+            return None
+
+        request = slf.context['request']
+        if request.user.is_authenticated:
+            ues = UserEventStatus.objects.filter(user=request.user.profile, event=obj)
+            return ues[0].status if ues.exists() else 0
 
 class EventSerializer(serializers.ModelSerializer):
     """Serializer for Event.
@@ -34,6 +47,9 @@ class EventSerializer(serializers.ModelSerializer):
     going_count = serializers.SerializerMethodField()
     get_going_count = lambda self, obj: FollowersMethods.get_count(obj, 2)
 
+    user_ues = serializers.SerializerMethodField()
+    get_user_ues = FollowersMethods.get_user_ues
+
     venues = LocationSerializerMin(many=True, read_only=True)
 
     bodies = BodySerializerMin(many=True, read_only=True)
@@ -42,7 +58,8 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = ('id', 'str_id', 'name', 'description', 'image_url',
                   'start_time', 'end_time', 'all_day', 'venues', 'bodies',
-                  'interested_count', 'going_count', 'website_url', 'weight')
+                  'interested_count', 'going_count', 'website_url', 'weight',
+                  'user_ues')
 
 class EventFullSerializer(serializers.ModelSerializer):
     """Serializer for Event with more information.
@@ -68,6 +85,9 @@ class EventFullSerializer(serializers.ModelSerializer):
     going = serializers.SerializerMethodField()
     get_going = lambda self, obj: FollowersMethods.get_followers(obj, 2)
 
+    user_ues = serializers.SerializerMethodField()
+    get_user_ues = FollowersMethods.get_user_ues
+
     venues = LocationSerializerMin(many=True, read_only=True)
     venue_names = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field='name', source='venues')
@@ -84,7 +104,7 @@ class EventFullSerializer(serializers.ModelSerializer):
         fields = ('id', 'str_id', 'name', 'description', 'image_url', 'start_time',
                   'end_time', 'all_day', 'venues', 'venue_names', 'bodies', 'bodies_id',
                   'interested_count', 'going_count', 'interested', 'going', 'venue_ids',
-                  'website_url')
+                  'website_url', 'user_ues')
 
     def to_representation(self, instance):
         result = super().to_representation(instance)

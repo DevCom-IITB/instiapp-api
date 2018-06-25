@@ -28,10 +28,8 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         Get by `uuid` or `str_id`"""
 
         event = self.get_event(pk)
-        serialized = EventFullSerializer(event).data
-        if request.user.is_authenticated:
-            ues = UserEventStatus.objects.filter(user=request.user.profile, event=event)
-            serialized['user_ues'] = ues[0].status if ues.exists() else 0
+        serialized = EventFullSerializer(event, context={'request': request}).data
+
         return Response(serialized)
 
     def list(self, request): #pylint: disable=unused-argument
@@ -50,7 +48,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
             # Respond with recent events
             queryset = get_fresh_prioritized_events(self.queryset, request)
 
-        serializer = EventSerializer(queryset, many=True)
+        serializer = EventSerializer(queryset, many=True, context={'request': request})
         data = serializer.data
 
         return Response({'count':len(data), 'data':data})
