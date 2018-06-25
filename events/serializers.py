@@ -52,7 +52,7 @@ class EventFullSerializer(serializers.ModelSerializer):
     """
 
     from bodies.serializer_min import BodySerializerMin
-    from locations.serializers import LocationSerializer
+    from locations.serializers import LocationSerializerMin
     from locations.models import Location
     from bodies.models import Body
 
@@ -68,7 +68,7 @@ class EventFullSerializer(serializers.ModelSerializer):
     going = serializers.SerializerMethodField()
     get_going = lambda self, obj: FollowersMethods.get_followers(obj, 2)
 
-    venues = LocationSerializer(many=True, read_only=True)
+    venues = LocationSerializerMin(many=True, read_only=True)
     venue_names = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field='name', source='venues')
     venue_ids = serializers.PrimaryKeyRelatedField(
