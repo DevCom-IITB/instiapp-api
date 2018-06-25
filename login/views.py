@@ -44,7 +44,6 @@ class LoginViewSet(viewsets.ViewSet):
 
         # Check that we have the access token
         if not 'access_token' in response_json:
-            print(response.content)
             return Response(response_json, status=400)
 
         # Get the user's profile
@@ -54,9 +53,6 @@ class LoginViewSet(viewsets.ViewSet):
                 "Authorization": "Bearer " + response_json['access_token'],
             }, verify=False)
         profile_json = profile_response.json()
-
-        # Print the profile for debugging
-        print(profile_response.content)
 
         # Check if we got at least the user's SSO id
         if not 'id' in profile_json:
