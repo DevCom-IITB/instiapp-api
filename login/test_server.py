@@ -33,8 +33,8 @@ class S(BaseHTTPRequestHandler):
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])  # <--- Gets the size of data
         post_data = self.rfile.read(content_length)  # <--- Gets the data itself
-        print("URL --> " + self.path)
-        print(str(post_data))
+        # print("URL --> " + self.path)
+        # print(str(post_data))
         self._set_headers()
 
         token_url = "CODE_TOKEN"
@@ -53,10 +53,13 @@ class S(BaseHTTPRequestHandler):
         else:
             self.wfile.write(b'{"error":"auth test failed"}')
 
+    def log_message(self, format, *args):
+        return
+
 def run(server_class=HTTPServer, handler_class=S, port=33000):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-    print('Starting httpd...')
+    # print('Starting httpd...')
     httpd.serve_forever()
 
 
