@@ -62,12 +62,9 @@ urlpatterns = [
     path('api/users/<pk>', UserProfileViewSet.as_view(
         {'get':'retrieve'}
     )),
-    path('api/users', UserProfileViewSet.as_view(
-        {'get':'list'}
-    )),
 
     path('api/upload', UploadViewSet.as_view(
-        {'get':'list', 'post':'create'}
+        {'post':'create'}
     )),
     path('api/upload/<pk>', UploadViewSet.as_view(
         {'get':'retrieve', 'delete':'destroy'}
@@ -86,7 +83,7 @@ urlpatterns = [
     path('api/user-me/roles', BodyRoleViewSet.as_view({'get':'get_my_roles'})),
 
     path('api/roles', BodyRoleViewSet.as_view(
-        {'get':'list', 'post':'create'}
+        {'post':'create'}
     )),
     path('api/roles/<pk>', BodyRoleViewSet.as_view(
         {'get':'retrieve', 'put':'update', 'delete':'destroy'}
@@ -113,9 +110,4 @@ urlpatterns = [
 
     # -------------- DOCS -------------------- #
     path('docs/', get_swagger_view(title='InstiApp API')),
-
-    # -------------- DEPRECATED -------------- #
-    path('user-details/<pk>', pr.user_details),
-    path('event-details/<pk>', pr.event_details),
-    path('body-details/<pk>', pr.body_details),
 ]
