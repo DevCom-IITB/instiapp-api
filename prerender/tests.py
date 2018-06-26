@@ -50,9 +50,9 @@ class PrerenderTestCase(APITestCase):
         self.assertContains(response, self.test_body.name)
 
     def test_user_details(self):
-        """Test user-details prerender."""
+        """Test user prerender."""
 
-        url = '/user-details/' + str(self.test_profile.id)
+        url = '/user/' + str(self.test_profile.id)
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -60,32 +60,32 @@ class PrerenderTestCase(APITestCase):
         self.assertContains(response, self.test_profile.roll_no)
         self.assertNotContains(response, self.test_profile.email)
 
-        url = '/user-details/' + str(self.test_profile.ldap_id)
+        url = '/user/' + str(self.test_profile.ldap_id)
         self.assertEqual(self.client.get(url).content, response.content)
 
     def test_body_details(self):
-        """Test body-details prerender."""
+        """Test body prerender."""
 
-        url = '/body-details/' + str(self.test_body.id)
+        url = '/org/' + str(self.test_body.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.test_body.name)
         self.assertContains(response, self.test_body.events.all()[0].name)
         self.assertContains(response, self.test_body.events.all()[1].name)
 
-        url = '/body-details/' + str(self.test_body.str_id)
+        url = '/org/' + str(self.test_body.str_id)
         self.assertEqual(self.client.get(url).content, response.content)
 
     def test_event_details(self):
-        """Test event-details prerender."""
+        """Test event prerender."""
 
-        url = '/event-details/' + str(self.test_event.id)
+        url = '/event/' + str(self.test_event.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.test_event.name)
         self.assertContains(response, self.test_body.name)
 
-        url = '/event-details/' + str(self.test_event.str_id)
+        url = '/event/' + str(self.test_event.str_id)
         self.assertEqual(self.client.get(url).content, response.content)
 
     def test_tree(self):
