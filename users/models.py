@@ -13,17 +13,17 @@ class UserProfile(models.Model):
         User, related_name='profile', on_delete=models.CASCADE, null=True, blank=True)
 
     name = models.CharField(max_length=50, blank=True)
-    roll_no = models.CharField(max_length=10, null=True, blank=True)
+    roll_no = models.CharField(max_length=30, null=True, blank=True)
     ldap_id = models.CharField(max_length=50, null=True, blank=True)
     profile_pic = models.URLField(null=True, blank=True)
     fcm_id = models.CharField(max_length=200, null=True, blank=True)
 
     followed_bodies = models.ManyToManyField('bodies.Body', related_name='followers', blank=True)
-    contact_no = models.CharField(max_length=10, null=True, blank=True)
+    contact_no = models.CharField(max_length=30, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     about = models.TextField(blank=True, null=True)
     website_url = models.URLField(blank=True, null=True)
-    department = models.CharField(max_length=10, null=True, blank=True)
+    department = models.CharField(max_length=30, null=True, blank=True)
     department_name = models.CharField(max_length=200, null=True, blank=True)
     degree = models.CharField(max_length=200, null=True, blank=True)
     degree_name = models.CharField(max_length=200, null=True, blank=True)
@@ -34,7 +34,7 @@ class UserProfile(models.Model):
     institute_roles = models.ManyToManyField(
         'roles.InstituteRole', related_name='users', blank=True)
     hostel = models.CharField(max_length=100, null=True, blank=True)
-    room = models.CharField(max_length=10, null=True, blank=True)
+    room = models.CharField(max_length=30, null=True, blank=True)
 
     class Meta:
         verbose_name = "Profile"
