@@ -17,7 +17,7 @@ class OtherViewset(viewsets.ViewSet):
         """EXPENSIVE: Search with query param `query` throughout the database."""
 
         req_query = request.GET.get("query")
-        if not req_query or len(req_query) < 5:
+        if not req_query or len(req_query) < 3:
             return Response({"message": "No query or too short!"}, status=400)
 
         # Search bodies by name and description
