@@ -26,7 +26,7 @@ class OtherTestCase(APITestCase):
         """Test the search endpoint."""
         url = '/api/search?query='
 
-        response = self.client.get(url + 'bod')
+        response = self.client.get(url + 'bo')
         self.assertEqual(response.status_code, 400)
 
         response = self.client.get(url + 'body1')
