@@ -69,6 +69,20 @@ class NewsTestCase(APITestCase):
         self.assertEqual(response.data[e1_i]['reactions_count'][5], 1)
         self.assertEqual(response.data[e1_i]['user_reaction'], 5)
 
+        # Check un-react
+        url = '/api/user-me/unr/' + str(news.id) + '?reaction=-1'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 204)
+        unr = UserNewsReaction.objects.get(news__id=news.id, user=self.user.profile)
+        self.assertEqual(unr.reaction, -1)
+
+        # Check /api/news after un-reacting
+        url = '/api/news'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        e1_i = next((index for (index, d) in enumerate(response.data) if d['title'] == self.entry1.title), None)
+        self.assertEqual(response.data[e1_i]['reactions_count'][5], 0)
+        self.assertEqual(response.data[e1_i]['user_reaction'], -1)
 
         # Check reacting validation
         url = '/api/user-me/unr/' + str(news.id)
