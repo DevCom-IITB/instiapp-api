@@ -13,7 +13,15 @@ class NewsEntrySerializer(serializers.ModelSerializer):
     @staticmethod
     def get_reactions_count(obj):
         """Get number of user reactions on news item."""
-        return {t : obj.reacted_by.filter(unr__reaction=t).count() for t in range(0, 6)}
+        # Get all UNR for news item
+        unrs = obj.unr.select_related()
+
+        # Count for each type
+        reaction_counts = {t: 0 for t in range(0, 6)}
+        for unr in unrs:
+            reaction_counts[unr.reaction] += 1
+
+        return reaction_counts
 
     def get_user_reaction(self, obj):
         """Get the current user's reaction on the news item"""
