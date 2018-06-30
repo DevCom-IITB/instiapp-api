@@ -19,7 +19,8 @@ class NewsEntrySerializer(serializers.ModelSerializer):
         # Count for each type
         reaction_counts = {t: 0 for t in range(0, 6)}
         for unr in unrs:
-            reaction_counts[unr.reaction] += 1
+            if unr.reaction >= 0 and unr.reaction < 6:
+                reaction_counts[unr.reaction] += 1
 
         return reaction_counts
 
