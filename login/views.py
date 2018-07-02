@@ -1,4 +1,6 @@
 """Login Viewset."""
+import requests
+from django.conf import settings
 from django.contrib.auth import logout
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -21,12 +23,52 @@ class LoginViewSet(viewsets.ViewSet):
         if auth_code is None:
             return Response({"message" : "{?code} is required"}, status=400)
 
-        # Construt post data to get token
+        # Check we have redir param
         redir = request.GET.get('redir')
         if redir is None:
             return Response({"message" : "{?redir} is required"}, status=400)
 
         return perform_login(auth_code, redir, request)
+
+    @staticmethod
+    def pass_login(request):
+        """DANGEROUS: Password Log in.
+        Uses the `username` and `password` query parameters."""
+
+        # Check if we have the username
+        username = request.GET.get('username')
+        if username is None:
+            return Response({"message" : "{?username} is required"}, status=400)
+
+        # Check if we have the password
+        password = request.GET.get('password')
+        if password is None:
+            return Response({"message" : "{?password} is required"}, status=400)
+
+        # Make a new session
+        session = requests.Session()
+
+        # Get constants
+        URL = settings.SSO_LOGIN_URL
+        REDIR = settings.SSO_DEFAULT_REDIR
+
+        # Get a CSRF token and update referer
+        response = session.get(URL)
+        csrf = response.cookies['csrftoken']
+        session.headers.update({'referer': URL})
+
+        # Make POST data
+        data = {
+            "csrfmiddlewaretoken": csrf,
+            "next": URL,
+            "username": username,
+            "password": password,
+        }
+
+        # Get our auth code
+        auth_code = session.post(URL, data=data).url.split("?code=", 1)[1]
+
+        return perform_login(auth_code, REDIR, request)
 
     @staticmethod
     def get_user(request):
