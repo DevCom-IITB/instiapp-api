@@ -53,7 +53,7 @@ class LoginViewSet(viewsets.ViewSet):
         REDIR = settings.SSO_DEFAULT_REDIR
 
         # Get a CSRF token and update referer
-        response = session.get(URL)
+        response = session.get(URL, verify=not settings.SSO_BAD_CERT)
         csrf = response.cookies['csrftoken']
         session.headers.update({'referer': URL})
 
@@ -66,7 +66,7 @@ class LoginViewSet(viewsets.ViewSet):
         }
 
         # Authenticate
-        response = session.post(URL, data=data)
+        response = session.post(URL, data=data, verify=not settings.SSO_BAD_CERT)
         if not response.history:
             return Response({"message" : "Bad username or password"}, status=403)
 

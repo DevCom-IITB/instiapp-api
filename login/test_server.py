@@ -50,7 +50,6 @@ class S(BaseHTTPRequestHandler):
 
         USERNAME = "biguser"
         PASSWORD = "bigpass"
-        csrf = "BIGCSRF"
 
         if token_url in self.path:
             self._set_headers()
