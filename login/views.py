@@ -65,8 +65,13 @@ class LoginViewSet(viewsets.ViewSet):
             "password": password,
         }
 
+        # Authenticate
+        response = session.post(URL, data=data)
+        if not response.history:
+            return Response({"message" : "Bad username or password"}, status=403)
+
         # Get our auth code
-        auth_code = session.post(URL, data=data).url.split("?code=", 1)[1]
+        auth_code = response.url.split("?code=", 1)[1]
 
         return perform_login(auth_code, REDIR, request)
 
