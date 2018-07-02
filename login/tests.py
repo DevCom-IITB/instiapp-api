@@ -87,3 +87,34 @@ class LoginTestCase(APITestCase):
         url = 'http://localhost/api/login/get-user'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 500)
+
+    def test_pass_login(self):
+        """Test if password login works."""
+
+        # Start mock server
+        mock_server = Popen(['python', 'login/test_server.py'])
+        time.sleep(1)
+
+        # Check validation
+        # Without password
+        url = 'http://localhost/api/pass-login?username=user'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
+
+        # Without user
+        url = 'http://localhost/api/pass-login?password=pass'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 400)
+
+        # Login with bad password
+        url = 'http://localhost/api/pass-login?username=biguser&password=badpass'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Login with correct username password
+        url = 'http://localhost/api/pass-login?username=biguser&password=bigpass'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        # Terminate server
+        mock_server.terminate()
