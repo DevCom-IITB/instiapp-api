@@ -111,7 +111,7 @@ def fill_models_from_sso(user_profile, user, profile_json):
             user_profile.profile_pic = 'https://gymkhana.iitb.ac.in' + profile_json['profile_picture']
 
     # Fill in program details
-    if 'program' in profile_json:
+    if 'program' in profile_json and profile_json['program'] is not None:
         for field in [
             'join_year',
             'department',
@@ -120,11 +120,13 @@ def fill_models_from_sso(user_profile, user, profile_json):
             'degree_name',
             'graduation_year']:
 
-            if profile_json['program'][field] is not None:
+            if field in profile_json['program'] and profile_json['program'][field] is not None:
                 setattr(user_profile, field, profile_json['program'][field])
 
-    if 'insti_address' in profile_json:
-        if profile_json['insti_address']['room'] is not None and profile_json['insti_address']['hostel'] is not None:
+    if 'insti_address' in profile_json and profile_json['insti_address'] is not None:
+        if 'room' in profile_json['insti_address'] and 'hostel' in profile_json['insti_address'] and \
+            profile_json['insti_address']['room'] is not None and profile_json['insti_address']['hostel'] is not None:
+
             user_profile.hostel = profile_json['insti_address']['hostel']
             user_profile.room = (profile_json['insti_address']['room'])
 
