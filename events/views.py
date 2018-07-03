@@ -58,6 +58,11 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         """Create Event.
         Needs `AddE` permission for each body to be associated."""
 
+        # Prevent events without any body
+        if 'bodies_id' not in request.data or not request.data['bodies_id']:
+            return forbidden_no_privileges()
+
+        # Check privileges for all bodies
         if all([user_has_privilege(request.user.profile, id, 'AddE')
                 for id in request.data['bodies_id']]):
 
@@ -73,6 +78,10 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         Needs BodyRole with `UpdE` for at least one associated body.
         Disassociating bodies from the event requires the `DelE`
         permission and associating needs `AddE`"""
+
+        # Prevent events without any body
+        if 'bodies_id' not in request.data or not request.data['bodies_id']:
+            return forbidden_no_privileges()
 
         # Get difference in bodies
         event = self.get_event(pk)
