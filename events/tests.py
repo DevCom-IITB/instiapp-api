@@ -220,6 +220,7 @@ class EventTestCase(APITestCase):
 
         # Check before adding child body relation
         self.update_event_data['description'] = "NEW DESCRIPTION"
+        self.update_event_data['bodies_id'] = [str(self.test_body_1.id)]
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 403)
 
@@ -249,3 +250,11 @@ class EventTestCase(APITestCase):
         self.user.profile.roles.add(body_2_role)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
+
+    def test_nobody(self):
+        """Test events can't be created/updated to have no body."""
+        response = self.client.post("/api/events", self.update_event_data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.put(self.update_url, self.update_event_data, format='json')
+        self.assertEqual(response.status_code, 403)
