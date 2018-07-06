@@ -70,6 +70,25 @@ class LoginViewSet(viewsets.ViewSet):
         if not response.history:
             return Response({"message" : "Bad username or password"}, status=403)
 
+        # If the user has not authenticated in the past
+        if "?code=" not in response.url:
+            # Get the authorize page
+            response = session.get(response.url, verify=not settings.SSO_BAD_CERT)
+            csrf = response.cookies['csrftoken']
+
+            # Grant all SSO permissions
+            data = {
+                "csrfmiddlewaretoken": csrf,
+                "redirect_uri": REDIR,
+                "scope": "basic profile picture ldap sex phone program secondary_emails insti_address",
+                "client_id": settings.SSO_CLIENT_ID,
+                "state": "",
+                "response_type": "code",
+                "scopes_array": ["profile", "picture", "ldap", "sex", "phone", "program", "secondary_emails", "insti_address"],
+                "allow": "Authorize"
+            }
+            response = session.post(response.url, data, verify=not settings.SSO_BAD_CERT)
+
         # Get our auth code
         auth_code = response.url.split("?code=", 1)[1]
 
