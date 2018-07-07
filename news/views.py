@@ -9,7 +9,17 @@ class NewsFeedViewset(viewsets.ViewSet):
     @staticmethod
     def news_feed(request):
         """Get News feed."""
+        # Paging parameters
         from_i, num = query_from_num(request, 30)
+
+        # Filter for body
+        body = request.GET.get('body')
+        if body is not None:
+            queryset = NewsEntry.objects.filter(body__id=body)
+        else:
+            queryset = NewsEntry.objects.all()
+
+        # Get sliced news items
         return Response(NewsEntrySerializer(
-            NewsEntry.objects.all()[from_i : from_i + num], many=True,
+            queryset[from_i : from_i + num], many=True,
             context={'request': request}).data)
