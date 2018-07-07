@@ -14,12 +14,12 @@ class NewsTestCase(APITestCase):
         self.client.force_authenticate(self.user) # pylint: disable=E1101
 
         # Create bodies
-        body1 = Body.objects.create(name="Body1")
+        self.body1 = Body.objects.create(name="Body1")
         body2 = Body.objects.create(name="Body2")
 
         # Create dummies
-        self.entry1 = NewsEntry.objects.create(title="PEntry1", blog_url="B1URL", body=body1)
-        NewsEntry.objects.create(title="PEntry2", blog_url="B1URL", body=body1)
+        self.entry1 = NewsEntry.objects.create(title="PEntry1", blog_url="B1URL", body=self.body1)
+        NewsEntry.objects.create(title="PEntry2", blog_url="B1URL", body=self.body1)
         NewsEntry.objects.create(title="TEntry1", blog_url="B2URL", body=body2)
         NewsEntry.objects.create(title="TEntry2", blog_url="B2URL", body=body2)
         NewsEntry.objects.create(title="TEntry3", blog_url="B2URL", body=body2)
@@ -38,6 +38,12 @@ class NewsTestCase(APITestCase):
 
         # Check with query params
         url = '/api/news?from=1&num=2'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+        # Check for body
+        url = '/api/news?body=' + str(self.body1.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
