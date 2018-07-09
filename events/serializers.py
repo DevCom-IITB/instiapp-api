@@ -1,21 +1,18 @@
 """Serializers for Event."""
 from rest_framework import serializers
+from django.db.models import Count
+from django.db.models import Q
 from events.models import Event
-from events.models import UserEventStatus
 
 class FollowersMethods:
     """Helper methods for followers."""
 
     @staticmethod
-    def get_count(obj, status):
-        """Get count of followers with specified status."""
-        return obj.followers.filter(ues__status=status).count()
-
-    @staticmethod
     def get_followers(obj, status):
         """Get serialized followers with specified status."""
         from users.serializers import UserProfileSerializer
-        return UserProfileSerializer(obj.followers.filter(ues__status=status), many=True).data
+        followers = [ues.user for ues in obj.ues.all() if ues.status == status]
+        return UserProfileSerializer(followers, many=True).data
 
     @staticmethod
     def get_user_ues(slf, obj):
@@ -25,9 +22,10 @@ class FollowersMethods:
             return None
 
         request = slf.context['request']
+        profile = request.user.profile
         if request.user.is_authenticated:
-            ues = UserEventStatus.objects.filter(user=request.user.profile, event=obj)
-            return ues[0].status if ues.exists() else 0
+            ues = [ues.status for ues in obj.ues.all() if ues.user == profile]
+            return ues[0] if ues else 0
 
 class EventSerializer(serializers.ModelSerializer):
     """Serializer for Event.
@@ -41,11 +39,8 @@ class EventSerializer(serializers.ModelSerializer):
     from locations.serializers import LocationSerializerMin
     from bodies.serializer_min import BodySerializerMin
 
-    interested_count = serializers.SerializerMethodField()
-    get_interested_count = lambda self, obj: FollowersMethods.get_count(obj, 1)
-
-    going_count = serializers.SerializerMethodField()
-    get_going_count = lambda self, obj: FollowersMethods.get_count(obj, 2)
+    interested_count = serializers.IntegerField()
+    going_count = serializers.IntegerField()
 
     user_ues = serializers.SerializerMethodField()
     get_user_ues = FollowersMethods.get_user_ues
@@ -61,6 +56,19 @@ class EventSerializer(serializers.ModelSerializer):
                   'interested_count', 'going_count', 'website_url', 'weight',
                   'user_ues')
 
+    @staticmethod
+    def setup_eager_loading(queryset):
+        """Perform necessary eager loading of data.
+        To be used for EventFullSerializer as well."""
+        queryset = queryset.prefetch_related('bodies', 'venues', 'ues', 'ues__user')
+
+        # Prefetch counts
+        interested_count = Count('followers', distinct=True, filter=Q(ues__status=1))
+        going_count = Count('followers', distinct=True, filter=Q(ues__status=2))
+        queryset = queryset.annotate(interested_count=interested_count).annotate(going_count=going_count)
+
+        return queryset
+
 class EventFullSerializer(serializers.ModelSerializer):
     """Serializer for Event with more information.
 
@@ -73,11 +81,8 @@ class EventFullSerializer(serializers.ModelSerializer):
     from locations.models import Location
     from bodies.models import Body
 
-    interested_count = serializers.SerializerMethodField()
-    get_interested_count = lambda self, obj: FollowersMethods.get_count(obj, 1)
-
-    going_count = serializers.SerializerMethodField()
-    get_going_count = lambda self, obj: FollowersMethods.get_count(obj, 2)
+    interested_count = serializers.IntegerField()
+    going_count = serializers.IntegerField()
 
     interested = serializers.SerializerMethodField()
     get_interested = lambda self, obj: FollowersMethods.get_followers(obj, 1)
