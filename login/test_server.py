@@ -11,6 +11,11 @@ Send a POST request::
 """
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+def send_302(obj, loc):
+    obj.send_response(302)
+    obj.send_header('Location', loc)
+    obj.end_headers()
+
 class S(BaseHTTPRequestHandler):
     def _set_headers(self):
         self.send_response(200)
@@ -50,6 +55,8 @@ class S(BaseHTTPRequestHandler):
 
         USERNAME = "biguser"
         PASSWORD = "bigpass"
+        FUSERNAME = "smalluser"
+        FPASSWORD = "smallpass"
 
         if token_url in self.path:
             self._set_headers()
@@ -62,11 +69,14 @@ class S(BaseHTTPRequestHandler):
             else:
                 self.wfile.write(b'{"error":"auth test failed"}')
 
+        elif "/SSOAUTH" in self.path:
+            send_302(self, 'http://localhost:33000/SSOREDIR/?code=TEST_CODE')
+
         elif "/SSO" in self.path:
             if USERNAME in str(post_data) and PASSWORD in str(post_data):
-                self.send_response(302)
-                self.send_header('Location', 'http://localhost:33000/SSOREDIR/?code=TEST_CODE')
-                self.end_headers()
+                send_302(self, 'http://localhost:33000/SSOREDIR/?code=TEST_CODE')
+            elif FUSERNAME in str(post_data) and FPASSWORD in str(post_data):
+                send_302(self, 'http://localhost:33000/SSOAUTH/')
             else:
                 self._set_headers()
                 self.wfile.write(b'{"error":"auth test failed"}')
