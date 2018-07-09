@@ -59,16 +59,26 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         status = request.GET.get('status')
         if status is None:
             return Response({"message" : "status is required"}, status=400)
+        status = int(status)
+
+        # Try to get existing UES
+        ues = UserEventStatus.objects.filter(event__id=event_pk, user=request.user.profile)
+
+        # Delete record if unknown status
+        if status != 1 and status != 2:
+            if ues.exists():
+                ues.delete()
+            return Response(status=204)
 
         # Create new UserEventStatus if not existing
-        if not request.user.profile.followed_events.filter(id=event_pk).exists():
+        if not ues.exists():
             get_event = get_object_or_404(Event.objects.all(), pk=event_pk)
             UserEventStatus.objects.create(
                 event=get_event, user=request.user.profile, status=status)
             return Response(status=204)
 
         # Update existing UserEventStatus
-        ues = UserEventStatus.objects.get(event__id=event_pk, user=request.user.profile)
+        ues = ues[0]
         ues.status = status
         ues.save()
         return Response(status=204)

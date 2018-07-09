@@ -98,6 +98,9 @@ urlpatterns = [
     path('api/mess', get_mess),
 
     path('api/search', OtherViewset.as_view({'get':'search'})),
+    path('api/notifications', OtherViewset.as_view({'get':'get_notifications'})),
+    path('api/notifications/read', OtherViewset.as_view({'get':'mark_all_notifications_read'})),
+    path('api/notifications/read/<pk>', OtherViewset.as_view({'get':'mark_notification_read'})),
 
     # -------------- PRERENDER --------------- #
     path('', pr.root),
