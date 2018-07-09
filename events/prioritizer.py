@@ -17,6 +17,9 @@ BODY_BONUS_MAX = 800                     # Maximum bonus for followed bodies
 def get_prioritized(queryset, request):
     now = timezone.now()
 
+    # Prefetch related
+    queryset = EventSerializer.setup_eager_loading(queryset)
+
     # Prefetch followed bodies
     followed_bodies = None
     if request.user.is_authenticated and hasattr(request.user, 'profile'):
@@ -55,9 +58,8 @@ def get_prioritized(queryset, request):
 
 def get_fresh_events(queryset, delta=3):
     """Gets events after removing stale ones."""
-    queryset = queryset.filter(
+    return queryset.filter(
         archived=False, end_time__gte=timezone.now() - timedelta(days=delta))
-    return EventSerializer.setup_eager_loading(queryset)
 
 def get_fresh_prioritized_events(queryset, request):
     """Gets fresh events with prioritization."""
