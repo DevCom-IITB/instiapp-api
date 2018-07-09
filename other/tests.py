@@ -117,7 +117,15 @@ class OtherTestCase(APITestCase):
         self.assertIn(EventSerializer(event3).data, actors)
         self.assertIn(EventSerializer(event4).data, actors)
 
-        # TODO: Check no notification after unfollowing event
+        # Check no notification after unfollowing event - unfollow 4 and update again
+        uesurl = '/api/user-me/ues/' + str(event4.id) + '?status=0'
+        response = self.client.get(uesurl, format='json')
+        self.assertEqual(response.status_code, 204)
+        event4.name = 'AUpdatedEvent4'
+        event4.save()
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
 
         # Mark all notifications as read and check
         response = self.client.get(url + '/read')
