@@ -42,6 +42,7 @@ class GenericNotificationRelatedField(serializers.RelatedField):
 class NotificationSerializer(serializers.Serializer):
     """Notification Serializer, with unread and actor"""
     id = serializers.IntegerField()
+    verb = serializers.ReadOnlyField(read_only=True)
     unread = serializers.BooleanField(read_only=True)
     actor = GenericNotificationRelatedField(read_only=True)
     actor_type = serializers.SerializerMethodField()
