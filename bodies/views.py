@@ -13,10 +13,11 @@ from roles.helpers import forbidden_no_privileges
 from roles.helpers import login_required_ajax
 from roles.helpers import insti_permission_required
 
-class BodyViewSet(viewsets.ViewSet):   # pylint: disable=too-many-ancestors
+class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """Body"""
     queryset = Body.objects.all()
     queryset = BodySerializer.setup_eager_loading(queryset)
+    serializer_class = BodySerializer
 
     def get_serializer_context(self):
         return {'request': self.request}

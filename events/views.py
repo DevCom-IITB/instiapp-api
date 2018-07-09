@@ -14,11 +14,12 @@ from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
 
-class EventViewSet(viewsets.ViewSet):   # pylint: disable=too-many-ancestors
+class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """Event"""
 
     queryset = Event.objects.all()
     queryset = EventSerializer.setup_eager_loading(queryset)
+    serializer_class = EventFullSerializer
 
     def get_serializer_context(self):
         return {'request': self.request}

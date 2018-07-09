@@ -10,7 +10,7 @@ class BodySerializer(serializers.ModelSerializer):
 
     from roles.serializers import RoleSerializerMin
 
-    followers_count = serializers.IntegerField()
+    followers_count = serializers.IntegerField(read_only=True)
 
     parents = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()

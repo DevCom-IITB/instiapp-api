@@ -39,8 +39,8 @@ class EventSerializer(serializers.ModelSerializer):
     from locations.serializers import LocationSerializerMin
     from bodies.serializer_min import BodySerializerMin
 
-    interested_count = serializers.IntegerField()
-    going_count = serializers.IntegerField()
+    interested_count = serializers.IntegerField(read_only=True)
+    going_count = serializers.IntegerField(read_only=True)
 
     user_ues = serializers.SerializerMethodField()
     get_user_ues = FollowersMethods.get_user_ues
@@ -81,8 +81,8 @@ class EventFullSerializer(serializers.ModelSerializer):
     from locations.models import Location
     from bodies.models import Body
 
-    interested_count = serializers.IntegerField()
-    going_count = serializers.IntegerField()
+    interested_count = serializers.IntegerField(read_only=True)
+    going_count = serializers.IntegerField(read_only=True)
 
     interested = serializers.SerializerMethodField()
     get_interested = lambda self, obj: FollowersMethods.get_followers(obj, 1)
