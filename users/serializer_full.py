@@ -45,3 +45,10 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         request = self.context['request']
         return EventSerializer(get_r_fresh_prioritized_events(
             obj.followed_events.filter(ues__status=status), request), many=True).data
+
+    @staticmethod
+    def setup_eager_loading(queryset):
+        """Perform necessary eager loading of data."""
+        queryset = queryset.prefetch_related(
+            'followed_bodies', 'roles', 'roles__body', 'roles__body__children', 'roles__users')
+        return queryset

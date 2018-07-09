@@ -53,7 +53,8 @@ def perform_login(auth_code, redir, request):
 
     # Check if User has a profile and create if not
     try:
-        user_profile = UserProfile.objects.get(user=user)
+        queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
+        user_profile = queryset.get(user=user)
     except UserProfile.DoesNotExist:
         user_profile = UserProfile.objects.create(user=user, name='iitbuser')
 
