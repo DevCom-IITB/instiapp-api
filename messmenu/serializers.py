@@ -15,3 +15,9 @@ class HostelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hostel
         fields = ('id', 'name', 'short_name', 'long_name', 'mess')
+
+    @staticmethod
+    def setup_eager_loading(queryset):
+        """Perform necessary eager loading of data."""
+        queryset = queryset.prefetch_related('mess')
+        return queryset

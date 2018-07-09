@@ -8,4 +8,5 @@ from messmenu.serializers import HostelSerializer
 def get_mess(request):
     """Get mess menus of all hostels."""
     queryset = Hostel.objects.all()
+    queryset = HostelSerializer.setup_eager_loading(queryset)
     return Response(HostelSerializer(queryset, many=True).data)
