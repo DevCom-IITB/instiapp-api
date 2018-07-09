@@ -9,7 +9,7 @@ from events.serializers import EventSerializer
 
 def notify_new_event(instance, action, **kwargs): # pylint: disable=W0613
     """Notify users that a new event was added for a followed body."""
-    if action == 'post_add':
+    if action == 'post_add' and isinstance(instance, Event):
         for body in instance.bodies.prefetch_related('followers').all():
             for profile in body.followers.all():
                 notify.send(
