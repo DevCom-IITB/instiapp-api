@@ -7,6 +7,7 @@ from bodies.models import Body
 from bodies.serializer_min import BodySerializerMin
 from events.models import Event
 from events.serializers import EventSerializer
+from events.prioritizer import get_prioritized
 from users.models import UserProfile
 from users.serializers import UserProfileSerializer
 
@@ -25,8 +26,8 @@ class OtherViewset(viewsets.ViewSet):
             Q(name__icontains=req_query) | Q(description__icontains=req_query))
 
         # Search events by name and description
-        events = Event.objects.filter(
-            Q(name__icontains=req_query) | Q(description__icontains=req_query))
+        events = get_prioritized(Event.objects.filter(
+            Q(name__icontains=req_query) | Q(description__icontains=req_query)), request)
 
         # Search users by only name: don't add anything else here
         users = UserProfile.objects.filter(
