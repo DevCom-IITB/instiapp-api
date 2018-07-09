@@ -258,3 +258,14 @@ class EventTestCase(APITestCase):
 
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 403)
+
+    def test_anonymous(self):
+        """Check APIs as anonymous user."""
+        self.client.logout()
+
+        url = '/api/events'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(self.update_url)
+        self.assertEqual(response.status_code, 200)
