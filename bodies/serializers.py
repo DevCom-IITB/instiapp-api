@@ -1,5 +1,6 @@
 """Serializers for Body and BodyChildRelation."""
 from rest_framework import serializers
+from django.db.models import Count
 from events.prioritizer import get_r_fresh_prioritized_events
 from bodies.models import Body
 from bodies.serializer_min import BodySerializerMin
@@ -9,9 +10,7 @@ class BodySerializer(serializers.ModelSerializer):
 
     from roles.serializers import RoleSerializerMin
 
-    followers_count = serializers.IntegerField(
-        source='followers.count',
-        read_only=True)
+    followers_count = serializers.IntegerField(read_only=True)
 
     parents = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
@@ -40,3 +39,15 @@ class BodySerializer(serializers.ModelSerializer):
         from events.serializers import EventSerializer
         return EventSerializer(get_r_fresh_prioritized_events(
             obj.events, self.context['request']), many=True, read_only=True).data
+
+    @staticmethod
+    def setup_eager_loading(queryset):
+        """Perform necessary eager loading of data."""
+        queryset = queryset.prefetch_related(
+            'parents', 'children', 'parents__parent', 'children__child')
+
+        # Prefetch counts
+        followers_count = Count('followers')
+        queryset = queryset.annotate(followers_count=followers_count)
+
+        return queryset

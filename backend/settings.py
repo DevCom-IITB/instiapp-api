@@ -27,3 +27,25 @@ MEDIA_ROOT = './upload/static/upload'
 MEDIA_URL = 'http://localhost:8000/static/upload/'
 
 USER_AVATAR_URL = '/static/upload/useravatar.jpg'
+
+LOGGING = {
+    'version': 1,
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        }
+    }
+}

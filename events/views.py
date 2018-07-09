@@ -18,6 +18,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
     """Event"""
 
     queryset = Event.objects.all()
+    queryset = EventSerializer.setup_eager_loading(queryset)
     serializer_class = EventFullSerializer
 
     def get_serializer_context(self):
@@ -131,11 +132,10 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
         return forbidden_no_privileges()
 
-    @staticmethod
-    def get_event(pk):
+    def get_event(self, pk):
         """Get an event from pk uuid or strid."""
         try:
             UUID(pk, version=4)
-            return get_object_or_404(Event.objects.all(), id=pk)
+            return get_object_or_404(self.queryset, id=pk)
         except ValueError:
-            return get_object_or_404(Event.objects.all(), str_id=pk)
+            return get_object_or_404(self.queryset, str_id=pk)

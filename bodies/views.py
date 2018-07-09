@@ -16,6 +16,7 @@ from roles.helpers import insti_permission_required
 class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """Body"""
     queryset = Body.objects.all()
+    queryset = BodySerializer.setup_eager_loading(queryset)
     serializer_class = BodySerializer
 
     def get_serializer_context(self):
@@ -84,14 +85,13 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
 
         return Response(status=204)
 
-    @staticmethod
-    def get_body(pk):
+    def get_body(self, pk):
         """Get a body from pk uuid or strid."""
         try:
             UUID(pk, version=4)
-            return get_object_or_404(Body.objects.all(), id=pk)
+            return get_object_or_404(self.queryset, id=pk)
         except ValueError:
-            return get_object_or_404(Body.objects.all(), str_id=pk)
+            return get_object_or_404(self.queryset, str_id=pk)
 
 class BodyFollowersViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """List followers of body."""

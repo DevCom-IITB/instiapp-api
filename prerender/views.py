@@ -17,6 +17,7 @@ def root(request):
 
 def news(request):
     news_items = NewsEntry.objects.all()[0 : 20]
+    news_items = news_items.prefetch_related('body')
     rendered = render_to_string('news.html', {'news': news_items, 'settings': settings})
     return HttpResponse(rendered)
 
@@ -30,7 +31,7 @@ def user_details(request, pk):
         UUID(pk, version=4)
         profile = get_object_or_404(UserProfile.objects, pk=pk)
     except ValueError:
-        profile = get_object_or_404(UserProfile.objects.all(), ldap_id=pk)
+        profile = get_object_or_404(UserProfile.objects, ldap_id=pk)
 
     if profile.profile_pic is None:
         profile.profile_pic = settings.USER_AVATAR_URL
@@ -39,21 +40,27 @@ def user_details(request, pk):
     return HttpResponse(rendered)
 
 def event_details(request, pk):
+    # Prefetch
+    queryset = Event.objects.prefetch_related('bodies', 'venues')
+
     try:
         UUID(pk, version=4)
-        event = get_object_or_404(Event.objects, pk=pk)
+        event = get_object_or_404(queryset, pk=pk)
     except ValueError:
-        event = get_object_or_404(Event.objects, str_id=pk)
+        event = get_object_or_404(queryset, str_id=pk)
 
     rendered = render_to_string('event-details.html', {'event': event, 'settings': settings})
     return HttpResponse(rendered)
 
 def body_details(request, pk):
+    # Get queryset
+    queryset = Body.objects
+
     try:
         UUID(pk, version=4)
-        body = get_object_or_404(Body.objects, pk=pk)
+        body = get_object_or_404(queryset, pk=pk)
     except ValueError:
-        body = get_object_or_404(Body.objects.all(), str_id=pk)
+        body = get_object_or_404(queryset, str_id=pk)
 
     events = get_fresh_prioritized_events(body.events, request)
 

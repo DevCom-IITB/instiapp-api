@@ -1,7 +1,8 @@
 """Event prioritizer."""
-from django.utils import timezone
 import math
 from datetime import timedelta
+from django.utils import timezone
+from events.serializers import EventSerializer
 
 BASE = 1000                              # Base points
 FINISHED_PENALTY = 600                   # Direct penalty if event is done
@@ -16,6 +17,16 @@ BODY_BONUS_MAX = 800                     # Maximum bonus for followed bodies
 def get_prioritized(queryset, request):
     now = timezone.now()
 
+    # Prefetch related
+    queryset = EventSerializer.setup_eager_loading(queryset)
+
+    # Prefetch followed bodies
+    followed_bodies = None
+    if request.user.is_authenticated and hasattr(request.user, 'profile'):
+        profile = request.user.profile
+        followed_bodies = profile.followed_bodies.all()
+
+    # Iterate all events
     for event in queryset:
         event.weight = BASE
 
@@ -34,13 +45,12 @@ def get_prioritized(queryset, request):
         start_time_points = WEIGHT_START_TIME * start_time_factor
         event.weight += int(start_time_points)
 
-        if request.user.is_authenticated and hasattr(request.user, 'profile'):
-            profile = request.user.profile
+        if followed_bodies:
             body_bonus = 0
             for body in event.bodies.all():
                 if body_bonus >= BODY_BONUS_MAX:
                     break
-                if body in profile.followed_bodies.all():
+                if body in followed_bodies:
                     body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * start_time_factor))
             event.weight += body_bonus
 
