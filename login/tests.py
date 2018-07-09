@@ -116,5 +116,10 @@ class LoginTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
 
+        # Login with correct username password
+        url = 'http://localhost/api/pass-login?username=smalluser&password=smallpass'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+
         # Terminate server
         mock_server.terminate()
