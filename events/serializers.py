@@ -22,8 +22,8 @@ class FollowersMethods:
             return None
 
         request = slf.context['request']
-        profile = request.user.profile
         if request.user.is_authenticated:
+            profile = request.user.profile
             ues = [ues.status for ues in obj.ues.all() if ues.user == profile]
             return ues[0] if ues else 0
 
