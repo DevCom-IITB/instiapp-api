@@ -14,7 +14,7 @@ class NewsEntrySerializer(serializers.ModelSerializer):
     def get_reactions_count(obj):
         """Get number of user reactions on news item."""
         # Get all UNR for news item
-        unrs = obj.unr.select_related()
+        unrs = obj.unr.all()
 
         # Count for each type
         reaction_counts = {t: 0 for t in range(0, 6)}
@@ -29,12 +29,20 @@ class NewsEntrySerializer(serializers.ModelSerializer):
         request = self.context['request']
         if request.user.is_authenticated:
             profile = request.user.profile
-            unr = obj.unr.filter(user=profile)
-            if unr.exists():
-                return unr[0].reaction
+            for unr in obj.unr.all():
+                if unr.user == profile:
+                    return unr.reaction
         return -1
 
     class Meta:
         model = NewsEntry
         fields = ('id', 'guid', 'link', 'title', 'content', 'published', 'body', 'reactions_count',
                   'user_reaction')
+
+    @staticmethod
+    def setup_eager_loading(queryset):
+        """Perform necessary eager loading of data."""
+        queryset = queryset.prefetch_related(
+            'body', 'unr', 'unr__user'
+        )
+        return queryset

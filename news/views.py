@@ -19,6 +19,9 @@ class NewsFeedViewset(viewsets.ViewSet):
         else:
             queryset = NewsEntry.objects.all()
 
+        # Eagerly load data
+        queryset = NewsEntrySerializer.setup_eager_loading(queryset)
+
         # Get sliced news items
         return Response(NewsEntrySerializer(
             queryset[from_i : from_i + num], many=True,
