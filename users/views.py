@@ -26,15 +26,18 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
             UUID(pk, version=4)
             return super().retrieve(self, request, pk)
         except ValueError:
-            profile = get_object_or_404(UserProfile.objects.all(), ldap_id=pk)
+            queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
+            profile = get_object_or_404(queryset, ldap_id=pk)
             return Response(UserProfileFullSerializer(
                 profile, context={'request': request}).data)
 
     @login_required_ajax
     def retrieve_me(self, request):
         """Get current user."""
+        queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
+        user_profile = queryset.get(user=request.user)
         return Response(UserProfileFullSerializer(
-            request.user.profile, context=self.get_serializer_context()).data)
+            user_profile, context=self.get_serializer_context()).data)
 
     @login_required_ajax
     def update_me(self, request):

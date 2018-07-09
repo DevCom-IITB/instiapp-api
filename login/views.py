@@ -104,7 +104,8 @@ class LoginViewSet(viewsets.ViewSet):
 
         # Check if the user has a profile
         try:
-            user_profile = UserProfile.objects.get(user=request.user)
+            queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
+            user_profile = queryset.get(user=request.user)
             profile_serialized = UserProfileFullSerializer(
                 user_profile, context={'request': request})
         except UserProfile.DoesNotExist:
