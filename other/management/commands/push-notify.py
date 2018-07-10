@@ -10,6 +10,7 @@ def send_push(subscription, payload):
     webpush(
         subscription_info=subscription,
         data=json.dumps(payload),
+        ttl=30,
         vapid_private_key=settings.VAPID_PRIV_KEY,
         vapid_claims={
             "sub": "mailto:support@radialapps.com",
@@ -40,12 +41,12 @@ class Command(BaseCommand):
                 if not notification or not notification.actor:
                     continue
 
+                # Stop the spam!
+                notification.emailed = True
+                notification.save()
+
                 # For each subscription
                 for subscription in profile.web_push_subscriptions.all():
-
-                    # Stop the spam!
-                    notification.emailed = True
-                    notification.save()
 
                     # Get a dict in the format we want
                     dict_sub = {
