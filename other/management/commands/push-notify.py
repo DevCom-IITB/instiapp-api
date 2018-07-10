@@ -10,6 +10,7 @@ def send_push(subscription, payload):
     webpush(
         subscription_info=subscription,
         data=json.dumps(payload),
+        ttl=30,
         vapid_private_key=settings.VAPID_PRIV_KEY,
         vapid_claims={
             "sub": "mailto:support@radialapps.com",
