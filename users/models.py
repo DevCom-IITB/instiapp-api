@@ -42,3 +42,14 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.name
+
+class WebPushSubscription(models.Model):
+    """One web push subscription."""
+    user = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE, related_name='web_push_subscriptions')
+    endpoint = models.TextField()
+    p256dh = models.CharField(max_length=200)
+    auth = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.user.name

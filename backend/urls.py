@@ -80,6 +80,7 @@ urlpatterns = [
     )),
     path('api/user-me/ues/<event_pk>', UserProfileViewSet.as_view({'get':'set_ues_me'})),
     path('api/user-me/unr/<news_pk>', UserProfileViewSet.as_view({'get':'set_unr_me'})),
+    path('api/user-me/subscribe-wp', UserProfileViewSet.as_view({'post':'subscribe_web_push'})),
     path('api/user-me/events', UserProfileViewSet.as_view({'get':'get_my_events'})),
     path('api/user-me/roles', BodyRoleViewSet.as_view({'get':'get_my_roles'})),
 

@@ -11,6 +11,7 @@ from news.models import UserNewsReaction
 from news.models import NewsEntry
 from users.serializer_full import UserProfileFullSerializer
 from users.models import UserProfile
+from users.models import WebPushSubscription
 from roles.helpers import login_required_ajax
 
 class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
@@ -117,3 +118,19 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         events = Event.objects.filter(created_by=request.user.profile)
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
+
+    @classmethod
+    @login_required_ajax
+    def subscribe_web_push(cls, request):
+        """Subscribe to web push."""
+        data = request.data
+        subscriptions = request.user.profile.web_push_subscriptions.filter(endpoint=data['endpoint'])
+        if not subscriptions.exists():
+            WebPushSubscription.objects.create(
+                user=request.user.profile,
+                endpoint=data['endpoint'],
+                p256dh=data['keys']['p256dh'],
+                auth=data['keys']['auth']
+            )
+
+        return Response(status=204)
