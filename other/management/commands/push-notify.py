@@ -3,6 +3,7 @@ import json
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from pywebpush import webpush, WebPushException
+from pyfcm import FCMNotification
 from users.models import UserProfile
 
 def send_push(subscription, payload):
@@ -25,6 +26,8 @@ class Command(BaseCommand):
 
         sent = 0
         failed = 0
+        fcm = 0
+        badfcm = 0
 
         # Iterate all users
         for profile in UserProfile.objects.prefetch_related(
@@ -45,7 +48,20 @@ class Command(BaseCommand):
                 notification.emailed = True
                 notification.save()
 
-                # For each subscription
+                # Send FCM push notification
+                try:
+                    push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
+                    registration_id = profile.fcm_id
+                    message_title = notification.actor.name
+                    message_body = notification.verb
+                    push_service.notify_single_device(
+                        registration_id=registration_id, message_title=message_title,
+                        message_body=message_body)
+                    fcm += 1
+                except Exception:
+                    badfcm += 1
+
+                # For each web push subscription
                 for subscription in profile.web_push_subscriptions.all():
 
                     # Get a dict in the format we want
@@ -79,4 +95,4 @@ class Command(BaseCommand):
                         failed += 1
                         subscription.delete()
 
-        print("Sent:", sent, "Failed:", failed)
+        print("Sent:", sent, "Failed:", failed, "FCM", fcm, "NoFCM:", badfcm)

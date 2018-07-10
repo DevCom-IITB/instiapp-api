@@ -29,6 +29,7 @@ MEDIA_URL = 'http://localhost:8000/static/upload/'
 USER_AVATAR_URL = '/static/upload/useravatar.jpg'
 
 VAPID_PRIV_KEY = ""
+FCM_SERVER_KEY = ""
 
 LOGGING = {
     'version': 1,
