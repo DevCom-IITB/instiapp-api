@@ -41,12 +41,12 @@ class Command(BaseCommand):
                 if not notification or not notification.actor:
                     continue
 
+                # Stop the spam!
+                notification.emailed = True
+                notification.save()
+
                 # For each subscription
                 for subscription in profile.web_push_subscriptions.all():
-
-                    # Stop the spam!
-                    notification.emailed = True
-                    notification.save()
 
                     # Get a dict in the format we want
                     dict_sub = {
