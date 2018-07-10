@@ -99,3 +99,20 @@ class UserTestCase(APITestCase):
         url = '/api/users/' + str(profile.id)
         response = self.client.get(url, format='json')
         self.assertNotEqual(response.data['email'], profile.email)
+
+    def test_notifications(self):
+        """Test push notification models."""
+
+        url = '/api/user-me/subscribe-wp'
+        data = {
+            "endpoint": "http://endpoint",
+            "keys": {
+                "p256dh": "sdfdsf",
+                "auth": "skjfhlsjkf"
+            }
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 204)
+
+        wpn = self.user.profile.web_push_subscriptions.all()[0]
+        self.assertEqual(str(wpn), self.user.profile.name)
