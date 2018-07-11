@@ -1,12 +1,15 @@
 """Unit tests for news feed."""
 from rest_framework.test import APITestCase
 from django.utils import timezone
+from notifications.signals import notify
 
 from login.tests import get_new_user
 from bodies.models import Body
 from events.models import Event
 from events.serializers import EventSerializer
 from users.models import UserProfile
+from news.models import NewsEntry
+from placements.models import BlogEntry
 
 class OtherTestCase(APITestCase):
     """Test other endpoints."""
@@ -22,6 +25,11 @@ class OtherTestCase(APITestCase):
 
         UserProfile.objects.create(name="Test User1")
         UserProfile.objects.create(name="Test User2")
+
+        # Fake authenticate
+        self.user = get_new_user()
+        self.profile = self.user.profile
+        self.client.force_authenticate(self.user) # pylint: disable=E1101
 
 
     def test_search(self):
@@ -52,9 +60,7 @@ class OtherTestCase(APITestCase):
     def test_notifications(self):
         """Test notifications API."""
         # Fake authenticate
-        user = get_new_user()
-        profile = user.profile
-        self.client.force_authenticate(user) # pylint: disable=E1101
+        profile = self.profile
 
         # Add two bodies, with the user following #1
         body1 = Body.objects.create(name="TestBody1")
@@ -134,3 +140,40 @@ class OtherTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
+
+    def test_news_notifications(self):
+        """Test news notifications."""
+
+        # Add two bodies, with the user following #1
+        body1 = Body.objects.create(name="TestBody1", blog_url="http://body.com")
+        body2 = Body.objects.create(name="TestBody2", blog_url="http://body2.com")
+        self.profile.followed_bodies.add(body1)
+
+        # Add one news for each
+        ne1 = NewsEntry.objects.create(
+            body=body1, title="NewsEntry1", blog_url=body1.blog_url, published=timezone.now())
+        NewsEntry.objects.create(
+            body=body2, title="NewsEntry2", blog_url=body2.blog_url, published=timezone.now())
+
+        # Get notifications
+        url = '/api/notifications'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['actor']['title'], ne1.title)
+
+    def test_pt_notifications(self):
+        """Test notifications for placement blog (Incomplete - only serializer)"""
+        # Create dummy
+        entry = BlogEntry.objects.create(
+            title="BlogEntry1", blog_url='https://test.com', published=timezone.now())
+
+        # Notify
+        notify.send(entry, recipient=self.user, verb="TEST")
+
+        # Get notifications
+        url = '/api/notifications'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['actor']['title'], entry.title)

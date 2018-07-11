@@ -5,6 +5,9 @@ from django.conf import settings
 from pywebpush import webpush, WebPushException
 from pyfcm import FCMNotification
 from users.models import UserProfile
+from placements.models import BlogEntry
+from events.models import Event
+from news.models import NewsEntry
 
 def send_push(subscription, payload):
     """Send a single push notification."""
@@ -48,11 +51,19 @@ class Command(BaseCommand):
                 notification.emailed = True
                 notification.save()
 
+                # Get title
+                title = "InstiApp"
+                actor = notification.actor
+                if isinstance(actor, Event):
+                    title = actor.name
+                if isinstance(actor, BlogEntry) or isinstance(actor, NewsEntry):
+                    title = actor.title
+
                 # Send FCM push notification
                 try:
                     push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
                     registration_id = profile.fcm_id
-                    message_title = notification.actor.name
+                    message_title = title
                     message_body = notification.verb
                     push_service.notify_single_device(
                         registration_id=registration_id, message_title=message_title,
@@ -76,7 +87,7 @@ class Command(BaseCommand):
                     # Make the payload
                     payload = {
                         "notification": {
-                            "title": notification.actor.name,
+                            "title": title,
                             "body": notification.verb,
                             "icon": "assets/logo-sq-sm.png",
                             "vibrate": [100, 50, 100],
