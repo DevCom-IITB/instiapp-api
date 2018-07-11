@@ -7,6 +7,9 @@ from django.db.models.signals import m2m_changed
 from events.models import Event
 from events.serializers import EventSerializer
 from news.models import NewsEntry
+from news.serializers import NewsEntrySerializer
+from placements.models import BlogEntry
+from placements.serializers import BlogEntrySerializer
 
 def notify_new_event(instance, action, **kwargs): # pylint: disable=W0613
     """Notify users that a new event was added for a followed body."""
@@ -44,6 +47,10 @@ class GenericNotificationRelatedField(serializers.RelatedField):
     def to_representation(self, value):
         if isinstance(value, Event):
             serializer = EventSerializer(value)
+        elif isinstance(value, NewsEntry):
+            serializer = NewsEntrySerializer(value)
+        elif isinstance(value, BlogEntry):
+            serializer = BlogEntrySerializer(value)
 
         return serializer.data
 
