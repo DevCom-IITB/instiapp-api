@@ -60,7 +60,6 @@ class OtherTestCase(APITestCase):
     def test_notifications(self):
         """Test notifications API."""
         # Fake authenticate
-        user = self.user
         profile = self.profile
 
         # Add two bodies, with the user following #1
