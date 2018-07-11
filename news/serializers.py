@@ -26,8 +26,8 @@ class NewsEntrySerializer(serializers.ModelSerializer):
 
     def get_user_reaction(self, obj):
         """Get the current user's reaction on the news item"""
-        request = self.context['request']
-        if request.user.is_authenticated:
+        request = self.context['request'] if 'request' in self.context else None
+        if request and request.user.is_authenticated:
             profile = request.user.profile
             for unr in obj.unr.all():
                 if unr.user == profile:
