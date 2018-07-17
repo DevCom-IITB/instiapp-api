@@ -13,29 +13,27 @@ from events.prioritizer import get_prioritized
 from users.models import UserProfile
 from users.serializers import UserProfileSerializer
 from other.notifications import NotificationSerializer
-
+from helpers.misc import query_search
 
 class OtherViewset(viewsets.ViewSet):
 
     @staticmethod
     def search(request):
         """EXPENSIVE: Search with query param `query` throughout the database."""
+        MIN_LENGTH = 3
 
         req_query = request.GET.get("query")
-        if not req_query or len(req_query) < 3:
+        if not req_query or len(req_query) < MIN_LENGTH:
             return Response({"message": "No query or too short!"}, status=400)
 
         # Search bodies by name and description
-        bodies = Body.objects.filter(
-            Q(name__icontains=req_query) | Q(description__icontains=req_query))
+        bodies = query_search(request, MIN_LENGTH, Body.objects, ['name', 'description'])
 
         # Search events by name and description
-        events = get_prioritized(Event.objects.filter(
-            Q(name__icontains=req_query) | Q(description__icontains=req_query)), request)
+        events = get_prioritized(query_search(request, MIN_LENGTH, Event.objects, ['name', 'description']), request)
 
         # Search users by only name: don't add anything else here
-        users = UserProfile.objects.filter(
-            Q(name__icontains=req_query))
+        users = query_search(request, MIN_LENGTH, UserProfile.objects, ['name'])
 
         return Response({
             "bodies": BodySerializerMin(bodies, many=True).data,
