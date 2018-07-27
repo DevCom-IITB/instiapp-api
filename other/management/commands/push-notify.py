@@ -67,7 +67,7 @@ class Command(BaseCommand):
                     message_body = notification.verb
                     push_service.notify_single_device(
                         registration_id=registration_id, message_title=message_title,
-                        message_body=message_body)
+                        message_body=message_body, sound='default')
                     fcm += 1
                 except Exception:
                     badfcm += 1
