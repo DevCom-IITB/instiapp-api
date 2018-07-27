@@ -31,6 +31,7 @@ class Command(BaseCommand):
         failed = 0
         fcm = 0
         badfcm = 0
+        push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
 
         # Iterate all users
         for profile in UserProfile.objects.prefetch_related(
@@ -61,7 +62,6 @@ class Command(BaseCommand):
 
                 # Send FCM push notification
                 try:
-                    push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
                     registration_id = profile.fcm_id
                     message_title = title
                     message_body = notification.verb
