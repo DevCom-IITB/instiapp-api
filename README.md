@@ -8,7 +8,7 @@ Backend API in Django for the to-be comprehensive app for managing, finding and 
 
 Google's [Python Style Guide](https://google.github.io/styleguide/pyguide.html) is followed upto a certain extent in all modules.
 
-Master branch of this repository is continuously deployed at [staging](https://temp-iitb.radialapps.com/).
+Master branch of this repository is continuously deployed to [production](https://insti.app/).
 
 ### Documentation
 Static OpenAPI specification can be found at the [project page](https://wncc.github.io/IITBapp/), at [Apiary](https://instiapp.docs.apiary.io/) or at `http://server/docs/`
