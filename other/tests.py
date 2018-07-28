@@ -69,16 +69,19 @@ class OtherTestCase(APITestCase):
 
         now = timezone.now()
 
-        # Add three events to followed body and one to other
+        # Add four events to followed body and one to other.
+        # Event 5 has notifications turned off
         event1 = Event.objects.create(name="TestEvent1", start_time=now, end_time=now)
         event2 = Event.objects.create(name="TestEvent2", start_time=now, end_time=now)
         event3 = Event.objects.create(name="TestEvent3", start_time=now, end_time=now)
         event4 = Event.objects.create(name="TestEvent4", start_time=now, end_time=now)
+        event5 = Event.objects.create(name="TestEvent5", start_time=now, end_time=now, notify=False)
 
         event1.bodies.add(body1)
         event2.bodies.add(body1)
         event3.bodies.add(body1)
         event4.bodies.add(body2)
+        event5.bodies.add(body1)
 
         # Get notifications
         url = '/api/notifications'
@@ -122,6 +125,20 @@ class OtherTestCase(APITestCase):
         self.assertIn(EventSerializer(event1).data, actors)
         self.assertIn(EventSerializer(event3).data, actors)
         self.assertIn(EventSerializer(event4).data, actors)
+
+        # Follow event 5
+        uesurl = '/api/user-me/ues/' + str(event5.id) + '?status=1'
+        response = self.client.get(uesurl, format='json')
+        self.assertEqual(response.status_code, 204)
+
+        # Update event 5
+        event5.name = 'UpdatedEvent5'
+        event5.save()
+
+        # Check no notification is added for event 5
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
 
         # Check no notification after unfollowing event - unfollow 4 and update again
         uesurl = '/api/user-me/ues/' + str(event4.id) + '?status=0'
