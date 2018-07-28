@@ -14,6 +14,11 @@ from placements.serializers import BlogEntrySerializer
 def notify_new_event(instance, action, **kwargs): # pylint: disable=W0613
     """Notify users that a new event was added for a followed body."""
     if action == 'post_add' and isinstance(instance, Event):
+        # Skip notification
+        if not instance.notify:
+            return
+
+        # Notify all body followers
         for body in instance.bodies.prefetch_related('followers').all():
             for profile in body.followers.all():
                 notify.send(
@@ -24,6 +29,11 @@ def notify_new_event(instance, action, **kwargs): # pylint: disable=W0613
 
 def notify_upd_event(instance):
     """Notify users that a followed event was updated."""
+    # Skip notification
+    if not instance.notify:
+        return
+
+    # Notify all event followers
     for profile in instance.followers.all():
         notify.send(instance, recipient=profile.user, verb=instance.name + " was updated")
 
