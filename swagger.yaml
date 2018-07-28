@@ -22,6 +22,7 @@ paths:
         schema:
           properties:
             blog_url: {description: '', type: string}
+            cover_url: {description: '', type: string}
             description: {description: '', type: string}
             image_url: {description: '', type: string}
             name: {description: '', type: string}
@@ -72,6 +73,7 @@ paths:
         schema:
           properties:
             blog_url: {description: '', type: string}
+            cover_url: {description: '', type: string}
             description: {description: '', type: string}
             image_url: {description: '', type: string}
             name: {description: '', type: string}
@@ -82,6 +84,17 @@ paths:
       responses:
         '200': {description: ''}
       summary: Update Body.
+      tags: [bodies]
+  /api/bodies/{id}/follow:
+    get:
+      description: Follow or unfollow a body {?action}=0,1
+      operationId: bodies_follow
+      parameters:
+      - {description: A UUID string identifying this Body., in: path, name: id, required: true,
+        type: string}
+      responses:
+        '200': {description: ''}
+      summary: Follow or unfollow a body {?action}=0,1
       tags: [bodies]
   /api/bodies/{id}/followers:
     get:
@@ -125,6 +138,7 @@ paths:
             end_time: {description: '', type: string}
             image_url: {description: '', type: string}
             name: {description: '', type: string}
+            notify: {description: '', type: boolean}
             start_time: {description: '', type: string}
             venue_ids:
               description: ''
@@ -188,6 +202,7 @@ paths:
             end_time: {description: '', type: string}
             image_url: {description: '', type: string}
             name: {description: '', type: string}
+            notify: {description: '', type: boolean}
             start_time: {description: '', type: string}
             venue_ids:
               description: ''
@@ -220,10 +235,17 @@ paths:
         name: data
         schema:
           properties:
+            description: {description: '', type: string}
+            group_id: {description: '', type: integer}
             lat: {description: '', type: number}
             lng: {description: '', type: number}
             name: {description: '', type: string}
+            parent: {description: '', type: string}
+            parent_relation: {description: '', type: string}
+            pixel_x: {description: '', type: integer}
+            pixel_y: {description: '', type: integer}
             reusable: {description: '', type: boolean}
+            short_name: {description: '', type: string}
           required: [name]
           type: object
       responses:
@@ -268,10 +290,17 @@ paths:
         name: data
         schema:
           properties:
+            description: {description: '', type: string}
+            group_id: {description: '', type: integer}
             lat: {description: '', type: number}
             lng: {description: '', type: number}
             name: {description: '', type: string}
+            parent: {description: '', type: string}
+            parent_relation: {description: '', type: string}
+            pixel_x: {description: '', type: integer}
+            pixel_y: {description: '', type: integer}
             reusable: {description: '', type: boolean}
+            short_name: {description: '', type: string}
           required: [name]
           type: object
       responses:
@@ -305,14 +334,60 @@ paths:
       responses:
         '200': {description: ''}
       summary: Log out.
+  /api/mess:
+    get:
+      description: Get mess menus of all hostels.
+      operationId: mess_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Get mess menus of all hostels.
+      tags: [mess]
   /api/news:
     get:
-      description: Get Feed.
+      description: Get News feed.
       operationId: news_feed
       parameters: []
       responses:
         '200': {description: ''}
-      summary: Get Feed.
+      summary: Get News feed.
+  /api/notifications:
+    get:
+      description: Get unread notifications for current user.
+      operationId: get_notifications
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Get unread notifications for current user.
+  /api/notifications/read:
+    get:
+      description: Mark all notifications as read.
+      operationId: notifications_mark_all_notifications_read
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Mark all notifications as read.
+      tags: [notifications]
+  /api/notifications/read/{id}:
+    get:
+      description: Mark one notification as read.
+      operationId: notifications_mark_notification_read
+      parameters:
+      - {description: '', in: path, name: id, required: true, type: string}
+      responses:
+        '200': {description: ''}
+      summary: Mark one notification as read.
+      tags: [notifications]
+  /api/pass-login:
+    get:
+      description: 'DANGEROUS: Password Log in.
+
+        Uses the `username` and `password` query parameters.'
+      operationId: pass_login
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: 'DANGEROUS: Password Log in.'
   /api/placement-blog:
     get:
       description: Get Placement Blog.
@@ -322,14 +397,6 @@ paths:
         '200': {description: ''}
       summary: Get Placement Blog.
   /api/roles:
-    get:
-      description: Body Role
-      operationId: roles_list
-      parameters: []
-      responses:
-        '200': {description: ''}
-      summary: Body Role
-      tags: [roles]
     post:
       consumes: [application/json]
       description: Body Role
@@ -346,6 +413,7 @@ paths:
               description: ''
               items: {type: string}
               type: array
+            priority: {description: '', type: integer}
             users:
               description: ''
               items: {type: string}
@@ -395,6 +463,7 @@ paths:
               description: ''
               items: {type: string}
               type: array
+            priority: {description: '', type: integer}
             users:
               description: ''
               items: {type: string}
@@ -405,6 +474,14 @@ paths:
         '200': {description: ''}
       summary: Body Role
       tags: [roles]
+  /api/search:
+    get:
+      description: 'EXPENSIVE: Search with query param `query` throughout the database.'
+      operationId: search
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: 'EXPENSIVE: Search with query param `query` throughout the database.'
   /api/training-blog:
     get:
       description: Get Training Blog.
@@ -414,14 +491,6 @@ paths:
         '200': {description: ''}
       summary: Get Training Blog.
   /api/upload:
-    get:
-      description: Upload
-      operationId: upload_list
-      parameters: []
-      responses:
-        '200': {description: ''}
-      summary: Upload
-      tags: [upload]
     post:
       consumes: [application/json]
       description: Upload file.
@@ -483,6 +552,7 @@ paths:
               description: ''
               items: {type: string}
               type: array
+            hostel: {description: '', type: string}
             ldap_id: {description: '', type: string}
             name: {description: '', type: string}
             profile_pic: {description: '', type: string}
@@ -508,6 +578,7 @@ paths:
               description: ''
               items: {type: string}
               type: array
+            hostel: {description: '', type: string}
             ldap_id: {description: '', type: string}
             name: {description: '', type: string}
             profile_pic: {description: '', type: string}
@@ -537,6 +608,34 @@ paths:
         '200': {description: ''}
       summary: Get roles with nested events.
       tags: [user-me]
+  /api/user-me/subscribe-wp:
+    post:
+      consumes: [application/json]
+      description: Subscribe to web push.
+      operationId: user-me_subscribe_web_push
+      parameters:
+      - in: body
+        name: data
+        schema:
+          properties:
+            about: {description: '', type: string}
+            contact_no: {description: '', type: string}
+            followed_bodies_id:
+              description: ''
+              items: {type: string}
+              type: array
+            hostel: {description: '', type: string}
+            ldap_id: {description: '', type: string}
+            name: {description: '', type: string}
+            profile_pic: {description: '', type: string}
+            roll_no: {description: '', type: string}
+            website_url: {description: '', type: string}
+          required: [followed_bodies_id]
+          type: object
+      responses:
+        '201': {description: ''}
+      summary: Subscribe to web push.
+      tags: [user-me]
   /api/user-me/ues/{event_pk}:
     get:
       description: 'Set UES for current user.
@@ -549,15 +648,18 @@ paths:
         '200': {description: ''}
       summary: Set UES for current user.
       tags: [user-me]
-  /api/users:
+  /api/user-me/unr/{news_pk}:
     get:
-      description: UserProfile
-      operationId: users_list
-      parameters: []
+      description: 'Set UNR(User News Reaction) for current user.
+
+        This will create or update if record exists.'
+      operationId: user-me_set_unr_me
+      parameters:
+      - {description: '', in: path, name: news_pk, required: true, type: string}
       responses:
         '200': {description: ''}
-      summary: UserProfile
-      tags: [users]
+      summary: Set UNR(User News Reaction) for current user.
+      tags: [user-me]
   /api/users/{id}:
     get:
       description: UserProfile
