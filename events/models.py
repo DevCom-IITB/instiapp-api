@@ -29,6 +29,7 @@ class Event(models.Model):
                                        related_name='followed_events', blank=True)
 
     archived = models.BooleanField(default=False)
+    notify = models.BooleanField(default=True)
 
     weight = 0
 
