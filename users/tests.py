@@ -99,7 +99,7 @@ class UserTestCase(APITestCase):
         url = '/api/user-me?fcm_id=TESTCHANGE'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.user.profile.fcm_id, 'TESTCHANGE')
+        self.assertEqual(UserProfile.objects.get(id=self.user.profile.id).fcm_id, 'TESTCHANGE')
 
     def test_get_noauth(self):
         """Test privacy with no auth."""
