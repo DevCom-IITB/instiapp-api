@@ -141,4 +141,4 @@ if 'LDAP_USERNAME' in os.environ and 'LDAP_PASSWORD' in os.environ:
     LDAP_PASSWORD = os.environ['LDAP_PASSWORD']
     print('INFO: LDAP username and password present in environment.')
 
-SSO_BAD_CERT = True
+SSO_BAD_CERT = False
