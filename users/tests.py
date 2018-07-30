@@ -38,11 +38,14 @@ class UserTestCase(APITestCase):
     def test_user_me(self):
         """Check the /api/user-me API."""
 
+        self.user.profile.fcm_id = 'TESTINIT'
+
         # Check GET
         url = '/api/user-me'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['id'], str(self.user.profile.id))
+        self.assertEqual(self.user.profile.fcm_id, 'TESTINIT')
 
         # Check PATCH
         url = '/api/user-me'
@@ -91,6 +94,12 @@ class UserTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], str(event.id))
+
+        # Check updating FCM Id
+        url = '/api/user-me?fcm_id=TESTCHANGE'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.user.profile.fcm_id, 'TESTCHANGE')
 
     def test_get_noauth(self):
         """Test privacy with no auth."""

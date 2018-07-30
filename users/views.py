@@ -37,6 +37,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         """Get current user."""
         queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
         user_profile = queryset.get(user=request.user)
+
+        # Update fcm id if present
+        if 'fcm_id' in request.GET:
+            user_profile.fcm_id = request.GET['fcm_id']
+            user_profile.save()
+
         return Response(UserProfileFullSerializer(
             user_profile, context=self.get_serializer_context()).data)
 
