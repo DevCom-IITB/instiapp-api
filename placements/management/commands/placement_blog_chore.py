@@ -1,4 +1,5 @@
 import feedparser
+import re
 import requests
 import html2text
 from requests.auth import HTTPBasicAuth
@@ -44,7 +45,12 @@ def fill_blog(url):
             db_entry.title = entry['title']
         if 'content' in entry and entry['content']:
             content = entry['content'][0]['value']
-            db_entry.content = h2t.handle(content) if "table" in content else content
+
+            # Convert tables to markdown
+            regex = re.compile(r"<table.*?/table>", re.DOTALL)
+            content = regex.sub(lambda x: '\n' + h2t.handle(x.group()) + '\n', content)
+
+            db_entry.content = content
         if 'link' in entry:
             db_entry.link = entry['link']
         if 'published' in entry:
