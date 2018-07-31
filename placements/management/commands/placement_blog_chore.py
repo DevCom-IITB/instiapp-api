@@ -1,5 +1,6 @@
 import feedparser
 import requests
+import html2text
 from requests.auth import HTTPBasicAuth
 from dateutil.parser import parse
 from django.conf import settings
@@ -7,6 +8,9 @@ from django.core.management.base import BaseCommand, CommandError
 from notifications.signals import notify
 from users.models import UserProfile
 from placements.models import BlogEntry
+
+# Setup HTML2Text object
+h2t = html2text.HTML2Text()
 
 # Prefetch objects
 PROFILES = UserProfile.objects.all()
@@ -39,7 +43,7 @@ def fill_blog(url):
         if 'title' in entry:
             db_entry.title = entry['title']
         if 'content' in entry and entry['content']:
-            db_entry.content = entry['content'][0]['value']
+            db_entry.content = h2t.handle(entry['content'][0]['value'])
         if 'link' in entry:
             db_entry.link = entry['link']
         if 'published' in entry:
