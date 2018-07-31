@@ -43,7 +43,8 @@ def fill_blog(url):
         if 'title' in entry:
             db_entry.title = entry['title']
         if 'content' in entry and entry['content']:
-            db_entry.content = h2t.handle(entry['content'][0]['value'])
+            content = entry['content'][0]['value']
+            db_entry.content = h2t.handle(content) if "table" in content else content
         if 'link' in entry:
             db_entry.link = entry['link']
         if 'published' in entry:
