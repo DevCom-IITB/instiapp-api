@@ -33,7 +33,7 @@ class OtherViewset(viewsets.ViewSet):
         events = get_prioritized(query_search(request, MIN_LENGTH, Event.objects, ['name', 'description'])[:20], request)
 
         # Search users by only name: don't add anything else here
-        users = query_search(request, MIN_LENGTH, UserProfile.objects, ['name'])[:20]
+        users = query_search(request, MIN_LENGTH, UserProfile.objects, ['name', 'ldap_id', 'roll_no'])[:20]
 
         return Response({
             "bodies": BodySerializerMin(bodies, many=True).data,
