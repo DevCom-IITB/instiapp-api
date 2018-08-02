@@ -62,6 +62,15 @@ class RoleSerializerMin(serializers.ModelSerializer):
         model = BodyRole
         fields = ('id', 'name', 'body', 'users_detail', 'priority')
 
+class RoleSerializerMinAlt(serializers.ModelSerializer):
+    """Alternative min serializer for BodyRole"""
+
+    body_detail = BodySerializerMin(read_only=True, source='body')
+
+    class Meta:
+        model = BodyRole
+        fields = ('id', 'name', 'body_detail', 'priority')
+
 class InstituteRoleSerializer(serializers.ModelSerializer):
 
     permissions = serializers.MultipleChoiceField(choices=INSTITUTE_PERMISSION_CHOICES)

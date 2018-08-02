@@ -31,6 +31,7 @@ class UserProfile(models.Model):
     graduation_year = models.IntegerField(null=True, blank=True)
 
     roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
+    former_roles = models.ManyToManyField('roles.BodyRole', related_name='former_users', blank=True)
     institute_roles = models.ManyToManyField(
         'roles.InstituteRole', related_name='users', blank=True)
     hostel = models.CharField(max_length=100, null=True, blank=True)
