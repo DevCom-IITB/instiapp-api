@@ -45,9 +45,16 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
         if user_has_insti_privilege(request.user.profile, 'RoleB'):
             return super().destroy(request, pk)
 
-        bodyid = str(BodyRole.objects.get(id=pk).body.id)
+        # Check for permission
+        body_role = BodyRole.objects.get(id=pk)
+        bodyid = str(body_role.body.id)
         if not user_has_privilege(request.user.profile, bodyid, 'Role'):
             return forbidden_no_privileges()
+
+        # Check for former users
+        if body_role.former_users.count() > 0:
+            return forbidden_no_privileges()
+
         return super().destroy(request, pk)
 
     @classmethod
