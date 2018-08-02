@@ -3,6 +3,7 @@ from rest_framework import serializers
 from events.prioritizer import get_r_fresh_prioritized_events
 from users.models import UserProfile
 from roles.serializers import RoleSerializer
+from roles.serializers import RoleSerializerMinAlt
 from roles.serializers import InstituteRoleSerializer
 
 class UserProfileFullSerializer(serializers.ModelSerializer):
@@ -24,6 +25,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         many=True, read_only=False, queryset=Body.objects.all(), source='followed_bodies')
 
     roles = RoleSerializer(many=True, read_only=True)
+    former_roles = RoleSerializerMinAlt(many=True, read_only=True)
     institute_roles = InstituteRoleSerializer(many=True, read_only=True)
 
     class Meta:
@@ -31,7 +33,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'profile_pic', 'events_interested',
                   'events_going', 'email', 'roll_no', 'contact_no',
                   'about', 'followed_bodies', 'followed_bodies_id', 'roles',
-                  'institute_roles', 'website_url', 'ldap_id', 'hostel')
+                  'institute_roles', 'website_url', 'ldap_id', 'hostel', 'former_roles')
 
     def get_email(self, obj):
         """Gets the email only if a user is logged in."""
@@ -50,5 +52,6 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     def setup_eager_loading(queryset):
         """Perform necessary eager loading of data."""
         queryset = queryset.prefetch_related(
-            'followed_bodies', 'roles', 'roles__body', 'roles__body__children', 'roles__users')
+            'followed_bodies', 'roles', 'roles__body', 'roles__body__children', 'roles__users',
+            'former_roles', 'former_roles__body')
         return queryset

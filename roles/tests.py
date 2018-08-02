@@ -101,6 +101,8 @@ class RoleTestCase(APITestCase):
             name="Role1", body=self.body, permissions=['Role'])
         bodyrole2 = BodyRole.objects.create(
             name="Role2", body=self.body, permissions=['Role'])
+        bodyrole3 = BodyRole.objects.create(
+            name="Role3", body=self.body, permissions=['Role'])
 
         # Check without role
         url = '/api/roles/' + str(bodyrole2.id)
@@ -111,6 +113,18 @@ class RoleTestCase(APITestCase):
         self.user.profile.roles.add(bodyrole1)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
+
+        # Check with former user
+        url = '/api/roles/' + str(bodyrole3.id)
+        profile = get_new_user().profile
+        profile.former_roles.add(bodyrole3)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+        profile.former_roles.remove(bodyrole3)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 204)
+
+        # Remove role
         self.user.profile.roles.remove(bodyrole1)
 
         # Check with institute role
