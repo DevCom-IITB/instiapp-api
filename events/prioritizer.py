@@ -11,8 +11,8 @@ WEIGHT_END_TIME = 800                    # Weight of time from event end
 TIME_SD = 2.5                            # Standard deviation of time distribution
 TIME_L_END = 1.2                         # Lambda for exponential of ended penalty
 BODY_FOLLOWING_BONUS = 100               # Bonus if the body is followed
-TIME_DEP_BODY_BONUS = 500                # Bonus if the body is followed dependent on time
-BODY_BONUS_MAX = 500                     # Maximum bonus for followed bodies
+TIME_DEP_BODY_BONUS = 200                # Bonus if the body is followed dependent on time
+BODY_BONUS_MAX = 400                     # Maximum bonus for followed bodies
 
 def get_prioritized(queryset, request):
     now = timezone.now()
