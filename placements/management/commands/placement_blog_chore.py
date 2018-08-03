@@ -44,13 +44,7 @@ def fill_blog(url):
         if 'title' in entry:
             db_entry.title = entry['title']
         if 'content' in entry and entry['content']:
-            content = entry['content'][0]['value']
-
-            # Convert tables to markdown
-            regex = re.compile(r"<table.*?/table>", re.DOTALL)
-            content = regex.sub(lambda x: '\n' + h2t.handle(x.group()) + '\n', content)
-
-            db_entry.content = content
+            db_entry.content = handle_html(entry['content'][0]['value'])
         if 'link' in entry:
             db_entry.link = entry['link']
         if 'published' in entry:
@@ -64,6 +58,18 @@ def fill_blog(url):
             for profile in PROFILES:
                 if profile.user and profile.roll_no and profile.roll_no in db_entry.content:
                     notify.send(db_entry, recipient=profile.user, verb="You were mentioned in a blog post")
+
+def handle_html(content):
+    # Convert tables to markdown
+    regex = re.compile(r"<table.*?/table>", re.DOTALL)
+    content = regex.sub(convert_table_md, content)
+    return content
+
+def convert_table_md(content):
+    content = h2t.handle(content.group())
+    first_line_end = content.find('\n')
+    content = content[:first_line_end] + '.' + content[first_line_end:]
+    return '\n' + content + '\n'
 
 class Command(BaseCommand):
     help = 'Updates the placement blog database'
