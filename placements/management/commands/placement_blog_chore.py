@@ -68,6 +68,7 @@ def handle_html(content):
 def convert_table_md(content):
     content = h2t.handle(content.group())
     content = content.replace(' | ', ' &zwnj;|&zwnj; ')
+    content = content.replace('\n|', ' \n&zwnj;|')
     return '\n' + content + '\n'
 
 class Command(BaseCommand):
