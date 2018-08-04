@@ -9,9 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 from notifications.signals import notify
 from users.models import UserProfile
 from placements.models import BlogEntry
-
-# Setup HTML2Text object
-h2t = html2text.HTML2Text()
+from helpers.misc import table_to_markdown
 
 # Prefetch objects
 PROFILES = UserProfile.objects.all()
@@ -66,10 +64,8 @@ def handle_html(content):
     return content
 
 def convert_table_md(content):
-    content = h2t.handle(content.group())
+    content = table_to_markdown(content.group())
     content = '\n' + content + '\n'
-    content = content.replace(' | ', ' &zwnj;|&zwnj; ')
-    content = content.replace('\n|', ' \n&zwnj;|')
     return content
 
 class Command(BaseCommand):

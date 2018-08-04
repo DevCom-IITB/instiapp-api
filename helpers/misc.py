@@ -1,5 +1,6 @@
 """Misc helpers."""
 from django.db.models import Q
+from bs4 import BeautifulSoup
 
 def get_url_friendly(name):
     """Converts the name to a url friendly string for use in `str_id`"""
@@ -32,3 +33,47 @@ def query_search(request, min_length, queryset, fields):
         return queryset.filter(all_queries)
 
     return queryset
+
+def table_to_markdown(html):
+    # Initialize
+    md = ''
+    MAX_COLS = 0
+    HEADER_SEPARATOR = 'HEADER_SEPARATOR'
+
+    # Parse
+    SOUP = BeautifulSoup(html, features='html.parser')
+
+    # Count maximum columns
+    for row in SOUP.find_all('tr'):
+        cols = row.find_all(['td', 'th'])
+        MAX_COLS = max(MAX_COLS, len(cols))
+
+    if MAX_COLS == 0:
+        return md
+
+    if MAX_COLS == 1:
+        for row in SOUP.find_all('tr'):
+            md += row.find(['td', 'th']).text + '\n'
+        return md
+
+    # Iterate all rows and columns
+    for i, row in enumerate(SOUP.find_all('tr')):
+        # Iterate all columns
+        cols = row.find_all(['td', 'th'])
+        for col in cols:
+            md += col.text + '&zwnj; | '
+
+        if len(cols) < MAX_COLS:
+            md += '&zwnj; | ' * (MAX_COLS - len(cols))
+
+        # Insert newline after each row
+        md += '\n'
+
+        # Insert header and separator placeholder
+        if i == 0:
+            md += HEADER_SEPARATOR + '\n'
+
+    # Replace header separator
+    md = md.replace(HEADER_SEPARATOR, '---|' * MAX_COLS)
+
+    return md
