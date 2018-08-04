@@ -133,6 +133,9 @@ LOGO_URL = 'https://insti.app/assets/logo.png'
 PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
 TRAINING_BLOG_URL = 'http://placements.iitb.ac.in/trainingblog/?feed=rss2'
 
+PLACEMENTS_BLOG_BODY = 'Placement Blog'
+TRAINING_BLOG_BODY = 'Internship Blog'
+
 LDAP_USERNAME = None
 LDAP_PASSWORD = None
 

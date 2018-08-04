@@ -8,13 +8,20 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from notifications.signals import notify
 from users.models import UserProfile
+from bodies.models import Body
 from placements.models import BlogEntry
 from helpers.misc import table_to_markdown
 
 # Prefetch objects
 PROFILES = UserProfile.objects.all()
 
-def fill_blog(url):
+def fill_blog(url, body_name):
+    # Get the body
+    body = None
+    bodies = Body.objects.filter(name=body_name)
+    if bodies.exists():
+        body = bodies[0]
+
     # Get the feed
     response = requests.get(url, auth=HTTPBasicAuth(
         settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
@@ -52,6 +59,11 @@ def fill_blog(url):
 
         # Send notification to mentioned people
         if new_added and db_entry.content:
+            # Send notifications to followers
+            if body is not None:
+                for follower in body.followers.all():
+                    notify.send(db_entry, recipient=follower.user, verb="New post on " + body_name)
+
             # Send notifications for mentioned users
             for profile in PROFILES:
                 if profile.user and profile.roll_no and profile.roll_no in db_entry.content:
@@ -74,7 +86,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Run the chore."""
 
-        fill_blog(settings.PLACEMENTS_URL)
-        fill_blog(settings.TRAINING_BLOG_URL)
+        fill_blog(settings.PLACEMENTS_URL, settings.PLACEMENTS_BLOG_BODY)
+        fill_blog(settings.TRAINING_BLOG_URL, settings.TRAINING_BLOG_BODY)
 
         self.stdout.write(self.style.SUCCESS('Placement Blog Chore completed successfully'))
