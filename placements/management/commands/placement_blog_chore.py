@@ -67,9 +67,10 @@ def handle_html(content):
 
 def convert_table_md(content):
     content = h2t.handle(content.group())
+    content = '\n' + content + '\n'
     content = content.replace(' | ', ' &zwnj;|&zwnj; ')
     content = content.replace('\n|', ' \n&zwnj;|')
-    return '\n' + content + '\n'
+    return content
 
 class Command(BaseCommand):
     help = 'Updates the placement blog database'
