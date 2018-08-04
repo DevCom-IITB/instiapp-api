@@ -69,7 +69,8 @@ class Command(BaseCommand):
                         registration_id=registration_id, message_title=message_title,
                         message_body=message_body, sound='default')
                     fcm += 1
-                except Exception:
+                except Exception as ex:
+                    print(profile.name, ex)
                     badfcm += 1
 
                 # For each web push subscription
