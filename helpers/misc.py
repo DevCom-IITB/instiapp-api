@@ -53,7 +53,7 @@ def table_to_markdown(html):
 
     if MAX_COLS == 1:
         for row in SOUP.find_all('tr'):
-            md += row.find(['td', 'th']).text + '\n'
+            md += row.find(['td', 'th']).text.replace('\n', '') + '\n'
         return md
 
     # Iterate all rows and columns
@@ -61,7 +61,8 @@ def table_to_markdown(html):
         # Iterate all columns
         cols = row.find_all(['td', 'th'])
         for col in cols:
-            md += col.text + '&zwnj; | '
+            txt = col.text.replace('\n', '')
+            md += txt + '&zwnj; | '
 
         if len(cols) < MAX_COLS:
             md += '&zwnj; | ' * (MAX_COLS - len(cols))
