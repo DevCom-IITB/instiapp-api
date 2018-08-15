@@ -1,5 +1,6 @@
 """Misc helpers."""
 from django.db.models import Q
+from django.db.models import Count
 from bs4 import BeautifulSoup
 
 def get_url_friendly(name):
@@ -33,6 +34,11 @@ def query_search(request, min_length, queryset, fields):
         return queryset.filter(all_queries)
 
     return queryset
+
+def sort_by_field(queryset, field, reverse=False):
+    """Return a queryset ordered by a field"""
+    queryset = queryset.annotate(field_count=Count(field))
+    return queryset.order_by(('-' if reverse else '') + 'field_count')
 
 def table_to_markdown(html):
     # Initialize

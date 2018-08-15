@@ -4,6 +4,7 @@ from django.db.models import Count
 from events.prioritizer import get_r_fresh_prioritized_events
 from bodies.models import Body
 from bodies.serializer_min import BodySerializerMin
+from helpers.misc import sort_by_field
 
 class BodySerializer(serializers.ModelSerializer):
     """Serializer for Body."""
@@ -27,12 +28,14 @@ class BodySerializer(serializers.ModelSerializer):
     @staticmethod
     def get_parents(obj):
         """Gets a min serialized parents of a Body."""
-        return [BodySerializerMin(x.parent).data for x in obj.parents.all()]
+        parents = sort_by_field(obj.parents.all(), 'parent__followers', reverse=True)
+        return [BodySerializerMin(x.parent).data for x in parents]
 
     @staticmethod
     def get_children(obj):
         """Gets a min serialized children of a Body."""
-        return [BodySerializerMin(x.child).data for x in obj.children.all()]
+        children = sort_by_field(obj.children.all(), 'child__followers', reverse=True)
+        return [BodySerializerMin(x.child).data for x in children]
 
     def get_events(self, obj):
         """Gets filtred events."""

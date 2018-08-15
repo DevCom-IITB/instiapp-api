@@ -12,6 +12,7 @@ from roles.helpers import user_has_privilege
 from roles.helpers import forbidden_no_privileges
 from roles.helpers import login_required_ajax
 from roles.helpers import insti_permission_required
+from helpers.misc import sort_by_field
 
 class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     """Body"""
@@ -25,6 +26,7 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     @classmethod
     def list(cls, request): #pylint: disable=unused-argument
         queryset = Body.objects.all()
+        queryset = sort_by_field(queryset, 'followers', reverse=True)
         serializer = BodySerializerMin(queryset, many=True)
         return Response(serializer.data)
 
