@@ -1,7 +1,6 @@
 import feedparser
 import re
 import requests
-import html2text
 from requests.auth import HTTPBasicAuth
 from dateutil.parser import parse
 from django.conf import settings
