@@ -1,5 +1,6 @@
 """Chore to send push notifications."""
 import json
+from datetime iport datetime, timedelta
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from pywebpush import webpush, WebPushException
@@ -42,12 +43,12 @@ class Command(BaseCommand):
                 continue
 
             # For each notification
-            for notification in profile.user.notifications.filter(unread=True, emailed=False):
+            for notification in profile.user.notifications.filter(unread=True, emailed=False,end_time__gte=timezone.now() - timedelta(days=7)):
 
                 # Check invalid subscriptions
                 if not notification or not notification.actor:
                     continue
-
+                
                 # Stop the spam!
                 notification.emailed = True
                 notification.save()
