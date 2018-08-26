@@ -1,5 +1,8 @@
 """Views that don't fit anywhere else."""
+from datetime import timedelta
+
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework import viewsets
 
@@ -44,7 +47,8 @@ class OtherViewset(viewsets.ViewSet):
     @login_required_ajax
     def get_notifications(cls, request):
         """Get unread notifications for current user."""
-        notifications = request.user.notifications.unread()
+        notifications = request.user.notifications.unread().filter(
+            timestamp__gte=timezone.now() - timedelta(days=7))
         return Response(NotificationSerializer(notifications, many=True).data)
 
     @classmethod
