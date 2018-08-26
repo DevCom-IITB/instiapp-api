@@ -1,6 +1,6 @@
 """Chore to send push notifications."""
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from pywebpush import webpush, WebPushException
