@@ -43,12 +43,12 @@ class Command(BaseCommand):
                 continue
 
             # For each notification
-            for notification in profile.user.notifications.filter(unread=True, emailed=False,end_time__gte=timezone.now() - timedelta(days=7)):
+            for notification in profile.user.notifications.filter(unread=True, emailed=False,timestamp__gte=timezone.now() - timedelta(days=7)):
 
                 # Check invalid subscriptions
                 if not notification or not notification.actor:
                     continue
-                
+
                 # Stop the spam!
                 notification.emailed = True
                 notification.save()
