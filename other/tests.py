@@ -1,4 +1,7 @@
 """Unit tests for news feed."""
+from datetime import timedelta
+from freezegun import freeze_time
+
 from rest_framework.test import APITestCase
 from django.utils import timezone
 from notifications.signals import notify
@@ -77,6 +80,12 @@ class OtherTestCase(APITestCase):
         event4 = Event.objects.create(name="TestEvent4", start_time=now, end_time=now)
         event5 = Event.objects.create(name="TestEvent5", start_time=now, end_time=now, notify=False)
 
+        # Notifications older than a week shouldn't show up
+        with freeze_time(timezone.now() - timedelta(days=10)):
+            event6 = Event.objects.create(name="TestEvent6", start_time=now, end_time=now)
+            event6.bodies.add(body1)
+
+        # Add bodies to all events
         event1.bodies.add(body1)
         event2.bodies.add(body1)
         event3.bodies.add(body1)

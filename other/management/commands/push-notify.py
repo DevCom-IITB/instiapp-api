@@ -3,6 +3,7 @@ import json
 from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.utils import timezone
 from pywebpush import webpush, WebPushException
 from pyfcm import FCMNotification
 from users.models import UserProfile
@@ -43,7 +44,8 @@ class Command(BaseCommand):
                 continue
 
             # For each notification
-            for notification in profile.user.notifications.filter(unread=True, emailed=False,timestamp__gte=timezone.now() - timedelta(days=7)):
+            for notification in profile.user.notifications.filter(
+                unread=True, emailed=False, timestamp__gte=timezone.now() - timedelta(days=7)):
 
                 # Check invalid subscriptions
                 if not notification or not notification.actor:
