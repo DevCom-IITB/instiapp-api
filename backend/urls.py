@@ -103,7 +103,7 @@ urlpatterns = [
     path('api/notifications', OtherViewset.as_view({'get': 'get_notifications'})),
     path('api/notifications/read', OtherViewset.as_view({'get': 'mark_all_notifications_read'})),
     path('api/notifications/read/<pk>', OtherViewset.as_view({'get': 'mark_notification_read'})),
-
+    ##
     # -------------- COMPLAINTS --------------- #
     path('api/venter/', include("venter.urls")),
 

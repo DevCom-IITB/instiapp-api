@@ -38,7 +38,7 @@ class complaints(models.Model):
     # media = models.ForeignKey('upload.UploadedImage', on_delete=models.CASCADE, related_name='media', null=True, blank=True)
 
     # tags = models.ManyToManyField(tag_uris, related_name='tags',blank=True)
-
+    ##
     class Meta:
         verbose_name = "Complaint"
         verbose_name_plural = "Complaints"
