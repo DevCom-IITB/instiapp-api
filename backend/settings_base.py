@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'news.apps.NewsConfig',
     'messmenu.apps.MessmenuConfig',
     'other.apps.OtherConfig',
-
+    'venter',
     'notifications',
 ]
 
