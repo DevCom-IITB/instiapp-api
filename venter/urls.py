@@ -16,39 +16,37 @@ Including another URLconf
 
 from django.urls import path
 
-from events.views import EventViewSet
-from upload.views import UploadViewSet
-
-from venter.views import ComplaintViewSet
+from .views import ComplaintViewSet
+from .views import ComplaintPostViewSet
 
 urlpatterns = [
 
-    path('get_complaints', ComplaintViewSet.as_view(
-        {'get': 'list'}
-    )),
+    path('get_complaints/', ComplaintViewSet.as_view()),
 
-    path('complaint/<pk>', ComplaintViewSet.as_view(
-        {'get': 'retrieve', 'post': 'create'}
-    )),
+    path('get_complaints/<created_by__ldap_id>', ComplaintViewSet.as_view()),
 
-    path('complaint_search', ComplaintViewSet.as_view(
-        {'get': 'search'}
-    )),
-
-    path('analyze_complaint', ComplaintViewSet.as_view(
-        {'get': 'analyze'}
-    )),
-
-    path('analyze_complaint_with_text', ComplaintViewSet.as_view(
-        {'get': 'analyze_text'}
-    )),
-
-    path('uploadFile', UploadViewSet.as_view(
+    path('complaint/<created_by__ldap_id>', ComplaintPostViewSet.as_view(
         {'post': 'create'}
     )),
 
-    path('uploadFile/<pk>', UploadViewSet.as_view(
-        {'get': 'retrieve'}
-    )),
+    # path('complaint_search', ComplaintViewSet.as_view(
+    #     {'get': 'search'}
+    # )),
+    #
+    # path('analyze_complaint', ComplaintViewSet.as_view(
+    #     {'get': 'analyze'}
+    # )),
+    #
+    # path('analyze_complaint_with_text', ComplaintViewSet.as_view(
+    #     {'get': 'analyze_text'}
+    # )),
+    #
+    # path('uploadFile', UploadViewSet.as_view(
+    #     {'post': 'create'}
+    # )),
+    #
+    # path('uploadFile/<pk>', UploadViewSet.as_view(
+    #     {'get': 'retrieve'}
+    # )),
 
 ]

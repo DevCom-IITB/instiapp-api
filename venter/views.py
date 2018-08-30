@@ -1,27 +1,25 @@
 from django.shortcuts import render
 
 # Create your views here.
-from rest_framework import viewsets
 from .models import complaints
+from .serializers import ComplaintSerializer, ComplaintPostSerializer
+from rest_framework.generics import ListAPIView
+from rest_framework import viewsets
 
-class ComplaintViewSet(viewsets.ViewSet):
+
+class ComplaintViewSet(ListAPIView):
+    serializer_class = ComplaintSerializer
+
+    def get_queryset(self):
+        if 'created_by__ldap_id' in self.kwargs:
+            return complaints.objects.filter(created_by__ldap_id=self.kwargs['created_by__ldap_id'])
+        else:
+            return complaints.objects.all()
+
+
+class ComplaintPostViewSet(viewsets.ModelViewSet):
     queryset = complaints.objects.all()
+    serializer_class = ComplaintPostSerializer
 
-    def list(self, request):
-
-        pass
-
-    def retrieve(self, request, pk):
-        pass
-
-    def create(self,request):
-        pass
-
-    def search(self, request):
-        pass
-
-    def analyze(self, request):
-        pass
-
-    def analyze_text(self, request):
+    def create(self, request):
         pass
