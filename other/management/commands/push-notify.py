@@ -107,7 +107,7 @@ class Command(BaseCommand):
                             "data": {
                                 "primaryKey": 1
                             }
-                        }
+                        },
                         "data": {
                             "type": notification_type
                             "id": event_id
