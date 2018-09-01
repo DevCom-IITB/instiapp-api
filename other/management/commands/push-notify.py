@@ -10,6 +10,7 @@ from users.models import UserProfile
 from placements.models import BlogEntry
 from events.models import Event
 from news.models import NewsEntry
+from uuid import uuid4
 
 def send_push(subscription, payload):
     """Send a single push notification."""
@@ -57,11 +58,19 @@ class Command(BaseCommand):
 
                 # Get title
                 title = "InstiApp"
+                notification_type = "event"
+                event_id = uuid4()
                 actor = notification.actor
                 if isinstance(actor, Event):
                     title = actor.name
-                if isinstance(actor, BlogEntry) or isinstance(actor, NewsEntry):
+                    event_type = "event"
+                    event_id = actor.id
+                if isinstance(actor, BlogEntry):
                     title = actor.title
+                    notification_type = "blog-entry"
+                if isinstance(actor, NewsEntry):
+                    title = actor.title
+                    notification_type = "news-entry"     
 
                 # Send FCM push notification
                 try:
@@ -98,6 +107,10 @@ class Command(BaseCommand):
                             "data": {
                                 "primaryKey": 1
                             }
+                        }
+                        "data": {
+                            "type": notification_type
+                            "id": event_id
                         }
                     }
 
