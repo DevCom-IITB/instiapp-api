@@ -109,7 +109,7 @@ class Command(BaseCommand):
                             }
                         },
                         "data": {
-                            "type": notification_type
+                            "type": notification_type,
                             "id": event_id
                         }
                     }
