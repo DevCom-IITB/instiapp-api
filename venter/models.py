@@ -25,16 +25,16 @@ class tag_uris(models.Model):
 
 class complaints(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    created_by = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE, related_name="created_by")
+    created_by = models.ForeignKey('users.UserProfile',null=True, blank=True, on_delete=models.CASCADE, related_name="created_by")
     description = models.TextField(blank=True, null=True)
-    report_date = models.DateTimeField(default=now())
+    report_date = models.DateTimeField(default=now)
     status = models.CharField(max_length=30, choices=STATUS, default='reported')
     latitude = models.FloatField(max_length=8, blank=True, null=True)
     longitude = models.FloatField(max_length=8, blank=True, null=True)
     location_description = models.TextField(blank=True, null=True)
     tags = models.ManyToManyField(tag_uris, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
-    media = models.ManyToManyField('upload.UploadedImage', related_name='media', null=True, blank=True)
+    media = models.ManyToManyField('upload.UploadedImage', related_name='media', blank=True)
 
     ##
     class Meta:
@@ -47,7 +47,7 @@ class complaints(models.Model):
 
 class comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    time = models.DateTimeField(default=now())
+    time = models.DateTimeField(default=now)
     text = models.TextField()
     user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE)
     complaint = models.ForeignKey(complaints, on_delete=models.CASCADE, related_name="comments")

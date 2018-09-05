@@ -1,6 +1,9 @@
+from coreapi.exceptions import ParseError
 from django.shortcuts import render
 
 # Create your views here.
+from rest_framework.decorators import detail_route, action
+
 from .models import complaints
 from .serializers import ComplaintSerializer, ComplaintPostSerializer
 from rest_framework.generics import ListAPIView
@@ -22,4 +25,4 @@ class ComplaintPostViewSet(viewsets.ModelViewSet):
     serializer_class = ComplaintPostSerializer
 
     def create(self, request):
-        pass
+        return super().create(request)

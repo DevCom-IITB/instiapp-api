@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from users.serializers import UserProfileSerializer
 from .models import complaints, tag_uris, comment
+from upload.models import UploadedImage
 from upload.serializers import UploadedImageSerializer
 
 
@@ -32,12 +33,26 @@ class ComplaintSerializer(serializers.ModelSerializer):
 
 
 class ComplaintPostSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True, read_only=False)
-    media = UploadedImageSerializer(many=True, read_only=False)
-    created_by = UserProfileSerializer(read_only= False)
+    tags = TagSerializer(many=True, read_only=True)
+    tag_names = serializers.SlugRelatedField(many=True, read_only=True, slug_field='tag_uri', source='tags')
+    tag_ids = serializers.PrimaryKeyRelatedField(many=True, read_only=False, source='tags',
+                                                 queryset=tag_uris.objects.all(), required=True)
+
+    media = UploadedImageSerializer(many=True, read_only=True)
+    # media = serializers.SlugRelatedField(many=True, read_only=True, slug_field='picture', source='media')
+    media_ids = serializers.PrimaryKeyRelatedField(many=True, read_only=False, source='media',
+                                                   queryset=UploadedImage.objects.all(), required=False)
 
     class Meta:
         model = complaints
         fields = (
-            'created_by', 'description', 'report_date', 'latitude', 'longitude', 'location_description', 'tags',
-            'media')
+            'id','description', 'report_date', 'latitude', 'longitude', 'location_description', 'tags',
+            'tag_names',
+            'tag_ids',
+            'media', 'media_ids')
+
+    def create(self, validated_data):
+        result = super().create(validated_data)
+        result.created_by = self.context['request'].user.profile
+        result.save()
+        return result

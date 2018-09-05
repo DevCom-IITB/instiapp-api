@@ -25,7 +25,7 @@ urlpatterns = [
 
     path('get_complaints/<created_by__ldap_id>', ComplaintViewSet.as_view()),
 
-    path('complaint/<created_by__ldap_id>', ComplaintPostViewSet.as_view(
+    path('complaint/', ComplaintPostViewSet.as_view(
         {'post': 'create'}
     )),
 
