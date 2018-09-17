@@ -24,7 +24,7 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
-    def test_complaint_post(self):
+    def test_complaint(self):
         url = '/api/complaints'
 
         data = {

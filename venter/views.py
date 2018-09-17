@@ -1,3 +1,4 @@
+from idlelib.FormatParagraph import get_comment_header
 from uuid import UUID
 
 from roles.helpers import login_required_ajax
@@ -37,6 +38,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
                 ComplaintMedia.objects.create(
                     complaint=complaint, image_url=image
                 )
+
         return Response(serializer.data, status=201)
 
     def get_complaint(self, pk):
@@ -59,15 +61,18 @@ class CommentViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def update(self, request, pk):
         text = request.data['text']
-        Comment.objects.filter(id=pk).update(text=text)
         get_comment = self.get_comment(pk)
-        serialized = CommentPostSerializer(get_comment, context={'request': request}).data
-        return Response(serialized)
+        if get_comment.commented_by == self.request.user.profile:
+            Comment.objects.filter(id=pk).update(text=text)
+            serialized = CommentPostSerializer(get_comment, context={'request': request}).data
+            return Response(serialized)
+        return Response(status=403)
 
     @login_required_ajax
     def destroy(self, request, pk):
         # Comment.objects.filter(id=pk).delete()
         # return Response(status=204)
+
         return super().destroy(request, pk)
 
     @login_required_ajax
