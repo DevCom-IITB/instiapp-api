@@ -1,5 +1,3 @@
-from idlelib.FormatParagraph import get_comment_header
-from uuid import UUID
 from rest_framework.generics import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
