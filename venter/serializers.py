@@ -49,13 +49,6 @@ class ComplaintPostSerializer(serializers.ModelSerializer):
         validated_data['created_by'] = self.context['request'].user.profile
         return super().create(validated_data)
 
-    def to_representation(self, instance):
-        result = super().to_representation(instance)
-        # Remove unnecessary fields
-        result.pop('tag_ids')
-        result.pop('tags')
-        return result
-
 class CommentPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
