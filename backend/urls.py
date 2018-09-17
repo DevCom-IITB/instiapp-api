@@ -17,7 +17,6 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_swagger.views import get_swagger_view
 
-import venter
 from bodies.views import BodyViewSet
 from bodies.views import BodyFollowersViewSet
 from events.views import EventViewSet
@@ -103,9 +102,9 @@ urlpatterns = [
     path('api/notifications', OtherViewset.as_view({'get': 'get_notifications'})),
     path('api/notifications/read', OtherViewset.as_view({'get': 'mark_all_notifications_read'})),
     path('api/notifications/read/<pk>', OtherViewset.as_view({'get': 'mark_notification_read'})),
-    ##
+
     # -------------- COMPLAINTS --------------- #
-    path('api/venter/', include("venter.urls")),
+    path('api/', include("venter.urls")),
 
     # -------------- PRERENDER --------------- #
     path('', pr.root),

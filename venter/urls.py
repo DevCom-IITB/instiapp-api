@@ -16,37 +16,23 @@ Including another URLconf
 
 from django.urls import path
 
-from .views import ComplaintViewSet
-from .views import ComplaintPostViewSet
+from venter.views import ComplaintViewSet, CommentViewSet
 
 urlpatterns = [
 
-    path('get_complaints/', ComplaintViewSet.as_view()),
+    path('complaints', ComplaintViewSet.as_view(
+        {'post': 'create','get':'list'}
+    )),
 
-    path('get_complaints/<created_by__ldap_id>', ComplaintViewSet.as_view()),
+    path('complaints/<pk>', ComplaintViewSet.as_view(
+        {'get': 'retrieve'}
+    )),
 
-    path('complaint/', ComplaintPostViewSet.as_view(
+    path('complaints/<pk>/comments', CommentViewSet.as_view(
         {'post': 'create'}
     )),
 
-    # path('complaint_search', ComplaintViewSet.as_view(
-    #     {'get': 'search'}
-    # )),
-    #
-    # path('analyze_complaint', ComplaintViewSet.as_view(
-    #     {'get': 'analyze'}
-    # )),
-    #
-    # path('analyze_complaint_with_text', ComplaintViewSet.as_view(
-    #     {'get': 'analyze_text'}
-    # )),
-    #
-    # path('uploadFile', UploadViewSet.as_view(
-    #     {'post': 'create'}
-    # )),
-    #
-    # path('uploadFile/<pk>', UploadViewSet.as_view(
-    #     {'get': 'retrieve'}
-    # )),
-
+    path('comments/<pk>', CommentViewSet.as_view(
+        {'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}
+    )),
 ]
