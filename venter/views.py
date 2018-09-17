@@ -37,7 +37,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
                 ComplaintMedia.objects.create(
                     complaint=complaint, image_url=image
                 )
-        return Response(serializer.data, status=201)
+        return Response(ComplaintSerializer(
+            Complaints.objects.get(id=complaint.id)
+        ).data, status=201)
 
     def get_complaint(self, pk):
         return get_object_or_404(self.queryset, id=pk)

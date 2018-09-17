@@ -38,6 +38,7 @@ class VenterTestCase(APITestCase):
 
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(response.data['media']), 2)
 
         url = '/api/complaints?filter=me'
         response = self.client.get(url)
