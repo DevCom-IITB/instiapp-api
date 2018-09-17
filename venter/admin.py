@@ -23,12 +23,13 @@ class UserLikedTabularInline(admin.TabularInline):
     verbose_name = "User up Voted"
     verbose_name_plural = "Users up voted"
 
-#
-# class MediaTabularInline(admin.TabularInline):
-#     model = Complaints.media
-#     verbose_name = "Media"
-#     verbose_name_plural = "Medias"
+class ComplaintMediaTabularInline(admin.TabularInline):
+    model = ComplaintMedia
+    readonly_fields = ('image_url',)
 
+class ComplaintMediaModelAdmin(admin.ModelAdmin):
+    list_display = ["image_url", "complaint"]
+    model = ComplaintMedia
 
 class CommentModelAdmin(admin.ModelAdmin):
     list_display = ["__str__", "commented_by", "complaint", "time"]
@@ -39,7 +40,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     list_display = ["__str__", "created_by", "report_date", "status"]
     list_editable = ["status"]
     list_filter = ["status"]
-    inlines = [CommentTabularInline, TagTabularInline, UserLikedTabularInline]#, MediaTabularInline]
+    inlines = [CommentTabularInline, TagTabularInline, UserLikedTabularInline, ComplaintMediaTabularInline]
     exclude = ('tags', 'users_up_voted', 'media',)
     search_fields = ["status", "description", "created_by__name"]
 
@@ -50,4 +51,4 @@ class ComplaintModelAdmin(admin.ModelAdmin):
 admin.site.register(Complaints, ComplaintModelAdmin)
 admin.site.register(Comment, CommentModelAdmin)
 admin.site.register(TagUris)
-admin.site.register(ComplaintMedia)
+admin.site.register(ComplaintMedia, ComplaintMediaModelAdmin)

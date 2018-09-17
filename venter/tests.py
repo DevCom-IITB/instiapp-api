@@ -29,7 +29,11 @@ class VenterTestCase(APITestCase):
 
         data = {
             'description': 'test',
-            'tag_ids': []
+            'tag_ids': [],
+            'images': [
+                "https://www.google.com/",
+                "https://www.facebook.com/"
+            ]
         }
 
         response = self.client.post(url, data, format='json')
