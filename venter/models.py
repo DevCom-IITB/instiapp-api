@@ -2,12 +2,6 @@ from uuid import uuid4
 
 from django.db import models
 
-"""
-STATUS = (
-    ('key', 'value')
-)
-"""
-
 STATUS = (
     ('Reported', 'Reported'),
     ('In Progress', 'In Progress'),

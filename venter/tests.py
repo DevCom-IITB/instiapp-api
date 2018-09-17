@@ -1,6 +1,4 @@
-from datetime import timedelta, timezone
-from rest_framework.test import APITestCase, APIRequestFactory
-
+from rest_framework.test import APITestCase
 from login.tests import get_new_user
 from venter.models import Complaints, TagUris, Comment
 
@@ -45,8 +43,8 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
-        id = str(response.data[0]['id'])
-        url = '/api/complaints/' + id
+        cid = str(response.data[0]['id'])
+        url = '/api/complaints/' + cid
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['description'], 'test')
@@ -62,8 +60,8 @@ class VenterTestCase(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
 
-        id = str(response.data['id'])
-        url = '/api/comments/' + id
+        cid = str(response.data['id'])
+        url = '/api/comments/' + cid
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['text'], 'test')

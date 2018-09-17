@@ -1,11 +1,7 @@
-from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from users.serializers import UserProfileSerializer
 from .models import Complaints, TagUris, Comment
-from upload.models import UploadedImage
-from upload.serializers import UploadedImageSerializer
-
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,7 +10,6 @@ class TagSerializer(serializers.ModelSerializer):
             'id', 'tag_uri'
         )
 
-
 class CommentSerializer(serializers.ModelSerializer):
     commented_by = UserProfileSerializer()
     class Meta:
@@ -22,7 +17,6 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'time', 'text', 'commented_by'
         )
-
 
 class ComplaintSerializer(serializers.ModelSerializer):
     created_by = UserProfileSerializer()
@@ -37,7 +31,6 @@ class ComplaintSerializer(serializers.ModelSerializer):
             'id', 'created_by', 'description', 'report_date', 'status', 'latitude',
             'longitude', 'location_description', 'tags', 'comments', 'users_up_voted','media'
         )
-
 
 class ComplaintPostSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
@@ -62,7 +55,6 @@ class ComplaintPostSerializer(serializers.ModelSerializer):
         result.pop('tag_ids')
         result.pop('tags')
         return result
-
 
 class CommentPostSerializer(serializers.ModelSerializer):
     class Meta:

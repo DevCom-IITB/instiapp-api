@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.admin import SimpleListFilter
 
 from venter.models import Complaints
 from venter.models import Comment
