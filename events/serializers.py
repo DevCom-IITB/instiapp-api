@@ -118,7 +118,5 @@ class EventFullSerializer(serializers.ModelSerializer):
         return result
 
     def create(self, validated_data):
-        result = super().create(validated_data)
-        result.created_by = self.context['request'].user.profile
-        result.save()
-        return result
+        validated_data['created_by'] = self.context['request'].user.profile
+        return super().create(validated_data)
