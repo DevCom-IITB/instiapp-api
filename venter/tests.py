@@ -76,6 +76,20 @@ class VenterTestCase(APITestCase):
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, 204)
 
+        comment = Comment.objects.create(
+            complaint=complaint,
+            text="test_comment",
+            commented_by=get_new_user().profile
+        )
+        url = '/api/comments/' + str(comment.id)
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, 403)
+
+
+
     def test_model_venter(self):
         complaint = Complaints.objects.create(
             created_by=self.user.profile,

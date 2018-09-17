@@ -73,10 +73,11 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     @login_required_ajax
     def destroy(self, request, pk):
-        # Comment.objects.filter(id=pk).delete()
-        # return Response(status=204)
-
-        return super().destroy(request, pk)
+        comment = self.get_comment(pk)
+        if comment.commented_by == self.request.user.profile:
+            return super().destroy(request, pk)
+        else:
+            return Response(status=403)
 
     @login_required_ajax
     def retrieve(self, request, pk):
