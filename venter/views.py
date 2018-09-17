@@ -61,10 +61,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def update(self, request, pk):
         text = request.data['text']
-        get_comment = self.get_comment(pk)
-        if get_comment.commented_by == self.request.user.profile:
+        comment = self.get_comment(pk)
+        if comment.commented_by == self.request.user.profile:
             Comment.objects.filter(id=pk).update(text=text)
-            serialized = CommentPostSerializer(get_comment, context={'request': request}).data
+            serialized = CommentPostSerializer(self.get_comment(pk), context={'request': request}).data
             return Response(serialized)
         return Response(status=403)
 
