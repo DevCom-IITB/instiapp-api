@@ -5,7 +5,6 @@ from roles.helpers import login_required_ajax
 from venter.models import Complaints, Comment, ComplaintMedia, TagUris
 from venter.serializers import ComplaintSerializer, ComplaintPostSerializer, CommentPostSerializer, CommentSerializer
 
-
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
@@ -25,8 +24,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             complaint, context={'request': request}, many=True).data
         return Response(serialized)
 
+    @classmethod
     @login_required_ajax
-    def create(self, request):
+    def create(cls, request):
         images = request.data['images']
         tags = request.data['tags']
         serializer = ComplaintPostSerializer(

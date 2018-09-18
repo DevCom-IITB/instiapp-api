@@ -10,7 +10,6 @@ class VenterTestCase(APITestCase):
 
     def test_complaint_get(self):
         Complaints.objects.create(created_by=self.user.profile)
-        # Complaints.objects.create(created_by=get_new_user().profile)
 
         url = '/api/complaints'
         response = self.client.get(url)
