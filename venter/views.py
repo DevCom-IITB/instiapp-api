@@ -2,7 +2,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
 from roles.helpers import login_required_ajax
-from venter.models import Complaints, Comment, ComplaintMedia
+from venter.models import Complaints, Comment, ComplaintMedia, TagUris
 from venter.serializers import ComplaintSerializer, ComplaintPostSerializer, CommentPostSerializer, CommentSerializer
 
 class ComplaintViewSet(viewsets.ModelViewSet):
@@ -28,15 +28,25 @@ class ComplaintViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def create(cls, request):
         images = request.data['images']
+        tags = request.data['tags']
         serializer = ComplaintPostSerializer(
             data=request.data, context={'request': request})
         if serializer.is_valid():
             complaint = serializer.save()
-            for image in images:
-                ComplaintMedia.objects.create(
-                    complaint=complaint, image_url=image
-                )
-
+            if tags:
+                for tag in tags:
+                    if TagUris.objects.filter(tag_uri=tag).exists():
+                        exist_tag = TagUris.objects.get(tag_uri=tag)
+                        complaint.tags.add(exist_tag.id)
+                    else:
+                        tag_name = TagUris(tag_uri=tag)
+                        tag_name.save()
+                        complaint.tags.add(tag_name)
+            if images:
+                for image in images:
+                    ComplaintMedia.objects.create(
+                        complaint=complaint, image_url=image
+                    )
         return Response(ComplaintSerializer(
             Complaints.objects.get(id=complaint.id)
         ).data, status=201)

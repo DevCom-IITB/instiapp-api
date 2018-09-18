@@ -33,17 +33,10 @@ class ComplaintSerializer(serializers.ModelSerializer):
         )
 
 class ComplaintPostSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True, read_only=True)
-    tag_names = serializers.SlugRelatedField(many=True, read_only=True, slug_field='tag_uri', source='tags')
-    tag_ids = serializers.PrimaryKeyRelatedField(many=True, read_only=False, source='tags',
-                                                 queryset=TagUris.objects.all(), required=True)
-
     class Meta:
         model = Complaints
         fields = (
-            'id', 'description', 'report_date', 'latitude', 'longitude', 'location_description', 'tags',
-            'tag_names',
-            'tag_ids')
+            'id', 'description', 'report_date', 'latitude', 'longitude', 'location_description')
 
     def create(self, validated_data):
         validated_data['created_by'] = self.context['request'].user.profile
