@@ -10,11 +10,12 @@ class VenterTestCase(APITestCase):
 
     def test_complaint_get(self):
         Complaints.objects.create(created_by=self.user.profile)
+        Complaints.objects.create(created_by=get_new_user().profile)
 
         url = '/api/complaints'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
 
         url = '/api/complaints?filter=me'
         response = self.client.get(url)
