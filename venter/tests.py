@@ -10,12 +10,12 @@ class VenterTestCase(APITestCase):
 
     def test_complaint_get(self):
         Complaints.objects.create(created_by=self.user.profile)
-        Complaints.objects.create(created_by=get_new_user().profile)
+        # Complaints.objects.create(created_by=get_new_user().profile)
 
         url = '/api/complaints'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 1)
 
         url = '/api/complaints?filter=me'
         response = self.client.get(url)
@@ -25,9 +25,10 @@ class VenterTestCase(APITestCase):
     def test_complaint(self):
         url = '/api/complaints'
 
+        TagUris.objects.create(tag_uri='garbage')
         data = {
             'description': 'test',
-            'tag_ids': [],
+            'tags':["flexes", "garbage"],
             'images': [
                 "https://www.google.com/",
                 "https://www.facebook.com/"
@@ -37,11 +38,23 @@ class VenterTestCase(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(response.data['media']), 2)
+        self.assertEqual(len(response.data['tags']), 2)
+
+        data = {
+            'description': 'test',
+            'tags': [],
+            'images': []
+        }
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(response.data['media']), 0)
+        self.assertEqual(len(response.data['tags']), 0)
 
         url = '/api/complaints?filter=me'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
 
         cid = str(response.data[0]['id'])
         url = '/api/complaints/' + cid
