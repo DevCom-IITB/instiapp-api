@@ -45,19 +45,6 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     inlines = [CommentTabularInline, TagTabularInline, UserLikedTabularInline, ComplaintMediaTabularInline]
     exclude = ('tags', 'users_up_voted', 'media',)
     search_fields = ["status", "description", "created_by__name"]
-    actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted']
-
-    def mark_as_resolved(self, request, queryset):
-        queryset.update(status='Resolved')
-        self.short_description = "Mark selected complaints as Resolved"
-
-    def mark_as_in_progress(self, request, queryset):
-        queryset.update(status='In Progress')
-        self.short_description = "Mark selected complaints as In Progress"
-
-    def mark_as_deleted(self, request, queryset):
-        queryset.update(status='Deleted')
-        self.short_description = "Mark selected complaints as Deleted"
 
     class Meta:
         model = Complaints
