@@ -1,3 +1,4 @@
+"""Serializers for venter."""
 from rest_framework import serializers
 from users.serializers import UserProfileSerializer
 
