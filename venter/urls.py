@@ -25,7 +25,7 @@ urlpatterns = [
     )),
 
     path('complaints/<pk>', ComplaintViewSet.as_view(
-        {'get': 'retrieve'}
+        {'get': 'retrieve', 'put': 'update'}
     )),
 
     path('complaints/<pk>/comments', CommentViewSet.as_view(

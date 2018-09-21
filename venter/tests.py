@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
-from venter.models import Complaints, TagUris, Comment
+from venter.models import Complaints, TagUris, Comment, ComplaintMedia
 
 
 class VenterTestCase(APITestCase):
@@ -11,6 +11,7 @@ class VenterTestCase(APITestCase):
     def test_complaint_get(self):
         Complaints.objects.create(created_by=self.user.profile)
         Complaints.objects.create(created_by=get_new_user().profile)
+        Complaints.objects.create(created_by=self.user.profile, status="Deleted")
 
         url = '/api/complaints'
         response = self.client.get(url)
@@ -37,7 +38,7 @@ class VenterTestCase(APITestCase):
 
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(len(response.data['media']), 2)
+        self.assertEqual(len(response.data['images']), 2)
         self.assertEqual(len(response.data['tags']), 2)
 
         data = {
@@ -48,7 +49,7 @@ class VenterTestCase(APITestCase):
 
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(len(response.data['media']), 0)
+        self.assertEqual(len(response.data['images']), 0)
         self.assertEqual(len(response.data['tags']), 0)
 
         url = '/api/complaints?filter=me'
@@ -61,6 +62,10 @@ class VenterTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['description'], 'test')
+
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_up_voted']), 1)
 
     def test_comment(self):
         complaint = Complaints.objects.create(created_by=self.user.profile)
@@ -124,3 +129,10 @@ class VenterTestCase(APITestCase):
         )
 
         self.assertEqual(str(comment), 'test_comment')
+
+        complaintMedia = ComplaintMedia.objects.create(
+            complaint=complaint,
+            image_url="www.google.com"
+        )
+
+        self.assertEqual(str(complaintMedia), 'www.google.com')

@@ -23,13 +23,13 @@ class ComplaintSerializer(serializers.ModelSerializer):
     users_up_voted = UserProfileSerializer(many=True)
     tags = TagSerializer(many=True)
     comments = CommentSerializer(many=True)
-    media= serializers.SlugRelatedField(many=True, read_only=True, slug_field='image_url')
+    images= serializers.SlugRelatedField(many=True, read_only=True, slug_field='image_url')
 
     class Meta:
         model = Complaints
         fields = (
             'id', 'created_by', 'description', 'report_date', 'status', 'latitude',
-            'longitude', 'location_description', 'tags', 'comments', 'users_up_voted','media'
+            'longitude', 'location_description', 'tags', 'comments', 'users_up_voted','images'
         )
 
 class ComplaintPostSerializer(serializers.ModelSerializer):
