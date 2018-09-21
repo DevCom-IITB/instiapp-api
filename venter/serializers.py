@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from users.serializers import UserProfileSerializer
-from .models import Complaints, TagUris, Comment, ComplaintMedia
+from .models import Complaints, TagUris, Comment
 
 
 class TagSerializer(serializers.ModelSerializer):

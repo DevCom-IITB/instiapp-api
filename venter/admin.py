@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.core.mail import send_mail
 
 from venter.models import Complaints
 from venter.models import Comment
@@ -50,18 +49,15 @@ class ComplaintModelAdmin(admin.ModelAdmin):
 
     def mark_as_resolved(self, request, queryset):
         queryset.update(status='Resolved')
-
-    mark_as_resolved.short_description = "Mark selected complaints as Resolved"
+        self.short_description = "Mark selected complaints as Resolved"
 
     def mark_as_in_progress(self, request, queryset):
         queryset.update(status='In Progress')
-
-    mark_as_in_progress.short_description = "Mark selected complaints as In Progress"
+        self.short_description = "Mark selected complaints as In Progress"
 
     def mark_as_deleted(self, request, queryset):
         queryset.update(status='Deleted')
-
-    mark_as_deleted.short_description = "Mark selected complaints as Deleted"
+        self.short_description = "Mark selected complaints as Deleted"
 
     class Meta:
         model = Complaints
