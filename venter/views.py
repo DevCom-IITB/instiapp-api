@@ -2,8 +2,16 @@ from rest_framework.generics import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
 from roles.helpers import login_required_ajax
-from venter.models import Complaints, Comment, ComplaintMedia, TagUris
-from venter.serializers import ComplaintSerializer, ComplaintPostSerializer, CommentPostSerializer, CommentSerializer
+
+from venter.models import Complaints
+from venter.models import Comment
+from venter.models import ComplaintMedia
+from venter.models import  TagUris
+
+from venter.serializers import ComplaintSerializer
+from venter.serializers import ComplaintPostSerializer
+from venter.serializers import CommentPostSerializer
+from venter.serializers import CommentSerializer
 
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
@@ -60,7 +68,6 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
     def get_complaint(self, pk):
         return get_object_or_404(self.queryset, id=pk)
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()

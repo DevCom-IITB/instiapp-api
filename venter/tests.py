@@ -2,7 +2,6 @@ from rest_framework.test import APITestCase
 from login.tests import get_new_user
 from venter.models import Complaints, TagUris, Comment, ComplaintMedia
 
-
 class VenterTestCase(APITestCase):
     def setUp(self):
         self.user = get_new_user()
@@ -11,7 +10,7 @@ class VenterTestCase(APITestCase):
     def test_complaint_get(self):
         Complaints.objects.create(created_by=self.user.profile)
         Complaints.objects.create(created_by=get_new_user().profile)
-        Complaints.objects.create(created_by=self.user.profile, status="Deleted")
+        Complaints.objects.create(created_by=self.user.profile, status='Deleted')
 
         url = '/api/complaints'
         response = self.client.get(url)
@@ -29,10 +28,10 @@ class VenterTestCase(APITestCase):
         TagUris.objects.create(tag_uri='garbage')
         data = {
             'description': 'test',
-            'tags':["flexes", "garbage"],
+            'tags':['flexes', 'garbage'],
             'images': [
-                "https://www.google.com/",
-                "https://www.facebook.com/"
+                'https://www.google.com/',
+                'https://www.facebook.com/'
             ]
         }
 
@@ -72,9 +71,7 @@ class VenterTestCase(APITestCase):
 
         url = '/api/complaints/' + str(complaint.id) + '/comments'
 
-        data = {
-            'text': "test"
-        }
+        data = { 'text': 'test' }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
 
@@ -84,9 +81,8 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['text'], 'test')
 
-        data = {
-            'text': "test2"
-        }
+        data = { 'text': 'test2' }
+
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['text'], 'test2')
@@ -96,7 +92,7 @@ class VenterTestCase(APITestCase):
 
         comment = Comment.objects.create(
             complaint=complaint,
-            text="test_comment",
+            text='test_comment',
             commented_by=get_new_user().profile
         )
         url = '/api/comments/' + str(comment.id)
@@ -106,25 +102,23 @@ class VenterTestCase(APITestCase):
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, 403)
 
-
-
     def test_model_venter(self):
         complaint = Complaints.objects.create(
             created_by=self.user.profile,
-            description="test"
+            description='test'
         )
 
         self.assertEqual(str(complaint), 'test')
 
         tag = TagUris.objects.create(
-            tag_uri="test_tag"
+            tag_uri='test_tag'
         )
 
         self.assertEqual(str(tag), 'test_tag')
 
         comment = Comment.objects.create(
             complaint=complaint,
-            text="test_comment",
+            text='test_comment',
             commented_by=self.user.profile
         )
 
@@ -132,7 +126,7 @@ class VenterTestCase(APITestCase):
 
         complaintMedia = ComplaintMedia.objects.create(
             complaint=complaint,
-            image_url="www.google.com"
+            image_url='www.google.com'
         )
 
         self.assertEqual(str(complaintMedia), 'www.google.com')
