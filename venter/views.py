@@ -5,7 +5,6 @@ from roles.helpers import login_required_ajax
 from venter.models import Complaints, Comment, ComplaintMedia, TagUris
 from venter.serializers import ComplaintSerializer, ComplaintPostSerializer, CommentPostSerializer, CommentSerializer
 
-
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
