@@ -29,7 +29,7 @@ class VenterTestCase(APITestCase):
         TagUris.objects.create(tag_uri='garbage')
         data = {
             'description': 'test',
-            'tags': ["flexes", "garbage"],
+            'tags':["flexes", "garbage"],
             'images': [
                 "https://www.google.com/",
                 "https://www.facebook.com/"
