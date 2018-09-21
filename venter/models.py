@@ -35,6 +35,7 @@ class Complaints(models.Model):
     tags = models.ManyToManyField(TagUris, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
 
+
     class Meta:
         verbose_name = "Complaint"
         verbose_name_plural = "Complaints"
