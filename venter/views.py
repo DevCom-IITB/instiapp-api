@@ -45,8 +45,8 @@ class ComplaintViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def create(cls, request):
         # Check for images and tags
-        images = request.data['images']
-        tags = request.data['tags']
+        images = request.data.get('images', [])
+        tags = request.data.get('tags', [])
 
         # Deserialize POST data
         serializer = ComplaintPostSerializer(
@@ -57,22 +57,20 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             complaint = serializer.save()
 
             # Create and save all tags if present
-            if tags:
-                for tag in tags:
-                    if TagUris.objects.filter(tag_uri=tag).exists():
-                        exist_tag = TagUris.objects.get(tag_uri=tag)
-                        complaint.tags.add(exist_tag.id)
-                    else:
-                        tag_name = TagUris(tag_uri=tag)
-                        tag_name.save()
-                        complaint.tags.add(tag_name)
+            for tag in tags:
+                if TagUris.objects.filter(tag_uri=tag).exists():
+                    exist_tag = TagUris.objects.get(tag_uri=tag)
+                    complaint.tags.add(exist_tag.id)
+                else:
+                    tag_name = TagUris(tag_uri=tag)
+                    tag_name.save()
+                    complaint.tags.add(tag_name)
 
             # Create and save all images if present
-            if images:
-                for image in images:
-                    ComplaintMedia.objects.create(
-                        complaint=complaint, image_url=image
-                    )
+            for image in images:
+                ComplaintMedia.objects.create(
+                    complaint=complaint, image_url=image
+                )
 
         # Return new serialized response
         return Response(ComplaintSerializer(
