@@ -47,9 +47,7 @@ class VenterTestCase(APITestCase):
         self.assertEqual(len(response.data['tags']), 2)
 
         data = {
-            'description': 'test',
-            'tags': [],
-            'images': []
+            'description': 'test'
         }
 
         response = self.client.post(url, data, format='json')
