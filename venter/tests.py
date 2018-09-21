@@ -3,11 +3,15 @@ from login.tests import get_new_user
 from venter.models import Complaints, TagUris, Comment, ComplaintMedia
 
 class VenterTestCase(APITestCase):
+    """Unit tests for venter."""
+
     def setUp(self):
         self.user = get_new_user()
         self.client.force_authenticate(self.user)
 
     def test_complaint_get(self):
+        """Test getting venter complaint lists."""
+
         Complaints.objects.create(created_by=self.user.profile)
         Complaints.objects.create(created_by=get_new_user().profile)
         Complaints.objects.create(created_by=self.user.profile, status='Deleted')
@@ -23,6 +27,8 @@ class VenterTestCase(APITestCase):
         self.assertEqual(len(response.data), 1)
 
     def test_complaint(self):
+        """Test all public methods of venter complaint."""
+
         url = '/api/complaints'
 
         TagUris.objects.create(tag_uri='garbage')
@@ -67,6 +73,8 @@ class VenterTestCase(APITestCase):
         self.assertEqual(len(response.data['users_up_voted']), 1)
 
     def test_comment(self):
+        """Test all public venter comment APIs."""
+
         complaint = Complaints.objects.create(created_by=self.user.profile)
 
         url = '/api/complaints/' + str(complaint.id) + '/comments'
@@ -103,6 +111,8 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_model_venter(self):
+        """Run other model tests for venter."""
+
         complaint = Complaints.objects.create(
             created_by=self.user.profile,
             description='test'

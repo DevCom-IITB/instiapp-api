@@ -1,3 +1,4 @@
+"""Admin models for venter."""
 from django.contrib import admin
 from venter.models import Complaints
 from venter.models import Comment
