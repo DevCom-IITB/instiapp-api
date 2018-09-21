@@ -106,6 +106,8 @@ class VenterTestCase(APITestCase):
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, 403)
 
+
+
     def test_model_venter(self):
         complaint = Complaints.objects.create(
             created_by=self.user.profile,

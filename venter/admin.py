@@ -5,14 +5,17 @@ from venter.models import Comment
 from venter.models import TagUris
 from venter.models import ComplaintMedia
 
+
 class CommentTabularInline(admin.TabularInline):
     model = Comment
     readonly_fields = ('text', 'time', 'commented_by',)
+
 
 class TagTabularInline(admin.TabularInline):
     model = Complaints.tags.through
     verbose_name = "Tag"
     verbose_name_plural = "Tags"
+
 
 class UserLikedTabularInline(admin.TabularInline):
     model = Complaints.users_up_voted.through
@@ -30,6 +33,7 @@ class ComplaintMediaModelAdmin(admin.ModelAdmin):
 class CommentModelAdmin(admin.ModelAdmin):
     list_display = ["__str__", "commented_by", "complaint", "time"]
     model = Comment
+
 
 class ComplaintModelAdmin(admin.ModelAdmin):
     list_display = ["__str__", "created_by", "report_date", "status"]
