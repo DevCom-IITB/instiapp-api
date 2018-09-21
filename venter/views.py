@@ -5,6 +5,7 @@ from roles.helpers import login_required_ajax
 from venter.models import Complaints, Comment, ComplaintMedia, TagUris
 from venter.serializers import ComplaintSerializer, ComplaintPostSerializer, CommentPostSerializer, CommentSerializer
 
+
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
@@ -17,7 +18,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
     @classmethod
     def list(cls, request):
-        complaint = Complaints.objects.all()
+        complaint = Complaints.objects.exclude(status='Deleted')
         if 'filter' in request.GET:
             complaint = complaint.filter(created_by=request.user.profile)
         serialized = ComplaintSerializer(
@@ -50,6 +51,13 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         return Response(ComplaintSerializer(
             Complaints.objects.get(id=complaint.id)
         ).data, status=201)
+
+    def update(self, request, pk):
+        complaint = self.get_complaint(pk)
+        complaint.users_up_voted.add(self.request.user.profile)
+        return Response(ComplaintSerializer(
+            Complaints.objects.get(id=complaint.id)
+        ).data)
 
     def get_complaint(self, pk):
         return get_object_or_404(self.queryset, id=pk)

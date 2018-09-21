@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.core.mail import send_mail
 
 from venter.models import Complaints
 from venter.models import Comment
@@ -22,13 +23,16 @@ class UserLikedTabularInline(admin.TabularInline):
     verbose_name = "User up Voted"
     verbose_name_plural = "Users up voted"
 
+
 class ComplaintMediaTabularInline(admin.TabularInline):
     model = ComplaintMedia
     readonly_fields = ('image_url',)
 
+
 class ComplaintMediaModelAdmin(admin.ModelAdmin):
     list_display = ["image_url", "complaint"]
     model = ComplaintMedia
+
 
 class CommentModelAdmin(admin.ModelAdmin):
     list_display = ["__str__", "commented_by", "complaint", "time"]
@@ -42,6 +46,22 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     inlines = [CommentTabularInline, TagTabularInline, UserLikedTabularInline, ComplaintMediaTabularInline]
     exclude = ('tags', 'users_up_voted', 'media',)
     search_fields = ["status", "description", "created_by__name"]
+    actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted']
+
+    def mark_as_resolved(self, request, queryset):
+        queryset.update(status='Resolved')
+
+    mark_as_resolved.short_description = "Mark selected complaints as Resolved"
+
+    def mark_as_in_progress(self, request, queryset):
+        queryset.update(status='In Progress')
+
+    mark_as_in_progress.short_description = "Mark selected complaints as In Progress"
+
+    def mark_as_deleted(self, request, queryset):
+        queryset.update(status='Deleted')
+
+    mark_as_deleted.short_description = "Mark selected complaints as Deleted"
 
     class Meta:
         model = Complaints

@@ -35,7 +35,6 @@ class Complaints(models.Model):
     tags = models.ManyToManyField(TagUris, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
 
-
     class Meta:
         verbose_name = "Complaint"
         verbose_name_plural = "Complaints"
@@ -44,14 +43,19 @@ class Complaints(models.Model):
     def __str__(self):
         return self.description
 
+
 class ComplaintMedia(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    complaint = models.ForeignKey(Complaints, on_delete=models.CASCADE, related_name='media')
+    complaint = models.ForeignKey(Complaints, on_delete=models.CASCADE, related_name='images')
     image_url = models.URLField()
 
     class Meta:
         verbose_name = "Complaint Medium"
         verbose_name_plural = "Complaint Media"
+
+    def __str__(self):
+        return str(self.image_url)
+
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
