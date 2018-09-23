@@ -61,8 +61,8 @@ class Comment(models.Model):
     complaint = models.ForeignKey(Complaints, on_delete=models.CASCADE, related_name='comments')
 
     class Meta:
-        verbose_name = "Comment"
-        verbose_name_plural = "Comments"
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
 
     def __str__(self):
         return self.text
