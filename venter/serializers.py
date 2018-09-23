@@ -1,7 +1,10 @@
+"""Serializers for venter."""
 from rest_framework import serializers
-
 from users.serializers import UserProfileSerializer
-from .models import Complaints, TagUris, Comment
+
+from venter.models import Complaints
+from venter.models import TagUris
+from venter.models import Comment
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,7 +26,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
     users_up_voted = UserProfileSerializer(many=True)
     tags = TagSerializer(many=True)
     comments = CommentSerializer(many=True)
-    images= serializers.SlugRelatedField(many=True, read_only=True, slug_field='image_url')
+    images = serializers.SlugRelatedField(many=True, read_only=True, slug_field='image_url')
 
     class Meta:
         model = Complaints
