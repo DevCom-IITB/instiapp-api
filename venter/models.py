@@ -53,9 +53,6 @@ class ComplaintMedia(models.Model):
     def __str__(self):
         return str(self.image_url)
 
-    def __str__(self):
-        return str(self.image_url)
-
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time = models.DateTimeField(auto_now_add=True)
