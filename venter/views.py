@@ -33,7 +33,6 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         complaint = Complaints.objects.exclude(status='Deleted')
 
         # Check if the user specific filter is present
-
         if 'filter' in request.GET:
             complaint = complaint.filter(created_by=request.user.profile)
 
