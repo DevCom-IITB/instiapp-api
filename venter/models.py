@@ -55,6 +55,7 @@ class ComplaintMedia(models.Model):
 
     def __str__(self):
         return str(self.image_url)
+
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time = models.DateTimeField(auto_now_add=True)
@@ -65,7 +66,6 @@ class Comment(models.Model):
     class Meta:
         verbose_name = "Comment"
         verbose_name_plural = "Comments"
-        ordering = ("-time",)
 
     def __str__(self):
         return self.text
