@@ -18,25 +18,54 @@
     <meta property="og:end_time" content="{{event.end_time.isoformat}}" />
 </head>
 
-<body>
+<body itemscope itemtype="http://schema.org/Event">
 
-<h2>{{event.name}}</h2>
-<img style="width:350px" src="{{event.image_url}}"><br>
+<div>
+<h2 itemprop="name">{{event.name}}</h2>
+<img itemprop="image" style="width:350px" src="{{event.image_url}}">
+</div>
 
-<span>{{event.start_time}} to {{event.end_time}}</span><br>
+<div>
+    <span itemprop="startDate" content="{{event.start_time|date:'c'}}">{{event.start_time}}</span>
+    to
+    <span itemprop="endDate" content="{{event.end_time|date:'c'}}">{{event.end_time}}</span>
+</div>
+
+<div>
 {% for venue in event.venues.all  %}
-- {{venue.name}}
+    <div itemprop="location" itemscope itemtype="http://schema.org/Place">
+        <span itemprop="name">{{venue.name}}</span>
+        <div class="address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+            <span style="display: none" itemprop="streetAddress">{{venue.name}}</span>
+        </div>
+    </div>
 {% endfor %}
-<br><br>
+</div>
 
-<span style="white-space: pre">{{event.description}}</span>
+<div style="white-space: pre" itemprop="description">
+    {{event.description}}
+</div>
 
-<h4>Conducted by:</h4>
-{% for body in event.bodies.all  %}
-<a href="/org/{{body.str_id}}">{{body.name}}</a><br>
-{% endfor %}
+<div>
+    <h4>Conducted by:</h4>
+    {% for body in event.bodies.all  %}
+        <a href="/org/{{body.str_id}}">{{body.name}}</a><br>
+    {% endfor %}
+</div>
+<br />
 
-{%include "links.html" %}
+<div>
+    {% if event.website_url  %}
+        <a itemprop="sameAs" href="{{event.website_url}}">Website</a> <br />
+    {% endif %}
+
+    <a itemprop="url" href="{{settings.BASE_URL}}/event/{{event.str_id}}">Canonical Link</a>
+</div>
+<br />
+
+<div>
+    {%include "links.html" %}
+</div>
 
 </body>
 </html>
