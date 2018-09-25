@@ -16,13 +16,23 @@
 
     <meta property="og:start_time" content="{{event.start_time.isoformat}}" />
     <meta property="og:end_time" content="{{event.end_time.isoformat}}" />
+
+    <style>
+        img.head {
+            width:350px;
+            max-width: 100%;
+        }
+        div {
+            margin: 10px 0;
+        }
+    </style>
 </head>
 
 <body itemscope itemtype="http://schema.org/Event">
 
 <div>
 <h2 itemprop="name">{{event.name}}</h2>
-<img itemprop="image" style="width:350px" src="{{event.image_url | default_if_none:event.bodies.first.image_url }}">
+<img itemprop="image" class="head" src="{{event.image_url | default_if_none:event.bodies.first.image_url }}">
 </div>
 
 <div>
@@ -42,8 +52,9 @@
 {% endfor %}
 </div>
 
-<div style="white-space: pre" itemprop="description">
-    {{event.description}}
+{% load markdownify %}
+<div itemprop="description">
+    {{event.description | markdownify}}
 </div>
 
 <div>
