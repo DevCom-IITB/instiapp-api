@@ -32,6 +32,7 @@ class Body(models.Model):
     class Meta:
         verbose_name = "Body"
         verbose_name_plural = "Bodies"
+        ordering = ("name",)
 
 class BodyChildRelation(models.Model):
     """Relates a body to one child."""
