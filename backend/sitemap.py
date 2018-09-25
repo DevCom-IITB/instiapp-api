@@ -28,7 +28,7 @@ class StaticViewSitemap(Sitemap):
     changefreq = 'daily'
 
     def items(self):
-        return ['', '/news', '/explore']
+        return ['/', '/news', '/explore']
 
     def location(self, item):
         return item
