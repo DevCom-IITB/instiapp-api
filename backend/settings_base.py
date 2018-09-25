@@ -128,8 +128,8 @@ REST_FRAMEWORK = {
 
 }
 
-PRERENDER_TITLE = 'InstiApp'
-PRERENDER_DESCRIPTION = 'InstiApp | IIT Bombay'
+PRERENDER_TITLE = 'InstiApp | IIT Bombay'
+PRERENDER_DESCRIPTION = 'InstiApp is the front page of all student activities at IIT Bombay<br>'
 LOGO_URL = 'https://insti.app/assets/logo.png'
 
 PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
