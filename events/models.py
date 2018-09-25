@@ -12,8 +12,9 @@ class Event(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     str_id = models.CharField(max_length=58, editable=False, null=True)
-
     time_of_creation = models.DateTimeField(auto_now_add=True)
+    time_of_modification = models.DateTimeField(auto_now=True)
+
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     bodies = models.ManyToManyField('bodies.Body', related_name='events', blank=True)
@@ -39,6 +40,9 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super(Event, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return '/event/' + self.str_id
 
     class Meta:
         verbose_name = "Event"
