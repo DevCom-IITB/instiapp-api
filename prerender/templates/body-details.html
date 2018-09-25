@@ -22,7 +22,8 @@
 
 <br>
 
-<div itemprop="description">{{body.description}}</div>
+{% load markdownify %}
+<div itemprop="description">{{body.description | markdownify}}</div>
 
 <img itemprop="logo" style="width:250px" src="{{body.image_url}}">
 

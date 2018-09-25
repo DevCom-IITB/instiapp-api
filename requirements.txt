@@ -16,3 +16,4 @@ pywebpush==1.7.0
 pyfcm==1.4.5
 beautifulsoup4==4.6.3
 freezegun==0.3.10
+django-markdownify==0.8.0
