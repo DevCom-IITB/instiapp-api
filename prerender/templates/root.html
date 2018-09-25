@@ -22,21 +22,33 @@
 <h2>Events</h2>
 <ul>
 {% for event in events  %}
-    <li>
-        <a href="/event/{{event.str_id}}">{{event.name}}</a>, {{event.start_time}} to {{event.end_time}}
-        {% if event.website_url  %}
-            - <a href="{{event.website_url}}">{{event.name}} Website</a>
-        {% endif %}
+    <li itemscope itemtype="http://schema.org/Event">
+        <a itemprop="url" href="{{settings.BASE_URL}}/event/{{event.str_id}}">
+            <span itemprop="name">{{event.name}}</span>
+        </a>
+        {%with event=event settings=settings template_name="event_date_venue.html" %}
+            {%include template_name%}
+        {%endwith%}
+        <meta itemprop="description" content="{{event.description}}">
+
         <br>
 
         {% for body in event.bodies.all  %}
-            <a href="/org/{{body.str_id}}">{{body.name}}</a>
-            {% if body.website_url  %}
-            - <a href="{{body.website_url}}">{{body.name}} Website</a>
-            {% endif %}
-            <br>
+            <div itemprop="organizer" itemscope itemtype="http://schema.org/Organization">
+                <a itemprop="url" href="{{settings.BASE_URL}}/org/{{body.str_id}}">
+                    <span itemprop="name">{{body.name}}</span>
+                </a>
+                {% if body.website_url  %}
+                - <a itemprop="sameAs" href="{{body.website_url}}">{{body.name}} Website</a>
+                {% endif %}
+            </div>
         {% endfor %}
-        <a href="/event/{{event.str_id}}"><img style="width:250px" src="{{event.image_url}}"></a><br>
+
+        <div>
+            <a href="{{settings.BASE_URL}}/event/{{event.str_id}}">
+                <img itemprop="image" style="width:250px" src="{{event.image_url | default_if_none:event.bodies.first.image_url }}">
+            </a>
+        </div>
     </li>
 {% endfor %}
 </ul>
