@@ -22,7 +22,7 @@
 
 <div>
 <h2 itemprop="name">{{event.name}}</h2>
-<img itemprop="image" style="width:350px" src="{{event.image_url}}">
+<img itemprop="image" style="width:350px" src="{{event.image_url | default_if_none:event.bodies.first.image_url }}">
 </div>
 
 <div>
