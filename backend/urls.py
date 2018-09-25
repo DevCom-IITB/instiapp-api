@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.sitemaps.views import sitemap
 from rest_framework_swagger.views import get_swagger_view
+from backend.sitemap import sitemaps
 
 from bodies.views import BodyViewSet
 from bodies.views import BodyFollowersViewSet
@@ -118,4 +120,7 @@ urlpatterns = [
 
     # -------------- DOCS -------------------- #
     path('docs/', get_swagger_view(title='InstiApp API')),
+
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps()},
+     name='django.contrib.sitemaps.views.sitemap')
 ]

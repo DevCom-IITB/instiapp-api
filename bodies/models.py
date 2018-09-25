@@ -8,6 +8,8 @@ class Body(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     str_id = models.CharField(max_length=50, editable=False, null=True)
+    time_of_creation = models.DateTimeField(auto_now_add=True)
+    time_of_modification = models.DateTimeField(auto_now=True)
 
     name = models.CharField(max_length=50)
     short_description = models.CharField(max_length=50, blank=True)
@@ -23,6 +25,9 @@ class Body(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return '/org/' + self.str_id
 
     class Meta:
         verbose_name = "Body"
