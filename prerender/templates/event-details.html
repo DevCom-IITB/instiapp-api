@@ -35,9 +35,9 @@
 {% for venue in event.venues.all  %}
     <div itemprop="location" itemscope itemtype="http://schema.org/Place">
         <span itemprop="name">{{venue.name}}</span>
-        <div class="address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-            <span style="display: none" itemprop="streetAddress">{{venue.name}}</span>
-        </div>
+        <span class="address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+            <meta itemprop="streetAddress" content="{{venue.name}}">
+        </span>
     </div>
 {% endfor %}
 </div>
