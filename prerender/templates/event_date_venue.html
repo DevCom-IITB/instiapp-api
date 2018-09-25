@@ -4,9 +4,9 @@ to
 {% for venue in event.venues.all  %}
     <span itemprop="location" itemscope itemtype="http://schema.org/Place">
         <span itemprop="name">{{venue.name}}</span>
-        <span class="address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-            <meta itemprop="streetAddress" content="{{venue.name}}">
-        </span>
+        {%with venue=venue settings=settings template_name="venue-meta.html" %}
+            {%include template_name%}
+        {%endwith%}
     </span>
 {% endfor %}
 
