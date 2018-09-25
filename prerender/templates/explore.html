@@ -22,13 +22,29 @@ Find Organizations, Events and People<br>
 
 <ul>
 {% for body in bodies %}
-    <li>
-        <b><a href="/org/{{body.str_id}}">{{body.name}}</a></b><br>
-        {{body.short_description}}<br>
+    <li itemscope itemtype="http://schema.org/Organization">
+        <div>
+            <a itemprop="url" href="{{settings.BASE_URL}}/org/{{body.str_id}}">
+                <span itemprop="name"><b>{{body.name}}</b></span>
+            </a>
+        </div>
+
+        <div itemprop="description">
+            {{body.short_description}}
+        </div>
+
         {% if body.image_url %}
-            <a href="/org/{{body.str_id}}">
-                <img style="width:100px;" src="{{body.image_url}}">
-            </a><br>
+        <div>
+            <a href="{{settings.BASE_URL}}/org/{{body.str_id}}">
+                <img itemprop="logo" style="width:100px;" src="{{body.image_url}}">
+            </a>
+        </div>
+        {% endif %}
+
+        {% if body.website_url  %}
+        <div>
+            <a itemprop="sameAs" href="{{body.website_url}}">{{body.name}} Website</a><br>
+        </div>
         {% endif %}
         <br>
     </li>
