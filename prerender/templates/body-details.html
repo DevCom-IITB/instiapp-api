@@ -15,46 +15,83 @@
     <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
 </head>
 
-<body>
+<body itemscope itemtype="http://schema.org/Organization">
 
-<h2>{{body.name}}</h2>
-{{body.short_description}}<br>
-<br>
-{{body.description}}<br>
-<br>
+<h2 itemprop="name">{{body.name}}</h2>
+<div>{{body.short_description}}</div>
 
-<img style="width:250px" src="{{body.image_url}}"><br>
 <br>
 
-<h3>Events</h3>
-{% for event in events  %}
-<a href="/event/{{event.str_id}}">{{event.name}}</a>, {{event.start_time}} to {{event.end_time}}<br>
-{% endfor %}
+<div itemprop="description">{{body.description}}</div>
+
+<img itemprop="logo" style="width:250px" src="{{body.image_url}}">
+
+<br><br>
+
+<div>
+    <h3>Events</h3>
+    {% for event in events  %}
+        <div itemprop="event" itemscope itemtype="http://schema.org/Event">
+            <a itemprop="url" href="{{settings.BASE_URL}}/event/{{event.str_id}}">
+                <span itemprop="name">{{event.name}}</span>
+            </a>
+
+            {%with event=event settings=settings template_name="event_date_venue.html" %}
+                {%include template_name%}
+            {%endwith%}
+
+            <meta itemprop="description" content="{{event.description}}">
+            <meta itemprop="image" content="{{event.image_url | default_if_none:event.bodies.first.image_url }}">
+        </div>
+    {% endfor %}
+</div>
 
 <!-- cbr is ChildBodyRelation -->
-<h3>Children</h3>
-{% for cbr in body.children.all  %}
-<a href="/org/{{cbr.child.str_id}}">{{cbr.child.name}}</a><br>
-{% endfor %}
+<div>
+    <h3>Children</h3>
+    {% for cbr in body.children.all  %}
+        <div itemprop="subOrganization" itemscope itemtype="http://schema.org/Organization">
+            <a itemprop="url" href="{{settings.BASE_URL}}/org/{{cbr.child.str_id}}">
+                <span itemprop="name">{{cbr.child.name}}</span>
+            </a>
+        </div>
+    {% endfor %}
+</div>
 
-<h3>Part of</h3>
-{% for cbr in body.parents.all  %}
-<a href="/org/{{cbr.parent.str_id}}">{{cbr.parent.name}}</a><br>
-{% endfor %}
+<div>
+    <h3>Part of</h3>
+    {% for cbr in body.parents.all  %}
+        <div itemprop="parentOrganization" itemscope itemtype="http://schema.org/Organization">
+            <a itemprop="url" href="{{settings.BASE_URL}}/org/{{cbr.parent.str_id}}">
+                <span itemprop="name">{{cbr.parent.name}}</span>
+            </a>
+        </div>
+    {% endfor %}
+</div>
 
-<h3>People</h3>
-{% for role in body.roles.all  %}
-    <h4>{{role.name}}</h4>
-    {% for user in role.users.all  %}
+<div>
+    <h3>People</h3>
+    {% for role in body.roles.all  %}
+        <h4>{{role.name}}</h4>
+        {% for user in role.users.all  %}
+            <div itemprop="member" itemscope itemtype="http://schema.org/Person">
+                <a itemprop="url" href="{{settings.BASE_URL}}/user/{{user.ldap_id | default_if_none:user.id }}">
+                    <span itemprop="name">{{user.name}}</span>
+                </a>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
 
-    {% if user.ldap_id %}
-        <a href="/user/{{user.ldap_id}}">{{user.name}}</a><br>
-    {% else %}
-        <a href="/user/{{user.id}}">{{user.name}}</a><br>
+<br>
+
+<div>
+    {% if body.website_url  %}
+        <a itemprop="sameAs" href="{{body.website_url}}">Website</a> <br />
     {% endif %}
 
-    {% endfor %}
-{% endfor %}
+    <a itemprop="url" href="{{settings.BASE_URL}}/org/{{body.str_id}}">Canonical Link</a>
+</div>
 
 {%include "links.html" %}
 
