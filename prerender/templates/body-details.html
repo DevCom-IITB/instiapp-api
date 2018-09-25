@@ -78,6 +78,7 @@
                 <a itemprop="url" href="{{settings.BASE_URL}}/user/{{user.ldap_id | default_if_none:user.id }}">
                     <span itemprop="name">{{user.name}}</span>
                 </a>
+                <meta itemprop="jobTitle" content="{{role.name}}">
             </div>
         {% endfor %}
     {% endfor %}
