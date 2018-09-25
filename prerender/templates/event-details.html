@@ -17,13 +17,9 @@
     <meta property="og:end_time" content="{{event.end_time.isoformat}}" />
 
     <style>
-        img.head {
-            width:350px;
-            max-width: 100%;
-        }
-        div {
-            margin: 10px 0;
-        }
+        img.head { width:350px; max-width: 100%; }
+        div { margin: 10px 0; }
+        .description { white-space: pre-line; }
     </style>
 </head>
 
@@ -52,7 +48,7 @@
 </div>
 
 {% load markdownify %}
-<div itemprop="description">
+<div class="description" itemprop="description">
     {{event.description | markdownify}}
 </div>
 

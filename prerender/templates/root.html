@@ -13,6 +13,10 @@
     <meta property="og:url" content="{{settings.BASE_URL}}" />
     <meta property="og:image" content="{{settings.LOGO_URL}}" />
     <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
+
+    <style>
+        img.head { width:350px; max-width: 100%; }
+    </style>
 </head>
 
 <body>
@@ -46,7 +50,7 @@
 
         <div>
             <a href="{{settings.BASE_URL}}/event/{{event.str_id}}">
-                <img itemprop="image" style="width:250px" src="{{event.image_url | default_if_none:event.bodies.first.image_url }}">
+                <img itemprop="image" class="head" src="{{event.image_url | default_if_none:event.bodies.first.image_url }}">
             </a>
         </div>
     </li>

@@ -13,6 +13,12 @@
     <meta property="og:url" content="{{settings.BASE_URL}}/org/{{body.str_id}}" />
     <meta property="og:image" content="{{body.image_url}}" />
     <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
+
+    <style>
+        img.head { width:350px; max-width: 100%; }
+        div { margin: 10px 0; }
+        .description { white-space: pre-line; }
+    </style>
 </head>
 
 <body itemscope itemtype="http://schema.org/Organization">
@@ -23,9 +29,11 @@
 <br>
 
 {% load markdownify %}
-<div itemprop="description">{{body.description | markdownify}}</div>
+<div class="description" itemprop="description">
+    {{body.description | markdownify}}
+</div>
 
-<img itemprop="logo" style="width:250px" src="{{body.image_url}}">
+<img itemprop="logo" class="head" src="{{body.image_url}}">
 
 <br><br>
 
