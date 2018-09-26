@@ -1,4 +1,5 @@
 """Full serializer for UserProfile with detailed information and events."""
+from django.conf import settings
 from rest_framework import serializers
 from events.prioritizer import get_r_fresh_prioritized_events
 from users.models import UserProfile
@@ -55,3 +56,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
             'followed_bodies', 'roles', 'roles__body', 'roles__body__children', 'roles__users',
             'former_roles', 'former_roles__body')
         return queryset
+
+    def to_representation(self, instance):
+        return settings.USER_PROFILE_FULL_SERIALIZER_TRANSFORM(
+            super().to_representation(instance))
