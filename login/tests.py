@@ -1,11 +1,12 @@
 import time
+import random
 from subprocess import Popen
 from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 from users.models import UserProfile
 
 def get_new_user():
-    user = User.objects.create(username="TestUser" + str(time.time()))
+    user = User.objects.create(username="TestUser" + str(time.time() + random.randint(1, 2e6)))
     UserProfile.objects.create(name="TestUserProfile", user=user)
     return user
 
