@@ -25,8 +25,10 @@ class PrerenderTestCase(APITestCase):
         self.news1 = NewsEntry.objects.create(guid="https://test.com", title="NewsIsGreat",
                         body=self.test_body, blog_url="https://blog", link="https://blog-item")
 
-        parent_body = Body.objects.create(name="Child")
+        parent_body = Body.objects.create(name="Parent")
+        grandparent_body = Body.objects.create(name="GrandParent")
         BodyChildRelation.objects.create(parent=parent_body, child=self.test_body)
+        BodyChildRelation.objects.create(parent=grandparent_body, child=parent_body)
 
     def test_root(self):
         """Root page prerender test."""
