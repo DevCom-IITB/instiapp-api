@@ -6,9 +6,7 @@
 <ul>
 {% for cbr in body.children.all  %}
     <li>
-        {%with body=cbr.child template_name="body-tree-data.html" %}
-            {%include template_name%}
-        {%endwith%}
+        {% include "body-tree-data.html" with body=cbr.child %}
     </li>
 {% endfor %}
 </ul>

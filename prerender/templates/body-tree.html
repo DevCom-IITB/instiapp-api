@@ -32,9 +32,7 @@
 
 <button onclick="toggleImages()">Toggle Images</button><br><br>
 
-{%with body=body settings=settings template_name="body-tree-data.html" %}
-    {%include template_name%}
-{%endwith%}
+{% include "body-tree-data.html" with body=body %}
 
 </body>
 </html>
