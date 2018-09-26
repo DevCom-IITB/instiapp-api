@@ -30,9 +30,7 @@
         <a itemprop="url" href="{{settings.BASE_URL}}/event/{{event.str_id}}">
             <span itemprop="name">{{event.name}}</span>
         </a>
-        {%with event=event settings=settings template_name="event_date_venue.html" %}
-            {%include template_name%}
-        {%endwith%}
+        {%include "event_date_venue.html" with event=event settings=settings %}
         <meta itemprop="description" content="{{event.description}}">
 
         <br>

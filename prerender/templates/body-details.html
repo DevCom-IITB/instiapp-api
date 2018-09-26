@@ -45,9 +45,7 @@
                 <span itemprop="name">{{event.name}}</span>
             </a>
 
-            {%with event=event settings=settings template_name="event_date_venue.html" %}
-                {%include template_name%}
-            {%endwith%}
+            {%include "event_date_venue.html" with event=event settings=settings%}
 
             <meta itemprop="description" content="{{event.description}}">
             <meta itemprop="image" content="{{event.image_url | default_if_none:event.bodies.first.image_url }}">
