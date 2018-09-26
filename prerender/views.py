@@ -26,11 +26,12 @@ def get_body_breadcrumb(body, index=0):
     """Gets a trail of breadcrumb from a body."""
     trails = []
     for parent in body.parents.all():
-        for bread in get_body_breadcrumb(parent.parent):
+        big_bread = get_body_breadcrumb(parent.parent)
+        for bread in big_bread:
             bread.append(Crumb().fromObj(body, bread[-1].index + 1))
             trails.append(bread)
-    if not trails:
-        trails.append([Crumb().fromObj(body, 1)])
+        if not big_bread:
+            trails.append([Crumb().fromObj(body, 1)])
     return trails
 
 def get_event_breadcrumb(event):
