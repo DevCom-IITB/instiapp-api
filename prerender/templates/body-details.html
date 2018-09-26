@@ -103,6 +103,10 @@
     <a itemprop="url" href="{{settings.BASE_URL}}/org/{{body.str_id}}">Canonical Link</a>
 </div>
 
+<div>
+    {%include "breadcrumb.html" with bread=bread %}
+</div>
+
 {%include "links.html" %}
 
 </body>

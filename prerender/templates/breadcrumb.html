@@ -1,0 +1,13 @@
+{% for trail in bread  %}
+<ol itemscope itemtype="http://schema.org/BreadcrumbList">
+    {% for crumb in trail  %}
+    <li itemprop="itemListElement" itemscope
+        itemtype="http://schema.org/ListItem">
+      <a itemtype="http://schema.org/Thing"
+         itemprop="item" href="{{ crumb.url }}">
+          <span itemprop="name">{{ crumb.name }}</span></a>
+      <meta itemprop="position" content="{{ crumb.index }}" />
+    </li>
+    {% endfor %}
+</ol>
+{% endfor %}
