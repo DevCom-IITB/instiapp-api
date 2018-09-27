@@ -33,7 +33,8 @@ class RoleSerializer(serializers.ModelSerializer):
         """Returns an array including a body and its children."""
         for child_body_relation in body.children.all():
             cls.get_children_recursive(child_body_relation.child, children)
-        children.append(body)
+        if body not in children:
+            children.append(body)
         return children
 
 class RoleSerializerWithEvents(serializers.ModelSerializer):
