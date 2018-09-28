@@ -1,7 +1,7 @@
 """Serializers for Body and BodyChildRelation."""
 from rest_framework import serializers
 from django.db.models import Count
-from events.prioritizer import get_r_fresh_prioritized_events
+from events.prioritizer import get_fresh_prioritized_events
 from bodies.models import Body
 from bodies.serializer_min import BodySerializerMin
 from helpers.misc import sort_by_field
@@ -40,8 +40,8 @@ class BodySerializer(serializers.ModelSerializer):
     def get_events(self, obj):
         """Gets filtred events."""
         from events.serializers import EventSerializer
-        return EventSerializer(get_r_fresh_prioritized_events(
-            obj.events, self.context['request']), many=True, read_only=True).data
+        return EventSerializer(get_fresh_prioritized_events(
+            obj.events, self.context['request'], delta=365), many=True, read_only=True).data
 
     @staticmethod
     def setup_eager_loading(queryset):
