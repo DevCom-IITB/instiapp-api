@@ -46,10 +46,9 @@ class UploadedImage(models.Model):
 
         # Resize
         factor = min(MAX_DIM / height, MAX_DIM / width)
-        if factor >= 0.85:
-            return
-        size = (int(width * factor), int(height * factor))
-        image = image.resize(size, Image.ANTIALIAS)
+        if factor < 0.85:
+            size = (int(width * factor), int(height * factor))
+            image = image.resize(size, Image.ANTIALIAS)
 
-        # Save
-        image.save(path)
+            # Save
+            image.save(path)
