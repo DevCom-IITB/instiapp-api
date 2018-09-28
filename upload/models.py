@@ -5,7 +5,7 @@ from PIL import Image
 
 def get_image_path(instance, filename):
     userid = str(instance.uploaded_by.id)
-    return './' + userid[0:2] + '/' + userid[2:4] + '/' + userid + '-' + filename
+    return './' + userid[0:2] + '/' + userid[2:4] + '/' + userid + '-' + filename + '.jpg'
 
 class UploadedImage(models.Model):
     """An uploaded file."""
@@ -27,21 +27,20 @@ class UploadedImage(models.Model):
 
         # Resize Image
         if self.pk and self.picture:
-            self.resize(self.picture.path)
+            self.resize_convert(self.picture.path)
 
         return saved
 
     def __str__(self):
         return str(self.time_of_creation)
 
-    @staticmethod
-    def resize(path):
-        """Resize image."""
+    def resize_convert(self, path):
+        """Resize image and convert to JPG."""
         # Maximum Dimension
         MAX_DIM = 800
 
         # Load image
-        image = Image.open(path)
+        image = Image.open(path).convert('RGB')
         (width, height) = image.size
 
         # Resize
@@ -50,5 +49,5 @@ class UploadedImage(models.Model):
             size = (int(width * factor), int(height * factor))
             image = image.resize(size, Image.ANTIALIAS)
 
-            # Save
-            image.save(path)
+        # Save
+        image.save(path, 'JPEG', quality=90, optimize=True, progressive=True)
