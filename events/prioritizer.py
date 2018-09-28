@@ -54,7 +54,7 @@ def get_prioritized(queryset, request):
                     body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * start_time_factor))
             event.weight += body_bonus
 
-    return sorted(queryset, key=lambda event: (-event.weight, event.start_time))
+    return sorted(queryset, key=lambda event: (event.weight, event.start_time), reverse=True)
 
 def get_fresh_events(queryset, delta=3):
     """Gets events after removing stale ones."""
