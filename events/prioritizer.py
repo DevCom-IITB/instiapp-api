@@ -61,10 +61,6 @@ def get_fresh_events(queryset, delta=3):
     return queryset.filter(
         archived=False, end_time__gte=timezone.now() - timedelta(days=delta))
 
-def get_fresh_prioritized_events(queryset, request):
+def get_fresh_prioritized_events(queryset, request, delta=3):
     """Gets fresh events with prioritization."""
-    return get_prioritized(get_fresh_events(queryset), request)
-
-def get_r_fresh_prioritized_events(queryset, request):
-    """Get relatively fresh events with prioritization. Very old events are removed."""
-    return get_prioritized(get_fresh_events(queryset, 30), request)
+    return get_prioritized(get_fresh_events(queryset, delta=delta), request)

@@ -1,7 +1,7 @@
 """Full serializer for UserProfile with detailed information and events."""
 from django.conf import settings
 from rest_framework import serializers
-from events.prioritizer import get_r_fresh_prioritized_events
+from events.prioritizer import get_fresh_prioritized_events
 from users.models import UserProfile
 from roles.serializers import RoleSerializer
 from roles.serializers import RoleSerializerMinAlt
@@ -46,8 +46,8 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         """Returns serialized events for given status."""
         from events.serializers import EventSerializer
         request = self.context['request']
-        return EventSerializer(get_r_fresh_prioritized_events(
-            obj.followed_events.filter(ues__status=status), request), many=True).data
+        return EventSerializer(get_fresh_prioritized_events(
+            obj.followed_events.filter(ues__status=status), request, delta=60), many=True).data
 
     @staticmethod
     def setup_eager_loading(queryset):
