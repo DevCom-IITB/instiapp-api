@@ -13,7 +13,6 @@ class UploadedImageSerializer(serializers.ModelSerializer):
         fields = ('id', 'picture')
 
     def create(self, validated_data):
+        validated_data['uploaded_by'] = self.context['request'].user.profile
         result = super().create(validated_data)
-        result.uploaded_by = self.context['request'].user.profile
-        result.save()
         return result
