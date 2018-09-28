@@ -107,6 +107,116 @@ paths:
         '200': {description: ''}
       summary: List followers of body.
       tags: [bodies]
+  /api/comments/{id}:
+    delete:
+      description: Delete a comment by the current user.
+      operationId: comments_delete
+      parameters:
+      - {description: A UUID string identifying this Comment., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '204': {description: ''}
+      summary: Delete a comment by the current user.
+      tags: [comments]
+    get:
+      description: Get a single comment.
+      operationId: comments_read
+      parameters:
+      - {description: A UUID string identifying this Comment., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '200': {description: ''}
+      summary: Get a single comment.
+      tags: [comments]
+    put:
+      consumes: [application/json]
+      description: Update a comment if created by current user.
+      operationId: comments_update
+      parameters:
+      - {description: A UUID string identifying this Comment., in: path, name: id,
+        required: true, type: string}
+      - in: body
+        name: data
+        schema:
+          properties:
+            text: {description: '', type: string}
+          required: [text]
+          type: object
+      responses:
+        '200': {description: ''}
+      summary: Update a comment if created by current user.
+      tags: [comments]
+  /api/complaints:
+    get:
+      description: 'Get a list of non-deleted complaints.
+
+        To filter by current user, add a query parameter {?filter}'
+      operationId: complaints_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Get a list of non-deleted complaints.
+      tags: [complaints]
+    post:
+      consumes: [application/json]
+      operationId: complaints_create
+      parameters:
+      - in: body
+        name: data
+        schema:
+          properties:
+            description: {description: '', type: string}
+            latitude: {description: '', type: number}
+            location_description: {description: '', type: string}
+            longitude: {description: '', type: number}
+          type: object
+      responses:
+        '201': {description: ''}
+      tags: [complaints]
+  /api/complaints/{id}:
+    get:
+      operationId: complaints_read
+      parameters:
+      - {description: A UUID string identifying this Complaint., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '200': {description: ''}
+      tags: [complaints]
+    put:
+      consumes: [application/json]
+      operationId: complaints_update
+      parameters:
+      - {description: A UUID string identifying this Complaint., in: path, name: id,
+        required: true, type: string}
+      - in: body
+        name: data
+        schema:
+          properties:
+            description: {description: '', type: string}
+            latitude: {description: '', type: number}
+            location_description: {description: '', type: string}
+            longitude: {description: '', type: number}
+          type: object
+      responses:
+        '200': {description: ''}
+      tags: [complaints]
+  /api/complaints/{id}/comments:
+    post:
+      consumes: [application/json]
+      operationId: complaints_comments_create
+      parameters:
+      - {description: A UUID string identifying this Comment., in: path, name: id,
+        required: true, type: string}
+      - in: body
+        name: data
+        schema:
+          properties:
+            text: {description: '', type: string}
+          required: [text]
+          type: object
+      responses:
+        '201': {description: ''}
+      tags: [complaints]
   /api/events:
     get:
       description: 'List Events.
