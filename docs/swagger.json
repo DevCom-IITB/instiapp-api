@@ -243,6 +243,261 @@
         ]
       }
     },
+    "/api/comments/{id}": {
+      "get": {
+        "operationId": "comments_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Comment.",
+            "type": "string"
+          }
+        ],
+        "description": "Get a single comment.",
+        "summary": "Get a single comment.",
+        "tags": [
+          "comments"
+        ]
+      },
+      "put": {
+        "operationId": "comments_update",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Comment.",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "description": "Update a comment if created by current user.",
+        "summary": "Update a comment if created by current user.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "comments"
+        ]
+      },
+      "delete": {
+        "operationId": "comments_delete",
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Comment.",
+            "type": "string"
+          }
+        ],
+        "description": "Delete a comment by the current user.",
+        "summary": "Delete a comment by the current user.",
+        "tags": [
+          "comments"
+        ]
+      }
+    },
+    "/api/complaints": {
+      "get": {
+        "operationId": "complaints_list",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "Get a list of non-deleted complaints.\nTo filter by current user, add a query parameter {?filter}",
+        "summary": "Get a list of non-deleted complaints.",
+        "tags": [
+          "complaints"
+        ]
+      },
+      "post": {
+        "operationId": "complaints_create",
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "description": "",
+                  "type": "string"
+                },
+                "latitude": {
+                  "description": "",
+                  "type": "number"
+                },
+                "longitude": {
+                  "description": "",
+                  "type": "number"
+                },
+                "location_description": {
+                  "description": "",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "complaints"
+        ]
+      }
+    },
+    "/api/complaints/{id}": {
+      "get": {
+        "operationId": "complaints_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Complaint.",
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "complaints"
+        ]
+      },
+      "put": {
+        "operationId": "complaints_update",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Complaint.",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "description": "",
+                  "type": "string"
+                },
+                "latitude": {
+                  "description": "",
+                  "type": "number"
+                },
+                "longitude": {
+                  "description": "",
+                  "type": "number"
+                },
+                "location_description": {
+                  "description": "",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "complaints"
+        ]
+      }
+    },
+    "/api/complaints/{id}/comments": {
+      "post": {
+        "operationId": "complaints_comments_create",
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Comment.",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "complaints"
+        ]
+      }
+    },
     "/api/events": {
       "get": {
         "operationId": "events_list",
