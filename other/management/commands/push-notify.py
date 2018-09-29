@@ -61,6 +61,7 @@ class Command(BaseCommand):
                 # Default values
                 notification_type = None
                 notification_id = None
+                notification_extra = None
 
                 # Get information about actor
                 actor = notification.actor
@@ -70,12 +71,14 @@ class Command(BaseCommand):
                         title = actor.name
                     if isinstance(actor, (BlogEntry, NewsEntry)):
                         title = actor.title
+                        notification_extra = actor.link
                     notification_id = str(actor.id)
 
                 # Construct the data message
                 data_message = {
                     "type": notification_type,
-                    "id": notification_id
+                    "id": notification_id,
+                    "extra": notification_extra
                 }
 
                 # Send FCM push notification
