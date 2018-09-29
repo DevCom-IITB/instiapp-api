@@ -57,20 +57,19 @@ class Command(BaseCommand):
 
                 # Get title
                 title = "InstiApp"
+
+                # Default values
                 notification_type = None
                 notification_id = None
+
+                # Get information about actor
                 actor = notification.actor
-                if isinstance(actor, Event):
-                    title = actor.name
-                    notification_type = "event"
-                    notification_id = str(actor.id)
-                if isinstance(actor, BlogEntry):
-                    title = actor.title
-                    notification_type = "blog-entry"
-                    notification_id = str(actor.id)
-                if isinstance(actor, NewsEntry):
-                    title = actor.title
-                    notification_type = "news-entry"
+                if actor is not None:
+                    notification_type = actor.__class__.__name__.lower()
+                    if isinstance(actor, Event):
+                        title = actor.name
+                    if isinstance(actor, (BlogEntry, NewsEntry)):
+                        title = actor.title
                     notification_id = str(actor.id)
 
                 # Construct the data message
