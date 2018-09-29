@@ -78,7 +78,8 @@ class Command(BaseCommand):
                 data_message = {
                     "type": notification_type,
                     "id": notification_id,
-                    "extra": notification_extra
+                    "extra": notification_extra,
+                    "notification_id": str(notification.id)
                 }
 
                 # Send FCM push notification
