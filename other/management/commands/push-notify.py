@@ -73,6 +73,12 @@ class Command(BaseCommand):
                     notification_type = "news-entry"
                     notification_id = str(actor.id)
 
+                # Construct the data message
+                data_message = {
+                    "type": notification_type,
+                    "id": notification_id
+                }
+
                 # Send FCM push notification
                 try:
                     registration_id = profile.fcm_id
@@ -80,7 +86,7 @@ class Command(BaseCommand):
                     message_body = notification.verb
                     push_service.notify_single_device(
                         registration_id=registration_id, message_title=message_title,
-                        message_body=message_body, sound='default')
+                        message_body=message_body, data_message=data_message, sound='default')
                     fcm += 1
                 except Exception as ex:
                     print(profile.name, ex)
@@ -105,13 +111,7 @@ class Command(BaseCommand):
                             "body": notification.verb,
                             "icon": "assets/logo-sq-sm.png",
                             "vibrate": [100, 50, 100],
-                            "data": {
-                                "primaryKey": 1
-                            }
-                        },
-                        "data": {
-                            "type": notification_type,
-                            "id": notification_id
+                            "data": data_message
                         }
                     }
 
