@@ -4,6 +4,7 @@ from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.utils import timezone
+from bs4 import BeautifulSoup
 from pywebpush import webpush, WebPushException
 from pyfcm import FCMNotification
 from users.models import UserProfile
@@ -66,6 +67,7 @@ class Command(BaseCommand):
                 # Rich fields
                 is_rich = False
                 notification_large_icon = None
+                notification_large_content = None
 
                 # Get information about actor
                 actor = notification.actor
@@ -89,6 +91,9 @@ class Command(BaseCommand):
                     # Rich field for news entry
                     if isinstance(actor, NewsEntry):
                         notification_large_icon = actor.body.image_url
+                        notification_large_content = BeautifulSoup(actor.content).text
+                        if len(notification_large_content) > 250:
+                            notification_large_content = notification_large_content[:250] + ' ...'
 
                     notification_id = str(actor.id)
 
@@ -106,6 +111,9 @@ class Command(BaseCommand):
                 if notification_large_icon is not None:
                     is_rich = True
                     data_message['large_icon'] = notification_large_icon
+                if notification_large_content is not None:
+                    is_rich = True
+                    data_message['large_content'] = notification_large_content
 
                 # Send FCM push notification
                 try:
