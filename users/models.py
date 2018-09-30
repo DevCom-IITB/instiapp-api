@@ -37,6 +37,8 @@ class UserProfile(models.Model):
     hostel = models.CharField(max_length=100, null=True, blank=True)
     room = models.CharField(max_length=30, null=True, blank=True)
 
+    android_version = models.IntegerField(null=True, blank=True)
+
     class Meta:
         verbose_name = "Profile"
         verbose_name_plural = "Profiles"
