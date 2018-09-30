@@ -159,4 +159,5 @@ class Command(BaseCommand):
                         failed += 1
                         subscription.delete()
 
-        print("Sent:", sent, "Failed:", failed, "FCM", fcm, "NoFCM:", badfcm)
+        print("WebPush:", sent, "WebPush FAIL:", failed, "FCM", fcm, "FCM FAIL:", badfcm)
+        self.stdout.write(self.style.SUCCESS('Push notification chore completed successfully'))
