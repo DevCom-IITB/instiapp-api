@@ -10,7 +10,11 @@ class Command(BaseCommand):
     help = 'Sends push notifications of event starting'
 
     def handle(self, *args, **options):
+        # Initiate connection
         push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
+
+        # Maintain a count
+        count = 0
 
         # Iterate all upcoming events
         for event in Event.objects.filter(
@@ -44,5 +48,9 @@ class Command(BaseCommand):
                     # Send rich notification
                     registration_id = profile.fcm_id
                     push_service.notify_single_device(registration_id=registration_id, data_message=data_message)
+                    count += 1
                 except Exception as ex:
                     print(profile.name, ex)
+
+        print('Sent', count, 'rich notifications')
+        self.stdout.write(self.style.SUCCESS('Event starting chore completed successfully'))
