@@ -104,10 +104,11 @@ class UserTestCase(APITestCase):
     def test_get_noauth(self):
         """Test privacy with no auth."""
         self.client.logout()
-        profile = UserProfile.objects.create(name="TestUser", email="user@user.com")
+        profile = UserProfile.objects.create(name="TestUser", email="user@user.com", contact_no="9876543210")
         url = '/api/users/' + str(profile.id)
         response = self.client.get(url, format='json')
         self.assertNotEqual(response.data['email'], profile.email)
+        self.assertNotEqual(response.data['contact_no'], profile.contact_no)
 
     def test_notifications(self):
         """Test push notification models."""

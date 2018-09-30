@@ -64,6 +64,7 @@ class PrerenderTestCase(APITestCase):
         self.assertContains(response, self.test_profile.name)
         self.assertContains(response, self.test_profile.roll_no)
         self.assertNotContains(response, self.test_profile.email)
+        self.assertNotContains(response, self.test_profile.contact_no)
 
         url = '/user/' + str(self.test_profile.ldap_id)
         self.assertEqual(self.client.get(url).content, response.content)

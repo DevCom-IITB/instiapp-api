@@ -14,6 +14,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     from bodies.models import Body
 
     email = serializers.SerializerMethodField()
+    contact_no = serializers.SerializerMethodField()
 
     events_interested = serializers.SerializerMethodField()
     get_events_interested = lambda self, obj: self.get_events(obj, 1)
@@ -40,6 +41,12 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         """Gets the email only if a user is logged in."""
         if self.context['request'].user.is_authenticated:
             return obj.email
+        return 'N/A'
+
+    def get_contact_no(self, obj):
+        """Gets contact no only if a user is logged in."""
+        if self.context['request'].user.is_authenticated:
+            return obj.contact_no
         return 'N/A'
 
     def get_events(self, obj, status):
