@@ -63,15 +63,33 @@ class Command(BaseCommand):
                 notification_id = None
                 notification_extra = None
 
+                # Rich fields
+                is_rich = False
+                notification_large_icon = None
+
                 # Get information about actor
                 actor = notification.actor
                 if actor is not None:
+                    # Infer notification type from actor class
                     notification_type = actor.__class__.__name__.lower()
+
+                    # Event
                     if isinstance(actor, Event):
                         title = actor.name
+                        # Rich notifications
+                        bodies = actor.bodies.all()
+                        if bodies.exists():
+                            notification_large_icon = bodies[0].image_url
+
+                    # News/Blog Entry
                     if isinstance(actor, (BlogEntry, NewsEntry)):
                         title = actor.title
                         notification_extra = actor.link
+
+                    # Rich field for news entry
+                    if isinstance(actor, NewsEntry):
+                        notification_large_icon = actor.body.image_url
+
                     notification_id = str(actor.id)
 
                 # Construct the data message
@@ -84,14 +102,26 @@ class Command(BaseCommand):
                     "verb": notification.verb
                 }
 
+                # Set rich fields if present
+                if notification_large_icon is not None:
+                    is_rich = True
+                    data_message['large_icon'] = notification_large_icon
+
                 # Send FCM push notification
                 try:
                     registration_id = profile.fcm_id
                     message_title = title
                     message_body = notification.verb
-                    push_service.notify_single_device(
-                        registration_id=registration_id, message_title=message_title,
-                        message_body=message_body, data_message=data_message, sound='default')
+
+                    # Check if the user supports rich notifications
+                    if is_rich and profile.android_version >= 17:
+                        push_service.notify_single_device(
+                            registration_id=registration_id, data_message=data_message)
+                    else:
+                        push_service.notify_single_device(
+                            registration_id=registration_id, message_title=message_title,
+                            message_body=message_body, data_message=data_message, sound='default')
+
                     fcm += 1
                 except Exception as ex:
                     print(profile.name, ex)
