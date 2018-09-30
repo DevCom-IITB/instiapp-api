@@ -24,6 +24,11 @@ def send_push(subscription, payload):
         }
     )
 
+def get_news_image(news):
+    if 'yt:video' in news.guid:
+        return 'https://img.youtube.com/vi/' + news.guid.split('video:')[1] + '/maxresdefault.jpg'
+    return None
+
 class Command(BaseCommand):
     help = 'Sends push notifications'
 
@@ -68,6 +73,7 @@ class Command(BaseCommand):
                 is_rich = False
                 notification_large_icon = None
                 notification_large_content = None
+                notification_image = None
 
                 # Get information about actor
                 actor = notification.actor
@@ -94,6 +100,7 @@ class Command(BaseCommand):
                         notification_large_content = BeautifulSoup(actor.content, features='html5lib').text
                         if len(notification_large_content) > 250:
                             notification_large_content = notification_large_content[:250] + ' ...'
+                        notification_image = get_news_image(actor)
 
                     notification_id = str(actor.id)
 
@@ -114,6 +121,9 @@ class Command(BaseCommand):
                 if notification_large_content is not None:
                     is_rich = True
                     data_message['large_content'] = notification_large_content
+                if notification_image is not None:
+                    is_rich = True
+                    data_message['image_url'] = notification_image
 
                 # Send FCM push notification
                 try:
