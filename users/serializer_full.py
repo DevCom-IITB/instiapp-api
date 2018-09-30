@@ -32,7 +32,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ('id', 'name', 'profile_pic', 'events_interested',
                   'events_going', 'email', 'roll_no', 'contact_no',
-                  'about', 'followed_bodies', 'fcm_id', 'roles',
+                  'about', 'followed_bodies', 'fcm_id', 'android_version', 'roles',
                   'institute_roles', 'website_url', 'ldap_id', 'hostel', 'former_roles')
 
     def get_email(self, obj):
@@ -65,4 +65,5 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         result = super().to_representation(instance)
         result.pop('fcm_id')
+        result.pop('android_version')
         return settings.USER_PROFILE_FULL_SERIALIZER_TRANSFORM(result)
