@@ -47,23 +47,6 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.data['id'], str(self.user.profile.id))
         self.assertEqual(self.user.profile.fcm_id, 'TESTINIT')
 
-        # Check PATCH
-        url = '/api/user-me'
-        data = {
-            "followed_bodies_id": [str(self.test_body.id)]
-        }
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.user.profile.followed_bodies.all()[0], self.test_body)
-
-        # Check validation
-        data = {
-            "followed_bodies_id": [str(self.test_body.id), "my-invalid-uid"]
-        }
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 400)
-        self.assertIn('error', response.data)
-
         event = Event.objects.create(
             start_time=timezone.now(), end_time=timezone.now(), created_by=self.user.profile)
 
@@ -95,7 +78,22 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], str(event.id))
 
-        # Check updating FCM Id
+        # Check updating user information
+        data = {
+            'fcm_id':'TEST1'
+        }
+        url = '/api/user-me'
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(UserProfile.objects.get(id=self.user.profile.id).fcm_id, 'TEST1')
+
+        # Check patch validation
+        data = { 'fcm_id': 'long' * 200 }
+        url = '/api/user-me'
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+
+        # Check updating FCM Id with the deprecated API
         url = '/api/user-me?fcm_id=TESTCHANGE'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
