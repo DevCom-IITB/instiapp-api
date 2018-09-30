@@ -10,7 +10,7 @@
     <meta property="og:title" content="{{event.name}}" />
     <meta property="og:type" content="event" />
     <meta property="og:url" content="{{settings.BASE_URL}}/event/{{event.str_id}}" />
-    <meta property="og:image" content="{{event.image_url}}" />
+    <meta property="og:image" content="{{event.image_url | default_if_none:event.bodies.first.image_url }}" />
     <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
 
     <meta property="og:start_time" content="{{event.start_time.isoformat}}" />
