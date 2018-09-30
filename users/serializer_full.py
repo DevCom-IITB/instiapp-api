@@ -23,8 +23,6 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     get_events_going = lambda self, obj: self.get_events(obj, 2)
 
     followed_bodies = BodySerializerMin(many=True, read_only=True)
-    followed_bodies_id = serializers.PrimaryKeyRelatedField(
-        many=True, read_only=False, queryset=Body.objects.all(), source='followed_bodies')
 
     roles = RoleSerializer(many=True, read_only=True)
     former_roles = RoleSerializerMinAlt(many=True, read_only=True)
@@ -34,7 +32,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ('id', 'name', 'profile_pic', 'events_interested',
                   'events_going', 'email', 'roll_no', 'contact_no',
-                  'about', 'followed_bodies', 'followed_bodies_id', 'roles',
+                  'about', 'followed_bodies', 'fcm_id', 'roles',
                   'institute_roles', 'website_url', 'ldap_id', 'hostel', 'former_roles')
 
     def get_email(self, obj):
@@ -65,5 +63,6 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         return queryset
 
     def to_representation(self, instance):
-        return settings.USER_PROFILE_FULL_SERIALIZER_TRANSFORM(
-            super().to_representation(instance))
+        result = super().to_representation(instance)
+        result.pop('fcm_id')
+        return settings.USER_PROFILE_FULL_SERIALIZER_TRANSFORM(result)
