@@ -79,7 +79,9 @@ class Command(BaseCommand):
                     "type": notification_type,
                     "id": notification_id,
                     "extra": notification_extra,
-                    "notification_id": str(notification.id)
+                    "notification_id": str(notification.id),
+                    "title": title,
+                    "verb": notification.verb
                 }
 
                 # Send FCM push notification
