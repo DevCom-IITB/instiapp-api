@@ -91,7 +91,7 @@ class Command(BaseCommand):
                     # Rich field for news entry
                     if isinstance(actor, NewsEntry):
                         notification_large_icon = actor.body.image_url
-                        notification_large_content = BeautifulSoup(actor.content).text
+                        notification_large_content = BeautifulSoup(actor.content, features='html5lib').text
                         if len(notification_large_content) > 250:
                             notification_large_content = notification_large_content[:250] + ' ...'
 
