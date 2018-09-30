@@ -84,7 +84,7 @@ class Command(BaseCommand):
                     # Rich notifications
                     bodies = actor.bodies.all()
                     if bodies.exists():
-                        notification_large_icon = bodies[0].image_url
+                        notification_large_icon = bodies.first().image_url
 
                 # News/Blog Entry
                 if isinstance(actor, (BlogEntry, NewsEntry)):

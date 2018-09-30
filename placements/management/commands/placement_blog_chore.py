@@ -19,7 +19,7 @@ def fill_blog(url, body_name):
     body = None
     bodies = Body.objects.filter(name=body_name)
     if bodies.exists():
-        body = bodies[0]
+        body = bodies.first()
 
     # Get the feed
     response = requests.get(url, auth=HTTPBasicAuth(
