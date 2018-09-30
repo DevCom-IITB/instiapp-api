@@ -38,6 +38,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
         user_profile = queryset.get(user=request.user)
 
+        # WARNING: DEPREACATED
         # Update fcm id if present
         if 'fcm_id' in request.GET:
             user_profile.fcm_id = request.GET['fcm_id']
