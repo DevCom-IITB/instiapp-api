@@ -35,13 +35,31 @@ class LocationTestCase(APITestCase):
     def test_location_get(self):
         """Check that only reusable locations are listed in get."""
         # Non reusable location
-        Location.objects.create(name='TestLocation1', reusable=False)
+        Location.objects.create(name='TestLocation0', reusable=False, group_id=1)
 
         url = '/api/locations'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], str(self.reusable_test_location.id))
+
+        # Reusable locations
+        Location.objects.create(name='TestLocation1', reusable=True, group_id=1)
+        Location.objects.create(name='TestLocation2', reusable=True, group_id=2)
+        Location.objects.create(name='TestLocation3', reusable=True, group_id=3)
+        Location.objects.create(name='TestLocation4', reusable=True, group_id=3)
+
+        # Get all reusable locations
+        url = '/api/locations'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 5)
+
+        # Exclude group_id 3
+        url = '/api/locations?exclude_group=3'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
 
     def test_event_link(self):
         """Test if events can be linked."""
