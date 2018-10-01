@@ -25,6 +25,9 @@ class NewsEntry(models.Model):
         verbose_name = "News Entry"
         verbose_name_plural = "News Entries"
         ordering = ("-published",)
+        indexes = [
+            models.Index(fields=['guid',]),
+        ]
 
 class UserNewsReaction(models.Model):
     """ Reaction:
