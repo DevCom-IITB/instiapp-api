@@ -106,7 +106,7 @@ urlpatterns = [
     path('api/notifications/read/<pk>', OtherViewset.as_view({'get': 'mark_notification_read'})),
 
     # -------------- COMPLAINTS --------------- #
-    path('api/', include("venter.urls")),
+    path('api/venter/', include("venter.urls")),
 
     # -------------- PRERENDER --------------- #
     path('', pr.root),
