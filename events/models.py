@@ -49,7 +49,10 @@ class Event(models.Model):
     class Meta:
         verbose_name = "Event"
         verbose_name_plural = "Events"
-        ordering = ("-time_of_creation",)
+        ordering = ("-start_time",)
+        indexes = [
+            models.Index(fields=['start_time',]),
+        ]
 
 class UserEventStatus(models.Model):
     """Associates a User and an Event, describing probabilty of attending.
