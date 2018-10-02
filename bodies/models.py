@@ -12,6 +12,7 @@ class Body(models.Model):
     time_of_modification = models.DateTimeField(auto_now=True)
 
     name = models.CharField(max_length=50)
+    canonical_name = models.CharField(max_length=50, blank=True)
     short_description = models.CharField(max_length=50, blank=True)
     description = models.TextField(blank=True)
     website_url = models.URLField(blank=True, null=True)
@@ -20,7 +21,8 @@ class Body(models.Model):
     blog_url = models.URLField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        self.str_id = get_url_friendly(self.name)
+        self.str_id = get_url_friendly(
+            self.name if not self.canonical_name else self.canonical_name)
         super(Body, self).save(*args, **kwargs)
 
     def __str__(self):
