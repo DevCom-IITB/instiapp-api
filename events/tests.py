@@ -103,6 +103,12 @@ class EventTestCase(APITestCase):
         self.user.profile.save()
         assertOrder([event2, event4])
 
+        # Test if secondary_target is working
+        me_tag.secondary_target = 'hostel'
+        me_tag.secondary_regex = '1'
+        me_tag.save()
+        assertOrder([event1, event2, event4])
+
     def test_events_list(self):
         """Test if events can be listed."""
         url = '/api/events'
