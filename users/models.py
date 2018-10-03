@@ -80,7 +80,8 @@ class UserTagCategory(models.Model):
 class UserTag(models.Model):
     """A single tag that a user can match."""
 
-    category = models.ForeignKey(UserTagCategory, on_delete=models.CASCADE)
+    name = models.CharField(max_length=30)
+    category = models.ForeignKey(UserTagCategory, on_delete=models.CASCADE, related_name='tags')
     target = models.CharField(max_length=40, choices=TAG_TARGET_CHOICES)
     regex = models.CharField(max_length=150)
     secondary_target = models.CharField(max_length=40, choices=TAG_TARGET_CHOICES, blank=True, null=True)

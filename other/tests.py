@@ -1,7 +1,7 @@
 """Unit tests for news feed."""
 from datetime import timedelta
-from freezegun import freeze_time
 import xml.etree.ElementTree as ET
+from freezegun import freeze_time
 
 from rest_framework.test import APITestCase
 from django.utils import timezone
@@ -14,6 +14,9 @@ from events.serializers import EventSerializer
 from users.models import UserProfile
 from news.models import NewsEntry
 from placements.models import BlogEntry
+
+from helpers.test_helpers import create_usertag
+from helpers.test_helpers import create_usertagcategory
 
 class OtherTestCase(APITestCase):
     """Test other endpoints."""
@@ -228,3 +231,19 @@ class OtherTestCase(APITestCase):
             for loc in [l for l in urlobj if 'loc' in l.tag]:
                 response = self.client.get(loc.text)
                 self.assertEqual(response.status_code, 200)
+
+    def test_get_user_tags(self):
+        """Test getting list of tags."""
+
+        cat1 = create_usertagcategory()
+        cat2 = create_usertagcategory()
+
+        create_usertag(cat1, '1')
+        create_usertag(cat1, '2')
+        create_usertag(cat2, 'ME', target='department')
+
+        url = '/api/user-tags'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data[0]['tags']), 2)

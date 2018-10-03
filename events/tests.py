@@ -1,8 +1,6 @@
 """Unit tests for Events."""
-from datetime import timedelta
 from django.utils import timezone
 from rest_framework.test import APITestCase
-from bodies.models import Body
 from bodies.models import BodyChildRelation
 from events.models import Event
 from roles.models import BodyRole
@@ -11,6 +9,8 @@ from users.models import UserTag
 from login.tests import get_new_user
 from helpers.test_helpers import create_body
 from helpers.test_helpers import create_event
+from helpers.test_helpers import create_usertag
+from helpers.test_helpers import create_usertagcategory
 
 class EventTestCase(APITestCase):
     """Check if we can create bodies and link events."""
@@ -77,15 +77,15 @@ class EventTestCase(APITestCase):
         self.user.profile.save()
 
         # Add one matching and one non-matching tag to both
-        category1 = UserTagCategory.objects.create(name='test1')
-        h1_tag = UserTag.objects.create(category=category1, target='hostel', regex='1')
-        h13_tag = UserTag.objects.create(category=category1, target='hostel', regex='13')
+        category1 = create_usertagcategory()
+        h1_tag = create_usertag(category1, '1')
+        h13_tag = create_usertag(category1, '13')
         event1.user_tags.add(h1_tag)
         event3.user_tags.add(h13_tag)
 
         # Add one matching tag to both events
-        category2 = UserTagCategory.objects.create(name='test2')
-        me_tag = UserTag.objects.create(category=category2, target='department', regex='ME')
+        category2 = create_usertagcategory()
+        me_tag = create_usertag(category2, 'ME', target='department')
         event1.user_tags.add(me_tag)
         event3.user_tags.add(me_tag)
 
@@ -261,9 +261,9 @@ class EventTestCase(APITestCase):
         data = self.client.get(url).data
 
         # Create tags and assign them
-        category = UserTagCategory.objects.create(name='Hostel')
-        tag1 = UserTag.objects.create(category=category, target='hostel', regex='1')
-        tag2 = UserTag.objects.create(category=category, target='hostel', regex='2')
+        category = create_usertagcategory()
+        tag1 = create_usertag(category, '1')
+        tag2 = create_usertag(category, '2')
         data['user_tags'] = [str(tag1.id), str(tag2.id)]
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 200)
