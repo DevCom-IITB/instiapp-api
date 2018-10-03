@@ -80,18 +80,22 @@ class EventTestCase(APITestCase):
 
         # Add one matching and one non-matching tag to both
         category1 = UserTagCategory.objects.create(name='test1')
-        matching_tag = UserTag.objects.create(category=category1, target='hostel', regex='1')
-        non_matching_tag = UserTag.objects.create(category=category1, target='hostel', regex='13')
-        event1.user_tags.add(matching_tag)
-        event3.user_tags.add(non_matching_tag)
+        h1_tag = UserTag.objects.create(category=category1, target='hostel', regex='1')
+        h13_tag = UserTag.objects.create(category=category1, target='hostel', regex='13')
+        event1.user_tags.add(h1_tag)
+        event3.user_tags.add(h13_tag)
 
         # Add one matching tag to both events
         category2 = UserTagCategory.objects.create(name='test2')
-        matching_tag = UserTag.objects.create(category=category2, target='department', regex='ME')
-        event1.user_tags.add(matching_tag)
-        event3.user_tags.add(matching_tag)
+        me_tag = UserTag.objects.create(category=category2, target='department', regex='ME')
+        event1.user_tags.add(me_tag)
+        event3.user_tags.add(me_tag)
 
-        # Chck new order
+        # Check new order
+        assertOrder([event1, event2, event4])
+
+        # Check if user needs to satisfy only one tag from each category
+        event1.user_tags.add(h13_tag)
         assertOrder([event1, event2, event4])
 
         # Test null check - now the department matching tag is non matching
