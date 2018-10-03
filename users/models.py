@@ -83,8 +83,8 @@ class UserTag(models.Model):
     category = models.ForeignKey(UserTagCategory, on_delete=models.CASCADE)
     target = models.CharField(max_length=40, choices=TAG_TARGET_CHOICES)
     regex = models.CharField(max_length=150)
-    secondary_target = models.CharField(max_length=40, choices=TAG_TARGET_CHOICES)
-    secondary_regex = models.CharField(max_length=150)
+    secondary_target = models.CharField(max_length=40, choices=TAG_TARGET_CHOICES, blank=True, null=True)
+    secondary_regex = models.CharField(max_length=150, blank=True, null=True)
 
     def __str__(self):
         return '%s %s' % (self.target, self.regex)
@@ -101,6 +101,6 @@ class UserTag(models.Model):
     @staticmethod
     def match_regex(user, target, regex):
         """Match the user with particular regex."""
-        if target and getattr(user, target):
+        if target and regex and getattr(user, target):
             return re.match(regex, getattr(user, target))
         return None
