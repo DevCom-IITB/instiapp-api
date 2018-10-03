@@ -3,6 +3,8 @@ from django.utils import timezone
 from rest_framework.test import APITestCase
 from events.models import Event
 from bodies.models import Body
+from users.models import UserTag
+from users.models import UserTagCategory
 from users.models import UserProfile
 from login.tests import get_new_user
 
@@ -124,3 +126,10 @@ class UserTestCase(APITestCase):
 
         wpn = self.user.profile.web_push_subscriptions.all()[0]
         self.assertEqual(str(wpn), self.user.profile.name)
+
+    def test_tag_str(self):
+        """Check __str__ methods for UserTag and UserTagCategory."""
+        category = UserTagCategory.objects.create(name='Category1')
+        tag = UserTag.objects.create(category=category, regex='abc', target='hostel')
+        self.assertEqual(str(category), 'Category1')
+        self.assertEqual(str(tag), 'hostel abc')

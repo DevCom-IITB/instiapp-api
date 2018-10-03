@@ -85,7 +85,7 @@ class UserTag(models.Model):
     regex = models.CharField(max_length=150)
 
     def __str__(self):
-        return self.category.name + ' - ' + self.target
+        return '%s %s' % (self.target, self.regex)
 
     def match(self, user):
         """Match a user with a tag and return a Match object."""
