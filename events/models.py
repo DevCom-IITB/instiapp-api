@@ -31,6 +31,7 @@ class Event(models.Model):
 
     archived = models.BooleanField(default=False)
     notify = models.BooleanField(default=True)
+    user_tags = models.ManyToManyField('users.UserTag', related_name='events', blank=True)
 
     starting_notified = models.BooleanField(default=False)
 

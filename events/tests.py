@@ -6,7 +6,11 @@ from bodies.models import Body
 from bodies.models import BodyChildRelation
 from events.models import Event
 from roles.models import BodyRole
+from users.models import UserTagCategory
+from users.models import UserTag
 from login.tests import get_new_user
+from helpers.test_helpers import create_body
+from helpers.test_helpers import create_event
 
 class EventTestCase(APITestCase):
     """Check if we can create bodies and link events."""
@@ -40,56 +44,70 @@ class EventTestCase(APITestCase):
     def test_event_prioritizer(self):
         """Test the event prioritizer."""
 
+        def assertOrder(events, url='/api/events'):
+            response = self.client.get(url)
+            for index, event in enumerate(events):
+                self.assertEqual(response.data['data'][index]['id'], str(event.id))
+
         # Events in future. event1 after event3 after event2. event4 in past
+        event1 = create_event(48, 48)
+        event2 = create_event(4, 5)
+        event3 = create_event(15, 16)
+        event4 = create_event(-5, -4)
 
-        event1 = Event.objects.create(name="Event1",
-                                      start_time=timezone.now() + timedelta(days=2),
-                                      end_time=timezone.now() + timedelta(days=2))
-
-        event2 = Event.objects.create(name="Event2",
-                                      start_time=timezone.now() + timedelta(hours=4),
-                                      end_time=timezone.now() + timedelta(hours=5))
-
-        event3 = Event.objects.create(name="Event3",
-                                      start_time=timezone.now() + timedelta(hours=15),
-                                      end_time=timezone.now() + timedelta(hours=16))
-
-        event4 = Event.objects.create(name="Event4",
-                                      start_time=timezone.now() - timedelta(hours=5),
-                                      end_time=timezone.now() - timedelta(hours=4))
-
-        url = '/api/events'
-        response = self.client.get(url)
-        self.assertEqual(response.data['data'][0]['id'], str(event2.id))
-        self.assertEqual(response.data['data'][1]['id'], str(event3.id))
-        self.assertEqual(response.data['data'][2]['id'], str(event1.id))
-        self.assertEqual(response.data['data'][3]['id'], str(event4.id))
+        assertOrder([event2, event3, event1, event4])
 
         # Check followed bodies priorities
-        body1 = Body.objects.create(name="TestBody1")
-        body2 = Body.objects.create(name="TestBody2")
-        body3 = Body.objects.create(name="TestBody3")
-        body4 = Body.objects.create(name="TestBody4")
-        body5 = Body.objects.create(name="TestBody5")
+        body1 = create_body()
+        body2 = create_body()
+        body3 = create_body()
+        body4 = create_body()
+        body5 = create_body()
         self.user.profile.followed_bodies.add(body1, body2, body3, body4, body5)
 
         # After the user is following  a body of event 3, it should bump up
         event3.bodies.add(body1)
-
-        response = self.client.get(url)
-        self.assertEqual(response.data['data'][0]['id'], str(event3.id))
-        self.assertEqual(response.data['data'][1]['id'], str(event2.id))
-        self.assertEqual(response.data['data'][2]['id'], str(event1.id))
-        self.assertEqual(response.data['data'][3]['id'], str(event4.id))
+        assertOrder([event3, event2, event1, event4])
 
         # Test the cap on followed bodies bonus
         event1.bodies.add(body1, body2, body3, body4, body5)
+        assertOrder([event3, event1, event2, event4])
 
-        response = self.client.get(url)
-        self.assertEqual(response.data['data'][0]['id'], str(event3.id))
-        self.assertEqual(response.data['data'][1]['id'], str(event1.id))
-        self.assertEqual(response.data['data'][2]['id'], str(event2.id))
-        self.assertEqual(response.data['data'][3]['id'], str(event4.id))
+        # Check user tags - setup the user
+        self.user.profile.hostel = '1'
+        self.user.profile.department = 'ME'
+        self.user.profile.save()
+
+        # Add one matching and one non-matching tag to both
+        category1 = UserTagCategory.objects.create(name='test1')
+        h1_tag = UserTag.objects.create(category=category1, target='hostel', regex='1')
+        h13_tag = UserTag.objects.create(category=category1, target='hostel', regex='13')
+        event1.user_tags.add(h1_tag)
+        event3.user_tags.add(h13_tag)
+
+        # Add one matching tag to both events
+        category2 = UserTagCategory.objects.create(name='test2')
+        me_tag = UserTag.objects.create(category=category2, target='department', regex='ME')
+        event1.user_tags.add(me_tag)
+        event3.user_tags.add(me_tag)
+
+        # Check new order
+        assertOrder([event1, event2, event4])
+
+        # Check if user needs to satisfy only one tag from each category
+        event1.user_tags.add(h13_tag)
+        assertOrder([event1, event2, event4])
+
+        # Test null check - now the department matching tag is non matching
+        self.user.profile.department = None
+        self.user.profile.save()
+        assertOrder([event2, event4])
+
+        # Test if secondary_target is working
+        me_tag.secondary_target = 'hostel'
+        me_tag.secondary_regex = '1'
+        me_tag.save()
+        assertOrder([event1, event2, event4])
 
     def test_events_list(self):
         """Test if events can be listed."""
