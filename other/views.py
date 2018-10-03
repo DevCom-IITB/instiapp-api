@@ -13,8 +13,10 @@ from events.models import Event
 from events.serializers import EventSerializer
 from events.prioritizer import get_prioritized
 from users.models import UserProfile
+from users.models import UserTagCategory
 from users.serializers import UserProfileSerializer
 from other.notifications import NotificationSerializer
+from other.serializers import UserTagCategorySerializer
 from helpers.misc import query_search
 
 class OtherViewset(viewsets.ViewSet):
@@ -65,3 +67,10 @@ class OtherViewset(viewsets.ViewSet):
         """Mark all notifications as read."""
         request.user.notifications.mark_all_as_read()
         return Response(status=204)
+
+    @classmethod
+    @login_required_ajax
+    def get_all_user_tags(cls, request):
+        """Get a list of categories of user tags with nested tags."""
+        return Response(UserTagCategorySerializer(
+            UserTagCategory.objects.all(), many=True).data)
