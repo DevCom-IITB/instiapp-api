@@ -93,15 +93,25 @@ class EventTestCase(APITestCase):
         self.assertEqual(response.data['data'][2]['id'], str(event2.id))
         self.assertEqual(response.data['data'][3]['id'], str(event4.id))
 
-        # Check user tags
+        # Check user tags - setup the user
         self.user.profile.hostel = '1'
+        self.user.profile.department = 'ME'
         self.user.profile.save()
-        category = UserTagCategory.objects.create(name='test1')
-        matching_tag = UserTag.objects.create(category=category, target='hostel', regex='1')
-        non_matching_tag = UserTag.objects.create(category=category, target='hostel', regex='13')
+
+        # Add one matching and one non-matching tag to both
+        category1 = UserTagCategory.objects.create(name='test1')
+        matching_tag = UserTag.objects.create(category=category1, target='hostel', regex='1')
+        non_matching_tag = UserTag.objects.create(category=category1, target='hostel', regex='13')
         event1.user_tags.add(matching_tag)
         event3.user_tags.add(non_matching_tag)
 
+        # Add one matching tag to both events
+        category2 = UserTagCategory.objects.create(name='test2')
+        matching_tag = UserTag.objects.create(category=category2, target='department', regex='ME')
+        event1.user_tags.add(matching_tag)
+        event3.user_tags.add(matching_tag)
+
+        # Chck new order
         response = self.client.get(url)
         self.assertEqual(response.data['data'][0]['id'], str(event1.id))
         self.assertEqual(response.data['data'][1]['id'], str(event2.id))
