@@ -117,6 +117,13 @@ class EventTestCase(APITestCase):
         self.assertEqual(response.data['data'][1]['id'], str(event2.id))
         self.assertEqual(response.data['data'][2]['id'], str(event4.id))
 
+        # Test null check - now the department matching tag is non matching
+        self.user.profile.department = None
+        self.user.profile.save()
+        response = self.client.get(url)
+        self.assertEqual(response.data['data'][0]['id'], str(event2.id))
+        self.assertEqual(response.data['data'][1]['id'], str(event4.id))
+
     def test_events_list(self):
         """Test if events can be listed."""
         url = '/api/events'
