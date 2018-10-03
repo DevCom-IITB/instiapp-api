@@ -43,6 +43,7 @@ class EventTestCase(APITestCase):
 
         def assertOrder(events, url='/api/events'):
             response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
             for index, event in enumerate(events):
                 self.assertEqual(response.data['data'][index]['id'], str(event.id))
 
@@ -105,6 +106,10 @@ class EventTestCase(APITestCase):
         me_tag.secondary_regex = '1'
         me_tag.save()
         assertOrder([event1, event2, event4])
+
+        # Test for anonymous user
+        self.client.logout()
+        assertOrder([event2, event4])
 
     def test_events_list(self):
         """Test if events can be listed."""

@@ -92,8 +92,10 @@ class UserTag(models.Model):
 
     def match(self, user):
         """Match a user with a tag and return a Match object."""
-        matched = self.match_regex(user, self.target, self.regex)
-        return matched if matched else self.match_secondary(user)
+        if user:
+            matched = self.match_regex(user, self.target, self.regex)
+            return matched if matched else self.match_secondary(user)
+        return None
 
     def match_secondary(self, user):
         """Match a user with the secondary target and return a Match object."""
