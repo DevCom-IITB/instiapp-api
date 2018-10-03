@@ -13,6 +13,7 @@ TIME_L_END = 1.2                         # Lambda for exponential of ended penal
 BODY_FOLLOWING_BONUS = 100               # Bonus if the body is followed
 TIME_DEP_BODY_BONUS = 200                # Bonus if the body is followed dependent on time
 BODY_BONUS_MAX = 400                     # Maximum bonus for followed bodies
+NOT_TAG_TARGET_PENALTY = 2000
 
 def get_prioritized(queryset, request):
     now = timezone.now()
@@ -45,6 +46,17 @@ def get_prioritized(queryset, request):
         start_time_points = WEIGHT_START_TIME * start_time_factor
         event.weight += int(start_time_points)
 
+        # Penalize for not being tagged
+        categories_satisfy = []
+        categories = []
+        for tag in event.user_tags.all():
+            if tag.category not in categories:
+                categories.append(tag.category)
+            if tag.category not in categories_satisfy and tag.match(profile):
+                categories_satisfy.append(tag.category)
+        event.weight -= int((len(categories) - len(categories_satisfy)) * NOT_TAG_TARGET_PENALTY)
+
+        # Grant bonus to followed bodies
         if followed_bodies:
             body_bonus = 0
             for body in event.bodies.all():
