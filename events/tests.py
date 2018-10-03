@@ -20,22 +20,19 @@ class EventTestCase(APITestCase):
         self.user = get_new_user()
         self.client.force_authenticate(self.user) # pylint: disable=E1101
 
-        self.test_body_1 = Body.objects.create(name="TestBody1")
-        self.test_body_2 = Body.objects.create(name="TestBody2")
+        self.test_body_1 = create_body()
+        self.test_body_2 = create_body()
 
         self.body_1_role = BodyRole.objects.create(
             name="Body1Role", body=self.test_body_1, permissions='AddE,UpdE,DelE')
         self.user.profile.roles.add(self.body_1_role)
 
-        self.update_test_event = Event.objects.create(
-            name='TestEventUpdated', start_time=timezone.now() - timedelta(days=1),
-            end_time=timezone.now() - timedelta(days=1))
-        url = '/api/events/' + str(self.update_test_event.id)
+        self.update_test_event = create_event(-24, -24)
+        url = '/api/events/%s' % self.update_test_event.id
         self.update_event_data = self.client.get(url).data
-        self.update_url = '/api/events/' + str(self.update_test_event.id)
+        self.update_url = '/api/events/%s' % self.update_test_event.id
 
-        Event.objects.create(name='TestEvent2', start_time=timezone.now() - timedelta(days=1),
-                             end_time=timezone.now() - timedelta(days=1))
+        create_event(-24, -24)
 
     def test_event_other(self):
         """Check misc paramters of Event"""
@@ -247,6 +244,25 @@ class EventTestCase(APITestCase):
 
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 200)
+
+    def test_event_update9(self):
+        """Event tags can be updated."""
+        # Add an event to an updateable body
+        event = create_event()
+        self.test_body_1.events.add(event)
+
+        # Get the response
+        url = '/api/events/%s' % event.id
+        data = self.client.get(url).data
+
+        # Create tags and assign them
+        category = UserTagCategory.objects.create(name='Hostel')
+        tag1 = UserTag.objects.create(category=category, target='hostel', regex='1')
+        tag2 = UserTag.objects.create(category=category, target='hostel', regex='2')
+        data['user_tags'] = [str(tag1.id), str(tag2.id)]
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(event.user_tags.count(), 2)
 
     def test_event_deletion(self):
         """Check if events can be deleted with priveleges."""
