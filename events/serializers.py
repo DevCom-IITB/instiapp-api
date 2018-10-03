@@ -61,7 +61,7 @@ class EventSerializer(serializers.ModelSerializer):
     def setup_eager_loading(queryset):
         """Perform necessary eager loading of data.
         To be used for EventFullSerializer as well."""
-        queryset = queryset.prefetch_related('bodies', 'venues', 'ues', 'ues__user')
+        queryset = queryset.prefetch_related('bodies', 'venues', 'ues', 'ues__user', 'user_tags')
 
         # Prefetch counts
         interested_count = Count('followers', distinct=True, filter=Q(ues__status=1))
