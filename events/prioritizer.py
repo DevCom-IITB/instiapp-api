@@ -23,6 +23,7 @@ def get_prioritized(queryset, request):
 
     # Prefetch followed bodies
     followed_bodies = None
+    profile = None
     if request.user.is_authenticated and hasattr(request.user, 'profile'):
         profile = request.user.profile
         followed_bodies = profile.followed_bodies.all()
