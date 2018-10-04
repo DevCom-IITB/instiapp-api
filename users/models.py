@@ -105,5 +105,5 @@ class UserTag(models.Model):
     def match_regex(user, target, regex):
         """Match the user with particular regex."""
         if target and regex and getattr(user, target):
-            return re.match(regex, getattr(user, target))
+            return re.match(regex, str(getattr(user, target)))
         return None
