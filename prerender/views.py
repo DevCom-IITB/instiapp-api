@@ -17,7 +17,7 @@ url_mapping = {
 
 class Crumb:
     def fromObj(self, obj, index):
-        self.name = obj.name
+        self.name = obj.canonical_name if hasattr(obj, 'canonical_name') else obj.name
         self.url = settings.BASE_URL + url_mapping[obj.__class__] + obj.str_id
         self.index = index
         return self
