@@ -38,6 +38,11 @@ def get_prioritized(queryset, request):
 
         start_time_factor = math.exp((-(start_time_diff / TIME_SD)**2))
 
+        # Event Length penalty
+        event_length = (event.end_time - event.start_time).total_seconds()
+        factor_a = 0.4
+        factor_b = event_length / 86400
+        length_penalty = 1/(1 + factor_a * factor_b)
         # Apply exponential to and penalise finished events
         if event.end_time < now:
             event.weight -= FINISHED_PENALTY
@@ -66,7 +71,8 @@ def get_prioritized(queryset, request):
                 if body in followed_bodies:
                     body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * start_time_factor))
             event.weight += body_bonus
-
+    #Apply Length Penalty
+    event.weight *= length_penalty
     return sorted(queryset, key=lambda event: (event.weight, event.start_time), reverse=True)
 
 def get_fresh_events(queryset, delta=3):
