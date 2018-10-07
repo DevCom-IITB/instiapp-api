@@ -13,6 +13,7 @@ TIME_L_END = 1.2                         # Lambda for exponential of ended penal
 BODY_FOLLOWING_BONUS = 100               # Bonus if the body is followed
 TIME_DEP_BODY_BONUS = 200                # Bonus if the body is followed dependent on time
 BODY_BONUS_MAX = 400                     # Maximum bonus for followed bodies
+TIME_PENALTY_FACTOR = 0.4                # Multiplying factor for event length penalty
 NOT_TAG_TARGET_PENALTY = 2000
 
 def get_prioritized(queryset, request):
@@ -38,6 +39,11 @@ def get_prioritized(queryset, request):
 
         start_time_factor = math.exp((-(start_time_diff / TIME_SD)**2))
 
+        # Event Length penalty
+        event_length = (event.end_time - event.start_time).total_seconds()
+        # factor_b is the number of days as a float
+        factor_b = event_length / 86400
+        length_penalty = 1 / (1 + TIME_PENALTY_FACTOR * factor_b)
         # Apply exponential to and penalise finished events
         if event.end_time < now:
             event.weight -= FINISHED_PENALTY
@@ -66,6 +72,8 @@ def get_prioritized(queryset, request):
                 if body in followed_bodies:
                     body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * start_time_factor))
             event.weight += body_bonus
+        # Apply Length Penalty
+        event.weight *= length_penalty
 
     return sorted(queryset, key=lambda event: (event.weight, event.start_time), reverse=True)
 
