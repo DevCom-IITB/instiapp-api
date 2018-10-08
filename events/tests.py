@@ -4,8 +4,6 @@ from rest_framework.test import APITestCase
 from bodies.models import BodyChildRelation
 from events.models import Event
 from roles.models import BodyRole
-from users.models import UserTagCategory
-from users.models import UserTag
 from login.tests import get_new_user
 from helpers.test_helpers import create_body
 from helpers.test_helpers import create_event
