@@ -7,14 +7,16 @@ from roles.helpers import login_required_ajax
 from venter.models import Complaints
 from venter.models import Comment
 from venter.models import ComplaintMedia
-from venter.models import  TagUris
+from venter.models import TagUris
 
 from venter.serializers import ComplaintSerializer
 from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
 
+
 class ComplaintViewSet(viewsets.ModelViewSet):
+    count = 0
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
 
@@ -77,16 +79,32 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             Complaints.objects.get(id=complaint.id)
         ).data, status=201)
 
-    def update(self, request, pk):
+    @login_required_ajax
+    def upVote(self, request, pk):
+        """UpVote or unUpVote a complaint {?action}=0,1"""
+
         complaint = self.get_complaint(pk)
-        complaint.users_up_voted.add(self.request.user.profile)
+
+        value = request.GET.get("action")
+        if value is None:
+            return Response({"message": "{?action} is required"}, status=400)
+
+            # Check possible actions
+        if value == "0":
+            complaint.users_up_voted.remove(self.request.user.profile)
+        elif value == "1":
+            complaint.users_up_voted.add(self.request.user.profile)
+        else:
+            return Response({"message": "Invalid Action"}, status=400)
+
         return Response(ComplaintSerializer(
             Complaints.objects.get(id=complaint.id)
-        ).data)
+        ).data, status=204)
 
     def get_complaint(self, pk):
         """Shortcut for get_object_or_404 with pk"""
         return get_object_or_404(self.queryset, id=pk)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()

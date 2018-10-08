@@ -66,9 +66,23 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['description'], 'test')
 
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 200)
+        url = '/api/venter/complaints/'+cid+'/upvote'
+
+        url += '?action='
+
+        # Invalid Action
+        response = self.client.get(url + 'k')
+        self.assertEqual(response.status_code, 400)
+
+        # UpVote
+        response = self.client.get(url + '1')
+        self.assertEqual(response.status_code, 204)
         self.assertEqual(len(response.data['users_up_voted']), 1)
+
+        # UnUpVote
+        response = self.client.get(url + '0')
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(len(response.data['users_up_voted']), 0)
 
     def test_comment(self):
         """Test all public venter comment APIs."""

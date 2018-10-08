@@ -9,7 +9,11 @@ urlpatterns = [
     })),
 
     path('complaints/<pk>', ComplaintViewSet.as_view({
-        'get': 'retrieve', 'put': 'update'
+        'get': 'retrieve'
+    })),
+
+    path('complaints/<pk>/upvote', ComplaintViewSet.as_view({
+        'get': 'upVote'
     })),
 
     path('complaints/<pk>/comments', CommentViewSet.as_view({
