@@ -16,7 +16,6 @@ from venter.serializers import CommentSerializer
 
 
 class ComplaintViewSet(viewsets.ModelViewSet):
-    count = 0
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
 
@@ -80,8 +79,8 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         ).data, status=201)
 
     @login_required_ajax
-    def upVote(self, request, pk):
-        """UpVote or unUpVote a complaint {?action}=0,1"""
+    def up_vote(self, request, pk):
+        """UpVote or un-UpVote a complaint {?action}=0,1"""
 
         complaint = self.get_complaint(pk)
 
@@ -89,7 +88,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         if value is None:
             return Response({"message": "{?action} is required"}, status=400)
 
-            # Check possible actions
+        # Check possible actions
         if value == "0":
             complaint.users_up_voted.remove(self.request.user.profile)
         elif value == "1":
@@ -99,7 +98,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
         return Response(ComplaintSerializer(
             Complaints.objects.get(id=complaint.id)
-        ).data, status=204)
+        ).data, status=200)
 
     def get_complaint(self, pk):
         """Shortcut for get_object_or_404 with pk"""

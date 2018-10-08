@@ -13,7 +13,7 @@ urlpatterns = [
     })),
 
     path('complaints/<pk>/upvote', ComplaintViewSet.as_view({
-        'get': 'upVote'
+        'get': 'up_vote'
     })),
 
     path('complaints/<pk>/comments', CommentViewSet.as_view({

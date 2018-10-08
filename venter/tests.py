@@ -1,13 +1,6 @@
-"""
-To run the tests fire this command:
-
-coverage run manage.py test venter --settings backend.settings_test && coverage html
-"""
-
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
 from venter.models import Complaints, TagUris, Comment, ComplaintMedia
-
 
 class VenterTestCase(APITestCase):
     """Unit tests for venter."""
@@ -87,12 +80,12 @@ class VenterTestCase(APITestCase):
 
         # UpVote
         response = self.client.get(url + '1')
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['users_up_voted']), 1)
 
         # UnUpVote
         response = self.client.get(url + '0')
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['users_up_voted']), 0)
 
     def test_comment(self):
