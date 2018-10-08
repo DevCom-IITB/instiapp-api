@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.db.models import Count
 from django.db.models import Q
 from events.models import Event
+from users.models import UserTag
 
 class FollowersMethods:
     """Helper methods for followers."""
@@ -60,7 +61,7 @@ class EventSerializer(serializers.ModelSerializer):
     def setup_eager_loading(queryset):
         """Perform necessary eager loading of data.
         To be used for EventFullSerializer as well."""
-        queryset = queryset.prefetch_related('bodies', 'venues', 'ues', 'ues__user')
+        queryset = queryset.prefetch_related('bodies', 'venues', 'ues', 'ues__user', 'user_tags')
 
         # Prefetch counts
         interested_count = Count('followers', distinct=True, filter=Q(ues__status=1))
@@ -104,12 +105,15 @@ class EventFullSerializer(serializers.ModelSerializer):
     bodies_id = serializers.PrimaryKeyRelatedField(
         many=True, read_only=False, queryset=Body.objects.all(), source='bodies')
 
+    user_tags = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=False, queryset=UserTag.objects.all(), default=[])
+
     class Meta:
         model = Event
         fields = ('id', 'str_id', 'name', 'description', 'image_url', 'start_time',
                   'end_time', 'all_day', 'venues', 'venue_names', 'bodies', 'bodies_id',
                   'interested_count', 'going_count', 'interested', 'going', 'venue_ids',
-                  'website_url', 'user_ues', 'notify')
+                  'website_url', 'user_ues', 'notify', 'user_tags')
 
     def to_representation(self, instance):
         result = super().to_representation(instance)

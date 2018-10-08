@@ -547,11 +547,8 @@ paths:
         schema:
           properties:
             about: {description: '', type: string}
-            contact_no: {description: '', type: string}
-            followed_bodies_id:
-              description: ''
-              items: {type: string}
-              type: array
+            android_version: {description: '', type: integer}
+            fcm_id: {description: '', type: string}
             hostel: {description: '', type: string}
             ldap_id: {description: '', type: string}
             name: {description: '', type: string}
@@ -573,18 +570,14 @@ paths:
         schema:
           properties:
             about: {description: '', type: string}
-            contact_no: {description: '', type: string}
-            followed_bodies_id:
-              description: ''
-              items: {type: string}
-              type: array
+            android_version: {description: '', type: integer}
+            fcm_id: {description: '', type: string}
             hostel: {description: '', type: string}
             ldap_id: {description: '', type: string}
             name: {description: '', type: string}
             profile_pic: {description: '', type: string}
             roll_no: {description: '', type: string}
             website_url: {description: '', type: string}
-          required: [followed_bodies_id]
           type: object
       responses:
         '200': {description: ''}
@@ -619,18 +612,14 @@ paths:
         schema:
           properties:
             about: {description: '', type: string}
-            contact_no: {description: '', type: string}
-            followed_bodies_id:
-              description: ''
-              items: {type: string}
-              type: array
+            android_version: {description: '', type: integer}
+            fcm_id: {description: '', type: string}
             hostel: {description: '', type: string}
             ldap_id: {description: '', type: string}
             name: {description: '', type: string}
             profile_pic: {description: '', type: string}
             roll_no: {description: '', type: string}
             website_url: {description: '', type: string}
-          required: [followed_bodies_id]
           type: object
       responses:
         '201': {description: ''}
@@ -671,6 +660,116 @@ paths:
         '200': {description: ''}
       summary: UserProfile
       tags: [users]
+  /api/venter/comments/{id}:
+    delete:
+      description: Delete a comment by the current user.
+      operationId: venter_comments_delete
+      parameters:
+      - {description: A UUID string identifying this Comment., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '204': {description: ''}
+      summary: Delete a comment by the current user.
+      tags: [venter]
+    get:
+      description: Get a single comment.
+      operationId: venter_comments_read
+      parameters:
+      - {description: A UUID string identifying this Comment., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '200': {description: ''}
+      summary: Get a single comment.
+      tags: [venter]
+    put:
+      consumes: [application/json]
+      description: Update a comment if created by current user.
+      operationId: venter_comments_update
+      parameters:
+      - {description: A UUID string identifying this Comment., in: path, name: id,
+        required: true, type: string}
+      - in: body
+        name: data
+        schema:
+          properties:
+            text: {description: '', type: string}
+          required: [text]
+          type: object
+      responses:
+        '200': {description: ''}
+      summary: Update a comment if created by current user.
+      tags: [venter]
+  /api/venter/complaints:
+    get:
+      description: 'Get a list of non-deleted complaints.
+
+        To filter by current user, add a query parameter {?filter}'
+      operationId: venter_complaints_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Get a list of non-deleted complaints.
+      tags: [venter]
+    post:
+      consumes: [application/json]
+      operationId: venter_complaints_create
+      parameters:
+      - in: body
+        name: data
+        schema:
+          properties:
+            description: {description: '', type: string}
+            latitude: {description: '', type: number}
+            location_description: {description: '', type: string}
+            longitude: {description: '', type: number}
+          type: object
+      responses:
+        '201': {description: ''}
+      tags: [venter]
+  /api/venter/complaints/{id}:
+    get:
+      operationId: venter_complaints_read
+      parameters:
+      - {description: A UUID string identifying this Complaint., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '200': {description: ''}
+      tags: [venter]
+    put:
+      consumes: [application/json]
+      operationId: venter_complaints_update
+      parameters:
+      - {description: A UUID string identifying this Complaint., in: path, name: id,
+        required: true, type: string}
+      - in: body
+        name: data
+        schema:
+          properties:
+            description: {description: '', type: string}
+            latitude: {description: '', type: number}
+            location_description: {description: '', type: string}
+            longitude: {description: '', type: number}
+          type: object
+      responses:
+        '200': {description: ''}
+      tags: [venter]
+  /api/venter/complaints/{id}/comments:
+    post:
+      consumes: [application/json]
+      operationId: venter_complaints_comments_create
+      parameters:
+      - {description: A UUID string identifying this Comment., in: path, name: id,
+        required: true, type: string}
+      - in: body
+        name: data
+        schema:
+          properties:
+            text: {description: '', type: string}
+          required: [text]
+          type: object
+      responses:
+        '201': {description: ''}
+      tags: [venter]
 schemes: [http]
 securityDefinitions:
   basic: {type: basic}

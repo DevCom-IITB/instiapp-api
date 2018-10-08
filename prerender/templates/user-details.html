@@ -4,8 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{settings.PRERENDER_TITLE}}</title>
-    <meta name="description" content="Profile at {{settings.PRERENDER_TITLE}}">
+    <title>{{profile.name}} | {{settings.PRERENDER_TITLE}}</title>
     <meta property="og:description" content="Profile at {{settings.PRERENDER_TITLE}}" />
 
     <meta property="og:title" content="{{profile.name}}" />
@@ -17,6 +16,9 @@
     {% endif %}
     <meta property="og:image" content="{{profile.profile_pic}}" />
     <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
+    <style>
+        img.head { width:200px; max-width: 100%; }
+    </style>
 </head>
 
 <body>
@@ -25,7 +27,7 @@
 {{profile.roll_no}}<br>
 <br>
 
-<img style="width:150px" src="{{profile.profile_pic}}"><br>
+<img class="head" src="{{profile.profile_pic}}"><br>
 <br>
 
 {% for role in profile.roles.all  %}

@@ -15,107 +15,38 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.sitemaps.views import sitemap
 from rest_framework_swagger.views import get_swagger_view
+from backend.sitemap import sitemaps
 
-from bodies.views import BodyViewSet
-from bodies.views import BodyFollowersViewSet
-from events.views import EventViewSet
-from locations.views import LocationViewSet
-from upload.views import UploadViewSet
-from users.views import UserProfileViewSet
-from login.views import LoginViewSet
-from roles.views import BodyRoleViewSet
-from placements.views import PlacementBlogViewset
-from news.views import NewsFeedViewset
-from messmenu.views import get_mess
-from other.views import OtherViewset
-import prerender.views as pr
+def api_base(prefix=None):
+    """Get the base URL for an endpoint set."""
+    if prefix is None:
+        return 'api/'
+    return 'api/' + prefix + '/'
 
 urlpatterns = [
+    # Admin site
     path('admin/', admin.site.urls),
 
-    path('api/bodies', BodyViewSet.as_view({'get': 'list', 'post': 'create'})),
-    path('api/bodies/<pk>', BodyViewSet.as_view(
-        {'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}
-    ), name='body-detail'),
-    path('api/bodies/<pk>/followers', BodyFollowersViewSet.as_view(
-        {'get': 'retrieve'}
-    ), name='body-followers'),
-    path('api/bodies/<pk>/follow', BodyViewSet.as_view(
-        {'get': 'follow'}
-    )),
+    # API
+    path(api_base(), include('bodies.urls')),
+    path(api_base(), include('events.urls')),
+    path(api_base(), include('locations.urls')),
+    path(api_base(), include('users.urls')),
+    path(api_base(), include('upload.urls')),
+    path(api_base(), include('roles.urls')),
+    path(api_base(), include('messmenu.urls')),
+    path(api_base(), include('news.urls')),
+    path(api_base(), include('login.urls')),
+    path(api_base(), include('placements.urls')),
+    path(api_base(), include('other.urls')),
+    path(api_base('venter'), include("venter.urls")),
 
-    path('api/events', EventViewSet.as_view(
-        {'get': 'list', 'post': 'create'}
-    )),
-    path('api/events/<pk>', EventViewSet.as_view(
-        {'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}
-    ), name='event-detail'),
-
-    path('api/locations', LocationViewSet.as_view(
-        {'get': 'list', 'post': 'create'}
-    )),
-    path('api/locations/<pk>', LocationViewSet.as_view(
-        {'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}
-    ), name='location-detail'),
-
-    path('api/users/<pk>', UserProfileViewSet.as_view(
-        {'get': 'retrieve'}
-    )),
-
-    path('api/upload', UploadViewSet.as_view(
-        {'post': 'create'}
-    )),
-    path('api/upload/<pk>', UploadViewSet.as_view(
-        {'get': 'retrieve', 'delete': 'destroy'}
-    )),
-
-    path('api/login', LoginViewSet.as_view({'get': 'login'})),
-    path('api/pass-login', LoginViewSet.as_view({'get': 'pass_login'})),
-    path('api/login/get-user', LoginViewSet.as_view({'get': 'get_user'})),
-    path('api/logout', LoginViewSet.as_view({'get': 'logout'})),
-
-    path('api/user-me', UserProfileViewSet.as_view(
-        {'get': 'retrieve_me', 'put': 'update_me', 'patch': 'update_me'}
-    )),
-    path('api/user-me/ues/<event_pk>', UserProfileViewSet.as_view({'get': 'set_ues_me'})),
-    path('api/user-me/unr/<news_pk>', UserProfileViewSet.as_view({'get': 'set_unr_me'})),
-    path('api/user-me/subscribe-wp', UserProfileViewSet.as_view({'post': 'subscribe_web_push'})),
-    path('api/user-me/events', UserProfileViewSet.as_view({'get': 'get_my_events'})),
-    path('api/user-me/roles', BodyRoleViewSet.as_view({'get': 'get_my_roles'})),
-
-    path('api/roles', BodyRoleViewSet.as_view(
-        {'post': 'create'}
-    )),
-    path('api/roles/<pk>', BodyRoleViewSet.as_view(
-        {'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}
-    )),
-
-    path('api/placement-blog', PlacementBlogViewset.as_view({'get': 'placement_blog'})),
-    path('api/training-blog', PlacementBlogViewset.as_view({'get': 'training_blog'})),
-
-    path('api/news', NewsFeedViewset.as_view({'get': 'news_feed'})),
-
-    path('api/mess', get_mess),
-
-    path('api/search', OtherViewset.as_view({'get': 'search'})),
-    path('api/notifications', OtherViewset.as_view({'get': 'get_notifications'})),
-    path('api/notifications/read', OtherViewset.as_view({'get': 'mark_all_notifications_read'})),
-    path('api/notifications/read/<pk>', OtherViewset.as_view({'get': 'mark_notification_read'})),
-
-    # -------------- COMPLAINTS --------------- #
-    path('api/', include("venter.urls")),
-
-    # -------------- PRERENDER --------------- #
-    path('', pr.root),
-    path('feed', pr.root),
-    path('news', pr.news),
-    path('explore', pr.explore),
-    path('user/<pk>', pr.user_details),
-    path('event/<pk>', pr.event_details),
-    path('org/<pk>', pr.body_details),
-    path('body-tree/<pk>', pr.body_tree),
-
-    # -------------- DOCS -------------------- #
+    # Non-API
+    path('', include('prerender.urls')),
     path('docs/', get_swagger_view(title='InstiApp API')),
+    path('sitemap.xml', sitemap, {
+        'sitemaps': sitemaps()
+    }, name='django.contrib.sitemaps.views.sitemap')
 ]

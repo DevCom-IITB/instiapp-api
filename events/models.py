@@ -12,8 +12,9 @@ class Event(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     str_id = models.CharField(max_length=58, editable=False, null=True)
-
     time_of_creation = models.DateTimeField(auto_now_add=True)
+    time_of_modification = models.DateTimeField(auto_now=True)
+
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     bodies = models.ManyToManyField('bodies.Body', related_name='events', blank=True)
@@ -30,6 +31,9 @@ class Event(models.Model):
 
     archived = models.BooleanField(default=False)
     notify = models.BooleanField(default=True)
+    user_tags = models.ManyToManyField('users.UserTag', related_name='events', blank=True)
+
+    starting_notified = models.BooleanField(default=False)
 
     weight = 0
 
@@ -40,10 +44,16 @@ class Event(models.Model):
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super(Event, self).save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return '/event/' + self.str_id
+
     class Meta:
         verbose_name = "Event"
         verbose_name_plural = "Events"
-        ordering = ("-time_of_creation",)
+        ordering = ("-start_time",)
+        indexes = [
+            models.Index(fields=['start_time',]),
+        ]
 
 class UserEventStatus(models.Model):
     """Associates a User and an Event, describing probabilty of attending.

@@ -3,6 +3,10 @@ from uuid import uuid4
 from django.db import models
 from PIL import Image
 
+def get_image_path(instance, filename):
+    userid = str(instance.uploaded_by.id)
+    return './' + userid[0:2] + '/' + userid[2:4] + '/' + userid + '-' + filename + '.jpg'
+
 class UploadedImage(models.Model):
     """An uploaded file."""
 
@@ -10,7 +14,7 @@ class UploadedImage(models.Model):
     time_of_creation = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey('users.UserProfile', null=True, blank=True,
                                     on_delete=models.SET_NULL, related_name='uploaded_images')
-    picture = models.ImageField(upload_to='.')
+    picture = models.ImageField(upload_to=get_image_path)
 
     class Meta:
         verbose_name = "Uploaded Image"
@@ -23,29 +27,27 @@ class UploadedImage(models.Model):
 
         # Resize Image
         if self.pk and self.picture:
-            self.resize(self.picture.path)
+            self.resize_convert(self.picture.path)
 
         return saved
 
     def __str__(self):
         return str(self.time_of_creation)
 
-    @staticmethod
-    def resize(path):
-        """Resize image."""
+    def resize_convert(self, path):
+        """Resize image and convert to JPG."""
         # Maximum Dimension
         MAX_DIM = 800
 
         # Load image
-        image = Image.open(path)
+        image = Image.open(path).convert('RGB')
         (width, height) = image.size
 
         # Resize
         factor = min(MAX_DIM / height, MAX_DIM / width)
-        if factor >= 0.85:
-            return
-        size = (int(width * factor), int(height * factor))
-        image = image.resize(size, Image.ANTIALIAS)
+        if factor < 0.85:
+            size = (int(width * factor), int(height * factor))
+            image = image.resize(size, Image.ANTIALIAS)
 
         # Save
-        image.save(path)
+        image.save(path, 'JPEG', quality=90, optimize=True, progressive=True)

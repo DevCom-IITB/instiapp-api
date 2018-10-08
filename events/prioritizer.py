@@ -13,6 +13,8 @@ TIME_L_END = 1.2                         # Lambda for exponential of ended penal
 BODY_FOLLOWING_BONUS = 100               # Bonus if the body is followed
 TIME_DEP_BODY_BONUS = 200                # Bonus if the body is followed dependent on time
 BODY_BONUS_MAX = 400                     # Maximum bonus for followed bodies
+TIME_PENALTY_FACTOR = 0.4                # Multiplying factor for event length penalty
+NOT_TAG_TARGET_PENALTY = 2000
 
 def get_prioritized(queryset, request):
     now = timezone.now()
@@ -22,6 +24,7 @@ def get_prioritized(queryset, request):
 
     # Prefetch followed bodies
     followed_bodies = None
+    profile = None
     if request.user.is_authenticated and hasattr(request.user, 'profile'):
         profile = request.user.profile
         followed_bodies = profile.followed_bodies.all()
@@ -36,6 +39,11 @@ def get_prioritized(queryset, request):
 
         start_time_factor = math.exp((-(start_time_diff / TIME_SD)**2))
 
+        # Event Length penalty
+        event_length = (event.end_time - event.start_time).total_seconds()
+        # factor_b is the number of days as a float
+        factor_b = event_length / 86400
+        length_penalty = 1 / (1 + TIME_PENALTY_FACTOR * factor_b)
         # Apply exponential to and penalise finished events
         if event.end_time < now:
             event.weight -= FINISHED_PENALTY
@@ -45,6 +53,17 @@ def get_prioritized(queryset, request):
         start_time_points = WEIGHT_START_TIME * start_time_factor
         event.weight += int(start_time_points)
 
+        # Penalize for not being tagged
+        categories_satisfy = []
+        categories = []
+        for tag in event.user_tags.all():
+            if tag.category not in categories:
+                categories.append(tag.category)
+            if tag.category not in categories_satisfy and tag.match(profile):
+                categories_satisfy.append(tag.category)
+        event.weight -= int((len(categories) - len(categories_satisfy)) * NOT_TAG_TARGET_PENALTY)
+
+        # Grant bonus to followed bodies
         if followed_bodies:
             body_bonus = 0
             for body in event.bodies.all():
@@ -53,18 +72,16 @@ def get_prioritized(queryset, request):
                 if body in followed_bodies:
                     body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * start_time_factor))
             event.weight += body_bonus
+        # Apply Length Penalty
+        event.weight *= length_penalty
 
-    return sorted(queryset, key=lambda event: (-event.weight, event.start_time))
+    return sorted(queryset, key=lambda event: (event.weight, event.start_time), reverse=True)
 
 def get_fresh_events(queryset, delta=3):
     """Gets events after removing stale ones."""
     return queryset.filter(
-        archived=False, end_time__gte=timezone.now() - timedelta(days=delta))
+        end_time__gte=timezone.now() - timedelta(days=delta))
 
-def get_fresh_prioritized_events(queryset, request):
+def get_fresh_prioritized_events(queryset, request, delta=3):
     """Gets fresh events with prioritization."""
-    return get_prioritized(get_fresh_events(queryset), request)
-
-def get_r_fresh_prioritized_events(queryset, request):
-    """Get relatively fresh events with prioritization. Very old events are removed."""
-    return get_prioritized(get_fresh_events(queryset, 30), request)
+    return get_prioritized(get_fresh_events(queryset, delta=delta), request)

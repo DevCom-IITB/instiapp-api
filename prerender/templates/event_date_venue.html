@@ -1,0 +1,13 @@
+<span itemprop="startDate" content="{{event.start_time|date:'c'}}">{{event.start_time}}</span>
+to
+<span itemprop="endDate" content="{{event.end_time|date:'c'}}">{{event.end_time}}</span>
+{% for venue in event.venues.all  %}
+    <span itemprop="location" itemscope itemtype="http://schema.org/Place">
+        <span itemprop="name">{{venue.name}}</span>
+        {%include "venue-meta.html" with venue=venue settings=settings %}
+    </span>
+{% endfor %}
+
+{% if event.website_url  %}
+    - <a itemprop="sameAs" href="{{event.website_url}}">{{event.name}} Website</a>
+{% endif %}

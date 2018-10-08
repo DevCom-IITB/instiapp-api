@@ -18,6 +18,12 @@ class LocationViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
     def list(request):
         """List reusable locations."""
         queryset = Location.objects.filter(reusable=True)
+
+        # Check if we don't want residences
+        exclude = request.GET.get('exclude_group')
+        if exclude is not None:
+            queryset = queryset.exclude(group_id=int(exclude))
+
         return Response(LocationSerializer(queryset, many=True).data)
 
     @insti_permission_required('Location')

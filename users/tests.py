@@ -3,6 +3,8 @@ from django.utils import timezone
 from rest_framework.test import APITestCase
 from events.models import Event
 from bodies.models import Body
+from users.models import UserTag
+from users.models import UserTagCategory
 from users.models import UserProfile
 from login.tests import get_new_user
 
@@ -47,23 +49,6 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.data['id'], str(self.user.profile.id))
         self.assertEqual(self.user.profile.fcm_id, 'TESTINIT')
 
-        # Check PATCH
-        url = '/api/user-me'
-        data = {
-            "followed_bodies_id": [str(self.test_body.id)]
-        }
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.user.profile.followed_bodies.all()[0], self.test_body)
-
-        # Check validation
-        data = {
-            "followed_bodies_id": [str(self.test_body.id), "my-invalid-uid"]
-        }
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 400)
-        self.assertIn('error', response.data)
-
         event = Event.objects.create(
             start_time=timezone.now(), end_time=timezone.now(), created_by=self.user.profile)
 
@@ -95,7 +80,22 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], str(event.id))
 
-        # Check updating FCM Id
+        # Check updating user information
+        data = {
+            'fcm_id':'TEST1'
+        }
+        url = '/api/user-me'
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(UserProfile.objects.get(id=self.user.profile.id).fcm_id, 'TEST1')
+
+        # Check patch validation
+        data = { 'fcm_id': 'long' * 200 }
+        url = '/api/user-me'
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+
+        # Check updating FCM Id with the deprecated API
         url = '/api/user-me?fcm_id=TESTCHANGE'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
@@ -104,10 +104,11 @@ class UserTestCase(APITestCase):
     def test_get_noauth(self):
         """Test privacy with no auth."""
         self.client.logout()
-        profile = UserProfile.objects.create(name="TestUser", email="user@user.com")
+        profile = UserProfile.objects.create(name="TestUser", email="user@user.com", contact_no="9876543210")
         url = '/api/users/' + str(profile.id)
         response = self.client.get(url, format='json')
         self.assertNotEqual(response.data['email'], profile.email)
+        self.assertNotEqual(response.data['contact_no'], profile.contact_no)
 
     def test_notifications(self):
         """Test push notification models."""
@@ -125,3 +126,10 @@ class UserTestCase(APITestCase):
 
         wpn = self.user.profile.web_push_subscriptions.all()[0]
         self.assertEqual(str(wpn), self.user.profile.name)
+
+    def test_tag_str(self):
+        """Check __str__ methods for UserTag and UserTagCategory."""
+        category = UserTagCategory.objects.create(name='Category1')
+        tag = UserTag.objects.create(category=category, regex='abc', target='hostel')
+        self.assertEqual(str(category), 'Category1')
+        self.assertEqual(str(tag), 'hostel abc')

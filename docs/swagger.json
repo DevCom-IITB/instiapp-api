@@ -1167,20 +1167,17 @@
                   "description": "",
                   "type": "string"
                 },
-                "contact_no": {
-                  "description": "",
-                  "type": "string"
-                },
                 "about": {
                   "description": "",
                   "type": "string"
                 },
-                "followed_bodies_id": {
+                "fcm_id": {
                   "description": "",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "type": "string"
+                },
+                "android_version": {
+                  "description": "",
+                  "type": "integer"
                 },
                 "website_url": {
                   "description": "",
@@ -1194,10 +1191,7 @@
                   "description": "",
                   "type": "string"
                 }
-              },
-              "required": [
-                "followed_bodies_id"
-              ]
+              }
             }
           }
         ],
@@ -1236,20 +1230,17 @@
                   "description": "",
                   "type": "string"
                 },
-                "contact_no": {
-                  "description": "",
-                  "type": "string"
-                },
                 "about": {
                   "description": "",
                   "type": "string"
                 },
-                "followed_bodies_id": {
+                "fcm_id": {
                   "description": "",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "type": "string"
+                },
+                "android_version": {
+                  "description": "",
+                  "type": "integer"
                 },
                 "website_url": {
                   "description": "",
@@ -1336,20 +1327,17 @@
                   "description": "",
                   "type": "string"
                 },
-                "contact_no": {
-                  "description": "",
-                  "type": "string"
-                },
                 "about": {
                   "description": "",
                   "type": "string"
                 },
-                "followed_bodies_id": {
+                "fcm_id": {
                   "description": "",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "type": "string"
+                },
+                "android_version": {
+                  "description": "",
+                  "type": "integer"
                 },
                 "website_url": {
                   "description": "",
@@ -1363,10 +1351,7 @@
                   "description": "",
                   "type": "string"
                 }
-              },
-              "required": [
-                "followed_bodies_id"
-              ]
+              }
             }
           }
         ],
@@ -1449,6 +1434,261 @@
         "summary": "UserProfile",
         "tags": [
           "users"
+        ]
+      }
+    },
+    "/api/venter/comments/{id}": {
+      "get": {
+        "operationId": "venter_comments_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Comment.",
+            "type": "string"
+          }
+        ],
+        "description": "Get a single comment.",
+        "summary": "Get a single comment.",
+        "tags": [
+          "venter"
+        ]
+      },
+      "put": {
+        "operationId": "venter_comments_update",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Comment.",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "description": "Update a comment if created by current user.",
+        "summary": "Update a comment if created by current user.",
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "venter"
+        ]
+      },
+      "delete": {
+        "operationId": "venter_comments_delete",
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Comment.",
+            "type": "string"
+          }
+        ],
+        "description": "Delete a comment by the current user.",
+        "summary": "Delete a comment by the current user.",
+        "tags": [
+          "venter"
+        ]
+      }
+    },
+    "/api/venter/complaints": {
+      "get": {
+        "operationId": "venter_complaints_list",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "Get a list of non-deleted complaints.\nTo filter by current user, add a query parameter {?filter}",
+        "summary": "Get a list of non-deleted complaints.",
+        "tags": [
+          "venter"
+        ]
+      },
+      "post": {
+        "operationId": "venter_complaints_create",
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "description": "",
+                  "type": "string"
+                },
+                "latitude": {
+                  "description": "",
+                  "type": "number"
+                },
+                "longitude": {
+                  "description": "",
+                  "type": "number"
+                },
+                "location_description": {
+                  "description": "",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "venter"
+        ]
+      }
+    },
+    "/api/venter/complaints/{id}": {
+      "get": {
+        "operationId": "venter_complaints_read",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Complaint.",
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "venter"
+        ]
+      },
+      "put": {
+        "operationId": "venter_complaints_update",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Complaint.",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "description": "",
+                  "type": "string"
+                },
+                "latitude": {
+                  "description": "",
+                  "type": "number"
+                },
+                "longitude": {
+                  "description": "",
+                  "type": "number"
+                },
+                "location_description": {
+                  "description": "",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "venter"
+        ]
+      }
+    },
+    "/api/venter/complaints/{id}/comments": {
+      "post": {
+        "operationId": "venter_complaints_comments_create",
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Comment.",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "tags": [
+          "venter"
         ]
       }
     }

@@ -1,5 +1,6 @@
 """Unit tests for news feed."""
 from datetime import timedelta
+import xml.etree.ElementTree as ET
 from freezegun import freeze_time
 
 from rest_framework.test import APITestCase
@@ -14,20 +15,30 @@ from users.models import UserProfile
 from news.models import NewsEntry
 from placements.models import BlogEntry
 
+from helpers.test_helpers import create_usertag
+from helpers.test_helpers import create_usertagcategory
+
 class OtherTestCase(APITestCase):
     """Test other endpoints."""
 
     def setUp(self):
         # Create bodies
-        Body.objects.create(name="Test Body1")
-        Body.objects.create(name="Test Body2")
+        body1 = Body.objects.create(name="Test Body1")
+        body2 = Body.objects.create(name="Test Body2")
 
-        Event.objects.create(name="Test Event1", start_time=timezone.now(), end_time=timezone.now())
-        Event.objects.create(name="Test Event2 Body1", start_time=timezone.now(), end_time=timezone.now())
-        Event.objects.create(name="Test Event21", start_time=timezone.now(), end_time=timezone.now())
+        # Create dummy events
+        event1 = Event.objects.create(name="Test Event1", start_time=timezone.now(), end_time=timezone.now())
+        event2 = Event.objects.create(name="Test Event2 Body1", start_time=timezone.now(), end_time=timezone.now())
+        event3 = Event.objects.create(name="Test Event21", start_time=timezone.now(), end_time=timezone.now())
 
+        # Create dummy users for search
         UserProfile.objects.create(name="Test User1")
         UserProfile.objects.create(name="Test User2")
+
+        # Associate events with bodies
+        event1.bodies.add(body1)
+        event2.bodies.add(body1)
+        event3.bodies.add(body2)
 
         # Fake authenticate
         self.user = get_new_user()
@@ -203,3 +214,36 @@ class OtherTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['actor']['title'], entry.title)
+
+    def test_sitemap(self):
+        """Test dynamic sitemap."""
+
+        # Get the sitemap
+        url = '/sitemap.xml'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Render the sitemap
+        urlset = ET.fromstring(response.rendered_content)
+
+        # Test each URL in the sitemap
+        for urlobj in urlset:
+            for loc in [l for l in urlobj if 'loc' in l.tag]:
+                response = self.client.get(loc.text)
+                self.assertEqual(response.status_code, 200)
+
+    def test_get_user_tags(self):
+        """Test getting list of tags."""
+
+        cat1 = create_usertagcategory()
+        cat2 = create_usertagcategory()
+
+        create_usertag(cat1, '1')
+        create_usertag(cat1, '2')
+        create_usertag(cat2, 'ME', target='department')
+
+        url = '/api/user-tags'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data[0]['tags']), 2)

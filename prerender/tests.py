@@ -25,6 +25,11 @@ class PrerenderTestCase(APITestCase):
         self.news1 = NewsEntry.objects.create(guid="https://test.com", title="NewsIsGreat",
                         body=self.test_body, blog_url="https://blog", link="https://blog-item")
 
+        parent_body = Body.objects.create(name="Parent")
+        grandparent_body = Body.objects.create(name="GrandParent")
+        BodyChildRelation.objects.create(parent=parent_body, child=self.test_body)
+        BodyChildRelation.objects.create(parent=grandparent_body, child=parent_body)
+
     def test_root(self):
         """Root page prerender test."""
         url = '/'
@@ -59,6 +64,7 @@ class PrerenderTestCase(APITestCase):
         self.assertContains(response, self.test_profile.name)
         self.assertContains(response, self.test_profile.roll_no)
         self.assertNotContains(response, self.test_profile.email)
+        self.assertNotContains(response, self.test_profile.contact_no)
 
         url = '/user/' + str(self.test_profile.ldap_id)
         self.assertEqual(self.client.get(url).content, response.content)

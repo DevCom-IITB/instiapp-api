@@ -1,12 +1,16 @@
 """Unit tests for Events."""
-from datetime import timedelta
 from django.utils import timezone
 from rest_framework.test import APITestCase
-from bodies.models import Body
 from bodies.models import BodyChildRelation
 from events.models import Event
 from roles.models import BodyRole
+from users.models import UserTagCategory
+from users.models import UserTag
 from login.tests import get_new_user
+from helpers.test_helpers import create_body
+from helpers.test_helpers import create_event
+from helpers.test_helpers import create_usertag
+from helpers.test_helpers import create_usertagcategory
 
 class EventTestCase(APITestCase):
     """Check if we can create bodies and link events."""
@@ -16,22 +20,19 @@ class EventTestCase(APITestCase):
         self.user = get_new_user()
         self.client.force_authenticate(self.user) # pylint: disable=E1101
 
-        self.test_body_1 = Body.objects.create(name="TestBody1")
-        self.test_body_2 = Body.objects.create(name="TestBody2")
+        self.test_body_1 = create_body()
+        self.test_body_2 = create_body()
 
         self.body_1_role = BodyRole.objects.create(
             name="Body1Role", body=self.test_body_1, permissions='AddE,UpdE,DelE')
         self.user.profile.roles.add(self.body_1_role)
 
-        self.update_test_event = Event.objects.create(
-            name='TestEventUpdated', start_time=timezone.now() - timedelta(days=1),
-            end_time=timezone.now() - timedelta(days=1))
-        url = '/api/events/' + str(self.update_test_event.id)
+        self.update_test_event = create_event(-24, -24)
+        url = '/api/events/%s' % self.update_test_event.id
         self.update_event_data = self.client.get(url).data
-        self.update_url = '/api/events/' + str(self.update_test_event.id)
+        self.update_url = '/api/events/%s' % self.update_test_event.id
 
-        Event.objects.create(name='TestEvent2', start_time=timezone.now() - timedelta(days=1),
-                             end_time=timezone.now() - timedelta(days=1))
+        create_event(-24, -24)
 
     def test_event_other(self):
         """Check misc paramters of Event"""
@@ -40,56 +41,75 @@ class EventTestCase(APITestCase):
     def test_event_prioritizer(self):
         """Test the event prioritizer."""
 
+        def assertOrder(events, url='/api/events'):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            for index, event in enumerate(events):
+                self.assertEqual(response.data['data'][index]['id'], str(event.id))
+
         # Events in future. event1 after event3 after event2. event4 in past
+        event1 = create_event(48, 48)
+        event2 = create_event(4, 5)
+        event3 = create_event(15, 16)
+        event4 = create_event(-5, -4)
 
-        event1 = Event.objects.create(name="Event1",
-                                      start_time=timezone.now() + timedelta(days=2),
-                                      end_time=timezone.now() + timedelta(days=2))
-
-        event2 = Event.objects.create(name="Event2",
-                                      start_time=timezone.now() + timedelta(hours=4),
-                                      end_time=timezone.now() + timedelta(hours=5))
-
-        event3 = Event.objects.create(name="Event3",
-                                      start_time=timezone.now() + timedelta(hours=15),
-                                      end_time=timezone.now() + timedelta(hours=16))
-
-        event4 = Event.objects.create(name="Event4",
-                                      start_time=timezone.now() - timedelta(hours=5),
-                                      end_time=timezone.now() - timedelta(hours=4))
-
-        url = '/api/events'
-        response = self.client.get(url)
-        self.assertEqual(response.data['data'][0]['id'], str(event2.id))
-        self.assertEqual(response.data['data'][1]['id'], str(event3.id))
-        self.assertEqual(response.data['data'][2]['id'], str(event1.id))
-        self.assertEqual(response.data['data'][3]['id'], str(event4.id))
+        assertOrder([event2, event3, event1, event4])
 
         # Check followed bodies priorities
-        body1 = Body.objects.create(name="TestBody1")
-        body2 = Body.objects.create(name="TestBody2")
-        body3 = Body.objects.create(name="TestBody3")
-        body4 = Body.objects.create(name="TestBody4")
-        body5 = Body.objects.create(name="TestBody5")
+        body1 = create_body()
+        body2 = create_body()
+        body3 = create_body()
+        body4 = create_body()
+        body5 = create_body()
         self.user.profile.followed_bodies.add(body1, body2, body3, body4, body5)
 
         # After the user is following  a body of event 3, it should bump up
         event3.bodies.add(body1)
-
-        response = self.client.get(url)
-        self.assertEqual(response.data['data'][0]['id'], str(event3.id))
-        self.assertEqual(response.data['data'][1]['id'], str(event2.id))
-        self.assertEqual(response.data['data'][2]['id'], str(event1.id))
-        self.assertEqual(response.data['data'][3]['id'], str(event4.id))
+        assertOrder([event3, event2, event1, event4])
 
         # Test the cap on followed bodies bonus
         event1.bodies.add(body1, body2, body3, body4, body5)
+        assertOrder([event3, event1, event2, event4])
 
-        response = self.client.get(url)
-        self.assertEqual(response.data['data'][0]['id'], str(event3.id))
-        self.assertEqual(response.data['data'][1]['id'], str(event1.id))
-        self.assertEqual(response.data['data'][2]['id'], str(event2.id))
-        self.assertEqual(response.data['data'][3]['id'], str(event4.id))
+        # Check user tags - setup the user
+        self.user.profile.hostel = '1'
+        self.user.profile.department = 'ME'
+        self.user.profile.save()
+
+        # Add one matching and one non-matching tag to both
+        category1 = create_usertagcategory()
+        h1_tag = create_usertag(category1, '1')
+        h13_tag = create_usertag(category1, '13')
+        event1.user_tags.add(h1_tag)
+        event3.user_tags.add(h13_tag)
+
+        # Add one matching tag to both events
+        category2 = create_usertagcategory()
+        me_tag = create_usertag(category2, 'ME', target='department')
+        event1.user_tags.add(me_tag)
+        event3.user_tags.add(me_tag)
+
+        # Check new order
+        assertOrder([event1, event2, event4])
+
+        # Check if user needs to satisfy only one tag from each category
+        event1.user_tags.add(h13_tag)
+        assertOrder([event1, event2, event4])
+
+        # Test null check - now the department matching tag is non matching
+        self.user.profile.department = None
+        self.user.profile.save()
+        assertOrder([event2, event4])
+
+        # Test if secondary_target is working
+        me_tag.secondary_target = 'hostel'
+        me_tag.secondary_regex = '1'
+        me_tag.save()
+        assertOrder([event1, event2, event4])
+
+        # Test for anonymous user
+        self.client.logout()
+        assertOrder([event2, event4])
 
     def test_events_list(self):
         """Test if events can be listed."""
@@ -229,6 +249,25 @@ class EventTestCase(APITestCase):
 
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 200)
+
+    def test_event_update9(self):
+        """Event tags can be updated."""
+        # Add an event to an updateable body
+        event = create_event()
+        self.test_body_1.events.add(event)
+
+        # Get the response
+        url = '/api/events/%s' % event.id
+        data = self.client.get(url).data
+
+        # Create tags and assign them
+        category = create_usertagcategory()
+        tag1 = create_usertag(category, '1')
+        tag2 = create_usertag(category, '2')
+        data['user_tags'] = [str(tag1.id), str(tag2.id)]
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(event.user_tags.count(), 2)
 
     def test_event_deletion(self):
         """Check if events can be deleted with priveleges."""

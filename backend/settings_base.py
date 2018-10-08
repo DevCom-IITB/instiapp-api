@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
 
     'rest_framework',
     'rest_framework_swagger',
@@ -36,7 +37,9 @@ INSTALLED_APPS = [
     'messmenu.apps.MessmenuConfig',
     'other.apps.OtherConfig',
     'venter.apps.VenterConfig',
+
     'notifications',
+    'markdownify',
 ]
 
 MIDDLEWARE = [
@@ -122,20 +125,22 @@ STATIC_URL = '/static/'
 
 # Settings for Django REST Framework
 
-REST_FRAMEWORK = {
+REST_FRAMEWORK = {}
 
-}
-
-PRERENDER_TITLE = 'InstiApp'
-PRERENDER_DESCRIPTION = 'InstiApp | IIT Bombay'
+# Prerender configuration
+PRERENDER_TITLE = 'InstiApp | IIT Bombay'
+PRERENDER_DESCRIPTION = 'InstiApp is the front page of all student activities at IIT Bombay'
 LOGO_URL = 'https://insti.app/assets/logo.png'
 
+# Placement blog URLs
 PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
 TRAINING_BLOG_URL = 'http://placements.iitb.ac.in/trainingblog/?feed=rss2'
 
+# Names of bodies to notify when there are new posts on placement/training blog
 PLACEMENTS_BLOG_BODY = 'Placement Blog'
 TRAINING_BLOG_BODY = 'Internship Blog'
 
+# Authentication for chores
 LDAP_USERNAME = None
 LDAP_PASSWORD = None
 
@@ -144,4 +149,9 @@ if 'LDAP_USERNAME' in os.environ and 'LDAP_PASSWORD' in os.environ:
     LDAP_PASSWORD = os.environ['LDAP_PASSWORD']
     print('INFO: LDAP username and password present in environment.')
 
+# Flip for broken external server certificates
 SSO_BAD_CERT = False
+
+# Optional deployment dependent serializer transforms
+USER_PROFILE_SERIALIZER_TRANSFORM = lambda x: x
+USER_PROFILE_FULL_SERIALIZER_TRANSFORM = lambda x: x

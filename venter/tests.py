@@ -16,12 +16,12 @@ class VenterTestCase(APITestCase):
         Complaints.objects.create(created_by=get_new_user().profile)
         Complaints.objects.create(created_by=self.user.profile, status='Deleted')
 
-        url = '/api/complaints'
+        url = '/api/venter/complaints'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
-        url = '/api/complaints?filter=me'
+        url = '/api/venter/complaints?filter=me'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
@@ -29,7 +29,7 @@ class VenterTestCase(APITestCase):
     def test_complaint(self):
         """Test all public methods of venter complaint."""
 
-        url = '/api/complaints'
+        url = '/api/venter/complaints'
 
         TagUris.objects.create(tag_uri='garbage')
         data = {
@@ -55,13 +55,13 @@ class VenterTestCase(APITestCase):
         self.assertEqual(len(response.data['images']), 0)
         self.assertEqual(len(response.data['tags']), 0)
 
-        url = '/api/complaints?filter=me'
+        url = '/api/venter/complaints?filter=me'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
         cid = str(response.data[0]['id'])
-        url = '/api/complaints/' + cid
+        url = '/api/venter/complaints/' + cid
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['description'], 'test')
@@ -75,14 +75,14 @@ class VenterTestCase(APITestCase):
 
         complaint = Complaints.objects.create(created_by=self.user.profile)
 
-        url = '/api/complaints/' + str(complaint.id) + '/comments'
+        url = '/api/venter/complaints/' + str(complaint.id) + '/comments'
 
         data = { 'text': 'test' }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
 
         cid = str(response.data['id'])
-        url = '/api/comments/' + cid
+        url = '/api/venter/comments/' + cid
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['text'], 'test')
@@ -101,7 +101,7 @@ class VenterTestCase(APITestCase):
             text='test_comment',
             commented_by=get_new_user().profile
         )
-        url = '/api/comments/' + str(comment.id)
+        url = '/api/venter/comments/' + str(comment.id)
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 403)
 

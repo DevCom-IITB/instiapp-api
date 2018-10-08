@@ -22,11 +22,28 @@
 <h2>News</h2>
 <ul>
 {% for entry in news  %}
-    <li>
-        <b><a href="{{entry.link}}">{{entry.title}}</b></a><br>
-        {{entry.published}}<br>
-        <a href="/org/{{entry.body.str_id}}">{{entry.body.name}}</a><br>
-        <p>{{entry.content | safe }}</p>
+    <li itemscope itemtype="https://schema.org/NewsArticle">
+        <div>
+            <a itemprop="url" href="{{entry.link}}">
+                <span itemprop="headline"><b>{{entry.title}}</b></span>
+            </a>
+        </div>
+        <span itemprop="datePublished dateModified" content="{{entry.published | date:'c'}}">{{entry.published}}</span>
+        <div itemprop="publisher author" itemscope itemtype="http://schema.org/Organization">
+            <a itemprop="url" href="{{settings.BASE_URL}}/org/{{entry.body.str_id}}">
+                <span itemprop="name">{{entry.body.name}}</span>
+            </a>
+            {% if entry.body.website_url  %}
+                - <a itemprop="sameAs" href="{{entry.body.website_url}}">website</a>
+            {% endif %}
+            <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+                <img itemprop="url" src="{{entry.body.image_url}}" alt="LOGO" style="height:60px">
+                <meta itemprop="width" content="600">
+            </div>
+            <meta itemprop="description" content="{{entry.body.short_description}}">
+        </div>
+        <p itemprop="text">{{entry.content | safe }}</p>
+        <meta itemprop="image" content="{{entry.body.image_url}}">
         <br>
     </li>
 {% endfor %}

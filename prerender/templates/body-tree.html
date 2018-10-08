@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{settings.PRERENDER_TITLE}} Body Tree</title>
+    <title>Body Tree | {{settings.PRERENDER_TITLE}}</title>
 
     <script>
         function toggleImages() {
@@ -32,9 +32,7 @@
 
 <button onclick="toggleImages()">Toggle Images</button><br><br>
 
-{%with body=body settings=settings template_name="body-tree-data.html" %}
-    {%include template_name%}
-{%endwith%}
+{% include "body-tree-data.html" with body=body %}
 
 </body>
 </html>

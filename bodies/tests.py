@@ -56,15 +56,27 @@ class BodyTestCase(APITestCase):
         """Test getting the body with id or str_id."""
         body = Body.objects.create(name="Test #Body 123!")
 
+        # Test GET by plain UUID
         url = '/api/bodies/' + str(body.id)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], body.name)
 
+        # Test GET with str_id
         url = '/api/bodies/test-body-123'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], body.name)
+
+        # Change the canonical name
+        body.canonical_name = "Test Canonical"
+        body.save()
+
+        # Test GET with canonical name
+        url = '/api/bodies/test-canonical'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['str_id'], body.str_id)
 
     def test_bodies_list(self):
         """Test if bodies can be listed."""
