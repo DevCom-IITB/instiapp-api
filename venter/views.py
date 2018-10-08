@@ -14,7 +14,6 @@ from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
 
-
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
