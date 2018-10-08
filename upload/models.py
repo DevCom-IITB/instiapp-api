@@ -34,7 +34,8 @@ class UploadedImage(models.Model):
     def __str__(self):
         return str(self.time_of_creation)
 
-    def resize_convert(self, path):
+    @staticmethod
+    def resize_convert(path):
         """Resize image and convert to JPG."""
         # Maximum Dimension
         MAX_DIM = 800
