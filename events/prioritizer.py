@@ -74,7 +74,7 @@ def get_prioritized(queryset, request):
             event.weight += body_bonus
         # Apply Length Penalty
         event.weight *= length_penalty
-       
+
     return sorted(queryset, key=lambda event: (event.weight, event.start_time), reverse=True)
 
 def get_fresh_events(queryset, delta=3):
