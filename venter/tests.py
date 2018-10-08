@@ -34,7 +34,7 @@ class VenterTestCase(APITestCase):
         TagUris.objects.create(tag_uri='garbage')
         data = {
             'description': 'test',
-            'tags':['flexes', 'garbage'],
+            'tags': ['flexes', 'garbage'],
             'images': [
                 'https://www.google.com/',
                 'https://www.facebook.com/'
@@ -66,9 +66,27 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['description'], 'test')
 
-        response = self.client.put(url, data, format='json')
+        url = '/api/venter/complaints/' + cid + '/upvote'
+
+        # No Action
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        url += '?action='
+
+        # Invalid Action
+        response = self.client.get(url + 'k')
+        self.assertEqual(response.status_code, 400)
+
+        # UpVote
+        response = self.client.get(url + '1')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['users_up_voted']), 1)
+
+        # UnUpVote
+        response = self.client.get(url + '0')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_up_voted']), 0)
 
     def test_comment(self):
         """Test all public venter comment APIs."""
@@ -77,7 +95,7 @@ class VenterTestCase(APITestCase):
 
         url = '/api/venter/complaints/' + str(complaint.id) + '/comments'
 
-        data = { 'text': 'test' }
+        data = {'text': 'test'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
 
@@ -87,7 +105,7 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['text'], 'test')
 
-        data = { 'text': 'test2' }
+        data = {'text': 'test2'}
 
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 200)
