@@ -103,7 +103,6 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         """Shortcut for get_object_or_404 with pk"""
         return get_object_or_404(self.queryset, id=pk)
 
-
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentPostSerializer
