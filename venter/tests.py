@@ -1,6 +1,13 @@
+"""
+To run the tests fire this command:
+
+coverage run manage.py test venter --settings backend.settings_test && coverage html
+"""
+
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
 from venter.models import Complaints, TagUris, Comment, ComplaintMedia
+
 
 class VenterTestCase(APITestCase):
     """Unit tests for venter."""
@@ -34,7 +41,7 @@ class VenterTestCase(APITestCase):
         TagUris.objects.create(tag_uri='garbage')
         data = {
             'description': 'test',
-            'tags':['flexes', 'garbage'],
+            'tags': ['flexes', 'garbage'],
             'images': [
                 'https://www.google.com/',
                 'https://www.facebook.com/'
@@ -66,7 +73,11 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['description'], 'test')
 
-        url = '/api/venter/complaints/'+cid+'/upvote'
+        url = '/api/venter/complaints/' + cid + '/upvote'
+
+        # No Action
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
 
         url += '?action='
 
@@ -91,7 +102,7 @@ class VenterTestCase(APITestCase):
 
         url = '/api/venter/complaints/' + str(complaint.id) + '/comments'
 
-        data = { 'text': 'test' }
+        data = {'text': 'test'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
 
@@ -101,7 +112,7 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['text'], 'test')
 
-        data = { 'text': 'test2' }
+        data = {'text': 'test2'}
 
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 200)
