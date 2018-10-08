@@ -23,6 +23,7 @@ class Command(BaseCommand):
 
             # Stop the spam!
             event.starting_notified = True
+            event.notify = False
             event.save()
 
             # Event About to Start
