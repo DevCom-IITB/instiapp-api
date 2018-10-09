@@ -45,13 +45,28 @@ class EventTestCase(APITestCase):
             for index, event in enumerate(events):
                 self.assertEqual(response.data['data'][index]['id'], str(event.id))
 
+        def assertWeightOrder(events, url='/api/events'):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            prev_weight = response.data['data'][0]['weight']
+            for event in events:
+                response_event = next(x for x in response.data['data'] if x['id'] == str(event.id))
+                self.assertLess(response_event['weight'], prev_weight)
+                prev_weight = response_event['weight']
+
         # Events in future. event1 after event3 after event2. event4 in past
         event1 = create_event(48, 48)
         event2 = create_event(4, 5)
         event3 = create_event(15, 16)
         event4 = create_event(-5, -4)
 
+        # These events check linear decay after 15 days
+        event5 = create_event(24 * 30, 24 * 30)
+        event6 = create_event(24 * 20, 24 * 20)
+        event7 = create_event(24 * 40, 24 * 40)
+
         assertOrder([event2, event3, event1, event4])
+        assertWeightOrder([event6, event5, event7])
 
         # Check followed bodies priorities
         body1 = create_body()
