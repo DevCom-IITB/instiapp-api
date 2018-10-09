@@ -78,7 +78,7 @@ def get_prioritized(queryset, request):
         if days_till_event > 15:
             far_off_multiplier = (1 - (days_till_event - 15) * DECAY_FACTOR)
         event.weight *= far_off_multiplier
-            
+
         # Apply length penalty
         length_penalty = 1 / (1 + TIME_PENALTY_FACTOR * event_length)
         event.weight *= length_penalty
