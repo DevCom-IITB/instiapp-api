@@ -22,7 +22,7 @@ jobs:
           name: install dependencies
           command: |
             python3 -m venv venv
-            ./venv/bin/activate
+            . venv/bin/activate
             pip install -r requirements.txt
 
       - save_cache:
@@ -34,7 +34,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            ./venv/bin/activate
+            . venv/bin/activate
             flake8
             pylint_runner --rcfile=.pylintrc.lax
             python manage.py test --settings backend.settings_test
