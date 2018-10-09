@@ -4,4 +4,4 @@ class OtherConfig(AppConfig):
     name = 'other'
 
     def ready(self):
-        import other.notifications  # pylint: disable=W0612 # noqa: F401
+        import other.notifications  # noqa: F401 pylint: disable=W0612

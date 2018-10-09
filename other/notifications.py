@@ -68,7 +68,8 @@ class NotificationSerializer(serializers.Serializer):
     actor = GenericNotificationRelatedField(read_only=True)
     actor_type = serializers.SerializerMethodField()
 
-    def get_actor_type(self, obj):
+    @staticmethod
+    def get_actor_type(obj):
         """Get the class name of actor."""
         return obj.actor.__class__.__name__.lower()
 
