@@ -9,7 +9,6 @@ from notifications.signals import notify
 
 from login.tests import get_new_user
 from bodies.models import Body
-from events.models import Event
 from events.serializers import EventSerializer
 from users.models import UserProfile
 from news.models import NewsEntry
@@ -17,19 +16,21 @@ from placements.models import BlogEntry
 
 from helpers.test_helpers import create_usertag
 from helpers.test_helpers import create_usertagcategory
+from helpers.test_helpers import create_event
+from helpers.test_helpers import create_body
 
 class OtherTestCase(APITestCase):
     """Test other endpoints."""
 
     def setUp(self):
         # Create bodies
-        body1 = Body.objects.create(name="Test Body1")
-        body2 = Body.objects.create(name="Test Body2")
+        body1 = create_body(name="Test Body1")
+        body2 = create_body(name="Test Body2")
 
         # Create dummy events
-        event1 = Event.objects.create(name="Test Event1", start_time=timezone.now(), end_time=timezone.now())
-        event2 = Event.objects.create(name="Test Event2 Body1", start_time=timezone.now(), end_time=timezone.now())
-        event3 = Event.objects.create(name="Test Event21", start_time=timezone.now(), end_time=timezone.now())
+        event1 = create_event(name="Test Event1")
+        event2 = create_event(name="Test Event2 Body1")
+        event3 = create_event(name="Test Event21")
 
         # Create dummy users for search
         UserProfile.objects.create(name="Test User1")
@@ -43,8 +44,7 @@ class OtherTestCase(APITestCase):
         # Fake authenticate
         self.user = get_new_user()
         self.profile = self.user.profile
-        self.client.force_authenticate(self.user) # pylint: disable=E1101
-
+        self.client.force_authenticate(self.user)  # pylint: disable=E1101
 
     def test_search(self):
         """Test the search endpoint."""
@@ -77,23 +77,23 @@ class OtherTestCase(APITestCase):
         profile = self.profile
 
         # Add two bodies, with the user following #1
-        body1 = Body.objects.create(name="TestBody1")
-        body2 = Body.objects.create(name="TestBody2")
+        body1 = create_body()
+        body2 = create_body()
         profile.followed_bodies.add(body1)
-
-        now = timezone.now()
 
         # Add four events to followed body and one to other.
         # Event 5 has notifications turned off
-        event1 = Event.objects.create(name="TestEvent1", start_time=now, end_time=now)
-        event2 = Event.objects.create(name="TestEvent2", start_time=now, end_time=now)
-        event3 = Event.objects.create(name="TestEvent3", start_time=now, end_time=now)
-        event4 = Event.objects.create(name="TestEvent4", start_time=now, end_time=now)
-        event5 = Event.objects.create(name="TestEvent5", start_time=now, end_time=now, notify=False)
+        event1 = create_event()
+        event2 = create_event()
+        event3 = create_event()
+        event4 = create_event()
+        event5 = create_event()
+        event5.notify = False
+        event5.save()
 
         # Notifications older than a week shouldn't show up
         with freeze_time(timezone.now() - timedelta(days=10)):
-            event6 = Event.objects.create(name="TestEvent6", start_time=now, end_time=now)
+            event6 = create_event()
             event6.bodies.add(body1)
 
         # Add bodies to all events

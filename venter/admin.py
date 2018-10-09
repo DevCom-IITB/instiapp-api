@@ -42,6 +42,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     class Meta:
         model = Complaints
 
+
 admin.site.register(Complaints, ComplaintModelAdmin)
 admin.site.register(Comment, CommentModelAdmin)
 admin.site.register(TagUris)

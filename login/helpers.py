@@ -23,7 +23,7 @@ def perform_login(auth_code, redir, request):
     response_json = response.json()
 
     # Check that we have the access token
-    if not 'access_token' in response_json:
+    if 'access_token' not in response_json:
         return Response(response_json, status=400)
 
     # Get the user's profile
@@ -35,7 +35,7 @@ def perform_login(auth_code, redir, request):
     profile_json = profile_response.json()
 
     # Check if we got at least the user's SSO id
-    if not 'id' in profile_json:
+    if 'id' not in profile_json:
         return Response(profile_response, status=400)
 
     # Check that we have basic details like name and roll no.
@@ -119,19 +119,20 @@ def fill_models_from_sso(user_profile, user, profile_json):
             'department_name',
             'degree',
             'degree_name',
-            'graduation_year']:
+            'graduation_year'
+        ]:
 
             if field in profile_json['program'] and profile_json['program'][field] is not None:
                 setattr(user_profile, field, profile_json['program'][field])
 
     if 'insti_address' in profile_json and profile_json['insti_address'] is not None:
-        if 'room' in profile_json['insti_address'] and 'hostel' in profile_json['insti_address'] and \
-            profile_json['insti_address']['room'] is not None and profile_json['insti_address']['hostel'] is not None:
+        if ('room' in profile_json['insti_address'] and
+                'hostel' in profile_json['insti_address'] and
+                profile_json['insti_address']['room'] is not None and
+                profile_json['insti_address']['hostel'] is not None):
 
             user_profile.hostel = profile_json['insti_address']['hostel']
             user_profile.room = (profile_json['insti_address']['room'])
-
-
 
     # Save the profile
     user.save()

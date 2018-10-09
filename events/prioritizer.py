@@ -38,21 +38,11 @@ def get_prioritized(queryset, request):
 
         # Get difference in days
         end_time_diff = (event.end_time - now).total_seconds() / 86400
-        start_time_diff = (event.start_time - now).total_seconds()  / 86400
+        start_time_diff = (event.start_time - now).total_seconds() / 86400
+        event_length = (event.end_time - event.start_time).total_seconds() / 86400
+        days_till_event = (event.start_time - now).total_seconds() / 86400
 
         start_time_factor = math.exp((-(start_time_diff / TIME_SD)**2))
-
-        # Event Length penalty
-        event_length = (event.end_time - event.start_time).total_seconds()
-        # factor_b is the number of days as a float
-        factor_b = event_length / 86400
-        length_penalty = 1 / (1 + TIME_PENALTY_FACTOR * factor_b)
-
-        # Far off event penalty
-        days_till_event = (event.start_time -now).total_seconds() / 86400
-        far_off_multiplier = 1
-        if days_till_event > 30 :
-            far_off_multiplier = (1 - (days_till_event - 30) * DECAY_FACTOR)
 
         # Apply exponential to and penalise finished events
         if event.end_time < now:
@@ -82,8 +72,16 @@ def get_prioritized(queryset, request):
                 if body in followed_bodies:
                     body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * start_time_factor))
             event.weight += body_bonus
-        # Apply Length Penalty
-        event.weight *= (length_penalty*far_off_multiplier)
+
+        # Far off event penalty
+        far_off_multiplier = 1
+        if days_till_event > 15:
+            far_off_multiplier = (1 - (days_till_event - 15) * DECAY_FACTOR)
+        event.weight *= far_off_multiplier
+            
+        # Apply length penalty
+        length_penalty = 1 / (1 + TIME_PENALTY_FACTOR * event_length)
+        event.weight *= length_penalty
 
     return sorted(queryset, key=lambda event: (event.weight, event.start_time), reverse=True)
 

@@ -32,7 +32,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
         return Response(serialized)
 
-    def list(self, request): #pylint: disable=unused-argument
+    def list(self, request):  # pylint: disable=unused-argument
         """List Events.
         List fresh events prioritized for the current user."""
 
@@ -51,7 +51,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
         serializer = EventSerializer(queryset, many=True, context={'request': request})
         data = serializer.data
 
-        return Response({'count':len(data), 'data':data})
+        return Response({'count': len(data), 'data': data})
 
     @login_required_ajax
     def create(self, request):
@@ -117,7 +117,6 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
             return super().update(request, pk)
 
         return forbidden_no_privileges()
-
 
     @login_required_ajax
     def destroy(self, request, pk):

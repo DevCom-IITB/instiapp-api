@@ -30,7 +30,7 @@ def get_news_image(news):
 class Command(BaseCommand):
     help = 'Sends push notifications'
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901
         """Send Push notifications."""
 
         sent = 0
@@ -148,7 +148,7 @@ class Command(BaseCommand):
                 # Get a dict in the format we want
                 dict_sub = {
                     "endpoint": subscription.endpoint,
-                    "keys":{
+                    "keys": {
                         "p256dh": subscription.p256dh,
                         "auth": subscription.auth
                     }

@@ -12,7 +12,7 @@ def test_blog(obj, url, count):
 
     # Try after authentication
     user = get_new_user()
-    obj.client.force_authenticate(user) # pylint: disable=E1101
+    obj.client.force_authenticate(user)  # pylint: disable=E1101
     response = obj.client.get(url)
     obj.assertEqual(response.status_code, 200)
     obj.assertEqual(len(response.data), count)
