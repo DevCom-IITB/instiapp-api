@@ -21,12 +21,12 @@ class LoginViewSet(viewsets.ViewSet):
         # Check if we have the auth code
         auth_code = request.GET.get('code')
         if auth_code is None:
-            return Response({"message" : "{?code} is required"}, status=400)
+            return Response({"message": "{?code} is required"}, status=400)
 
         # Check we have redir param
         redir = request.GET.get('redir')
         if redir is None:
-            return Response({"message" : "{?redir} is required"}, status=400)
+            return Response({"message": "{?redir} is required"}, status=400)
 
         return perform_login(auth_code, redir, request)
 
@@ -38,12 +38,12 @@ class LoginViewSet(viewsets.ViewSet):
         # Check if we have the username
         username = request.GET.get('username')
         if username is None:
-            return Response({"message" : "{?username} is required"}, status=400)
+            return Response({"message": "{?username} is required"}, status=400)
 
         # Check if we have the password
         password = request.GET.get('password')
         if password is None:
-            return Response({"message" : "{?password} is required"}, status=400)
+            return Response({"message": "{?password} is required"}, status=400)
 
         # Make a new session
         session = requests.Session()
@@ -68,7 +68,7 @@ class LoginViewSet(viewsets.ViewSet):
         # Authenticate
         response = session.post(URL, data=data, verify=not settings.SSO_BAD_CERT)
         if not response.history:
-            return Response({"message" : "Bad username or password"}, status=403)
+            return Response({"message": "Bad username or password"}, status=403)
 
         # If the user has not authenticated in the past
         if "?code=" not in response.url:
@@ -84,7 +84,10 @@ class LoginViewSet(viewsets.ViewSet):
                 "client_id": settings.SSO_CLIENT_ID,
                 "state": "",
                 "response_type": "code",
-                "scopes_array": ["profile", "picture", "ldap", "sex", "phone", "program", "secondary_emails", "insti_address"],
+                "scopes_array": [
+                    "profile", "picture", "ldap", "sex", "phone",
+                    "program", "secondary_emails", "insti_address"
+                ],
                 "allow": "Authorize"
             }
             response = session.post(response.url, data, verify=not settings.SSO_BAD_CERT)
@@ -100,7 +103,7 @@ class LoginViewSet(viewsets.ViewSet):
 
         # Check if the user is authenticated
         if not request.user.is_authenticated:
-            return Response({"message":"not logged in"}, status=401)
+            return Response({"message": "not logged in"}, status=401)
 
         # Check if the user has a profile
         try:

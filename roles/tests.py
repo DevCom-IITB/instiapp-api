@@ -12,7 +12,7 @@ class RoleTestCase(APITestCase):
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()
-        self.client.force_authenticate(self.user) # pylint: disable=E1101
+        self.client.force_authenticate(self.user)  # pylint: disable=E1101
 
         self.body = Body.objects.create(name="Body1")
         self.bodyrole = BodyRole.objects.create(

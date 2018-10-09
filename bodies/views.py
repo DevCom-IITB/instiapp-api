@@ -24,7 +24,7 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
         return {'request': self.request}
 
     @classmethod
-    def list(cls, request): #pylint: disable=unused-argument
+    def list(cls, request):  # pylint: disable=unused-argument
         queryset = Body.objects.all()
         queryset = sort_by_field(queryset, 'followers', reverse=True)
         serializer = BodySerializerMin(queryset, many=True)

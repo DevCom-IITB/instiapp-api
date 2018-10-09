@@ -2,19 +2,23 @@ from rest_framework.test import APITestCase
 from login.tests import get_new_user
 from venter.models import Complaints, TagUris, Comment, ComplaintMedia
 
+
 class VenterTestCase(APITestCase):
     """Unit tests for venter."""
 
     def setUp(self):
         self.user = get_new_user()
-        self.client.force_authenticate(self.user)
+        self.client.force_authenticate(self.user)  # pylint: disable=E1101
 
     def test_complaint_get(self):
         """Test getting venter complaint lists."""
 
-        Complaints.objects.create(created_by=self.user.profile)
-        Complaints.objects.create(created_by=get_new_user().profile)
-        Complaints.objects.create(created_by=self.user.profile, status='Deleted')
+        def create_complaint(user, **kwargs):
+            Complaints.objects.create(created_by=user, **kwargs)
+
+        create_complaint(self.user.profile)
+        create_complaint(get_new_user().profile)
+        create_complaint(self.user.profile, status='Deleted')
 
         url = '/api/venter/complaints'
         response = self.client.get(url)

@@ -66,7 +66,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         # Get status from query paramter
         status = request.GET.get('status')
         if status is None:
-            return Response({"message" : "status is required"}, status=400)
+            return Response({"message": "status is required"}, status=400)
         status = int(status)
 
         # Try to get existing UES

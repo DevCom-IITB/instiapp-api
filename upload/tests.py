@@ -19,7 +19,7 @@ class UploadTestCase(APITestCase):
 
         # Fake authenticate and try again
         user = get_new_user()
-        self.client.force_authenticate(user) # pylint: disable=E1101
+        self.client.force_authenticate(user)  # pylint: disable=E1101
 
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)

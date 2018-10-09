@@ -5,4 +5,5 @@ class LocationAdmin(admin.ModelAdmin):
     list_filter = ('reusable',)
     search_fields = ['name']
 
+
 admin.site.register(Location, LocationAdmin)
