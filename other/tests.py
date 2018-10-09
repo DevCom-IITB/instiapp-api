@@ -9,7 +9,6 @@ from notifications.signals import notify
 
 from login.tests import get_new_user
 from bodies.models import Body
-from events.models import Event
 from events.serializers import EventSerializer
 from users.models import UserProfile
 from news.models import NewsEntry
