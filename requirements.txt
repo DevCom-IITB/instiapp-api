@@ -18,3 +18,4 @@ beautifulsoup4==4.6.3
 freezegun==0.3.10
 django-markdownify==0.8.0
 flake8==3.5.0
+PyYAML==3.13

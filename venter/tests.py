@@ -8,7 +8,7 @@ class VenterTestCase(APITestCase):
 
     def setUp(self):
         self.user = get_new_user()
-        self.client.force_authenticate(self.user)
+        self.client.force_authenticate(self.user)  # pylint: disable=E1101
 
     def test_complaint_get(self):
         """Test getting venter complaint lists."""
