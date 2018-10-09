@@ -4,10 +4,7 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6.1
-
-      # Specify service dependencies here if necessary
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
+      - image: circleci/postgres:9.4
 
     working_directory: ~/repo
 
