@@ -49,10 +49,10 @@ def get_prioritized(queryset, request):
         length_penalty = 1 / (1 + TIME_PENALTY_FACTOR * factor_b)
 
         # Far off event penalty
-        days_till_event = (event.end_time -now).total_days()
+        days_till_event = (event.start_time -now).total_seconds() / 86400
         far_off_multiplier = 1
         if days_till_event > 30 :
-            far_off_multiplier = (1-(days_till_event-30)*DECAY_FACTOR)
+            far_off_multiplier = (1 - (days_till_event - 30) * DECAY_FACTOR)
 
         # Apply exponential to and penalise finished events
         if event.end_time < now:
