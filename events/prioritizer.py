@@ -14,7 +14,9 @@ BODY_FOLLOWING_BONUS = 100               # Bonus if the body is followed
 TIME_DEP_BODY_BONUS = 200                # Bonus if the body is followed dependent on time
 BODY_BONUS_MAX = 400                     # Maximum bonus for followed bodies
 TIME_PENALTY_FACTOR = 0.4                # Multiplying factor for event length penalty
-NOT_TAG_TARGET_PENALTY = 2000
+LINEAR_DECAY = 0.05                       # Slope of linear decay
+FAR_OFF_THRESHOLD = 15                   # Time in days after which events are considered far off
+NOT_TAG_TARGET_PENALTY = 2000            # Penalty if not targeted in a restricted event
 
 def get_prioritized(queryset, request):
     now = timezone.now()
@@ -37,6 +39,7 @@ def get_prioritized(queryset, request):
         end_time_diff = (event.end_time - now).total_seconds() / 86400
         start_time_diff = (event.start_time - now).total_seconds() / 86400
         event_length = (event.end_time - event.start_time).total_seconds() / 86400
+        days_till_event = (event.start_time - now).total_seconds() / 86400
 
         start_time_factor = math.exp((-(start_time_diff / TIME_SD)**2))
 
@@ -68,6 +71,12 @@ def get_prioritized(queryset, request):
                 if body in followed_bodies:
                     body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * start_time_factor))
             event.weight += body_bonus
+
+        # Far off event penalty
+        far_off_multiplier = 1
+        if days_till_event > FAR_OFF_THRESHOLD:
+            far_off_multiplier = (1 - (days_till_event - FAR_OFF_THRESHOLD) * LINEAR_DECAY)
+        event.weight *= far_off_multiplier
 
         # Apply length penalty
         length_penalty = 1 / (1 + TIME_PENALTY_FACTOR * event_length)
