@@ -4,3 +4,4 @@ ignore=.git,__pycache__,backend,*/migrations/*
 
 [MESSAGES CONTROL]
 max-line-length=120
+disable=C,R,W
