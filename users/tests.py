@@ -14,7 +14,7 @@ class UserTestCase(APITestCase):
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()
-        self.client.force_authenticate(self.user) # pylint: disable=E1101
+        self.client.force_authenticate(self.user)  # pylint: disable=E1101
         self.test_body = Body.objects.create(name="test")
 
     def test_get_user(self):
@@ -82,7 +82,7 @@ class UserTestCase(APITestCase):
 
         # Check updating user information
         data = {
-            'fcm_id':'TEST1'
+            'fcm_id': 'TEST1'
         }
         url = '/api/user-me'
         response = self.client.patch(url, data, format='json')
@@ -90,7 +90,7 @@ class UserTestCase(APITestCase):
         self.assertEqual(UserProfile.objects.get(id=self.user.profile.id).fcm_id, 'TEST1')
 
         # Check patch validation
-        data = { 'fcm_id': 'long' * 200 }
+        data = {'fcm_id': 'long' * 200}
         url = '/api/user-me'
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, 400)

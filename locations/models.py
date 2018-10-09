@@ -34,6 +34,6 @@ class Location(models.Model):
         verbose_name_plural = "Locations"
         ordering = ("name",)
         indexes = [
-            models.Index(fields=['reusable',]),
+            models.Index(fields=['reusable', ]),
             models.Index(fields=['reusable', 'group_id']),
         ]

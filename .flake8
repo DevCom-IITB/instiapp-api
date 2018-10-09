@@ -1,0 +1,5 @@
+[flake8]
+exclude = .git,__pycache__,backend/settings*,*/migrations/*
+ignore = E302,E731
+max-complexity = 10
+max-line-length = 120

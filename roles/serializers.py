@@ -44,12 +44,14 @@ class RoleSerializerWithEvents(serializers.ModelSerializer):
     events = serializers.SerializerMethodField()
     body_detail = BodySerializerMin(read_only=True, source='body')
     bodies = serializers.SerializerMethodField()
-    get_bodies = lambda self, obj: RoleSerializer.get_bodies(obj)
 
     class Meta:
         model = BodyRole
         fields = ('id', 'name', 'inheritable', 'body', 'body_detail',
                   'bodies', 'permissions', 'events', 'priority')
+
+    def get_bodies(self, obj):
+        return RoleSerializer.get_bodies(obj)
 
     def get_events(self, obj):
         return EventSerializer(get_fresh_prioritized_events(

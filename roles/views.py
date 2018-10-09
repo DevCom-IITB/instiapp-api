@@ -19,7 +19,7 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
         if user_has_insti_privilege(request.user.profile, 'RoleB'):
             return super().create(request)
 
-        if not 'body' in request.data or not request.data['body']:
+        if 'body' not in request.data or not request.data['body']:
             return Response({"body": "body is required"}, status=400)
         if not user_has_privilege(request.user.profile, request.data['body'], 'Role'):
             return forbidden_no_privileges()
@@ -62,4 +62,4 @@ class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ances
     def get_my_roles(cls, request):
         """Get roles with nested events."""
         return Response(RoleSerializerWithEvents(
-            request.user.profile.roles, many=True, context={'request':request}).data)
+            request.user.profile.roles, many=True, context={'request': request}).data)

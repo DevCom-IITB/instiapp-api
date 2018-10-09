@@ -50,7 +50,7 @@ def root(request):
     return HttpResponse(rendered)
 
 def news(request):
-    news_items = NewsEntry.objects.all()[0 : 20]
+    news_items = NewsEntry.objects.all()[0:20]
     news_items = news_items.prefetch_related('body')
     rendered = render_to_string('news.html', {'news': news_items, 'settings': settings})
     return HttpResponse(rendered)

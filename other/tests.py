@@ -43,8 +43,7 @@ class OtherTestCase(APITestCase):
         # Fake authenticate
         self.user = get_new_user()
         self.profile = self.user.profile
-        self.client.force_authenticate(self.user) # pylint: disable=E1101
-
+        self.client.force_authenticate(self.user)  # pylint: disable=E1101
 
     def test_search(self):
         """Test the search endpoint."""

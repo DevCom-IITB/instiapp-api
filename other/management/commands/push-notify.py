@@ -148,7 +148,7 @@ class Command(BaseCommand):
                 # Get a dict in the format we want
                 dict_sub = {
                     "endpoint": subscription.endpoint,
-                    "keys":{
+                    "keys": {
                         "p256dh": subscription.p256dh,
                         "auth": subscription.auth
                     }

@@ -22,7 +22,7 @@ def query_from_num(request, default_num, queryset):
     if num_q is not None and str.isdigit(num_q) and int(num_q) <= 100:
         num = int(num_q)
 
-    return queryset[from_i : from_i + num]
+    return queryset[from_i: from_i + num]
 
 def query_search(request, min_length, queryset, fields):
     """Returns queryset with search filter."""
@@ -30,7 +30,7 @@ def query_search(request, min_length, queryset, fields):
     if search is not None and len(search) >= min_length:
         all_queries = Q()
         for field in fields:
-            all_queries = all_queries | Q(**{field + '__icontains' : search})
+            all_queries = all_queries | Q(**{field + '__icontains': search})
         return queryset.filter(all_queries)
 
     return queryset

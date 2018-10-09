@@ -16,7 +16,7 @@ class EventTestCase(APITestCase):
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()
-        self.client.force_authenticate(self.user) # pylint: disable=E1101
+        self.client.force_authenticate(self.user)  # pylint: disable=E1101
 
         self.test_body_1 = create_body()
         self.test_body_2 = create_body()

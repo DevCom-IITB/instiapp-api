@@ -14,7 +14,7 @@ class LocationTestCase(APITestCase):
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()
-        self.client.force_authenticate(self.user) # pylint: disable=E1101
+        self.client.force_authenticate(self.user)  # pylint: disable=E1101
 
         self.test_body_1 = Body.objects.create(name="TestBody1")
         self.body_1_role = BodyRole.objects.create(
@@ -29,8 +29,10 @@ class LocationTestCase(APITestCase):
 
     def test_location_other(self):
         """Check misc parameters of Location"""
-        self.assertEqual(str(self.reusable_test_location),
-                 self.reusable_test_location.short_name + ' - ' + self.reusable_test_location.name)
+        self.assertEqual(
+            str(self.reusable_test_location),
+            '%s - %s' % (self.reusable_test_location.short_name, self.reusable_test_location.name)
+        )
 
     def test_location_get(self):
         """Check that only reusable locations are listed in get."""
