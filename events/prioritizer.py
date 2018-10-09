@@ -14,6 +14,9 @@ BODY_FOLLOWING_BONUS = 100               # Bonus if the body is followed
 TIME_DEP_BODY_BONUS = 200                # Bonus if the body is followed dependent on time
 BODY_BONUS_MAX = 400                     # Maximum bonus for followed bodies
 TIME_PENALTY_FACTOR = 0.4                # Multiplying factor for event length penalty
+LINEAR_DECAY = 0.4                       # Factor to determine decay value of far-off events
+FAR_OFF_THRESHOLD = 30                   # Time in days after which events are considered far off
+DECAY_FACTOR = 0.03                      # Factor by which Far off penalty changes
 NOT_TAG_TARGET_PENALTY = 2000
 
 def get_prioritized(queryset, request):
@@ -44,6 +47,13 @@ def get_prioritized(queryset, request):
         # factor_b is the number of days as a float
         factor_b = event_length / 86400
         length_penalty = 1 / (1 + TIME_PENALTY_FACTOR * factor_b)
+
+        # Far off event penalty
+        days_till_event = (event.end_time -now).total_days()
+        far_off_multiplier = 1
+        if days_till_event > 30 :
+            far_off_multiplier = (1-(days_till_event-30)*DECAY_FACTOR)
+
         # Apply exponential to and penalise finished events
         if event.end_time < now:
             event.weight -= FINISHED_PENALTY
@@ -73,7 +83,7 @@ def get_prioritized(queryset, request):
                     body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * start_time_factor))
             event.weight += body_bonus
         # Apply Length Penalty
-        event.weight *= length_penalty
+        event.weight *= (length_penalty*far_off_multiplier)
 
     return sorted(queryset, key=lambda event: (event.weight, event.start_time), reverse=True)
 
