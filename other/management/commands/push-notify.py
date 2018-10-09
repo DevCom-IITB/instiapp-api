@@ -30,7 +30,7 @@ def get_news_image(news):
 class Command(BaseCommand):
     help = 'Sends push notifications'
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901
         """Send Push notifications."""
 
         sent = 0
