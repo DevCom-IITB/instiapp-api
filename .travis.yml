@@ -15,8 +15,6 @@ install:
   - pip install codecov
 
 script:
-  - flake8
-  - pylint_runner --rcfile=.pylintrc.lax
   - coverage run --source ./ manage.py test -v2
   - codecov
 
