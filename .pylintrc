@@ -1,3 +1,3 @@
 [MESSAGES CONTROL]
 max-line-length=120
-disable=R,C,W
+disable=R,C
