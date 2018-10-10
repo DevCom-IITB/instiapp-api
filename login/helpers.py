@@ -158,7 +158,5 @@ class SSOFiller():
             data_key = response_key
         if not target:
             target = self.profile_json
-        if not self.jhas(response_key, target):
-            print(response_key, 'not found', target)
-            return
-        setattr(self.user_profile, data_key, target[response_key])
+        if self.jhas(response_key, target):
+            setattr(self.user_profile, data_key, target[response_key])
