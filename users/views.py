@@ -14,7 +14,7 @@ from users.models import UserProfile
 from users.models import WebPushSubscription
 from roles.helpers import login_required_ajax
 
-class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
+class UserProfileViewSet(viewsets.ModelViewSet):
     """UserProfile"""
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileFullSerializer
@@ -73,7 +73,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-an
         ues = UserEventStatus.objects.filter(event__id=event_pk, user=request.user.profile)
 
         # Delete record if unknown status
-        if status != 1 and status != 2:
+        if status not in (1, 2):
             if ues.exists():
                 ues.delete()
             return Response(status=204)

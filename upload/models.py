@@ -29,8 +29,6 @@ class UploadedImage(models.Model):
         if self.pk and self.picture:
             self.resize_convert(self.picture.path)
 
-        return None
-
     def __str__(self):
         return str(self.time_of_creation)
 

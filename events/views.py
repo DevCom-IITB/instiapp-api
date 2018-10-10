@@ -13,7 +13,7 @@ from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
 
-class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
+class EventViewSet(viewsets.ModelViewSet):
     """Event"""
 
     queryset = Event.objects.all()
@@ -32,7 +32,7 @@ class EventViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestor
 
         return Response(serialized)
 
-    def list(self, request):  # pylint: disable=unused-argument
+    def list(self, request):
         """List Events.
         List fresh events prioritized for the current user."""
 

@@ -138,7 +138,7 @@ class Command(BaseCommand):
                         message_body=message_body, data_message=data_message, sound='default')
 
                 fcm += 1
-            except Exception as ex:
+            except Exception as ex:  # pylint: disable=W0703
                 print(profile.name, ex)
                 badfcm += 1
 

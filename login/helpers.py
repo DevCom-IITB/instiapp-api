@@ -114,12 +114,12 @@ def fill_models_from_sso(user_profile, user, profile_json):
     # Fill in program details
     if 'program' in profile_json and profile_json['program'] is not None:
         for field in [
-            'join_year',
-            'department',
-            'department_name',
-            'degree',
-            'degree_name',
-            'graduation_year'
+                'join_year',
+                'department',
+                'department_name',
+                'degree',
+                'degree_name',
+                'graduation_year'
         ]:
 
             if field in profile_json['program'] and profile_json['program'][field] is not None:

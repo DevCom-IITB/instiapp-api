@@ -66,7 +66,7 @@ class Command(BaseCommand):
                 print("Aggregating for", body.name, "- ", end="", flush=True)
                 fill_blog(body.blog_url, body)
                 print("")
-            except Exception:
+            except Exception:  # pylint: disable=W0703
                 print("Failed!")
 
         self.stdout.write(self.style.SUCCESS('News Chore completed successfully'))

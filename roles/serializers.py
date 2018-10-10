@@ -50,7 +50,8 @@ class RoleSerializerWithEvents(serializers.ModelSerializer):
         fields = ('id', 'name', 'inheritable', 'body', 'body_detail',
                   'bodies', 'permissions', 'events', 'priority')
 
-    def get_bodies(self, obj):
+    @staticmethod
+    def get_bodies(obj):
         return RoleSerializer.get_bodies(obj)
 
     def get_events(self, obj):
