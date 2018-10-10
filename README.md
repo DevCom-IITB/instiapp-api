@@ -17,7 +17,7 @@ To setup dependenices, make a new `virtualenv`, activate it and run `pip install
 * `python manage.py runserver` to start a local server.
 * `python manage.py test --settings backend.settings_test` to run automated tests.
 * `flake8` to lint with `flake8`.
-* `pylint_runner --rcfile=.pylintrc.lax` to check for errors statically with `pylint` in all files.
+* `pylint_runner` to check for code style and other errors statically with `pylint` in all files.
 
 It is recommended to set up your IDE with both `pylint` and `flake8`, since these will cause the CircleCI build to fail. Google's [Python Style Guide](https://google.github.io/styleguide/pyguide.html) is followed upto a certain extent in all modules.
 

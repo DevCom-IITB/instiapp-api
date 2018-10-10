@@ -34,7 +34,7 @@ jobs:
           command: |
             . venv/bin/activate
             flake8
-            pylint_runner --rcfile=.pylintrc.lax
+            pylint_runner
 
       - run:
           name: Run Tests
