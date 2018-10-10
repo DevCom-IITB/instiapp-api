@@ -5,28 +5,25 @@ from django.db.models import Q
 from events.models import Event
 from users.models import UserTag
 
-class FollowersMethods:
-    """Helper methods for followers."""
+def get_followers(obj, status):
+    """Get serialized followers with specified status."""
+    from users.serializers import UserProfileSerializer
+    followers = [ues.user for ues in obj.ues.all() if ues.status == status]
+    return UserProfileSerializer(followers, many=True).data
 
-    @staticmethod
-    def get_followers(obj, status):
-        """Get serialized followers with specified status."""
-        from users.serializers import UserProfileSerializer
-        followers = [ues.user for ues in obj.ues.all() if ues.status == status]
-        return UserProfileSerializer(followers, many=True).data
+def get_user_ues(slf, obj):
+    """Get UES for current user or 0."""
+    # May not always want this
+    if 'request' not in slf.context:
+        return None
 
-    @staticmethod
-    def get_user_ues(slf, obj):
-        """Get UES for current user or 0."""
-        # May not always want this
-        if 'request' not in slf.context:
-            return None
+    request = slf.context['request']
+    if request.user.is_authenticated:
+        profile = request.user.profile
+        ues = [ues.status for ues in obj.ues.all() if ues.user == profile]
+        return ues[0] if ues else 0
 
-        request = slf.context['request']
-        if request.user.is_authenticated:
-            profile = request.user.profile
-            ues = [ues.status for ues in obj.ues.all() if ues.user == profile]
-            return ues[0] if ues else 0
+    return None
 
 class EventSerializer(serializers.ModelSerializer):
     """Serializer for Event.
@@ -44,7 +41,7 @@ class EventSerializer(serializers.ModelSerializer):
     going_count = serializers.IntegerField(read_only=True)
 
     user_ues = serializers.SerializerMethodField()
-    get_user_ues = FollowersMethods.get_user_ues
+    get_user_ues = get_user_ues
 
     venues = LocationSerializerMin(many=True, read_only=True)
 
@@ -86,13 +83,13 @@ class EventFullSerializer(serializers.ModelSerializer):
     going_count = serializers.IntegerField(read_only=True)
 
     interested = serializers.SerializerMethodField()
-    get_interested = lambda self, obj: FollowersMethods.get_followers(obj, 1)
+    get_interested = lambda self, obj: get_followers(obj, 1)
 
     going = serializers.SerializerMethodField()
-    get_going = lambda self, obj: FollowersMethods.get_followers(obj, 2)
+    get_going = lambda self, obj: get_followers(obj, 2)
 
     user_ues = serializers.SerializerMethodField()
-    get_user_ues = FollowersMethods.get_user_ues
+    get_user_ues = get_user_ues
 
     venues = LocationSerializerMin(many=True, read_only=True)
     venue_names = serializers.SlugRelatedField(

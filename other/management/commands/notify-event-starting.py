@@ -50,7 +50,7 @@ class Command(BaseCommand):
                     registration_id = profile.fcm_id
                     push_service.notify_single_device(registration_id=registration_id, data_message=data_message)
                     count += 1
-                except Exception as ex:
+                except Exception as ex:  # pylint: disable=W0703
                     print(profile.name, ex)
 
         print('Sent', count, 'rich notifications')

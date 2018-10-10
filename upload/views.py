@@ -4,7 +4,7 @@ from upload.serializers import UploadedImageSerializer
 from upload.models import UploadedImage
 from roles.helpers import login_required_ajax
 
-class UploadViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
+class UploadViewSet(viewsets.ModelViewSet):
     """Upload"""
     queryset = UploadedImage.objects.all()
     serializer_class = UploadedImageSerializer

@@ -14,7 +14,7 @@ from roles.helpers import login_required_ajax
 from roles.helpers import insti_permission_required
 from helpers.misc import sort_by_field
 
-class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
+class BodyViewSet(viewsets.ModelViewSet):
     """Body"""
     queryset = Body.objects.all()
     queryset = BodySerializer.setup_eager_loading(queryset)
@@ -23,8 +23,8 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
     def get_serializer_context(self):
         return {'request': self.request}
 
-    @classmethod
-    def list(cls, request):  # pylint: disable=unused-argument
+    @staticmethod
+    def list(request):
         queryset = Body.objects.all()
         queryset = sort_by_field(queryset, 'followers', reverse=True)
         serializer = BodySerializerMin(queryset, many=True)
@@ -95,7 +95,7 @@ class BodyViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
 
-class BodyFollowersViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
+class BodyFollowersViewSet(viewsets.ModelViewSet):
     """List followers of body."""
     queryset = Body.objects.all()
     serializer_class = BodyFollowersSerializer

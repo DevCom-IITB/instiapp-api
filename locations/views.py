@@ -9,7 +9,7 @@ from roles.helpers import user_has_insti_privilege
 from roles.helpers import user_has_privilege
 from roles.helpers import forbidden_no_privileges
 
-class LocationViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
+class LocationViewSet(viewsets.ModelViewSet):
     """Location"""
     queryset = Location.objects.all()
     serializer_class = LocationSerializer

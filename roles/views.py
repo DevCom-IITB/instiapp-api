@@ -9,7 +9,7 @@ from roles.helpers import user_has_insti_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
 
-class BodyRoleViewSet(viewsets.ModelViewSet):   # pylint: disable=too-many-ancestors
+class BodyRoleViewSet(viewsets.ModelViewSet):
     """Body Role"""
     queryset = BodyRole.objects.all()
     serializer_class = RoleSerializer

@@ -1,5 +1,5 @@
-import feedparser
 import re
+import feedparser
 import requests
 from requests.auth import HTTPBasicAuth
 from dateutil.parser import parse

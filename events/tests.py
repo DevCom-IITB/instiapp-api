@@ -36,7 +36,7 @@ class EventTestCase(APITestCase):
         """Check misc paramters of Event"""
         self.assertEqual(str(self.update_test_event), self.update_test_event.name)
 
-    def test_event_prioritizer(self):
+    def test_event_prioritizer(self):  # pylint: disable=R0914,R0915
         """Test the event prioritizer."""
 
         def assertOrder(events, url='/api/events'):

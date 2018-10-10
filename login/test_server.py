@@ -115,7 +115,7 @@ class S(BaseHTTPRequestHandler):
                 self._set_headers()
                 self.wfile.write(b'{"error":"auth test failed"}')
 
-    def log_message(self, format, *args):
+    def log_message(self, format, *args):  # pylint: disable=W0622
         return
 
 def run(server_class=HTTPServer, handler_class=S, port=33000):

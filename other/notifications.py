@@ -48,7 +48,7 @@ def news_saved(instance, created, **kwargs):  # pylint: disable=W0613
         for profile in instance.body.followers.all():
             notify.send(instance, recipient=profile.user, verb=instance.body.name + " added a new news article")
 
-class GenericNotificationRelatedField(serializers.RelatedField):
+class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disable=W0223
     """Serializer for actor/target of notifications."""
     def to_representation(self, value):
         if isinstance(value, Event):
@@ -60,7 +60,7 @@ class GenericNotificationRelatedField(serializers.RelatedField):
 
         return serializer.data
 
-class NotificationSerializer(serializers.Serializer):
+class NotificationSerializer(serializers.Serializer):  # pylint: disable=W0223
     """Notification Serializer, with unread and actor"""
     id = serializers.IntegerField()
     verb = serializers.ReadOnlyField(read_only=True)
