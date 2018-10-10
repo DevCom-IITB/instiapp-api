@@ -51,7 +51,7 @@ def handle_entry(entry, body, url):
 
         # Send notifications for mentioned users
         for profile in PROFILES:
-            if profile.user and profile.roll_no and profile.roll_no in db_entry.content:
+            if profile.roll_no and profile.roll_no in db_entry.content and profile.user:
                 notify.send(db_entry, recipient=profile.user, verb="You were mentioned in a blog post")
 
 def fill_blog(url, body_name):
