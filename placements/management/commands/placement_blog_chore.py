@@ -14,6 +14,46 @@ from helpers.misc import table_to_markdown
 # Prefetch objects
 PROFILES = UserProfile.objects.all()
 
+def handle_entry(entry, body, url):
+    """Handle a single entry from a feed."""
+
+    # Try to get an entry existing
+    guid = entry['id']
+    db_entries = BlogEntry.objects.filter(guid=guid)
+    new_added = False
+
+    # Reuse if entry exists, create new otherwise
+    if db_entries.exists():
+        db_entry = db_entries[0]
+    else:
+        db_entry = BlogEntry.objects.create(guid=guid)
+        db_entry.blog_url = url
+        new_added = True
+
+    # Fill the db entry
+    if 'title' in entry:
+        db_entry.title = entry['title']
+    if 'content' in entry and entry['content']:
+        db_entry.content = handle_html(entry['content'][0]['value'])
+    if 'link' in entry:
+        db_entry.link = entry['link']
+    if 'published' in entry:
+        db_entry.published = parse(entry['published'])
+
+    db_entry.save()
+
+    # Send notification to mentioned people
+    if new_added and db_entry.content:
+        # Send notifications to followers
+        if body is not None:
+            for follower in body.followers.all():
+                notify.send(db_entry, recipient=follower.user, verb="New post on " + body.name)
+
+        # Send notifications for mentioned users
+        for profile in PROFILES:
+            if profile.roll_no and profile.roll_no in db_entry.content and profile.user:
+                notify.send(db_entry, recipient=profile.user, verb="You were mentioned in a blog post")
+
 def fill_blog(url, body_name):
     # Get the body
     body = None
@@ -31,42 +71,7 @@ def fill_blog(url, body_name):
 
     # Add each entry if doesn't exist
     for entry in feeds['entries']:
-        # Try to get an entry existing
-        guid = entry['id']
-        db_entries = BlogEntry.objects.filter(guid=guid)
-        new_added = False
-
-        # Reuse if entry exists, create new otherwise
-        if db_entries.exists():
-            db_entry = db_entries[0]
-        else:
-            db_entry = BlogEntry.objects.create(guid=guid)
-            db_entry.blog_url = url
-            new_added = True
-
-        # Fill the db entry
-        if 'title' in entry:
-            db_entry.title = entry['title']
-        if 'content' in entry and entry['content']:
-            db_entry.content = handle_html(entry['content'][0]['value'])
-        if 'link' in entry:
-            db_entry.link = entry['link']
-        if 'published' in entry:
-            db_entry.published = parse(entry['published'])
-
-        db_entry.save()
-
-        # Send notification to mentioned people
-        if new_added and db_entry.content:
-            # Send notifications to followers
-            if body is not None:
-                for follower in body.followers.all():
-                    notify.send(db_entry, recipient=follower.user, verb="New post on " + body_name)
-
-            # Send notifications for mentioned users
-            for profile in PROFILES:
-                if profile.user and profile.roll_no and profile.roll_no in db_entry.content:
-                    notify.send(db_entry, recipient=profile.user, verb="You were mentioned in a blog post")
+        handle_entry(entry, body, url)
 
 def handle_html(content):
     # Convert tables to markdown

@@ -62,9 +62,13 @@ class LoginTestCase(APITestCase):
 
         # Assert that at least a few fields are saved correctly
         user = UserProfile.objects.get(id=response.data['profile_id'])
+        self.assertEqual(user.name, "First Name Last Name")
         self.assertEqual(user.email, "username@iitb.ac.in")
-        self.assertEqual(user.department, "DEPARTMENT")
+        self.assertEqual(user.contact_no, "9876543210")
+        self.assertEqual(user.profile_pic, "https://gymkhana.iitb.ac.in/sso/path/to/profile_picture_file")
         self.assertEqual(user.join_year, 2012)
+        self.assertEqual(user.department, "DEPARTMENT")
+        self.assertEqual(user.degree, "DEGREE")
         self.assertEqual(user.hostel, "HOSTEL")
         self.assertEqual(user.room, "room_number")
 

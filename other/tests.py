@@ -71,7 +71,7 @@ class OtherTestCase(APITestCase):
         self.assertEqual(len(response.data['events']), 0)
         self.assertEqual(len(response.data['users']), 2)
 
-    def test_notifications(self):
+    def test_notifications(self):  # pylint: disable=R0914,R0915
         """Test notifications API."""
         # Fake authenticate
         profile = self.profile

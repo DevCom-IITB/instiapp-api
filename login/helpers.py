@@ -81,59 +81,82 @@ def perform_login(auth_code, redir, request):
 
 def fill_models_from_sso(user_profile, user, profile_json):
     """Fill models from SSO data."""
+    SSOFiller(user_profile, user, profile_json).fill().save()
 
-    # Fill in data into the profile from SSO
-    for response_key, data_key in {
-            'first_name': 'name',
-            'email': 'email',
-            'mobile': 'contact_no',
-            'roll_number': 'roll_no',
-            'username': 'ldap_id'}.items():
+class SSOFiller():
+    """Helper class to fill user model from SSO."""
 
-        if response_key in profile_json and profile_json[response_key] is not None:
-            setattr(user_profile, data_key, profile_json[response_key])
+    def __init__(self, user_profile, user, profile_json):
+        self.user_profile = user_profile
+        self.user = user
+        self.profile_json = profile_json
 
-    # Fill in some special parameters
-    if 'first_name' in profile_json and 'last_name' in profile_json:
-        if profile_json['first_name'] is not None and profile_json['last_name'] is not None:
-            user_profile.name = profile_json['first_name'] + ' ' + profile_json['last_name']
-            user.first_name = profile_json['first_name']
-            user.last_name = profile_json['last_name']
+    def fill(self):
+        self.fill_common()
+        self.fill_name()
+        self.oset('email')
+        self.fill_contact()
+        self.fill_profile_pic()
+        self.fill_program()
+        self.fill_insti_address()
+        return self
 
-    if 'email' in profile_json:
-        if profile_json['email'] is not None:
-            user.email = profile_json['email']
+    def save(self):
+        self.user.save()
+        self.user_profile.save()
+        return self
 
-    if 'contacts' in profile_json and profile_json['contacts']:
-        user_profile.contact_no = profile_json['contacts'][0]['number']
+    def fill_common(self):
+        """Fill in common data into the profile from SSO. """
+        for response_key, data_key in {
+                'first_name': 'name',
+                'email': 'email',
+                'mobile': 'contact_no',
+                'roll_number': 'roll_no',
+                'username': 'ldap_id'
+        }.items():
+            self.oset(response_key, data_key)
 
-    if 'profile_picture' in profile_json:
-        if profile_json['profile_picture'] is not None:
-            user_profile.profile_pic = 'https://gymkhana.iitb.ac.in' + profile_json['profile_picture']
+    def fill_name(self):
+        if self.jhas('first_name') and self.jhas('last_name'):
+            self.user_profile.name = '%s %s' % (self.jget('first_name'), self.jget('last_name'))
 
-    # Fill in program details
-    if 'program' in profile_json and profile_json['program'] is not None:
-        for field in [
-                'join_year',
-                'department',
-                'department_name',
-                'degree',
-                'degree_name',
-                'graduation_year'
-        ]:
+    def fill_contact(self):
+        if self.jhas('contacts'):
+            self.user_profile.contact_no = self.jget('contacts')[0]['number']
 
-            if field in profile_json['program'] and profile_json['program'][field] is not None:
-                setattr(user_profile, field, profile_json['program'][field])
+    def fill_profile_pic(self):
+        if self.jhas('profile_picture'):
+            self.user_profile.profile_pic = 'https://gymkhana.iitb.ac.in' + self.jget('profile_picture')
 
-    if 'insti_address' in profile_json and profile_json['insti_address'] is not None:
-        if ('room' in profile_json['insti_address'] and
-                'hostel' in profile_json['insti_address'] and
-                profile_json['insti_address']['room'] is not None and
-                profile_json['insti_address']['hostel'] is not None):
+    def fill_program(self):
+        if self.jhas('program'):
+            target = self.jget('program')
+            self.oset('join_year', target=target)
+            self.oset('department', target=target)
+            self.oset('department_name', target=target)
+            self.oset('degree', target=target)
+            self.oset('degree_name', target=target)
+            self.oset('graduation_year', target=target)
 
-            user_profile.hostel = profile_json['insti_address']['hostel']
-            user_profile.room = (profile_json['insti_address']['room'])
+    def fill_insti_address(self):
+        if self.jhas('insti_address'):
+            target = self.jget('insti_address')
+            self.oset('hostel', target=target)
+            self.oset('room', target=target)
 
-    # Save the profile
-    user.save()
-    user_profile.save()
+    def jhas(self, response_key, target=None):
+        if not target:
+            target = self.profile_json
+        return response_key in target and target[response_key] is not None
+
+    def jget(self, response_key):
+        return self.profile_json[response_key]
+
+    def oset(self, response_key, data_key=None, target=None):
+        if data_key is None:
+            data_key = response_key
+        if not target:
+            target = self.profile_json
+        if self.jhas(response_key, target):
+            setattr(self.user_profile, data_key, target[response_key])

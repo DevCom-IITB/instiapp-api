@@ -83,40 +83,17 @@ class EventViewSet(viewsets.ModelViewSet):
         if 'bodies_id' not in request.data or not request.data['bodies_id']:
             return forbidden_no_privileges()
 
-        # Get difference in bodies
+        # Get the event currently in database
         event = self.get_event(pk)
-        old_bodies_id = [str(x.id) for x in event.bodies.all()]
-        new_bodies_id = request.data['bodies_id']
-        added_bodies = diff_set(new_bodies_id, old_bodies_id)
-        removed_bodies = diff_set(old_bodies_id, new_bodies_id)
 
-        # Check if user can add events for new bodies
-        can_add_events = all(
-            [user_has_privilege(request.user.profile, id, 'AddE') for id in added_bodies])
+        # Check if difference in bodies is valid
+        if not can_update_bodies(request.data['bodies_id'], event, request.user.profile):
+            return forbidden_no_privileges()
 
-        # Check if user can remove events for removed
-        can_del_events = all(
-            [user_has_privilege(request.user.profile, id, 'DelE') for id in removed_bodies])
+        # Create added unreusable venues, unlink deleted ones
+        request.data['venue_ids'] = get_update_venue_ids(request.data['venue_names'], event)
 
-        # Check if the user can update event for any of the old bodies
-        can_update = any(
-            [user_has_privilege(request.user.profile, id, 'UpdE') for id in old_bodies_id])
-
-        if can_add_events and can_del_events and can_update:
-            # Create added unreusable venues, unlink deleted ones
-            old_venue_names = [x.name for x in event.venues.all()]
-            new_venue_names = request.data['venue_names']
-            added_venues = diff_set(new_venue_names, old_venue_names)
-            common_venues = list(set(old_venue_names).intersection(new_venue_names))
-
-            common_venue_ids = [str(x.id) for x in event.venues.filter(name__in=common_venues)]
-            added_venue_ids = create_unreusable_locations(added_venues)
-
-            request.data['venue_ids'] = added_venue_ids + common_venue_ids
-
-            return super().update(request, pk)
-
-        return forbidden_no_privileges()
+        return super().update(request, pk)
 
     @login_required_ajax
     def destroy(self, request, pk):
@@ -137,3 +114,39 @@ class EventViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
+
+
+def can_update_bodies(new_bodies_id, event, profile):
+    """Check if the user is permitted to change the event bodies to ones given."""
+
+    # Get current and difference in body ids
+    old_bodies_id = [str(x.id) for x in event.bodies.all()]
+    added_bodies = diff_set(new_bodies_id, old_bodies_id)
+    removed_bodies = diff_set(old_bodies_id, new_bodies_id)
+
+    # Check if user can add events for new bodies
+    can_add_events = all(
+        [user_has_privilege(profile, bid, 'AddE') for bid in added_bodies])
+
+    # Check if user can remove events for removed
+    can_del_events = all(
+        [user_has_privilege(profile, bid, 'DelE') for bid in removed_bodies])
+
+    # Check if the user can update event for any of the old bodies
+    can_update = any(
+        [user_has_privilege(profile, bid, 'UpdE') for bid in old_bodies_id])
+
+    return can_add_events and can_del_events and can_update
+
+def get_update_venue_ids(venue_names, event):
+    """Get venue ids with minimal object creation for updating event."""
+
+    old_venue_names = [x.name for x in event.venues.all()]
+    new_venue_names = venue_names
+    added_venues = diff_set(new_venue_names, old_venue_names)
+    common_venues = list(set(old_venue_names).intersection(new_venue_names))
+
+    common_venue_ids = [str(x.id) for x in event.venues.filter(name__in=common_venues)]
+    added_venue_ids = create_unreusable_locations(added_venues)
+
+    return added_venue_ids + common_venue_ids
