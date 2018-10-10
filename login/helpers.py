@@ -120,8 +120,6 @@ class SSOFiller():
     def fill_name(self):
         if self.jhas('first_name') and self.jhas('last_name'):
             self.user_profile.name = '%s %s' % (self.jget('first_name'), self.jget('last_name'))
-            self.oset('first_name')
-            self.oset('last_name')
 
     def fill_contact(self):
         if self.jhas('contacts'):
