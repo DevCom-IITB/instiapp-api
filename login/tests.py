@@ -60,7 +60,7 @@ class LoginTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
 
-        # Assert that at least a few fields are saved correctly
+        # Assert user profile properties
         user = UserProfile.objects.get(id=response.data['profile_id'])
         self.assertEqual(user.name, "First Name Last Name")
         self.assertEqual(user.email, "username@iitb.ac.in")
@@ -71,6 +71,10 @@ class LoginTestCase(APITestCase):
         self.assertEqual(user.degree, "DEGREE")
         self.assertEqual(user.hostel, "HOSTEL")
         self.assertEqual(user.room, "room_number")
+
+        # Assert user object properties
+        self.assertEqual(user.user.first_name, "First Name")
+        self.assertEqual(user.user.last_name, "Last Name")
 
         # Terminate our server
         mock_server.terminate()
