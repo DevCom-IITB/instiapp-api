@@ -65,8 +65,8 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
         # For multiple tags and single tags
         if 'tags' in request.GET:
-            filter = request.query_params.getlist('tags')
-            clauses = (Q(tags__tag_uri__icontains=p) for p in filter)
+            val = request.query_params.getlist('tags')
+            clauses = (Q(tags__tag_uri__icontains=p) for p in val)
             query = reduce(operator.or_, clauses)
             complaint = complaint.filter(query)
 
