@@ -1,4 +1,7 @@
 """Views for venter."""
+from functools import reduce
+
+from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -9,11 +12,32 @@ from venter.models import Comment
 from venter.models import ComplaintMedia
 from venter.models import TagUris
 
-from venter.serializers import ComplaintSerializer
+from venter.serializers import ComplaintSerializer,TagSerializer
 from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
 
+import operator
+
+# TagViewSet for the getting related tags
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = TagUris.objects.all()
+    serializer_class = TagSerializer
+
+    @classmethod
+    def list(cls, request):
+        tag = TagUris.objects.all()
+        if 'tags' in request.GET:
+            val = request.query_params.get('tags')
+            tag =TagUris.objects.filter(tag_uri__icontains=val)
+
+    # Serialize and return
+        serialized = TagSerializer(
+            	 tag, context={'get': 'list'}, many=True).data
+
+        return Response(serialized)
+
+# ComplaintViewSet to get the complaints
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
@@ -36,9 +60,21 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         if 'filter' in request.GET:
             complaint = complaint.filter(created_by=request.user.profile)
 
-        # Serialize and return
+        #Filter for a particular word search
+        if 'search' in request.GET:
+            filter = request.query_params.get('search')
+            complaint = complaint.filter(description__icontains=filter)
+
+        #For multiple tags and single tags
+        if 'tags' in request.GET:
+            filter = request.query_params.getlist('tags')
+            clauses = (Q(tags__tag_uri__icontains=p) for p in filter)
+            query = reduce(operator.or_, clauses)
+            complaint = complaint.filter(query)
+
         serialized = ComplaintSerializer(
-            complaint, context={'request': request}, many=True).data
+            complaint , context={'request': request}, many=True).data
+
         return Response(serialized)
 
     @classmethod

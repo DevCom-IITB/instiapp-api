@@ -30,11 +30,25 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
+    def test_tags_get(self):
+
+        TagUris.objects.create(tag_uri='garbage')
+        TagUris.objects.create(tag_uri='Stray dogs')
+
+        url = '/api/venter/tags'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.data),2)
+
+        url = '/api/venter/tags?tags=gar'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
     def test_complaint(self):
         """Test all public methods of venter complaint."""
 
         url = '/api/venter/complaints'
-
         TagUris.objects.create(tag_uri='garbage')
         data = {
             'description': 'test',
@@ -51,15 +65,41 @@ class VenterTestCase(APITestCase):
         self.assertEqual(len(response.data['tags']), 2)
 
         data = {
-            'description': 'test'
+            'description': 'test',
+            'tags': ['Stray Dogs', 'Potholes'],
         }
 
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(response.data['images']), 0)
-        self.assertEqual(len(response.data['tags']), 0)
+        self.assertEqual(len(response.data['tags']), 2)
 
         url = '/api/venter/complaints?filter=me'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+        url = '/api/venter/complaints?search=te'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+        url = '/api/venter/complaints?search'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+        url = '/api/venter/complaints?tags'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 4)
+
+        url = '/api/venter/complaints?tags=stra'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        url = '/api/venter/complaints?tags=stra&tags=Po'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
