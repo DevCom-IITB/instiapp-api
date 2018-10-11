@@ -60,8 +60,8 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
         # Filter for a particular word search
         if 'search' in request.GET:
-            filter = request.query_params.get('search')
-            complaint = complaint.filter(description__icontains=filter)
+            val = request.query_params.get('search')
+            complaint = complaint.filter(description__icontains=val)
 
         # For multiple tags and single tags
         if 'tags' in request.GET:
