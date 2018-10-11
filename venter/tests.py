@@ -45,7 +45,8 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
-    def test_complaint(self):  # pylint: disable=E1101
+    # pylint: disable=E1101
+    def test_complaint(self):
         """ Test all public methods of venter complaint."""
         url = '/api/venter/complaints'
         TagUris.objects.create(tag_uri='garbage')
