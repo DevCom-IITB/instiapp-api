@@ -49,6 +49,7 @@ class VenterTestCase(APITestCase):
         """Test all public methods of venter complaint."""
 
         url = '/api/venter/complaints'
+
         TagUris.objects.create(tag_uri='garbage')
         data = {
             'description': 'test',

@@ -1,6 +1,5 @@
 """Views for venter."""
 from functools import reduce
-
 from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from rest_framework import viewsets
@@ -72,9 +71,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             query = reduce(operator.or_, clauses)
             complaint = complaint.filter(query)
 
+        # Serialize and return
         serialized = ComplaintSerializer(
             complaint , context={'request': request}, many=True).data
-
         return Response(serialized)
 
     @classmethod
