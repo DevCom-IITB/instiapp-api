@@ -124,7 +124,7 @@ class SSOFiller():
             self.user.last_name = self.jget('last_name')
 
     def fill_contact(self):
-        if self.jhas('contacts'):
+        if self.jhas('contacts') and self.jget('contacts'):
             self.user_profile.contact_no = self.jget('contacts')[0]['number']
 
     def fill_profile_pic(self):
