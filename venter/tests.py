@@ -45,7 +45,7 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
-    # pylint: disable=E1101
+    # pylint: disable=R0915
     def test_complaint(self):
         """ Test all public methods of venter complaint."""
         url = '/api/venter/complaints'
