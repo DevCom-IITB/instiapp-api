@@ -11,7 +11,7 @@ from venter.models import Comment
 from venter.models import ComplaintMedia
 from venter.models import TagUris
 
-from venter.serializers import ComplaintSerializer,TagSerializer
+from venter.serializers import ComplaintSerializer, TagSerializer
 from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
@@ -28,11 +28,11 @@ class TagViewSet(viewsets.ModelViewSet):
         tag = TagUris.objects.all()
         if 'tags' in request.GET:
             val = request.query_params.get('tags')
-            tag =TagUris.objects.filter(tag_uri__icontains=val)
+            tag = TagUris.objects.filter(tag_uri__icontains=val)
 
     # Serialize and return
         serialized = TagSerializer(
-            	 tag, context={'get': 'list'}, many=True).data
+            tag, context={'get': 'list'}, many=True).data
 
         return Response(serialized)
 
@@ -59,12 +59,12 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         if 'filter' in request.GET:
             complaint = complaint.filter(created_by=request.user.profile)
 
-        #Filter for a particular word search
+        # Filter for a particular word search
         if 'search' in request.GET:
             filter = request.query_params.get('search')
             complaint = complaint.filter(description__icontains=filter)
 
-        #For multiple tags and single tags
+        # For multiple tags and single tags
         if 'tags' in request.GET:
             filter = request.query_params.getlist('tags')
             clauses = (Q(tags__tag_uri__icontains=p) for p in filter)
@@ -73,7 +73,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
         # Serialize and return
         serialized = ComplaintSerializer(
-            complaint , context={'request': request}, many=True).data
+            complaint, context={'request': request}, many=True).data
         return Response(serialized)
 
     @classmethod

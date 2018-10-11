@@ -37,8 +37,8 @@ class VenterTestCase(APITestCase):
 
         url = '/api/venter/tags'
         response = self.client.get(url)
-        self.assertEqual(response.status_code,200)
-        self.assertEqual(len(response.data),2)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
 
         url = '/api/venter/tags?tags=gar'
         response = self.client.get(url)
