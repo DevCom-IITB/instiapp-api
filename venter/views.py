@@ -18,13 +18,13 @@ from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
 
-""" TagViewSet for the getting related tags """
 class TagViewSet(viewsets.ModelViewSet):
     queryset = TagUris.objects.all()
     serializer_class = TagSerializer
 
     @classmethod
     def list(cls, request):
+        """TagViewSet for the getting related tags"""
         queryset = TagUris.objects.all()
         if 'tags' in request.GET:
             val = request.query_params.get('tags')
@@ -37,12 +37,12 @@ class TagViewSet(viewsets.ModelViewSet):
         return Response(serialized)
 
 
-""" ComplaintViewSet to get the complaints """
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
 
     def retrieve(self, request, pk):
+        """ComplaintViewSet to get the complaints"""
         complaint = self.get_complaint(pk)
         serialized = ComplaintSerializer(
             complaint, context={'request': request}).data
