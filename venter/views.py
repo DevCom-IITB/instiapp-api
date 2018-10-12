@@ -12,30 +12,31 @@ from venter.models import Comment
 from venter.models import ComplaintMedia
 from venter.models import TagUris
 
-from venter.serializers import ComplaintSerializer, TagSerializer
+from venter.serializers import ComplaintSerializer
+from venter.serializers import TagSerializer
 from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
 
-# TagViewSet for the getting related tags
+""" TagViewSet for the getting related tags """
 class TagViewSet(viewsets.ModelViewSet):
     queryset = TagUris.objects.all()
     serializer_class = TagSerializer
 
     @classmethod
     def list(cls, request):
-        tag = TagUris.objects.all()
+        queryset = TagUris.objects.all()
         if 'tags' in request.GET:
             val = request.query_params.get('tags')
-            tag = TagUris.objects.filter(tag_uri__icontains=val)
+            queryset = TagUris.objects.filter(tag_uri__icontains=val)
 
-    # Serialize and return
+        # Serialize and return
         serialized = TagSerializer(
-            tag, context={'get': 'list'}, many=True).data
+            queryset, context={'get': 'list'}, many=True).data
 
         return Response(serialized)
 
-# ComplaintViewSet to get the complaints
+""" ComplaintViewSet to get the complaints """
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer

@@ -1,6 +1,7 @@
 """URLs for venter."""
 from django.urls import path
-from venter.views import ComplaintViewSet, TagViewSet
+from venter.views import ComplaintViewSet
+from venter.views import TagViewSet
 from venter.views import CommentViewSet
 
 urlpatterns = [

@@ -31,6 +31,7 @@ class VenterTestCase(APITestCase):
         self.assertEqual(len(response.data), 1)
 
     def test_tags_get(self):
+        """ Test all tags or particular tag return."""
 
         TagUris.objects.create(tag_uri='garbage')
         TagUris.objects.create(tag_uri='Stray dogs')
@@ -45,9 +46,10 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
-    # pylint: disable=R0915
-    def test_complaint(self):
+
+    def test_complaint(self):  # pylint: disable=R0915
         """ Test all public methods of venter complaint."""
+
         url = '/api/venter/complaints'
         TagUris.objects.create(tag_uri='garbage')
         data = {
