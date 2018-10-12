@@ -36,6 +36,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
         return Response(serialized)
 
+
 """ ComplaintViewSet to get the complaints """
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
