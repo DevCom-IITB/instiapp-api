@@ -1,4 +1,7 @@
 """Views for venter."""
+from functools import reduce
+import operator
+from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -10,15 +13,36 @@ from venter.models import ComplaintMedia
 from venter.models import TagUris
 
 from venter.serializers import ComplaintSerializer
+from venter.serializers import TagSerializer
 from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
+
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = TagUris.objects.all()
+    serializer_class = TagSerializer
+
+    @classmethod
+    def list(cls, request):
+        """TagViewSet for the getting related tags"""
+        queryset = TagUris.objects.all()
+        if 'tags' in request.GET:
+            val = request.query_params.get('tags')
+            queryset = TagUris.objects.filter(tag_uri__icontains=val)
+
+        # Serialize and return
+        serialized = TagSerializer(
+            queryset, context={'get': 'list'}, many=True).data
+
+        return Response(serialized)
+
 
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
 
     def retrieve(self, request, pk):
+        """ComplaintViewSet to get the complaints"""
         complaint = self.get_complaint(pk)
         serialized = ComplaintSerializer(
             complaint, context={'request': request}).data
@@ -35,6 +59,18 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         # Check if the user specific filter is present
         if 'filter' in request.GET:
             complaint = complaint.filter(created_by=request.user.profile)
+
+        # Filter for a particular word search
+        if 'search' in request.GET:
+            val = request.query_params.get('search')
+            complaint = complaint.filter(description__icontains=val)
+
+        # For multiple tags and single tags
+        if 'tags' in request.GET:
+            val = request.query_params.getlist('tags')
+            clauses = (Q(tags__tag_uri__icontains=p) for p in val)
+            query = reduce(operator.or_, clauses)
+            complaint = complaint.filter(query)
 
         # Serialize and return
         serialized = ComplaintSerializer(
