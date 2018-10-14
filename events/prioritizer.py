@@ -13,7 +13,7 @@ TIME_L_END = 1.2                         # Lambda for exponential of ended penal
 BODY_FOLLOWING_BONUS = 100               # Bonus if the body is followed
 TIME_DEP_BODY_BONUS = 200                # Bonus if the body is followed dependent on time
 BODY_BONUS_MAX = 400                     # Maximum bonus for followed bodies
-TIME_PENALTY_FACTOR = 0.4                # Multiplying factor for event length penalty
+TIME_PENALTY_FACTOR = 0.05               # Multiplying factor for event length penalty
 LINEAR_DECAY = 0.05                      # Slope of linear decay
 FAR_OFF_THRESHOLD = 15                   # Time in days after which events are considered far off
 NOT_TAG_TARGET_PENALTY = 2000            # Penalty if not targeted in a restricted event
@@ -94,7 +94,7 @@ class EventPrioritizer():  # pylint: disable=R0902
 
     def penalise_length(self):
         """Penalise long running events."""
-        self.weight *= 1 / (1 + TIME_PENALTY_FACTOR * self.event_length)
+        self.weight *= 1 / (1 + TIME_PENALTY_FACTOR * math.floor(self.event_length))
 
 
 def get_prioritized(queryset, request):
