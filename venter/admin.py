@@ -1,35 +1,44 @@
 """Admin models for venter."""
 from django.contrib import admin
+from django.core.mail import send_mass_mail
+
 from venter.models import Complaints
 from venter.models import Comment
 from venter.models import TagUris
 from venter.models import ComplaintMedia
 
+
 class CommentTabularInline(admin.TabularInline):
     model = Comment
     readonly_fields = ('text', 'time', 'commented_by',)
+
 
 class TagTabularInline(admin.TabularInline):
     model = Complaints.tags.through
     verbose_name = 'Tag'
     verbose_name_plural = 'Tags'
 
+
 class UserLikedTabularInline(admin.TabularInline):
     model = Complaints.users_up_voted.through
     verbose_name = 'User up Voted'
     verbose_name_plural = 'Users up voted'
 
+
 class ComplaintMediaTabularInline(admin.TabularInline):
     model = ComplaintMedia
     readonly_fields = ('image_url',)
+
 
 class ComplaintMediaModelAdmin(admin.ModelAdmin):
     list_display = ['image_url', 'complaint']
     model = ComplaintMedia
 
+
 class CommentModelAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'commented_by', 'complaint', 'time']
     model = Comment
+
 
 class ComplaintModelAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'created_by', 'report_date', 'status']
@@ -38,6 +47,38 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     inlines = [CommentTabularInline, TagTabularInline, UserLikedTabularInline, ComplaintMediaTabularInline]
     exclude = ('tags', 'users_up_voted', 'media',)
     search_fields = ['status', 'description', 'created_by__name']
+    actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']
+
+    def mark_as_resolved(self, request, queryset):
+        queryset.update(status='Resolved')
+
+    mark_as_resolved.short_description = "Mark selected complaints as Resolved"
+
+    def mark_as_in_progress(self, request, queryset):
+        queryset.update(status='In Progress')
+
+    mark_as_in_progress.short_description = "Mark selected complaints as In Progress"
+
+    def mark_as_deleted(self, request, queryset):
+        queryset.update(status='Deleted')
+
+    mark_as_deleted.short_description = "Mark selected complaints as Deleted"
+
+    @staticmethod
+    def send_emails(request, queryset):
+        mail_list = []
+
+        for object in queryset:
+            subject = 'Complaint from %s located %s' % ({object.created_by}, {object.location_description})
+            message = '%s' % ({object.description})
+            sender_id = 'webmaster@localhost'
+            recipient_list = ['%s' % ({object.authority_email})]
+
+            email_message = (subject, message, sender_id, recipient_list)
+
+            mail_list.append(email_message)
+
+            send_mass_mail(tuple(mail_list))
 
     class Meta:
         model = Complaints
