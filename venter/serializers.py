@@ -15,6 +15,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     commented_by = UserProfileSerializer()
+
     class Meta:
         model = Comment
         fields = (
@@ -32,7 +33,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
         model = Complaints
         fields = (
             'id', 'created_by', 'description', 'report_date', 'status', 'latitude',
-            'longitude', 'location_description', 'tags', 'comments', 'users_up_voted','images'
+            'longitude', 'location_description', 'tags', 'comments', 'users_up_voted', 'images'
         )
 
 class ComplaintPostSerializer(serializers.ModelSerializer):

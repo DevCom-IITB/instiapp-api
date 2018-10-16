@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 try:
                     fetch_hostel(client, hostel)
                     print("OK")
-                except Exception:
+                except Exception:  # pylint: disable=W0703
                     print("FAIL")
             else:
                 print("SKIP")

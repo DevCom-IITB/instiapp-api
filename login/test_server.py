@@ -9,6 +9,7 @@ Send a HEAD request::
 Send a POST request::
     curl -d "foo=bar&bin=baz" http://localhost
 """
+import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 def send_302(obj, loc):
@@ -27,7 +28,40 @@ class S(BaseHTTPRequestHandler):
             self._set_headers()
             auth = str(self.headers["Authorization"])
             if "Bearer ACCESS_TOKEN" in auth:
-                self.wfile.write(b'{"id":3,"username":"username","first_name":"First Name","type":"TYPE","profile_picture":"/sso/path/to/profile_picture_file","last_name":"Last Name","sex":"SEX","email":"username@iitb.ac.in","mobile":"0123456789","roll_number":"123456789","program":{"id":1,"department":"DEPARTMENT","department_name":"FULL_DEPARTMENT_NAME","join_year":2012,"graduation_year":2016,"degree":"DEGREE","degree_name":"FULL_DEGREE_NAME"},"secondary_emails":[{"id":1,"email":"user_email@gmail.com"}],"contacts":[{"id":1,"number":"9876543210"}],"insti_address":{"id":1,"room":"room_number","hostel":"HOSTEL","hostel_name":"FULL_HOSTEL_NAME"}}')
+                data = {
+                    "id": 3,
+                    "username": "username",
+                    "first_name": "First Name",
+                    "type": "TYPE",
+                    "profile_picture": "/sso/path/to/profile_picture_file",
+                    "last_name": "Last Name",
+                    "sex": "SEX",
+                    "email": "username@iitb.ac.in",
+                    "mobile": "0123456789",
+                    "roll_number": "123456789",
+                    "program": {
+                        "id": 1,
+                        "department": "DEPARTMENT",
+                        "department_name": "FULL_DEPARTMENT_NAME",
+                        "join_year": 2012,
+                        "graduation_year": 2016,
+                        "degree": "DEGREE",
+                        "degree_name": "FULL_DEGREE_NAME"
+                    },
+                    "secondary_emails": [
+                        {"id": 1, "email": "user_email@gmail.com"}
+                    ],
+                    "contacts": [
+                        {"id": 1, "number": "9876543210"}
+                    ],
+                    "insti_address": {
+                        "id": 1,
+                        "room": "room_number",
+                        "hostel": "HOSTEL",
+                        "hostel_name": "FULL_HOSTEL_NAME"
+                    }
+                }
+                self.wfile.write(json.dumps(data).encode())
             elif "Bearer LOW_PRIV_ACCESS_TOKEN" in auth:
                 self.wfile.write(b'{"id":3,"username":"username"}')
             else:
@@ -81,7 +115,7 @@ class S(BaseHTTPRequestHandler):
                 self._set_headers()
                 self.wfile.write(b'{"error":"auth test failed"}')
 
-    def log_message(self, format, *args):
+    def log_message(self, format, *args):  # pylint: disable=W0622
         return
 
 def run(server_class=HTTPServer, handler_class=S, port=33000):

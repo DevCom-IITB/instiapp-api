@@ -17,10 +17,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     contact_no = serializers.SerializerMethodField()
 
     events_interested = serializers.SerializerMethodField()
-    get_events_interested = lambda self, obj: self.get_events(obj, 1)
-
     events_going = serializers.SerializerMethodField()
-    get_events_going = lambda self, obj: self.get_events(obj, 2)
 
     followed_bodies = BodySerializerMin(many=True, read_only=True)
 
@@ -34,6 +31,12 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
                   'events_going', 'email', 'roll_no', 'contact_no',
                   'about', 'followed_bodies', 'fcm_id', 'android_version', 'roles',
                   'institute_roles', 'website_url', 'ldap_id', 'hostel', 'former_roles')
+
+    def get_events_going(self, obj):
+        return self.get_events(obj, 2)
+
+    def get_events_interested(self, obj):
+        return self.get_events(obj, 1)
 
     def get_email(self, obj):
         """Gets the email only if a user is logged in."""

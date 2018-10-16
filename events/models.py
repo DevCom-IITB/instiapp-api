@@ -52,7 +52,7 @@ class Event(models.Model):
         verbose_name_plural = "Events"
         ordering = ("-start_time",)
         indexes = [
-            models.Index(fields=['start_time',]),
+            models.Index(fields=['start_time', ]),
         ]
 
 class UserEventStatus(models.Model):

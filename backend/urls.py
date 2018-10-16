@@ -25,6 +25,7 @@ def api_base(prefix=None):
         return 'api/'
     return 'api/' + prefix + '/'
 
+
 urlpatterns = [
     # Admin site
     path('admin/', admin.site.urls),

@@ -60,13 +60,21 @@ class LoginTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
 
-        # Assert that at least a few fields are saved correctly
+        # Assert user profile properties
         user = UserProfile.objects.get(id=response.data['profile_id'])
+        self.assertEqual(user.name, "First Name Last Name")
         self.assertEqual(user.email, "username@iitb.ac.in")
-        self.assertEqual(user.department, "DEPARTMENT")
+        self.assertEqual(user.contact_no, "9876543210")
+        self.assertEqual(user.profile_pic, "https://gymkhana.iitb.ac.in/sso/path/to/profile_picture_file")
         self.assertEqual(user.join_year, 2012)
+        self.assertEqual(user.department, "DEPARTMENT")
+        self.assertEqual(user.degree, "DEGREE")
         self.assertEqual(user.hostel, "HOSTEL")
         self.assertEqual(user.room, "room_number")
+
+        # Assert user object properties
+        self.assertEqual(user.user.first_name, "First Name")
+        self.assertEqual(user.user.last_name, "Last Name")
 
         # Terminate our server
         mock_server.terminate()
@@ -83,7 +91,7 @@ class LoginTestCase(APITestCase):
 
         # Try get-user without profile
         user = User.objects.get(username='3')
-        self.client.force_authenticate(user) # pylint: disable=E1101
+        self.client.force_authenticate(user)  # pylint: disable=E1101
         user.profile.delete()
         url = 'http://localhost/api/login/get-user'
         response = self.client.get(url, format='json')

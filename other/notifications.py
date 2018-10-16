@@ -11,7 +11,7 @@ from news.serializers import NewsEntrySerializer
 from placements.models import BlogEntry
 from placements.serializers import BlogEntrySerializer
 
-def notify_new_event(instance, action, **kwargs): # pylint: disable=W0613
+def notify_new_event(instance, action, **kwargs):  # pylint: disable=W0613
     """Notify users that a new event was added for a followed body."""
     if action == 'post_add' and isinstance(instance, Event):
         # Skip notification
@@ -37,22 +37,18 @@ def notify_upd_event(instance):
     for profile in instance.followers.all():
         notify.send(instance, recipient=profile.user, verb=instance.name + " was updated")
 
-def event_saved(instance, created, **kwargs): # pylint: disable=W0613
+def event_saved(instance, created, **kwargs):  # pylint: disable=W0613
     """Notify users when an event changes."""
     if not created:
         notify_upd_event(instance)
 
-def news_saved(instance, created, **kwargs): # pylint: disable=W0613
+def news_saved(instance, created, **kwargs):  # pylint: disable=W0613
     """Notify users when a followed body adds new news."""
     if created and instance.body:
         for profile in instance.body.followers.all():
             notify.send(instance, recipient=profile.user, verb=instance.body.name + " added a new news article")
 
-post_save.connect(event_saved, sender=Event)
-m2m_changed.connect(notify_new_event, sender=Event.bodies.through)
-post_save.connect(news_saved, sender=NewsEntry)
-
-class GenericNotificationRelatedField(serializers.RelatedField):
+class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disable=W0223
     """Serializer for actor/target of notifications."""
     def to_representation(self, value):
         if isinstance(value, Event):
@@ -64,7 +60,7 @@ class GenericNotificationRelatedField(serializers.RelatedField):
 
         return serializer.data
 
-class NotificationSerializer(serializers.Serializer):
+class NotificationSerializer(serializers.Serializer):  # pylint: disable=W0223
     """Notification Serializer, with unread and actor"""
     id = serializers.IntegerField()
     verb = serializers.ReadOnlyField(read_only=True)
@@ -72,6 +68,12 @@ class NotificationSerializer(serializers.Serializer):
     actor = GenericNotificationRelatedField(read_only=True)
     actor_type = serializers.SerializerMethodField()
 
-    def get_actor_type(self, obj):
+    @staticmethod
+    def get_actor_type(obj):
         """Get the class name of actor."""
         return obj.actor.__class__.__name__.lower()
+
+
+post_save.connect(event_saved, sender=Event)
+m2m_changed.connect(notify_new_event, sender=Event.bodies.through)
+post_save.connect(news_saved, sender=NewsEntry)

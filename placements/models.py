@@ -22,5 +22,5 @@ class BlogEntry(models.Model):
         verbose_name_plural = "Placement Blog Entries"
         ordering = ("-published",)
         indexes = [
-            models.Index(fields=['guid',]),
+            models.Index(fields=['guid', ]),
         ]

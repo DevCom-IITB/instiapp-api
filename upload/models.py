@@ -23,13 +23,11 @@ class UploadedImage(models.Model):
 
     def save(self, *args, **kwargs):
         # Super
-        saved = super(UploadedImage, self).save(*args, **kwargs)
+        super(UploadedImage, self).save(*args, **kwargs)
 
         # Resize Image
         if self.pk and self.picture:
             self.resize_convert(self.picture.path)
-
-        return saved
 
     def __str__(self):
         return str(self.time_of_creation)

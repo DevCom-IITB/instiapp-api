@@ -22,8 +22,10 @@ class PrerenderTestCase(APITestCase):
         self.test_body.events.add(event2)
         self.test_event = event1
 
-        self.news1 = NewsEntry.objects.create(guid="https://test.com", title="NewsIsGreat",
-                        body=self.test_body, blog_url="https://blog", link="https://blog-item")
+        self.news1 = NewsEntry.objects.create(
+            guid="https://test.com", title="NewsIsGreat",
+            body=self.test_body, blog_url="https://blog", link="https://blog-item"
+        )
 
         parent_body = Body.objects.create(name="Parent")
         grandparent_body = Body.objects.create(name="GrandParent")

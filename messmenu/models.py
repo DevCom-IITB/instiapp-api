@@ -10,7 +10,7 @@ class Hostel(models.Model):
     long_name = models.CharField(max_length=100, blank=True)
     mess_gsheet = models.URLField(null=True, blank=True)
 
-    def __str__ (self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -29,5 +29,5 @@ class MenuEntry(models.Model):
     snacks = models.TextField(blank=True)
     dinner = models.TextField(blank=True)
 
-    def __str__ (self):
+    def __str__(self):
         return self.hostel.name + ' - ' + str(self.day)

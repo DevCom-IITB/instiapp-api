@@ -15,24 +15,23 @@ url_mapping = {
     Body: '/org/'
 }
 
-class Crumb:
-    def fromObj(self, obj, index):
+class Crumb:  # pylint: disable=R0903
+    def __init__(self, obj, index):
         has_canonical = hasattr(obj, 'canonical_name') and obj.canonical_name
         self.name = obj.canonical_name if has_canonical else obj.name
         self.url = settings.BASE_URL + url_mapping[obj.__class__] + obj.str_id
         self.index = index
-        return self
 
-def get_body_breadcrumb(body, index=0):
+def get_body_breadcrumb(body):
     """Gets a trail of breadcrumb from a body."""
     trails = []
     for parent in body.parents.all():
         big_bread = get_body_breadcrumb(parent.parent)
         for bread in big_bread:
-            bread.append(Crumb().fromObj(body, bread[-1].index + 1))
+            bread.append(Crumb(body, bread[-1].index + 1))
             trails.append(bread)
         if not big_bread:
-            trails.append([Crumb().fromObj(body, 1)])
+            trails.append([Crumb(body, 1)])
     return trails
 
 def get_event_breadcrumb(event):
@@ -40,7 +39,7 @@ def get_event_breadcrumb(event):
     trails = []
     for body in event.bodies.all():
         for bread in get_body_breadcrumb(body):
-            bread.append(Crumb().fromObj(event, bread[-1].index + 1))
+            bread.append(Crumb(event, bread[-1].index + 1))
             trails.append(bread)
     return trails
 
@@ -50,7 +49,7 @@ def root(request):
     return HttpResponse(rendered)
 
 def news(request):
-    news_items = NewsEntry.objects.all()[0 : 20]
+    news_items = NewsEntry.objects.all()[0:20]
     news_items = news_items.prefetch_related('body')
     rendered = render_to_string('news.html', {'news': news_items, 'settings': settings})
     return HttpResponse(rendered)
