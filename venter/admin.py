@@ -2,7 +2,8 @@
 from django.contrib import admin
 from django.core.mail import send_mass_mail
 
-from venter.models import Complaints
+from backend import settings_base
+from venter.models import Complaints, Authorities
 from venter.models import Comment
 from venter.models import TagUris
 from venter.models import ComplaintMedia
@@ -40,9 +41,14 @@ class CommentModelAdmin(admin.ModelAdmin):
     model = Comment
 
 
+class AuthoritiesModelAdmin(admin.ModelAdmin):
+    list_display = ['name', '__str__']
+    model = Authorities
+
+
 class ComplaintModelAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'created_by', 'report_date', 'status']
-    list_editable = ['status']
+    list_display = ['__str__', 'created_by', 'report_date', 'status', 'authority_email']
+    list_editable = ['status', 'authority_email']
     list_filter = ['status']
     inlines = [CommentTabularInline, TagTabularInline, UserLikedTabularInline, ComplaintMediaTabularInline]
     exclude = ('tags', 'users_up_voted', 'media',)
@@ -64,20 +70,30 @@ class ComplaintModelAdmin(admin.ModelAdmin):
 
     mark_as_deleted.short_description = "Mark selected complaints as Deleted"
 
-    @staticmethod
-    def send_emails(request, queryset):
+    def send_emails(self, request, queryset):
         mail_list = []
+        input_list = []
+        output_list = []
 
         for object in queryset:
-            subject = 'Complaint from %s located %s' % ({object.created_by}, {object.location_description})
-            message = '%s' % ({object.description})
-            sender_id = 'webmaster@localhost'
-            recipient_list = ['%s' % ({object.authority_email})]
+            for i in ComplaintMedia.objects.filter(complaint=object.id).values('image_url'):
+                input_list.append(i)
 
+            for images in input_list:
+                for key in images:
+                    output_list.append(images[key])
+
+            subject = 'Complaint from %s on %s' % (object.created_by, object.report_date)
+            if output_list:
+                message = '%s \nLocation Description: %s \nStatus: %s \nAttachments: %s' % (
+                    object.description, object.location_description,object.status, output_list)
+            elif not output_list:
+                message = '%s \nLocation Description: %s \nStatus: %s' % (
+                    object.description, object.location_description, object.status)
+            sender_id = settings_base.EMAIL_HOST_USER
+            recipient_list = ['%s' % object.authority_email]
             email_message = (subject, message, sender_id, recipient_list)
-
             mail_list.append(email_message)
-
             send_mass_mail(tuple(mail_list))
 
     class Meta:
@@ -88,3 +104,4 @@ admin.site.register(Complaints, ComplaintModelAdmin)
 admin.site.register(Comment, CommentModelAdmin)
 admin.site.register(TagUris)
 admin.site.register(ComplaintMedia, ComplaintMediaModelAdmin)
+admin.site.register(Authorities, AuthoritiesModelAdmin)

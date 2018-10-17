@@ -20,6 +20,20 @@ class TagUris(models.Model):
     def __str__(self):
         return self.tag_uri
 
+
+class Authorities(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    name = models.CharField(max_length=30, blank=True, null=True)
+    email = models.EmailField(max_length=50, blank=True, null=True, unique=True)
+
+    class Meta:
+        verbose_name = 'Authority Email'
+        verbose_name_plural = 'Authority Emails'
+
+    def __str__(self):
+        return self.email
+
+
 class Complaints(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     created_by = models.ForeignKey(
@@ -32,6 +46,7 @@ class Complaints(models.Model):
     location_description = models.TextField(blank=True, null=True)
     tags = models.ManyToManyField(TagUris, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
+    authority_email = models.ForeignKey(Authorities, on_delete=models.CASCADE, null=True, blank=True, to_field='email')
 
     class Meta:
         verbose_name = 'Complaint'
@@ -40,6 +55,7 @@ class Complaints(models.Model):
 
     def __str__(self):
         return self.description
+
 
 class ComplaintMedia(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -52,6 +68,7 @@ class ComplaintMedia(models.Model):
 
     def __str__(self):
         return str(self.image_url)
+
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
