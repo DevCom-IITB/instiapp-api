@@ -1,4 +1,5 @@
 """Unit tests for upload."""
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
 from upload.models import UploadedImage
@@ -36,3 +37,14 @@ class UploadTestCase(APITestCase):
         url = '/api/upload/' + img_id
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, 204)
+
+        # Check POST file upload
+        url = '/api/upload'
+        image = SimpleUploadedFile(
+            "img.jpg", open("./upload/img.jpg", "rb").read(), content_type="image/jpeg")
+        response = self.client.post(url, {'picture': image})
+
+        # Check if the file was uploaded
+        img_id = response.data['id']
+        img = UploadedImage.objects.get(pk=img_id)
+        self.assertIn('.jpg', str(img.picture))
