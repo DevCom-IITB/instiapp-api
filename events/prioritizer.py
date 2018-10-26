@@ -46,6 +46,7 @@ class EventPrioritizer():  # pylint: disable=R0902
         self.bonus_followed()
         self.penalise_far_off()
         self.penalise_length()
+        self.bonus_promotion()
 
         return self
 
@@ -95,6 +96,10 @@ class EventPrioritizer():  # pylint: disable=R0902
     def penalise_length(self):
         """Penalise long running events."""
         self.weight *= 1 / (1 + TIME_PENALTY_FACTOR * math.floor(self.event_length))
+
+    def bonus_promotion(self):
+        """Add bonus for promoted events"""
+        self.weight += self.event.promotion_boost * self.start_time_factor
 
 
 def get_prioritized(queryset, request):
