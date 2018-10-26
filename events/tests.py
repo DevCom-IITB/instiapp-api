@@ -124,6 +124,11 @@ class EventTestCase(APITestCase):
         self.client.logout()
         assertOrder([event2, event4])
 
+        # Test promotion boost
+        event4.promotion_boost = 2000
+        event4.save()
+        assertOrder([event4, event2])
+
     def test_events_list(self):
         """Test if events can be listed."""
         url = '/api/events'

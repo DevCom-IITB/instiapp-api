@@ -35,6 +35,8 @@ class Event(models.Model):
 
     starting_notified = models.BooleanField(default=False)
 
+    promotion_boost = models.IntegerField(default=0)
+
     weight = 0
 
     def __str__(self):
