@@ -16,6 +16,7 @@ class TagTabularInline(admin.TabularInline):
 
 class UserLikedTabularInline(admin.TabularInline):
     model = Complaints.users_up_voted.through
+    readonly_fields = ('userprofile',)
     verbose_name = 'User up Voted'
     verbose_name_plural = 'Users up voted'
 
@@ -28,11 +29,12 @@ class ComplaintMediaModelAdmin(admin.ModelAdmin):
     model = ComplaintMedia
 
 class CommentModelAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'commented_by', 'complaint', 'time']
+    list_display = ['__str__', 'complaint', 'time']
     model = Comment
 
 class ComplaintModelAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'created_by', 'report_date', 'status']
+    readonly_fields = ['created_by']
+    list_display = ['report_date', 'status']
     list_editable = ['status']
     list_filter = ['status']
     inlines = [CommentTabularInline, TagTabularInline, UserLikedTabularInline, ComplaintMediaTabularInline]
