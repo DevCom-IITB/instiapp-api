@@ -1,14 +1,14 @@
 # InstiApp
 Backend API in Django for the to-be comprehensive app for managing, finding and enjoying life at Indian Institute of Technology, Bombay!
 
+[![InstiApp](https://insti.app/instiapp-badge-gh.svg)](https://insti.app)
 [![TravisCI](https://api.travis-ci.org/wncc/IITBapp.svg?branch=master)](https://travis-ci.org/wncc/IITBapp)
 [![CircleCI](https://circleci.com/gh/wncc/IITBapp.svg?style=shield)](https://circleci.com/gh/wncc/IITBapp)
+
 [![codecov](https://codecov.io/gh/wncc/IITBapp/branch/master/graph/badge.svg)](https://codecov.io/gh/wncc/IITBapp)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7e6a386dbec649c99aa6a10218cc3768)](https://www.codacy.com/app/pulsejet/IITBapp?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wncc/IITBapp&amp;utm_campaign=Badge_Grade)
 [![Requirements Status](https://requires.io/github/wncc/IITBapp/requirements.svg?branch=master)](https://requires.io/github/wncc/IITBapp/requirements/?branch=master)
-
 [![GitHub license](https://img.shields.io/github/license/wncc/IITBapp.svg)](https://github.com/wncc/IITBapp/blob/master/LICENSE)
-[![Production](https://img.shields.io/badge/production-insti.app-magenta.svg)](https://insti.app)
 
 ## Setup
 To setup dependenices, make a new `virtualenv`, activate it and run `pip install -r requirements.txt`. Then you can run
