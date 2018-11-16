@@ -156,8 +156,4 @@ SSO_BAD_CERT = False
 USER_PROFILE_SERIALIZER_TRANSFORM = lambda x: x
 USER_PROFILE_FULL_SERIALIZER_TRANSFORM = lambda x: x
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'venter.iitb.complaints@gmail.com'
-EMAIL_HOST_PASSWORD = 'venteriitb'
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'

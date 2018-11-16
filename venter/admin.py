@@ -91,7 +91,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             elif not output_list:
                 message = '%s \nLocation Description: %s \nStatus: %s' % (
                     object.description, object.location_description, object.status)
-            sender_id = settings_base.EMAIL_HOST_USER
+            sender_id = settings_base.DEFAULT_FROM_EMAIL
             recipient_list = ['%s' % object.authority_email]
             email_message = (subject, message, sender_id, recipient_list)
             mail_list.append(email_message)
