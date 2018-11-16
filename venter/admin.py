@@ -59,7 +59,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     def mark_as_resolved(self, request, queryset):  # pylint: disable=R0201
         queryset.update(status='Resolved')
 
-    mark_as_resolved.short_description = "Mark selected complaints as Resolved"    
+    mark_as_resolved.short_description = "Mark selected complaints as Resolved"
 
     def mark_as_in_progress(self, request, queryset):  # pylint: disable=R0201
         queryset.update(status='In Progress')
