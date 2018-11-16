@@ -117,7 +117,7 @@ def get_rich_notification(notification):
 
         # Comment
         if isinstance(actor, Comment):
-            title = 'Comment by '+ actor.commented_by.user
+            title = 'Comment by ' + actor.commented_by.user
             notification_extra = actor.text
 
         # Rich field for news entry
