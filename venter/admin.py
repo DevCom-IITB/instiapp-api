@@ -76,7 +76,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         input_list = []
         output_list = []
 
-        for object in queryset: # pylint: disable=W0622
+        for object in queryset:  # pylint: disable=W0622
             for i in ComplaintMedia.objects.filter(complaint=object.id).values('image_url'):
                 input_list.append(i)
 

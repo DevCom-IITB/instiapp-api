@@ -13,6 +13,7 @@ from venter.models import Authorities
 class MockRequest(object):
     pass
 
+
 request = MockRequest()
 
 class VenterTestCase(APITestCase):
@@ -222,7 +223,7 @@ class VenterTestCase(APITestCase):
         self.assertEqual(str(complaintMedia), 'www.google.com')
 
     def test_admin_actions(self):
-        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite()) # pylint: disable=W0201
+        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())  # pylint: disable=W0201
 
         def create_complaint(user, **kwargs):
             Complaints.objects.create(created_by=user, **kwargs)
@@ -244,7 +245,7 @@ class VenterTestCase(APITestCase):
 
     def test_send_mass_mail(self):
 
-        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite()) # pylint: disable=W0201
+        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())  # pylint: disable=W0201
         authority_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
         complaints = Complaints.objects.create(created_by=self.user.profile, status='Reported',
                                                description='Test Complaint', authority_email=authority_mail)
