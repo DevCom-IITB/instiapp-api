@@ -113,6 +113,11 @@ def get_rich_notification(notification):
         if isinstance(actor, (BlogEntry, NewsEntry)):
             title = actor.title
             notification_extra = actor.link
+        
+        # Comment
+        if isinstance(actor, Comment):
+            title = actor.text
+            notification_extra = actor.commented_by.user
 
         # Rich field for news entry
         if isinstance(actor, NewsEntry):
