@@ -1,6 +1,3 @@
-from unittest import TestCase
-
-from django import urls
 from django.core import mail
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
@@ -223,7 +220,7 @@ class VenterTestCase(APITestCase):
 
         create_complaint(self.user.profile, status='Reported')
         queryset = Complaints.objects.filter(status='Reported')
-        self.complaint_admin.mark_as_resolved(request,queryset)
+        self.complaint_admin.mark_as_resolved(request, queryset)
         self.assertEquals(Complaints.objects.get(status='Resolved').status, 'Resolved')
 
         create_complaint(self.user.profile, status='Reported')
@@ -240,7 +237,8 @@ class VenterTestCase(APITestCase):
 
         self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
         authority_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
-        complaints = Complaints.objects.create(created_by=self.user.profile, status='Reported', description='Test Complaint', authority_email=authority_mail)
+        complaints = Complaints.objects.create(created_by=self.user.profile, status='Reported',
+                                                description='Test Complaint', authority_email=authority_mail)
         Complaints.objects.create(created_by=self.user.profile, status='In Progress', authority_email=authority_mail)
         image = []
         image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaints))
