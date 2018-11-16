@@ -9,6 +9,7 @@ from notifications.models import Notification
 from placements.models import BlogEntry
 from events.models import Event
 from news.models import NewsEntry
+from venter.models import Comment
 
 def send_push(subscription, payload):
     """Send a single push notification."""
@@ -113,7 +114,7 @@ def get_rich_notification(notification):
         if isinstance(actor, (BlogEntry, NewsEntry)):
             title = actor.title
             notification_extra = actor.link
-        
+
         # Comment
         if isinstance(actor, Comment):
             title = actor.text

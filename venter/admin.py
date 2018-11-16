@@ -1,5 +1,8 @@
 """Admin models for venter."""
 from django.contrib import admin
+from django.core.mail import send_mass_mail
+from backend import settings_base
+
 from venter.models import Complaints
 from venter.models import Comment
 from venter.models import TagUris
@@ -73,7 +76,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             subject = 'Complaint from %s on %s' % (object.created_by, object.report_date)
             if output_list:
                 message = '%s \nLocation Description: %s \nStatus: %s \nAttachments: %s' % (
-                    object.description, object.location_description,object.status, output_list)
+                    object.description, object.location_description, object.status, output_list)
             elif not output_list:
                 message = '%s \nLocation Description: %s \nStatus: %s' % (
                     object.description, object.location_description, object.status)
