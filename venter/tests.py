@@ -10,7 +10,7 @@ from venter.models import Comment
 from venter.models import ComplaintMedia
 from venter.models import Authorities
 
-class MockRequest(object):  #pylint: disable=R0205
+class MockRequest(object):  # pylint: disable=R0205
     pass
 
 
