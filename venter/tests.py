@@ -1,17 +1,8 @@
-from django.core import mail
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
 from venter.admin import ComplaintModelAdmin
-from venter.models import Complaints, TagUris, Comment, ComplaintMedia, Authorities
+from venter.models import Complaints, TagUris, Comment, ComplaintMedia
 from django.contrib.admin.sites import AdminSite
-
-
-class MockRequest(object):
-    pass
-
-
-request = MockRequest()
-
 
 class VenterTestCase(APITestCase):
     """Unit tests for venter."""
@@ -211,43 +202,4 @@ class VenterTestCase(APITestCase):
         )
 
         self.assertEqual(str(complaintMedia), 'www.google.com')
-
-    def test_admin_actions(self):
-        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
-
-        def create_complaint(user, **kwargs):
-            Complaints.objects.create(created_by=user, **kwargs)
-
-        create_complaint(self.user.profile, status='Reported')
-        queryset = Complaints.objects.filter(status='Reported')
-        self.complaint_admin.mark_as_resolved(request, queryset)
-        self.assertEquals(Complaints.objects.get(status='Resolved').status, 'Resolved')
-
-        create_complaint(self.user.profile, status='Reported')
-        queryset = Complaints.objects.filter(status='Reported')
-        self.complaint_admin.mark_as_in_progress(request, queryset)
-        self.assertEquals(Complaints.objects.get(status='In Progress').status, 'In Progress')
-
-        create_complaint(self.user.profile, status='Reported')
-        queryset = Complaints.objects.filter(status='Reported')
-        self.complaint_admin.mark_as_deleted(request, queryset)
-        self.assertEquals(Complaints.objects.get(status='Deleted').status, 'Deleted')
-
-    def test_send_mass_mail(self):
-
-        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
-        authority_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
-        complaints = Complaints.objects.create(created_by=self.user.profile, status='Reported',
-                                            description='Test Complaint', authority_email=authority_mail)
-        Complaints.objects.create(created_by=self.user.profile, status='In Progress', authority_email=authority_mail)
-        image = []
-        image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaints))
-        complaints.images.set(image)
-
-        queryset = Complaints.objects.filter(status='Reported')
-        self.complaint_admin.send_emails(request, queryset)
-        self.assertEqual(len(mail.outbox), 1)
-
-        queryset = Complaints.objects.filter(status='In Progress')
-        self.complaint_admin.send_emails(request, queryset)
-        self.assertEqual(len(mail.outbox), 2)
+        
