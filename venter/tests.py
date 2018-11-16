@@ -238,7 +238,7 @@ class VenterTestCase(APITestCase):
         self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
         authority_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
         complaints = Complaints.objects.create(created_by=self.user.profile, status='Reported',
-                                                description='Test Complaint', authority_email=authority_mail)
+                                            description='Test Complaint', authority_email=authority_mail)
         Complaints.objects.create(created_by=self.user.profile, status='In Progress', authority_email=authority_mail)
         image = []
         image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaints))
