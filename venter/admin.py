@@ -56,22 +56,22 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     search_fields = ['status', 'description', 'created_by__name']
     actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']
 
-    def mark_as_resolved(self, request, queryset):
+    def mark_as_resolved(self, request, queryset):  #pylint: disable=R0201
         queryset.update(status='Resolved')
 
-    mark_as_resolved.short_description = "Mark selected complaints as Resolved"
+    mark_as_resolved.short_description = "Mark selected complaints as Resolved"    
 
-    def mark_as_in_progress(self, request, queryset):
+    def mark_as_in_progress(self, request, queryset):  #pylint: disable=R0201
         queryset.update(status='In Progress')
 
     mark_as_in_progress.short_description = "Mark selected complaints as In Progress"
 
-    def mark_as_deleted(self, request, queryset):
+    def mark_as_deleted(self, request, queryset):  #pylint: disable=R0201
         queryset.update(status='Deleted')
 
     mark_as_deleted.short_description = "Mark selected complaints as Deleted"
 
-    def send_emails(self, request, queryset):
+    def send_emails(self, request, queryset):  #pylint: disable=R0201 #pylint: disable=R0914
         mail_list = []
         input_list = []
         output_list = []
@@ -96,6 +96,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             email_message = (subject, message, sender_id, recipient_list)
             mail_list.append(email_message)
             send_mass_mail(tuple(mail_list))
+        return
 
     send_emails.short_description = "Send emails to the authorities"
 
