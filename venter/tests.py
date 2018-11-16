@@ -1,8 +1,6 @@
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
-from venter.admin import ComplaintModelAdmin
 from venter.models import Complaints, TagUris, Comment, ComplaintMedia
-from django.contrib.admin.sites import AdminSite
 
 class VenterTestCase(APITestCase):
     """Unit tests for venter."""
@@ -202,4 +200,3 @@ class VenterTestCase(APITestCase):
         )
 
         self.assertEqual(str(complaintMedia), 'www.google.com')
-        
