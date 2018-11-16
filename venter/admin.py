@@ -71,7 +71,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
 
     mark_as_deleted.short_description = "Mark selected complaints as Deleted"
 
-    def send_emails(self, request, queryset):  # pylint: disable=R0201 # pylint: disable=R0914
+    def send_emails(self, request, queryset):  # pylint: disable=R0201, R0914
         mail_list = []
         input_list = []
         output_list = []
@@ -96,7 +96,6 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             email_message = (subject, message, sender_id, recipient_list)
             mail_list.append(email_message)
             send_mass_mail(tuple(mail_list))
-        return
 
     send_emails.short_description = "Send emails to the authorities"
 
