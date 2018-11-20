@@ -1,6 +1,19 @@
+from django.core import mail
+from django.contrib.admin.sites import AdminSite
+
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
-from venter.models import Complaints, TagUris, Comment, ComplaintMedia
+from venter.admin import ComplaintModelAdmin
+from venter.models import Complaints
+from venter.models import TagUris
+from venter.models import Comment
+from venter.models import ComplaintMedia
+from venter.models import Authorities
+
+class MockRequest(object):  # pylint: disable=R0205
+    pass
+
+request = MockRequest()
 
 class VenterTestCase(APITestCase):
     """Unit tests for venter."""
@@ -200,3 +213,49 @@ class VenterTestCase(APITestCase):
         )
 
         self.assertEqual(str(complaintMedia), 'www.google.com')
+
+        authority = Authorities.objects.create(
+            name='dummyauth',
+            email='dummyauth@example.com'
+        )
+
+        self.assertEqual(str(authority), 'dummyauth@example.com')
+
+    def test_admin_actions(self):
+        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite()) # pylint: disable=W0201
+
+        def create_complaint(user, **kwargs):
+            Complaints.objects.create(created_by=user, **kwargs)
+
+        create_complaint(self.user.profile, status='Reported')
+        queryset = Complaints.objects.filter(status='Reported')
+        self.complaint_admin.mark_as_resolved(request, queryset)
+        self.assertEqual(Complaints.objects.get(status='Resolved').status, 'Resolved')
+
+        create_complaint(self.user.profile, status='Reported')
+        queryset = Complaints.objects.filter(status='Reported')
+        self.complaint_admin.mark_as_in_progress(request, queryset)
+        self.assertEqual(Complaints.objects.get(status='In Progress').status, 'In Progress')
+
+        create_complaint(self.user.profile, status='Reported')
+        queryset = Complaints.objects.filter(status='Reported')
+        self.complaint_admin.mark_as_deleted(request, queryset)
+        self.assertEqual(Complaints.objects.get(status='Deleted').status, 'Deleted')
+
+    def test_send_mass_mail(self):
+        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite()) # pylint: disable=W0201
+        authority_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
+        complaints = Complaints.objects.create(created_by=self.user.profile, status='Reported',
+                                               description='Test Complaint', authority_email=authority_mail)
+        Complaints.objects.create(created_by=self.user.profile, status='In Progress', authority_email=authority_mail)
+        image = []
+        image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaints))
+        complaints.images.set(image)
+
+        queryset = Complaints.objects.filter(status='Reported')
+        self.complaint_admin.send_emails(request, queryset)
+        self.assertEqual(len(mail.outbox), 1)
+
+        queryset = Complaints.objects.filter(status='In Progress')
+        self.complaint_admin.send_emails(request, queryset)
+        self.assertEqual(len(mail.outbox), 2)
