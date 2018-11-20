@@ -15,6 +15,7 @@ class MockRequest(object):  # pylint: disable=R0205
 
 request = MockRequest()
 
+
 class VenterTestCase(APITestCase):
     """Unit tests for venter."""
 
@@ -222,7 +223,7 @@ class VenterTestCase(APITestCase):
         self.assertEqual(str(authority), 'dummyauth@example.com')
 
     def test_admin_actions(self):
-        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite()) # pylint: disable=W0201
+        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())  # pylint: disable=W0201
 
         def create_complaint(user, **kwargs):
             Complaints.objects.create(created_by=user, **kwargs)
@@ -243,7 +244,7 @@ class VenterTestCase(APITestCase):
         self.assertEqual(Complaints.objects.get(status='Deleted').status, 'Deleted')
 
     def test_send_mass_mail(self):
-        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite()) # pylint: disable=W0201
+        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())  # pylint: disable=W0201
         authority_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
         complaints = Complaints.objects.create(created_by=self.user.profile, status='Reported',
                                                description='Test Complaint', authority_email=authority_mail)

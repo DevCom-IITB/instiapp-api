@@ -71,7 +71,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         output_list = []
         mail_list = []
 
-        for object in queryset: # pylint: disable=W0622
+        for object in queryset:  # pylint: disable=W0622
             for i in ComplaintMedia.objects.filter(complaint=object.id).values('image_url'):
                 input_list.append(i)
 
@@ -104,13 +104,12 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             recipient_list = [f'{object.authority_email}']
 
             # Composes the email to be sent to the authorities and stores it in the mailing list
-            
+
             mail_list.append((subject, message, sender_id, recipient_list))
-        #Sends the e-mails stored in the mailing list to the respective authorities via send_mass_mail method in django
+        # Sends the e-mails stored in the mailing list to the respective authorities via send_mass_mail method in django
         send_mass_mail(tuple(mail_list))
 
     send_emails.short_description = "Send emails to the authorities"
-
 
     class Meta:
         model = Complaints
