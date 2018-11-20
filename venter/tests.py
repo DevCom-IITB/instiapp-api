@@ -13,8 +13,8 @@ from venter.models import Authorities
 class MockRequest(object):  # pylint: disable=R0205
     pass
 
-request = MockRequest()
 
+request = MockRequest()
 
 class VenterTestCase(APITestCase):
     """Unit tests for venter."""
