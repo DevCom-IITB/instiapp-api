@@ -42,7 +42,7 @@ class AuthoritiesModelAdmin(admin.ModelAdmin):
 
 class ComplaintModelAdmin(admin.ModelAdmin):
     readonly_fields = ['created_by']
-    list_display = ['report_date', 'status', 'authority_email']
+    list_display = ['report_date', 'status', 'authority_email', 'created_by']
     list_editable = ['status', 'authority_email']
     list_filter = ['status']
     inlines = [CommentTabularInline, TagTabularInline, UserLikedTabularInline, ComplaintMediaTabularInline]
@@ -50,61 +50,62 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     search_fields = ['status', 'description', 'created_by__name']
     actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']
 
-    # Admin action to change complaint status to 'Resolved'
     def mark_as_resolved(self, request, queryset):  # pylint: disable=R0201
+        """
+        Admin action to change complaint status to 'Resolved'
+        Queryset contains the selected complaints and this is a batch SQL UPDATE process for the complaint status
+        """
         queryset.update(status='Resolved')
     mark_as_resolved.short_description = "Mark selected complaints as Resolved"
 
-    # Admin action to change complaint status to 'In Progress'
     def mark_as_in_progress(self, request, queryset):  # pylint: disable=R0201
+        """
+        Admin action to change complaint status to 'In Progress'
+        Queryset contains the selected complaints, and this is a batch SQL UPDATE process for the complaint status
+        """
         queryset.update(status='In Progress')
     mark_as_in_progress.short_description = "Mark selected complaints as In Progress"
 
-    # Admin action to change complaint status to 'Deleted'
     def mark_as_deleted(self, request, queryset):  # pylint: disable=R0201
+        """
+        Admin action to change complaint status to 'In Progress'
+        Queryset contains the selected complaints, and this is a batch SQL UPDATE process for the complaint status
+        """
         queryset.update(status='Deleted')
     mark_as_deleted.short_description = "Mark selected complaints as Deleted"
 
-    # Admin action for composing emails and sending them to the authorities
     def send_emails(self, request, queryset):  # pylint: disable=R0201
-        input_list = []
-        output_list = []
         mail_list = []
 
-        for object in queryset:  # pylint: disable=W0622
-            for i in ComplaintMedia.objects.filter(complaint=object.id).values('image_url'):
-                input_list.append(i)
+        for item in queryset:
+            input_list = [i for i in ComplaintMedia.objects.filter(complaint=item.id).values('image_url')]
+            output_list = [images[key] for images in input_list for key in images]
 
-            for images in input_list:
-                for key in images:
-                    output_list.append(images[key])
-
-            subject = f'Complaint from {object.created_by} on {object.report_date.date()}'
+            subject = f'Complaint from {item.created_by} on {item.report_date.date()}'
 
             # Checks for attachments and modifies the email message based on that
             if output_list:
                 message = (
-                    f'Complaint Description: {object.description}\n'
-                    f'Location Description: {object.location_description}\n'
-                    f'Status: {object.status}\n'
-                    f'Attachments: {output_list}'
+                    f'Complaint Description: {item.description}\n'
+                    f'Location Description: {item.location_description}\n'
+                    f'Status: {item.status}\n'
+                    f'Images: {output_list}'
                 )
 
             elif not output_list:
                 message = (
-                    f'Complaint Description: {object.description}\n'
-                    f'Location Description: {object.location_description}\n'
-                    f'Status: {object.status}\n'
+                    f'Complaint Description: {item.description}\n'
+                    f'Location Description: {item.location_description}\n'
+                    f'Status: {item.status}\n'
                 )
 
             # The 'DEFAULT_FROM_EMAIL' setting is recommended by django when the site has an independent mailing server
-            sender_id = settings_base.DEFAULT_FROM_EMAIL
+            sender_id = settings_base.EMAIL_HOST_USER
 
             # Retrieves the authority body's email id
-            recipient_list = [f'{object.authority_email}']
+            recipient_list = [f'{item.authority_email}']
 
             # Composes the email to be sent to the authorities and stores it in the mailing list
-
             mail_list.append((subject, message, sender_id, recipient_list))
         # Sends the e-mails stored in the mailing list to the respective authorities via send_mass_mail method in django
         send_mass_mail(tuple(mail_list))

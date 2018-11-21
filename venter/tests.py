@@ -223,28 +223,26 @@ class VenterTestCase(APITestCase):
         self.assertEqual(str(authority), 'dummyauth@example.com')
 
     def test_admin_actions(self):
-        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())  # pylint: disable=W0201
+        complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
 
-        def create_complaint(user, **kwargs):
-            Complaints.objects.create(created_by=user, **kwargs)
-
-        create_complaint(self.user.profile, status='Reported')
+        Complaints.objects.create(created_by=self.user.profile, status='Reported')
         queryset = Complaints.objects.filter(status='Reported')
-        self.complaint_admin.mark_as_resolved(request, queryset)
+        complaint_admin.mark_as_resolved(request, queryset)
         self.assertEqual(Complaints.objects.get(status='Resolved').status, 'Resolved')
 
-        create_complaint(self.user.profile, status='Reported')
+        Complaints.objects.create(created_by=self.user.profile, status='Reported')
         queryset = Complaints.objects.filter(status='Reported')
-        self.complaint_admin.mark_as_in_progress(request, queryset)
+        complaint_admin.mark_as_in_progress(request, queryset)
         self.assertEqual(Complaints.objects.get(status='In Progress').status, 'In Progress')
 
-        create_complaint(self.user.profile, status='Reported')
+        Complaints.objects.create(created_by=self.user.profile, status='Reported')
         queryset = Complaints.objects.filter(status='Reported')
-        self.complaint_admin.mark_as_deleted(request, queryset)
+        complaint_admin.mark_as_deleted(request, queryset)
         self.assertEqual(Complaints.objects.get(status='Deleted').status, 'Deleted')
 
     def test_send_mass_mail(self):
-        self.complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())  # pylint: disable=W0201
+        complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
+
         authority_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
         complaints = Complaints.objects.create(created_by=self.user.profile, status='Reported',
                                                description='Test Complaint', authority_email=authority_mail)
@@ -254,9 +252,9 @@ class VenterTestCase(APITestCase):
         complaints.images.set(image)
 
         queryset = Complaints.objects.filter(status='Reported')
-        self.complaint_admin.send_emails(request, queryset)
+        complaint_admin.send_emails(request, queryset)
         self.assertEqual(len(mail.outbox), 1)
 
         queryset = Complaints.objects.filter(status='In Progress')
-        self.complaint_admin.send_emails(request, queryset)
+        complaint_admin.send_emails(request, queryset)
         self.assertEqual(len(mail.outbox), 2)

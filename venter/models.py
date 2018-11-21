@@ -37,7 +37,7 @@ class Authorities(models.Model):
 class Complaints(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     created_by = models.ForeignKey(
-        'users.UserProfile', on_delete=models.CASCADE, related_name='created_by', null=True)
+        'users.UserProfile', on_delete=models.CASCADE, related_name='created_by')
     description = models.TextField(blank=True, null=True)
     report_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=30, choices=STATUS, default='reported')

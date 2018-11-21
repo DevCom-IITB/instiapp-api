@@ -180,18 +180,6 @@ class OtherTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
 
-        # Create dummy complaint
-        complaint1 = Complaints.objects.create(created_by=self.user.profile)
-
-        # Creating dummy comments to test comment notifications
-        Comment.objects.create(complaint=complaint1, text='test_comment_1', commented_by=get_new_user().profile)
-        Comment.objects.create(complaint=complaint1, text='test_comment_2', commented_by=get_new_user().profile)
-
-        # Checking whether the comments have generated notifications as expected
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
-
     def test_news_notifications(self):
         """Test news notifications."""
 
