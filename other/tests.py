@@ -13,8 +13,6 @@ from events.serializers import EventSerializer
 from users.models import UserProfile
 from news.models import NewsEntry
 from placements.models import BlogEntry
-from venter.models import Complaints
-from venter.models import Comment
 
 from helpers.test_helpers import create_usertag
 from helpers.test_helpers import create_usertagcategory

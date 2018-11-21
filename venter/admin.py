@@ -100,7 +100,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
                 )
 
             # The 'DEFAULT_FROM_EMAIL' setting is recommended by django when the site has an independent mailing server
-            sender_id = settings_base.EMAIL_HOST_USER
+            sender_id = settings_base.DEFAULT_FROM_EMAIL
 
             # Retrieves the authority body's email id
             recipient_list = [f'{item.authority_email}']
