@@ -1,6 +1,6 @@
+from types import SimpleNamespace
 from django.core import mail
 from django.contrib.admin.sites import AdminSite
-
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
 from venter.admin import ComplaintModelAdmin
@@ -9,12 +9,6 @@ from venter.models import TagUris
 from venter.models import Comment
 from venter.models import ComplaintMedia
 from venter.models import Authorities
-
-class MockRequest(object):  # pylint: disable=R0205
-    pass
-
-
-request = MockRequest()
 
 class VenterTestCase(APITestCase):
     """Unit tests for venter."""
@@ -224,6 +218,7 @@ class VenterTestCase(APITestCase):
 
     def test_admin_actions(self):
         complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
+        request = SimpleNamespace()
 
         Complaints.objects.create(created_by=self.user.profile, status='Reported')
         queryset = Complaints.objects.filter(status='Reported')
@@ -242,6 +237,7 @@ class VenterTestCase(APITestCase):
 
     def test_send_mass_mail(self):
         complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
+        request = SimpleNamespace()
 
         authority_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
         complaints = Complaints.objects.create(created_by=self.user.profile, status='Reported',
