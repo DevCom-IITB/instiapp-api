@@ -41,7 +41,7 @@ class AuthoritiesModelAdmin(admin.ModelAdmin):
     model = Authorities
 
 class ComplaintModelAdmin(admin.ModelAdmin):
-    readonly_fields = ['created_by']
+    #readonly_fields = ['created_by']
     list_display = ['report_date', 'status', 'authority_email']
     list_editable = ['status', 'authority_email']
     list_filter = ['status']
@@ -75,13 +75,30 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     mark_as_deleted.short_description = "Mark selected complaints as Deleted"
 
     def send_emails(self, request, queryset):  # pylint: disable=R0201
-        mail_list = []
+        """
+        Admin action to compose a preformatted email message and to send it to the selected authority's email ID
+        Queryset contains selected complaints. This is a process to send a preformatted batch of emails to authorities
+        For every complaint, the relevant information is extracted and turned into elements of the email as follows:
+
+        Subject: Complaint from <User> on <DateTime object format> where datetime format is hardcoded
+
+        Message: Multiline string containing variables stored within the complaint, along with a list of attached images
+
+        Sender ID: Used for sending mails in accordance with the send_mass_mail function
+
+        Recipient List: A list containing authorities to whom the email is to be sent
+
+        The email messages are composed for all the selected complaints and appended to the mailing list.
+        After this, send_mass_mail is used to send a tuple of the stored messages using django's default email backend
+        """
+        # List containing all the email messages to be sent, is being converted to tuple and sent using "send_mass_mail"
+        mailing_list = []
 
         for item in queryset:
             input_list = [i for i in ComplaintMedia.objects.filter(complaint=item.id).values('image_url')]
             output_list = [images[key] for images in input_list for key in images]
 
-            subject = f'Complaint from {item.created_by} on {item.report_date.date()}'
+            subject = f'Complaint from {item.created_by} on {item.report_date:%A, %d %b %Y at %I:%M %p}'
 
             # Checks for attachments and modifies the email message based on that
             if output_list:
@@ -106,9 +123,9 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             recipient_list = [f'{item.authority_email}']
 
             # Composes the email to be sent to the authorities and stores it in the mailing list
-            mail_list.append((subject, message, sender_id, recipient_list))
+            mailing_list.append((subject, message, sender_id, recipient_list))
         # Sends the e-mails stored in the mailing list to the respective authorities via send_mass_mail method in django
-        send_mass_mail(tuple(mail_list))
+        send_mass_mail(tuple(mailing_list))
 
     send_emails.short_description = "Send emails to the authorities"
 
