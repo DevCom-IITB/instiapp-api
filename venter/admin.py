@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.core.mail import send_mass_mail
 
-from backend import settings_base
+from django.conf import settings
 from venter.models import Complaints
 from venter.models import Comment
 from venter.models import TagUris
@@ -50,31 +50,32 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     search_fields = ['status', 'description', 'created_by__name']
     actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']
 
-    def mark_as_resolved(self, request, queryset):  # pylint: disable=R0201
+    @staticmethod
+    def mark_as_resolved(modeladmin, request, queryset):  # pylint: disable=R0201
         """
         Admin action to change complaint status to 'Resolved'
         Queryset contains the selected complaints and this is a batch SQL UPDATE process for the complaint status
         """
         queryset.update(status='Resolved')
-    mark_as_resolved.short_description = "Mark selected complaints as Resolved"
 
-    def mark_as_in_progress(self, request, queryset):  # pylint: disable=R0201
+    @staticmethod
+    def mark_as_in_progress(modeladmin, request, queryset):  # pylint: disable=R0201
         """
         Admin action to change complaint status to 'In Progress'
         Queryset contains the selected complaints, and this is a batch SQL UPDATE process for the complaint status
         """
         queryset.update(status='In Progress')
-    mark_as_in_progress.short_description = "Mark selected complaints as In Progress"
 
-    def mark_as_deleted(self, request, queryset):  # pylint: disable=R0201
+    @staticmethod
+    def mark_as_deleted(modeladmin, request, queryset):  # pylint: disable=R0201
         """
         Admin action to change complaint status to 'In Progress'
         Queryset contains the selected complaints, and this is a batch SQL UPDATE process for the complaint status
         """
         queryset.update(status='Deleted')
-    mark_as_deleted.short_description = "Mark selected complaints as Deleted"
 
-    def send_emails(self, request, queryset):  # pylint: disable=R0201
+    @staticmethod
+    def send_emails(modeladmin, request, queryset):  # pylint: disable=R0201
         """
         Admin action to compose a preformatted email message and to send it to the selected authority's email ID
         Queryset contains selected complaints. This is a process to send a preformatted batch of emails to authorities
@@ -117,7 +118,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
                 )
 
             # The 'DEFAULT_FROM_EMAIL' setting is recommended by django when the site has an independent mailing server
-            sender_id = settings_base.DEFAULT_FROM_EMAIL
+            sender_id = settings.DEFAULT_FROM_EMAIL
 
             # Retrieves the authority body's email id
             recipient_list = [f'{item.authority_email}']
@@ -126,8 +127,6 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             mailing_list.append((subject, message, sender_id, recipient_list))
         # Sends the e-mails stored in the mailing list to the respective authorities via send_mass_mail method in django
         send_mass_mail(tuple(mailing_list))
-
-    send_emails.short_description = "Send emails to the authorities"
 
     class Meta:
         model = Complaints
