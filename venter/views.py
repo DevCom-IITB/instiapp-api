@@ -18,22 +18,37 @@ from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
 
-class TagViewSet(viewsets.ModelViewSet):
-    queryset = TagUris.objects.all()
-    serializer_class = TagSerializer
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+class RelevantViewSet(viewsets.ModelViewSet):
+    queryset = Complaints.objects.all()
+    serializer_class = ComplaintSerializer
 
     @classmethod
     def list(cls, request):
-        """TagViewSet for the getting related tags"""
-        queryset = TagUris.objects.all()
-        if 'tags' in request.GET:
-            val = request.query_params.get('tags')
-            queryset = TagUris.objects.filter(tag_uri__icontains=val)
+        """RelevantViewSet for the getting list of relevant complaints"""
+        queryset = Complaints.objects.all()
+        serialized = queryset.values_list('description')
+
+        if 'filter' not in request.GET:
+            return Response(serialized)
+
+        if 'filter' in request.GET:
+            val = request.GET.get("filter")
+            value = val.split()
+            stop_words = set(stopwords.words('english'))
+            filtered_sentence = [w for w in value if not w in stop_words]
+            for w in value:
+                if w not in stop_words:
+                    filtered_sentence.append(w)
+            clauses = (Q(description__icontains=p) for p in filtered_sentence)
+            query = reduce(operator.or_, clauses)
+            queryset = Complaints.objects.filter(query)
 
         # Serialize and return
-        serialized = TagSerializer(
+        serialized = ComplaintSerializer(
             queryset, context={'get': 'list'}, many=True).data
-
         return Response(serialized)
 
 
@@ -59,11 +74,13 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         # Check if the user specific filter is present
         if 'filter' in request.GET:
             complaint = complaint.filter(created_by=request.user.profile)
+            print(complaint)
 
         # Filter for a particular word search
         if 'search' in request.GET:
             val = request.query_params.get('search')
             complaint = complaint.filter(description__icontains=val)
+            print(complaint)
 
         # For multiple tags and single tags
         if 'tags' in request.GET:

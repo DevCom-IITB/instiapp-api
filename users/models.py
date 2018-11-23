@@ -31,6 +31,8 @@ class UserProfile(models.Model):
     fcm_id = models.CharField(max_length=200, null=True, blank=True)
 
     followed_bodies = models.ManyToManyField('bodies.Body', related_name='followers', blank=True)
+    complaints_followed = models.ManyToManyField('venter.Complaints', related_name='complaints_subscribed', blank=True)
+
     contact_no = models.CharField(max_length=30, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     about = models.TextField(blank=True, null=True)

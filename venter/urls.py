@@ -1,7 +1,7 @@
 """URLs for venter."""
 from django.urls import path
 from venter.views import ComplaintViewSet
-from venter.views import TagViewSet
+from venter.views import RelevantViewSet
 from venter.views import CommentViewSet
 
 urlpatterns = [
@@ -25,7 +25,7 @@ urlpatterns = [
         'put': 'update', 'delete': 'destroy', 'get': 'retrieve'
     })),
 
-    path('tags', TagViewSet.as_view({
+    path('relevant', RelevantViewSet.as_view({
         'get': 'list'
     })),
 ]

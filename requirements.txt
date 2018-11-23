@@ -22,3 +22,4 @@ python-dateutil==2.7.3
 pywebpush==1.7.0
 PyYAML==3.13
 requests==2.19.1
+nltk
