@@ -37,7 +37,7 @@ class CommentModelAdmin(admin.ModelAdmin):
     model = Comment
 
 class AuthoritiesModelAdmin(admin.ModelAdmin):
-    list_display = ['name', '__str__']
+    list_display = ['name', 'email']
     model = Authorities
 
 class ComplaintModelAdmin(admin.ModelAdmin):
@@ -121,7 +121,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             sender_id = settings.DEFAULT_FROM_EMAIL
 
             # Retrieves the authority body's email id
-            recipient_list = [f'{item.authority_email}']
+            recipient_list = [f'{item.authority_email.email}']
 
             # Composes the email to be sent to the authorities and stores it in the mailing list
             mailing_list.append((subject, message, sender_id, recipient_list))

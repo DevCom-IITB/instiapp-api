@@ -31,7 +31,7 @@ class Authorities(models.Model):
         verbose_name_plural = 'Authority Emails'
 
     def __str__(self):
-        return self.email
+        return '%s <%s>' % (self.name, self.email)
 
 
 class Complaints(models.Model):
