@@ -220,7 +220,7 @@ class VenterTestCase(APITestCase):
             email='dummyauth@example.com'
         )
 
-        self.assertEqual(str(authority), 'dummyauth@example.com')
+        self.assertEqual(str(authority), 'dummyauth <dummyauth@example.com>')
 
     def test_admin_actions(self):
         complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
@@ -260,3 +260,5 @@ class VenterTestCase(APITestCase):
         queryset = Complaints.objects.filter(status=STATUS_IN_PROGRESS)
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(mail.outbox), 2)
+
+        self.assertEqual(mail.outbox[0].to[0], auth_mail.email)
