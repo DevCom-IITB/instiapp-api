@@ -1,6 +1,3 @@
-from unittest import TestCase
-
-from django import urls
 from django.core import mail
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
