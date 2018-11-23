@@ -246,13 +246,21 @@ class VenterTestCase(APITestCase):
         request = SimpleNamespace()
 
         auth_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
+
+        # Reported Complaint
         complaints = Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED,
                                                description='Test Complaint', authority_email=auth_mail)
+
+        # In Progress Complaint with images
         Complaints.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS, authority_email=auth_mail)
         image = []
         image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaints))
         complaints.images.set(image)
 
+        # Complaint with no authority
+        Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
+
+        # Test if the email shows up in outbox
         queryset = Complaints.objects.filter(status=STATUS_REPORTED)
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(mail.outbox), 1)
