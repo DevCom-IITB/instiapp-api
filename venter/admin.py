@@ -96,6 +96,10 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         mailing_list = []
 
         for item in queryset:
+            # Check if the complaint has a valid authority set
+            if item.authority_email is None:
+                continue
+
             input_list = [i for i in ComplaintMedia.objects.filter(complaint=item.id).values('image_url')]
             output_list = [images[key] for images in input_list for key in images]
 
