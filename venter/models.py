@@ -46,7 +46,7 @@ class Complaints(models.Model):
     location_description = models.TextField(blank=True, null=True)
     tags = models.ManyToManyField(TagUris, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
-    authority_email = models.ForeignKey(Authorities, on_delete=models.CASCADE, null=True, blank=True)
+    authority_email = models.ForeignKey(Authorities, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Complaint'
