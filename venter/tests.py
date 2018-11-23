@@ -1,7 +1,20 @@
+from types import SimpleNamespace
+from django.core import mail
+from django.contrib.admin.sites import AdminSite
 from rest_framework.test import APITestCase
 from login.tests import get_new_user
-from venter.models import Complaints, TagUris, Comment, ComplaintMedia
+from venter.admin import ComplaintModelAdmin
+from venter.models import Complaints
+from venter.models import TagUris
+from venter.models import Comment
+from venter.models import ComplaintMedia
+from venter.models import Authorities
 
+# Status variables for complaints
+STATUS_REPORTED = 'Reported'
+STATUS_IN_PROGRESS = 'In Progress'
+STATUS_RESOLVED = 'Resolved'
+STATUS_DELETED = 'Deleted'
 
 class VenterTestCase(APITestCase):
     """Unit tests for venter."""
@@ -18,7 +31,7 @@ class VenterTestCase(APITestCase):
 
         create_complaint(self.user.profile)
         create_complaint(get_new_user().profile)
-        create_complaint(self.user.profile, status='Deleted')
+        create_complaint(self.user.profile, status=STATUS_DELETED)
 
         url = '/api/venter/complaints'
         response = self.client.get(url)
@@ -201,3 +214,49 @@ class VenterTestCase(APITestCase):
         )
 
         self.assertEqual(str(complaintMedia), 'www.google.com')
+
+        authority = Authorities.objects.create(
+            name='dummyauth',
+            email='dummyauth@example.com'
+        )
+
+        self.assertEqual(str(authority), 'dummyauth@example.com')
+
+    def test_admin_actions(self):
+        complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
+        request = SimpleNamespace()
+
+        Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
+        queryset = Complaints.objects.filter(status=STATUS_REPORTED)
+        complaint_admin.mark_as_resolved(complaint_admin, request, queryset)
+        self.assertEqual(Complaints.objects.get(status=STATUS_RESOLVED).status, STATUS_RESOLVED)
+
+        Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
+        queryset = Complaints.objects.filter(status=STATUS_REPORTED)
+        complaint_admin.mark_as_in_progress(complaint_admin, request, queryset)
+        self.assertEqual(Complaints.objects.get(status=STATUS_IN_PROGRESS).status, STATUS_IN_PROGRESS)
+
+        Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
+        queryset = Complaints.objects.filter(status=STATUS_REPORTED)
+        complaint_admin.mark_as_deleted(complaint_admin, request, queryset)
+        self.assertEqual(Complaints.objects.get(status=STATUS_DELETED).status, STATUS_DELETED)
+
+    def test_send_mass_mail(self):
+        complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
+        request = SimpleNamespace()
+
+        auth_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
+        complaints = Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED,
+                                               description='Test Complaint', authority_email=auth_mail)
+        Complaints.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS, authority_email=auth_mail)
+        image = []
+        image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaints))
+        complaints.images.set(image)
+
+        queryset = Complaints.objects.filter(status=STATUS_REPORTED)
+        complaint_admin.send_emails(complaint_admin, request, queryset)
+        self.assertEqual(len(mail.outbox), 1)
+
+        queryset = Complaints.objects.filter(status=STATUS_IN_PROGRESS)
+        complaint_admin.send_emails(complaint_admin, request, queryset)
+        self.assertEqual(len(mail.outbox), 2)
