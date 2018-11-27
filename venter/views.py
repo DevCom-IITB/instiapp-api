@@ -5,6 +5,7 @@ from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
+from nltk.corpus import stopwords
 from roles.helpers import login_required_ajax
 
 from venter.models import Complaints
@@ -17,7 +18,6 @@ from venter.serializers import TagSerializer
 from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
-from nltk.corpus import stopwords
 
 class RelevantViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
