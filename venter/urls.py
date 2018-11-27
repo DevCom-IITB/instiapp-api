@@ -29,4 +29,3 @@ urlpatterns = [
         'get': 'list'
     })),
 ]
-
