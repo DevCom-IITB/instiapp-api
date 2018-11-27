@@ -12,7 +12,7 @@ Backend API in Django for the to-be comprehensive app for managing, finding and 
 
 ## Setup
 To setup dependenices, make a new `virtualenv`, activate it and run `pip install -r requirements.txt`. Then you can run
-* `python nltk_download.py`  for nltk requirements
+* `python -m nltk.downloader stopwords`  for nltk requirements
 * `python manage.py migrate` to create a new database.
 * `python manage.py createsuperuser` will let you create a new user to use the admin panel for testing.
 * `python manage.py runserver` to start a local server.
