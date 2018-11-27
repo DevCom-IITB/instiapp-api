@@ -13,10 +13,10 @@ from venter.models import ComplaintMedia
 from venter.models import TagUris
 
 from venter.serializers import ComplaintSerializer
+from venter.serializers import TagSerializer
 from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
-
 from nltk.corpus import stopwords
 
 class RelevantViewSet(viewsets.ModelViewSet):
@@ -48,6 +48,25 @@ class RelevantViewSet(viewsets.ModelViewSet):
         serialized = ComplaintSerializer(
             queryset, context={'get': 'list'}, many=True).data
         return Response(serialized)
+
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = TagUris.objects.all()
+    serializer_class = TagSerializer
+
+    @classmethod
+    def list(cls, request):
+        """TagViewSet for the getting related tags"""
+        queryset = TagUris.objects.all()
+        if 'tags' in request.GET:
+            val = request.query_params.get('tags')
+            queryset = TagUris.objects.filter(tag_uri__icontains=val)
+
+        # Serialize and return
+        serialized = TagSerializer(
+            queryset, context={'get': 'list'}, many=True).data
+
+        return Response(serialized)
+
 
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
