@@ -32,16 +32,28 @@ class VenterTestCase(APITestCase):
         create_complaint(self.user.profile)
         create_complaint(get_new_user().profile)
         create_complaint(self.user.profile, status=STATUS_DELETED)
+        create_complaint(self.user.profile, description='garbage')
 
         url = '/api/venter/complaints'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 3)
+
+        # Tests for Relevant complaints
+        url = '/api/venter/relevant'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 4)
+
+        url = '/api/venter/relevant?filter=garbage'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
 
         url = '/api/venter/complaints?filter=me'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
 
     def test_tags_get(self):
         """ Test all tags or particular tag return."""
