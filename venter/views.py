@@ -49,6 +49,7 @@ class RelevantViewSet(viewsets.ModelViewSet):
             queryset, context={'get': 'list'}, many=True).data
         return Response(serialized)
 
+
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
