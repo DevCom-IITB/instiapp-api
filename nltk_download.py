@@ -1,2 +1,2 @@
 import nltk
-nltk.downloader('stopwords')
+nltk.download('stopwords')
