@@ -10,13 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='complaints',
-            name='authority_email',
-        ),
         migrations.AddField(
             model_name='complaints',
-            name='auth_email',
+            name='authorities',
             field=models.ManyToManyField(related_name='complaints', to='venter.Authorities'),
         ),
     ]

@@ -220,11 +220,11 @@ class VenterTestCase(APITestCase):
             email='dummyauth@example.com'
         )
 
-<<<<<<< HEAD
-        self.assertEqual(str(authority), 'dummyauth@example.com')
-=======
         self.assertEqual(str(authority), 'dummyauth <dummyauth@example.com>')
->>>>>>> master
+
+        complaint.authorities.add(authority)
+
+        self.assertEqual(len(Complaints.email_list(complaint)), 1)
 
     def test_admin_actions(self):
         complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
@@ -250,48 +250,25 @@ class VenterTestCase(APITestCase):
         request = SimpleNamespace()
 
         auth_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
-<<<<<<< HEAD
+        # Reported Complaint
         complaint_1 = Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED,
                                                 description='Test Complaint')
         complaint_1.authorities.add(auth_mail)
 
+        # In Progress Complaint with images
         complaint_2 = Complaints.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS)
         complaint_2.authorities.add(auth_mail)
         image = []
         image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaint_1))
-        complaint_1.images.set(image)
+        complaint_2.images.set(image)
 
+        # Test if the email shows up in the outbox
         queryset = Complaints.objects.filter(status=STATUS_REPORTED)
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(list(queryset)[0].email_status, True)
-=======
-
-        # Reported Complaint
-        complaints = Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED,
-                                               description='Test Complaint', authority_email=auth_mail)
-
-        # In Progress Complaint with images
-        Complaints.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS, authority_email=auth_mail)
-        image = []
-        image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaints))
-        complaints.images.set(image)
-
-        # Complaint with no authority
-        Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
-
-        # Test if the email shows up in outbox
-        queryset = Complaints.objects.filter(status=STATUS_REPORTED)
-        complaint_admin.send_emails(complaint_admin, request, queryset)
->>>>>>> master
         self.assertEqual(len(mail.outbox), 1)
 
         queryset = Complaints.objects.filter(status=STATUS_IN_PROGRESS)
         complaint_admin.send_emails(complaint_admin, request, queryset)
-<<<<<<< HEAD
         self.assertEqual(list(queryset)[0].email_status, True)
         self.assertEqual(len(mail.outbox), 2)
-=======
-        self.assertEqual(len(mail.outbox), 2)
-
-        self.assertEqual(mail.outbox[0].to[0], auth_mail.email)
->>>>>>> master
