@@ -97,6 +97,10 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         mailing_list = []
 
         for item in queryset:
+            # Check if the complaint has a valid authority set
+            if item.authorities is None:
+                continue
+
             input_list = [i for i in ComplaintMedia.objects.filter(complaint=item.id).values('image_url')]
             output_list = [images[key] for images in input_list for key in images]
 
@@ -115,7 +119,8 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             sender_id = settings.DEFAULT_FROM_EMAIL
 
             # Retrieves the authority body's email id
-            recipient_list = list(queryset.values_list('authorities__email', flat=True))
+            #recipient_list = list(queryset.values_list('authorities__email', flat=True))
+            recipient_list = [f'{item.authorities.email}']
 
             # Composes the email to be sent to the authorities and stores it in the mailing list
             mailing_list.append((subject, message, sender_id, recipient_list))
