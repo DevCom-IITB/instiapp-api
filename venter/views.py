@@ -29,7 +29,7 @@ class RelevantViewSet(viewsets.ModelViewSet):
         queryset = Complaints.objects.all()
         serialized = queryset.values_list('description')
 
-        if 'filter' not in request.GET:
+        if not 'filter' in request.GET:
             return Response(serialized)
 
         if 'filter' in request.GET:
