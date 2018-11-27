@@ -36,7 +36,7 @@ class RelevantViewSet(viewsets.ModelViewSet):
             val = request.GET.get("filter")
             value = val.split()
             stop_words = set(stopwords.words('english'))
-            filtered_sentence = [w for w in value if not w in stop_words]
+            filtered_sentence = [w for w in value if w not in stop_words]
             for w in value:
                 if w not in stop_words:
                     filtered_sentence.append(w)
