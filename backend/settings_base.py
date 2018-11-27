@@ -155,3 +155,5 @@ SSO_BAD_CERT = False
 # Optional deployment dependent serializer transforms
 USER_PROFILE_SERIALIZER_TRANSFORM = lambda x: x
 USER_PROFILE_FULL_SERIALIZER_TRANSFORM = lambda x: x
+
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'

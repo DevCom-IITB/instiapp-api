@@ -5,11 +5,11 @@ django-markdownify==0.8.0
 django-multiselectfield==0.1.8
 django-notifications-hq==1.5.0
 django-rest-swagger==2.2.0
-Django==2.1.2
-djangorestframework==3.8.2
+Django==2.1.3
+djangorestframework==3.9.0
 feedparser==5.2.1
-flake8==3.5.0
-freezegun==0.3.10
+flake8==3.6.0
+freezegun==0.3.11
 gspread==3.0.1
 markdown==3.0.1
 oauth2client==4.1.3
@@ -18,7 +18,7 @@ pyfcm==1.4.5
 pylint-django==2.0.2
 pylint-runner==0.5.4
 pylint==2.1.1
-python-dateutil==2.7.3
+python-dateutil==2.7.5
 pywebpush==1.7.0
 PyYAML==3.13
-requests==2.19.1
+requests==2.20.1
