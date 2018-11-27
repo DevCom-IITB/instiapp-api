@@ -246,17 +246,22 @@ class VenterTestCase(APITestCase):
         request = SimpleNamespace()
 
         auth_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
-        complaints = Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED,
-                                               description='Test Complaint', authority_email=auth_mail)
-        Complaints.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS, authority_email=auth_mail)
+        complaint_1 = Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED,
+                                                description='Test Complaint')
+        complaint_1.authorities.add(auth_mail)
+
+        complaint_2 = Complaints.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS)
+        complaint_2.authorities.add(auth_mail)
         image = []
-        image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaints))
-        complaints.images.set(image)
+        image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaint_1))
+        complaint_1.images.set(image)
 
         queryset = Complaints.objects.filter(status=STATUS_REPORTED)
         complaint_admin.send_emails(complaint_admin, request, queryset)
+        self.assertEqual(list(queryset)[0].email_status, True)
         self.assertEqual(len(mail.outbox), 1)
 
         queryset = Complaints.objects.filter(status=STATUS_IN_PROGRESS)
         complaint_admin.send_emails(complaint_admin, request, queryset)
+        self.assertEqual(list(queryset)[0].email_status, True)
         self.assertEqual(len(mail.outbox), 2)

@@ -37,21 +37,22 @@ class CommentModelAdmin(admin.ModelAdmin):
     model = Comment
 
 class AuthoritiesModelAdmin(admin.ModelAdmin):
-    list_display = ['name', '__str__']
+    list_display = ['name', 'email']
     model = Authorities
 
 class ComplaintModelAdmin(admin.ModelAdmin):
     readonly_fields = ['created_by']
-    list_display = ['report_date', 'status', 'authority_email']
-    list_editable = ['status', 'authority_email']
+    list_display = ['description', 'report_date', 'status', 'email_status', 'email_list']
+    list_editable = ['status']
     list_filter = ['status']
+    filter_horizontal = ('authorities',)
     inlines = [CommentTabularInline, TagTabularInline, UserLikedTabularInline, ComplaintMediaTabularInline]
     exclude = ('tags', 'users_up_voted', 'media',)
     search_fields = ['status', 'description', 'created_by__name']
     actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']
 
     @staticmethod
-    def mark_as_resolved(modeladmin, request, queryset):  # pylint: disable=R0201
+    def mark_as_resolved(modeladmin, request, queryset):
         """
         Admin action to change complaint status to 'Resolved'
         Queryset contains the selected complaints and this is a batch SQL UPDATE process for the complaint status
@@ -59,7 +60,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         queryset.update(status='Resolved')
 
     @staticmethod
-    def mark_as_in_progress(modeladmin, request, queryset):  # pylint: disable=R0201
+    def mark_as_in_progress(modeladmin, request, queryset):
         """
         Admin action to change complaint status to 'In Progress'
         Queryset contains the selected complaints, and this is a batch SQL UPDATE process for the complaint status
@@ -67,7 +68,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         queryset.update(status='In Progress')
 
     @staticmethod
-    def mark_as_deleted(modeladmin, request, queryset):  # pylint: disable=R0201
+    def mark_as_deleted(modeladmin, request, queryset):
         """
         Admin action to change complaint status to 'In Progress'
         Queryset contains the selected complaints, and this is a batch SQL UPDATE process for the complaint status
@@ -75,7 +76,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         queryset.update(status='Deleted')
 
     @staticmethod
-    def send_emails(modeladmin, request, queryset):  # pylint: disable=R0201
+    def send_emails(modeladmin, request, queryset):
         """
         Admin action to compose a preformatted email message and to send it to the selected authority's email ID
         Queryset contains selected complaints. This is a process to send a preformatted batch of emails to authorities
@@ -102,31 +103,25 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             subject = f'Complaint from {item.created_by} on {item.report_date:%A, %d %b %Y at %I:%M %p}'
 
             # Checks for attachments and modifies the email message based on that
-            if output_list:
-                message = (
-                    f'Complaint Description: {item.description}\n'
-                    f'Location Description: {item.location_description}\n'
-                    f'Status: {item.status}\n'
-                    f'Images: {output_list}'
-                )
 
-            elif not output_list:
-                message = (
-                    f'Complaint Description: {item.description}\n'
-                    f'Location Description: {item.location_description}\n'
-                    f'Status: {item.status}\n'
-                )
+            message = (
+                f'Complaint Description: {item.description}\n'
+                f'Location Description: {item.location_description}\n'
+                f'Status: {item.status}\n'
+                f'Images: {", ".join(output_list)}'
+            )
 
             # The 'DEFAULT_FROM_EMAIL' setting is recommended by django when the site has an independent mailing server
             sender_id = settings.DEFAULT_FROM_EMAIL
 
             # Retrieves the authority body's email id
-            recipient_list = [f'{item.authority_email}']
+            recipient_list = list(queryset.values_list('authorities__email', flat=True))
 
             # Composes the email to be sent to the authorities and stores it in the mailing list
             mailing_list.append((subject, message, sender_id, recipient_list))
         # Sends the e-mails stored in the mailing list to the respective authorities via send_mass_mail method in django
         send_mass_mail(tuple(mailing_list))
+        queryset.update(email_status=True)
 
     class Meta:
         model = Complaints
