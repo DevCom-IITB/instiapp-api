@@ -16,8 +16,4 @@ class Migration(migrations.Migration):
             name='authority_email',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='venter.Authorities'),
         ),
-        migrations.RemoveField(
-            model_name='complaints',
-            name='authority_email',
-        ),
     ]

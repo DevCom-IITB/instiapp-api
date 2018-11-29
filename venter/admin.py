@@ -1,7 +1,6 @@
 """Admin models for venter."""
 from django.contrib import admin
-from django.core.mail import send_mass_mail
-
+from django.core.mail import send_mail
 from django.conf import settings
 from venter.models import Complaints
 from venter.models import Comment
@@ -90,26 +89,30 @@ class ComplaintModelAdmin(admin.ModelAdmin):
 
         Recipient List: A list containing authorities to whom the email is to be sent
 
-        The email messages are composed for all the selected complaints and appended to the mailing list.
-        After this, send_mass_mail is used to send a tuple of the stored messages using django's default email backend
+        The email messages are sent using the send_mail() method, and use the four parameters listed above
         """
-        # List containing all the email messages to be sent, is being converted to tuple and sent using "send_mass_mail"
-        mailing_list = []
+        # Variable used to keep track of the number of emails that have not been sent
+        email_block = 0
 
         for item in queryset:
+            # Check if the complaint has a valid authority set. If none exists, remove the complaint from the queryset
+            # and stop the emails from being sent to them
+            if item.authorities.all().exists() is False:
+                email_block += 1
+                queryset = queryset.exclude(id=item.id)
+                continue
+
             input_list = [i for i in ComplaintMedia.objects.filter(complaint=item.id).values('image_url')]
             output_list = [images[key] for images in input_list for key in images]
 
             subject = f'Complaint from {item.created_by} on {item.report_date:%A, %d %b %Y at %I:%M %p}'
 
-            # Checks for attachments and modifies the email message based on that
-
-            message = (
-                f'Complaint Description: {item.description}\n'
-                f'Location Description: {item.location_description}\n'
-                f'Status: {item.status}\n'
-                f'Images: {", ".join(output_list)}'
-            )
+            message = f'{item.description}\n\n' \
+                      f'Location Description: {item.location_description}\n' \
+                      f'Status: {item.status}\n'
+            # Adds links to attached images into the message if any
+            if output_list:
+                message = message + f'Images: {output_list}'
 
             # The 'DEFAULT_FROM_EMAIL' setting is recommended by django when the site has an independent mailing server
             sender_id = settings.DEFAULT_FROM_EMAIL
@@ -117,11 +120,10 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             # Retrieves the authority body's email id
             recipient_list = list(queryset.values_list('authorities__email', flat=True))
 
-            # Composes the email to be sent to the authorities and stores it in the mailing list
-            mailing_list.append((subject, message, sender_id, recipient_list))
+            # Composes the email to be sent to the authorities and sends it to the recipients
+            send_mail(subject, message, sender_id, recipient_list)
 
-        # Sends the e-mails stored in the mailing list to the respective authorities via send_mass_mail method in django
-        send_mass_mail(tuple(mailing_list))
+        # Indicates that the emails have been sent to the respective authorities
         queryset.update(email_status=True)
 
     class Meta:

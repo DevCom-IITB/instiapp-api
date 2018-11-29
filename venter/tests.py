@@ -249,26 +249,33 @@ class VenterTestCase(APITestCase):
         complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
         request = SimpleNamespace()
 
-        auth_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
+        auth_mail_1 = Authorities.objects.create(email='receiver1@example.com', name='receiver1')
+        auth_mail_2 = Authorities.objects.create(email='receiver2@example.com', name='receiver2')
+
         # Reported Complaint
         complaint_1 = Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED,
                                                 description='Test Complaint')
-        complaint_1.authorities.add(auth_mail)
+        complaint_1.authorities.add(auth_mail_1, auth_mail_2)
 
         # In Progress Complaint with images
         complaint_2 = Complaints.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS)
-        complaint_2.authorities.add(auth_mail)
+        complaint_2.authorities.add(auth_mail_1)
         image = []
         image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaint_1))
         complaint_2.images.set(image)
 
+        # Complaint with no authority
+        Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
+
         # Test if the email shows up in the outbox
         queryset = Complaints.objects.filter(status=STATUS_REPORTED)
         complaint_admin.send_emails(complaint_admin, request, queryset)
-        self.assertEqual(list(queryset)[0].email_status, True)
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(queryset.filter(email_status=True)), 1)
 
         queryset = Complaints.objects.filter(status=STATUS_IN_PROGRESS)
         complaint_admin.send_emails(complaint_admin, request, queryset)
-        self.assertEqual(list(queryset)[0].email_status, True)
         self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(queryset.filter(email_status=True)), 1)
+
+        self.assertEqual(len(mail.outbox[0].to), 2)
