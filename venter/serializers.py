@@ -33,15 +33,14 @@ class ComplaintSerializer(serializers.ModelSerializer):
         model = Complaints
         fields = (
             'id', 'created_by', 'description', 'report_date', 'status', 'latitude',
-            'longitude', 'location_description', 'tags', 'comments', 'authorities', 'users_up_voted', 'images'
+            'longitude', 'location_description', 'tags', 'comments', 'users_up_voted', 'images'
         )
 
 class ComplaintPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Complaints
         fields = (
-            'id', 'description', 'report_date', 'latitude', 'longitude', 'location_description'
-        )
+            'id', 'description', 'report_date', 'latitude', 'longitude', 'location_description')
 
     def create(self, validated_data):
         validated_data['created_by'] = self.context['request'].user.profile

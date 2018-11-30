@@ -91,15 +91,10 @@ class ComplaintModelAdmin(admin.ModelAdmin):
 
         The email messages are sent using the send_mail() method, and use the four parameters listed above
         """
-        # Variable used to keep track of the number of emails that have not been sent
-        email_block = 0
 
         for item in queryset:
             # Check if the complaint has a valid authority set. If none exists, remove the complaint from the queryset
-            # and stop the emails from being sent to them
-            if item.authorities.all().exists() is False:
-                email_block += 1
-                queryset = queryset.exclude(id=item.id)
+            if not item.authorities.all().exists():
                 continue
 
             input_list = [i for i in ComplaintMedia.objects.filter(complaint=item.id).values('image_url')]
@@ -108,8 +103,8 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             subject = f'Complaint from {item.created_by} on {item.report_date:%A, %d %b %Y at %I:%M %p}'
 
             message = f'{item.description}\n\n' \
-                      f'Location Description: {item.location_description}\n' \
-                      f'Status: {item.status}\n'
+                      f'Location Description: {item.location_description}\n\n' \
+                      f'Status: {item.status}\n\n'
             # Adds links to attached images into the message if any
             if output_list:
                 message = message + f'Images: {output_list}'
@@ -117,14 +112,14 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             # The 'DEFAULT_FROM_EMAIL' setting is recommended by django when the site has an independent mailing server
             sender_id = settings.DEFAULT_FROM_EMAIL
 
-            # Retrieves the authority body's email id
-            recipient_list = list(queryset.values_list('authorities__email', flat=True))
+            # Retrieves a list of email ids for the selected authorities. Excludes the authority bodies with no email id
+            recipient_list = queryset.values_list('authorities__email', flat=True).exclude(authorities__email=None)
 
             # Composes the email to be sent to the authorities and sends it to the recipients
             send_mail(subject, message, sender_id, recipient_list)
 
-        # Indicates that the emails have been sent to the respective authorities
-        queryset.update(email_status=True)
+            item.email_status = True
+            item.save()
 
     class Meta:
         model = Complaints
