@@ -119,12 +119,14 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
+        # Retreiving complaint id (cid)
         cid = str(response.data[0]['id'])
         url = '/api/venter/complaints/' + cid
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['description'], 'test')
 
+        # Test for complaint upvoting
         url = '/api/venter/complaints/' + cid + '/upvote'
 
         # No Action
@@ -146,6 +148,29 @@ class VenterTestCase(APITestCase):
         response = self.client.get(url + '0')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['users_up_voted']), 0)
+
+        # Test for Complaint Subscription
+        url = '/api/venter/complaints/' + cid + '/subscribe'
+
+        # No Action
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        url += '?action='
+
+        # Invalid Action
+        response = self.client.get(url + 'k')
+        self.assertEqual(response.status_code, 400)
+
+        # Subscribe
+        response = self.client.get(url + '1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['subscriptions']), 1)
+
+        # UnSubscribe
+        response = self.client.get(url + '0')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['subscriptions']), 0)
 
     def test_comment(self):
         """Test all public venter comment APIs."""

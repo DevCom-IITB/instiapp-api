@@ -17,6 +17,10 @@ urlpatterns = [
         'get': 'up_vote'
     })),
 
+    path('complaints/<pk>/subscribe', ComplaintViewSet.as_view({
+        'get': 'subscribe'
+    })),
+
     path('complaints/<pk>/comments', CommentViewSet.as_view({
         'post': 'create'
     })),

@@ -135,6 +135,28 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             Complaints.objects.get(id=complaint.id)
         ).data, status=200)
 
+    @login_required_ajax
+    def subscribe(self, request, pk):
+        """Subscribe or Un-Subscribe from a complaint {?action}=0,1"""
+
+        complaint = self.get_complaint(pk)
+
+        value = request.GET.get("action")
+        if value is None:
+            return Response({"message": "{?action} is required"}, status=400)
+
+        # Check possible actions
+        if value == "0":
+            complaint.subscriptions.remove(self.request.user.profile)
+        elif value == "1":
+            complaint.subscriptions.add(self.request.user.profile)
+        else:
+            return Response({"message": "Invalid Action"}, status=400)
+
+        return Response(ComplaintSerializer(
+            Complaints.objects.get(id=complaint.id)
+        ).data, status=200)
+
     def get_complaint(self, pk):
         """Shortcut for get_object_or_404 with pk"""
         return get_object_or_404(self.queryset, id=pk)

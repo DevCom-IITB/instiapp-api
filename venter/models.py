@@ -48,6 +48,7 @@ class Complaints(models.Model):
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
     authorities = models.ManyToManyField(Authorities, related_name='complaints', blank=True)
     email_status = models.BooleanField(default=False)
+    subscriptions = models.ManyToManyField('users.UserProfile', related_name='subscriptions', blank=True)
 
     def email_list(self):
         return list(self.authorities.all().values_list('name', flat=True))
