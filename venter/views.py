@@ -107,6 +107,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
                 ComplaintMedia.objects.create(
                     complaint=complaint, image_url=image
                 )
+            # Add the complaint creator to the subscribers list
+            complaint.subscriptions.add(complaint.created_by)
+            complaint.save()
 
         # Return new serialized response
         return Response(ComplaintSerializer(
@@ -172,6 +175,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         get_text = request.data['text']
         comment = Comment.objects.create(text=get_text, commented_by=request.user.profile,
                                          complaint=get_complaint)
+        # Auto subscribes the commenter to the complaint
+        get_complaint.subscriptions.add(request.user.profile)
+        get_complaint.save()
+
         serialized = CommentSerializer(comment)
         return Response(serialized.data, status=201)
 
