@@ -43,10 +43,13 @@ class EventPrioritizer():  # pylint: disable=R0902
         # Apply all bonuses/penalties
         self.apply_time_bonus()
         self.penalise_untagged()
-        self.bonus_followed()
         self.penalise_far_off()
         self.penalise_length()
-        self.bonus_promotion()
+
+        # Give bonuses to events yet to end
+        if self.event.end_time > timezone.now():
+            self.bonus_followed()
+            self.bonus_promotion()
 
         return self
 
@@ -79,11 +82,6 @@ class EventPrioritizer():  # pylint: disable=R0902
 
     def bonus_followed(self):
         """Apply bonus if user is following a body conducting the event."""
-        # Do not give bonus to ended events
-        if self.event.end_time < timezone.now():
-            return
-
-        # Check if the user has followed bodies
         if self.followed_bodies:
             body_bonus = 0
             for body in self.event.bodies.all():

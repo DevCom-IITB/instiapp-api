@@ -89,6 +89,8 @@ class EventTestCase(APITestCase):
 
         # Test that ended events do not receive bonus
         eventP2.bodies.add(body1, body2, body3, body4)
+        eventP2.promotion_boost = 2000
+        eventP2.save()
         assertOrder([event3, event1, event2, eventP1, eventP2])
 
         # Check user tags - setup the user
@@ -127,14 +129,16 @@ class EventTestCase(APITestCase):
         me_tag.save()
         assertOrder([event1, event2, eventP1])
 
+        # Test promotion boost
+        event2.promotion_boost = 2000
+        event2.save()
+        assertOrder([event2, event1, eventP1])
+        event2.promotion_boost = 0
+        event2.save()
+
         # Test for anonymous user
         self.client.logout()
         assertOrder([event2, eventP1])
-
-        # Test promotion boost
-        eventP1.promotion_boost = 2000
-        eventP1.save()
-        assertOrder([eventP1, event2])
 
     def test_events_list(self):
         """Test if events can be listed."""
