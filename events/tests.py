@@ -54,19 +54,22 @@ class EventTestCase(APITestCase):
                 self.assertLess(response_event['weight'], prev_weight)
                 prev_weight = response_event['weight']
 
-        # Events in future. event1 after event3 after event2. event4 in past
+        # Events in future:
+        # event1 after event3 after event2
+        # eventP1, eventP1 in past
         event1 = create_event(48, 48)
         event2 = create_event(4, 5)
         event3 = create_event(15, 16)
-        event4 = create_event(-5, -4)
+        eventP1 = create_event(-5, -4)
+        eventP2 = create_event(-6, -5)
 
         # These events check linear decay after 15 days
-        event5 = create_event(24 * 30, 24 * 30)
-        event6 = create_event(24 * 20, 24 * 20)
-        event7 = create_event(24 * 40, 24 * 40)
+        eventL1 = create_event(24 * 30, 24 * 30)
+        eventL2 = create_event(24 * 20, 24 * 20)
+        eventL3 = create_event(24 * 40, 24 * 40)
 
-        assertOrder([event2, event3, event1, event4])
-        assertWeightOrder([event6, event5, event7])
+        assertOrder([event2, event3, event1, eventP1, eventP2])
+        assertWeightOrder([eventL2, eventL1, eventL3])
 
         # Check followed bodies priorities
         body1 = create_body()
@@ -78,11 +81,17 @@ class EventTestCase(APITestCase):
 
         # After the user is following  a body of event 3, it should bump up
         event3.bodies.add(body1)
-        assertOrder([event3, event2, event1, event4])
+        assertOrder([event3, event2, event1, eventP1, eventP2])
 
         # Test the cap on followed bodies bonus
         event1.bodies.add(body1, body2, body3, body4, body5)
-        assertOrder([event3, event1, event2, event4])
+        assertOrder([event3, event1, event2, eventP1, eventP2])
+
+        # Test that ended events do not receive bonus
+        eventP2.bodies.add(body1, body2, body3, body4)
+        eventP2.promotion_boost = 2000
+        eventP2.save()
+        assertOrder([event3, event1, event2, eventP1, eventP2])
 
         # Check user tags - setup the user
         self.user.profile.hostel = '1'
@@ -103,31 +112,33 @@ class EventTestCase(APITestCase):
         event3.user_tags.add(me_tag)
 
         # Check new order
-        assertOrder([event1, event2, event4])
+        assertOrder([event1, event2, eventP1])
 
         # Check if user needs to satisfy only one tag from each category
         event1.user_tags.add(h13_tag)
-        assertOrder([event1, event2, event4])
+        assertOrder([event1, event2, eventP1])
 
         # Test null check - now the department matching tag is non matching
         self.user.profile.department = None
         self.user.profile.save()
-        assertOrder([event2, event4])
+        assertOrder([event2, eventP1])
 
         # Test if secondary_target is working
         me_tag.secondary_target = 'hostel'
         me_tag.secondary_regex = '1'
         me_tag.save()
-        assertOrder([event1, event2, event4])
+        assertOrder([event1, event2, eventP1])
+
+        # Test promotion boost
+        event2.promotion_boost = 2000
+        event2.save()
+        assertOrder([event2, event1, eventP1])
+        event2.promotion_boost = 0
+        event2.save()
 
         # Test for anonymous user
         self.client.logout()
-        assertOrder([event2, event4])
-
-        # Test promotion boost
-        event4.promotion_boost = 2000
-        event4.save()
-        assertOrder([event4, event2])
+        assertOrder([event2, eventP1])
 
     def test_events_list(self):
         """Test if events can be listed."""
