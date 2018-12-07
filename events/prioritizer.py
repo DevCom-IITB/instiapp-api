@@ -79,6 +79,11 @@ class EventPrioritizer():  # pylint: disable=R0902
 
     def bonus_followed(self):
         """Apply bonus if user is following a body conducting the event."""
+        # Do not give bonus to ended events
+        if self.event.end_time < timezone.now():
+            return
+
+        # Check if the user has followed bodies
         if self.followed_bodies:
             body_bonus = 0
             for body in self.event.bodies.all():
