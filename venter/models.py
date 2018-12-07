@@ -46,7 +46,12 @@ class Complaints(models.Model):
     location_description = models.TextField(blank=True, null=True)
     tags = models.ManyToManyField(TagUris, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
-    authority_email = models.ForeignKey(Authorities, on_delete=models.SET_NULL, null=True, blank=True)
+    authorities = models.ManyToManyField(Authorities, related_name='complaints', blank=True)
+    email_status = models.BooleanField(default=False)
+
+    def email_list(self):
+        return list(self.authorities.all().values_list('name', flat=True))
+    email_list.short_description = 'List of Authorities'
 
     class Meta:
         verbose_name = 'Complaint'
