@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 from django.core import mail
 from django.contrib.admin.sites import AdminSite
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from login.tests import get_new_user
 from venter.admin import ComplaintModelAdmin
 from venter.models import Complaints
@@ -20,8 +20,9 @@ class VenterTestCase(APITestCase):
     """Unit tests for venter."""
 
     def setUp(self):
+        self.client = APIClient()
         self.user = get_new_user()
-        self.client.force_authenticate(self.user)  # pylint: disable=E1101
+        self.client.force_authenticate(self.user)
 
     def test_complaint_get(self):
         """Test getting venter complaint lists."""
@@ -222,6 +223,10 @@ class VenterTestCase(APITestCase):
 
         self.assertEqual(str(authority), 'dummyauth <dummyauth@example.com>')
 
+        complaint.authorities.add(authority)
+
+        self.assertEqual(len(Complaints.email_list(complaint)), 1)
+
     def test_admin_actions(self):
         complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
         request = SimpleNamespace()
@@ -245,28 +250,36 @@ class VenterTestCase(APITestCase):
         complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
         request = SimpleNamespace()
 
-        auth_mail = Authorities.objects.create(email='receiver1@example.com', name='receiver')
+        # Adding dummy recipients for emails
+        auth_mail_1 = Authorities.objects.create(email='receiver1@example.com', name='receiver1')
+        auth_mail_2 = Authorities.objects.create(email='receiver2@example.com', name='receiver2')
 
-        # Reported Complaint
-        complaints = Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED,
-                                               description='Test Complaint', authority_email=auth_mail)
+        # Reported Complaint (multiple recipients)
+        complaint_multi = Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED,
+                                                    description='Test Complaint')
+        complaint_multi.authorities.add(auth_mail_1, auth_mail_2)
 
-        # In Progress Complaint with images
-        Complaints.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS, authority_email=auth_mail)
+        # In Progress Complaint with images (single recipient)
+        complaint_single = Complaints.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS)
+        complaint_single.authorities.add(auth_mail_1)
         image = []
-        image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaints))
-        complaints.images.set(image)
+        image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaint_single))
+        complaint_single.images.set(image)
 
         # Complaint with no authority
         Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
 
-        # Test if the email shows up in outbox
+        # Test if the email shows up in the outbox when method is called
         queryset = Complaints.objects.filter(status=STATUS_REPORTED)
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(queryset.filter(email_status=True)), 1)
 
         queryset = Complaints.objects.filter(status=STATUS_IN_PROGRESS)
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(queryset.filter(email_status=True)), 1)
 
-        self.assertEqual(mail.outbox[0].to[0], auth_mail.email)
+        # Evaluating whether the correct number of recipients are being addressed in the multi recipient complaint
+        self.assertEqual(len(mail.outbox[0].to), 2)
+        self.assertEqual(set(mail.outbox[0].to), set(complaint_multi.authorities.values_list('email', flat=True)))
