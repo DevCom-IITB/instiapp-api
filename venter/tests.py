@@ -1,8 +1,10 @@
 from types import SimpleNamespace
 from django.core import mail
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import User
 from rest_framework.test import APITestCase, APIClient
 from login.tests import get_new_user
+from users.models import UserProfile
 from venter.admin import ComplaintModelAdmin
 from venter.models import Complaints
 from venter.models import TagUris
@@ -62,7 +64,7 @@ class VenterTestCase(APITestCase):
 
     def test_complaint(self):  # pylint: disable=R0915
         """ Test all public methods of venter complaint."""
-
+        # Testing complaint POST requests
         url = '/api/venter/complaints'
         TagUris.objects.create(tag_uri='garbage')
         data = {
@@ -78,6 +80,9 @@ class VenterTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(response.data['images']), 2)
         self.assertEqual(len(response.data['tags']), 2)
+
+        # Creator should be auto-subscribed to the complaint
+        self.assertEqual(len(response.data['subscriptions']), 1)
 
         data = {
             'description': 'test',
@@ -174,16 +179,28 @@ class VenterTestCase(APITestCase):
 
     def test_comment(self):
         """Test all public venter comment APIs."""
-
+        # Dummy complaint, created by 'user'. The creator is already subscribed to the complaint
         complaint = Complaints.objects.create(created_by=self.user.profile)
+        complaint.subscriptions.add(self.user.profile)
+
+        # Creating a new user and profile to make a comment and test auto-subscription of comments
+        test_commenter_1 = User.objects.create_user(username='Commenter1', password='Commenter1@123')
+        UserProfile.objects.create(name='CommentProfile1', user=test_commenter_1)
+        self.client.force_authenticate(user=test_commenter_1)
 
         url = '/api/venter/complaints/' + str(complaint.id) + '/comments'
 
         data = {'text': 'test'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
-
         cid = str(response.data['id'])
+
+        # Testing whether commenter is auto-subscribed to the complaint, and is the most recent subscriber
+        url = '/api/venter/complaints/' + str(complaint.id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['subscriptions'][0]['id'], str(test_commenter_1.profile.id))
+
         url = '/api/venter/comments/' + cid
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

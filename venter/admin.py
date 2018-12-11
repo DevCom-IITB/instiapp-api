@@ -46,7 +46,7 @@ class AuthoritiesModelAdmin(admin.ModelAdmin):
     model = Authorities
 
 class ComplaintModelAdmin(admin.ModelAdmin):
-    #readonly_fields = ['created_by']
+    readonly_fields = ['created_by']
     list_display = ['report_date', 'status', 'email_status', 'email_list']
     list_editable = ['status']
     list_filter = ['status']
