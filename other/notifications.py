@@ -58,18 +58,9 @@ def new_comment(instance, created, **kwargs):  # pylint: disable=W0613
             notify.send(
                 instance,
                 recipient=profile.user,
-                verb=instance.commented_by.name + " commented on a complaint you are subscribed to"
+                verb="New comment on a complaint you're following"
                 )
 
-# def complaint_status_change(instance, created):
-#     """Notify users when a followed complaint changes its status"""
-#     if not created:
-#         for profile in instance.subscriptions.all():
-#             notify.send(
-#                 instance,
-#                 recipient=profile.user,
-#                 verb="A followed complaint has had its status changed"
-#             )
 
 class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disable=W0223
     """Serializer for actor/target of notifications."""

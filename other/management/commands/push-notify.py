@@ -9,6 +9,7 @@ from notifications.models import Notification
 from placements.models import BlogEntry
 from events.models import Event
 from news.models import NewsEntry
+from venter.models import Comment
 
 def send_push(subscription, payload):
     """Send a single push notification."""
@@ -121,6 +122,11 @@ def get_rich_notification(notification):
             if len(notification_large_content) > 250:
                 notification_large_content = notification_large_content[:250] + ' ...'
             notification_image = get_news_image(actor)
+
+        # Comment
+        if isinstance(actor, Comment):
+            title = actor.complaint.description
+            notification_extra = actor.complaint.id
 
         notification_id = str(actor.id)
 
