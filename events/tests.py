@@ -359,6 +359,16 @@ class EventTestCase(APITestCase):
         self.assertEqual(test_event.ues.first().status, 1)
         assert_user_ues(test_event, 1)
 
+        # Mark the event as going
+        url = '/api/user-me/ues/%s?status=2' % test_event.id
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 204)
+
+        # Assert updated UES
+        self.assertEqual(test_event.ues.count(), 1)
+        self.assertEqual(test_event.ues.first().status, 2)
+        assert_user_ues(test_event, 2)
+
         # Un-follow the event
         url = '/api/user-me/ues/%s?status=0' % test_event.id
         response = self.client.get(url, format='json')
