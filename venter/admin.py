@@ -41,7 +41,7 @@ class AuthoritiesModelAdmin(admin.ModelAdmin):
 
 class ComplaintModelAdmin(admin.ModelAdmin):
     readonly_fields = ['created_by']
-    list_display = ['report_date', 'status', 'email_list','email_sent_to']
+    list_display = ['report_date', 'status', 'email_list', 'email_sent_to']
     list_editable = ['status']
     list_filter = ['status']
     filter_horizontal = ('authorities',)
