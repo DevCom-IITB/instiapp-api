@@ -20,8 +20,8 @@ def get_user_ues(slf, obj):
     request = slf.context['request']
     if request.user.is_authenticated:
         profile = request.user.profile
-        ues = [ues.status for ues in obj.ues.all() if ues.user == profile]
-        return ues[0] if ues else 0
+        ues = obj.ues.filter(user=profile).first()
+        return ues.status if ues else 0
 
     return None
 
