@@ -333,14 +333,26 @@ class EventTestCase(APITestCase):
         def assert_user_ues(t_event, t_ues):
             """Test user_ues in event serializer."""
 
-            url = '/api/events'
+            url = '/api/events/%s' % t_event.id
             response = self.client.get(url, format='json')
             self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['user_ues'], t_ues)
 
-            # Find and compare the event
-            for event in response.data['data']:
-                if event['id'] == str(t_event.id):
-                    self.assertEqual(event['user_ues'], t_ues)
+        def mark_test(event, ues, count):
+            """Helper to mark UES and test creation/updation."""
+
+            # Mark UES for the event
+            url = '/api/user-me/ues/%s?status=%s' % (event.id, str(ues))
+            response = self.client.get(url, format='json')
+            self.assertEqual(response.status_code, 204)
+
+            # Assert creation of UES
+            self.assertEqual(event.ues.count(), count)
+            assert_user_ues(event, ues)
+
+            # Check first only if exists
+            if count > 0:
+                self.assertEqual(event.ues.first().status, ues)
 
         # Create event with one body
         test_body = create_body(name="Test Body1")
@@ -349,24 +361,11 @@ class EventTestCase(APITestCase):
         self.assertEqual(test_event.ues.count(), 0)
         assert_user_ues(test_event, 0)
 
-        # Mark the event as followed
-        url = '/api/user-me/ues/%s?status=1' % test_event.id
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, 204)
-
-        # Assert creation of UES
-        self.assertEqual(test_event.ues.count(), 1)
-        self.assertEqual(test_event.ues.first().status, 1)
-        assert_user_ues(test_event, 1)
-
-        # Un-follow the event
-        url = '/api/user-me/ues/%s?status=0' % test_event.id
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, 204)
-
-        # Assert removed UES
-        self.assertEqual(test_event.ues.count(), 0)
-        assert_user_ues(test_event, 0)
+        # Test interested, going and neutral
+        # When the user un-marks the event, UES must be removed
+        mark_test(test_event, 1, 1)
+        mark_test(test_event, 2, 1)
+        mark_test(test_event, 0, 0)
 
         # Assert user_ues as anonymous
         self.client.logout()
