@@ -50,15 +50,15 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     list_display = ['report_date', 'status', 'email_status', 'email_list']
     list_editable = ['status']
     list_filter = ['status']
-    filter_horizontal = ('authorities', 'subscriptions', 'users_up_voted')
+    filter_horizontal = ('authorities',)
     inlines = [
         CommentTabularInline,
         TagTabularInline,
         UserLikedTabularInline,
         ComplaintMediaTabularInline,
         UserSubscribedTabularInline
-        ]
-    exclude = ('tags', 'media',)
+    ]
+    exclude = ('tags', 'users_up_voted', 'media',)
     search_fields = ['status', 'description', 'created_by__name']
     actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']
 
