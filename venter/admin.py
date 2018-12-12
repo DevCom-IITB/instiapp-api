@@ -124,13 +124,11 @@ class ComplaintModelAdmin(admin.ModelAdmin):
 
             # check if email_sent_to list is empty or not, if empty assign auth value else append auth value
             if item.email_sent_to:
-                authority_name = item.email_sent_to + ', ' + auth
-                item.email_sent_to = authority_name
+                item.email_sent_to = item.email_sent_to + ', ' + auth
             else:
                 item.email_sent_to = auth
 
             item.delete()
-            item.status = 'In Progress'
             item.email_status = True
             item.save()
 
