@@ -279,10 +279,12 @@ class VenterTestCase(APITestCase):
         self.assertEqual(len(mail.outbox), 2)
 
         # Test if email_sent_to get added and pending list is empty
-        queryset = Complaints.objects.all()
-        self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(len(queryset.filter(email_sent_to='receiver1')), 1)
-        self.assertEqual(len(queryset.filter(authorities=None)), 3)
+        self.assertEqual(len(queryset.filter(authorities=None)), 2)
+
+        queryset = Complaints.objects.all()
+        complaint_admin.send_emails(complaint_admin, request, queryset)
+        self.assertEqual(len(queryset.filter(email_sent_to='receiver1, receiver2')), 1)
 
         # Evaluating whether the correct number of recipients are being addressed in the multi recipient complaint
         self.assertEqual(len(mail.outbox[0].to), 2)
