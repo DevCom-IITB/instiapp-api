@@ -327,6 +327,51 @@ class EventTestCase(APITestCase):
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 403)
 
+    def test_ues(self):
+        """Test user-event-status APIs."""
+
+        def assert_user_ues(t_event, t_ues):
+            """Test user_ues in event serializer."""
+
+            url = '/api/events'
+            response = self.client.get(url, format='json')
+            self.assertEqual(response.status_code, 200)
+
+            # Find and compare the event
+            for event in response.data['data']:
+                if event['id'] == str(t_event.id):
+                    self.assertEqual(event['user_ues'], t_ues)
+
+        # Create event with one body
+        test_body = create_body(name="Test Body1")
+        test_event = create_event(name="Test Event1")
+        test_event.bodies.add(test_body)
+        self.assertEqual(test_event.ues.count(), 0)
+        assert_user_ues(test_event, 0)
+
+        # Mark the event as followed
+        url = '/api/user-me/ues/%s?status=1' % test_event.id
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 204)
+
+        # Assert creation of UES
+        self.assertEqual(test_event.ues.count(), 1)
+        self.assertEqual(test_event.ues.first().status, 1)
+        assert_user_ues(test_event, 1)
+
+        # Un-follow the event
+        url = '/api/user-me/ues/%s?status=0' % test_event.id
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 204)
+
+        # Assert removed UES
+        self.assertEqual(test_event.ues.count(), 0)
+        assert_user_ues(test_event, 0)
+
+        # Assert user_ues as anonymous
+        self.client.logout()
+        assert_user_ues(test_event, None)
+
     def test_anonymous(self):
         """Check APIs as anonymous user."""
         self.client.logout()
