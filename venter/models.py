@@ -47,11 +47,11 @@ class Complaints(models.Model):
     tags = models.ManyToManyField(TagUris, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
     authorities = models.ManyToManyField(Authorities, related_name='complaints', blank=True)
-    email_status = models.BooleanField(default=False)
+    email_sent_to = models.CharField(max_length=50, blank=True)
 
     def email_list(self):
         return list(self.authorities.all().values_list('name', flat=True))
-    email_list.short_description = 'List of Authorities'
+    email_list.short_description = 'Pending list'
 
     class Meta:
         verbose_name = 'Complaint'
@@ -60,6 +60,7 @@ class Complaints(models.Model):
 
     def __str__(self):
         return self.description
+
 
 class ComplaintMedia(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -72,6 +73,7 @@ class ComplaintMedia(models.Model):
 
     def __str__(self):
         return str(self.image_url)
+
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
