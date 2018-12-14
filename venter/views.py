@@ -36,7 +36,6 @@ class TagViewSet(viewsets.ModelViewSet):
 
         return Response(serialized)
 
-
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
@@ -138,7 +137,6 @@ class ComplaintViewSet(viewsets.ModelViewSet):
     def get_complaint(self, pk):
         """Shortcut for get_object_or_404 with pk"""
         return get_object_or_404(self.queryset, id=pk)
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()

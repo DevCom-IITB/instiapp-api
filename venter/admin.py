@@ -116,8 +116,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             recipient_list = queryset.values_list('authorities__email', flat=True).exclude(authorities__email=None)
 
             authority = item.authorities.values_list('name', flat=True)
-            auth = ', '
-            auth = auth.join(authority)
+            auth = ', '.join(authority)
 
             # Composes the email to be sent to the authorities and sends it to the recipients
             send_mail(subject, message, sender_id, recipient_list)
