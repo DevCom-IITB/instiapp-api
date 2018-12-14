@@ -287,18 +287,11 @@ class VenterTestCase(APITestCase):
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(queryset.filter(email_sent_to='auth3')), 1)
 
-        a = Complaints.objects.get(description='multiple')
-        b = str(a.email_sent_to)
-        print("\n\nThese are the authorities added to the test complaint " + b )
-
+        # Test for email_sent_to for new authorities added
         complaint_multival.authorities.add(new_auth2)
         queryset = Complaints.objects.filter(description='multiple')
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(queryset.filter(email_sent_to='auth3, auth2')), 1)
-
-        a = Complaints.objects.get(description='multiple')
-        b = str(a.email_sent_to)
-        print("\n\nThese are the authorities added to the test complaint " + b )
 
         # Evaluating whether the correct number of recipients are being addressed in the multi recipient complaint
         self.assertEqual(len(mail.outbox[0].to), 2)
