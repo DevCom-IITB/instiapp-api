@@ -279,17 +279,26 @@ class VenterTestCase(APITestCase):
         self.assertEqual(len(mail.outbox), 2)
 
         # Test for email_sent_to list
-        new_auth1 = Authorities.objects.create(email='auth1@example.com', name='auth1')
-        complaint_garbage= Complaints.objects.create(created_by=self.user.profile,description='Garbage')
-        complaint_garbage.authorities.add(new_auth1)
-        queryset = Complaints.objects.filter(description='Garbage')
-        complaint_admin.send_emails(complaint_admin, request, queryset)
-        self.assertEqual(len(queryset.filter(email_sent_to='auth1')), 1)
+        complaint_multival = Complaints.objects.create(created_by=self.user.profile, description='multiple')
+        new_auth3 = Authorities.objects.create(email='auth3@example.com', name='auth3')
         new_auth2 = Authorities.objects.create(email='auth2@example.com', name='auth2')
-        complaint_garbage.authorities.add(new_auth2)
-        queryset = Complaints.objects.filter(description='Garbage',)
+        complaint_multival.authorities.add(new_auth3)
+        queryset = Complaints.objects.filter(description='multiple')
         complaint_admin.send_emails(complaint_admin, request, queryset)
-        self.assertEqual(len(queryset.filter(email_sent_to='auth1')), 1)
+        self.assertEqual(len(queryset.filter(email_sent_to='auth3')), 1)
+
+        a = Complaints.objects.get(description='multiple')
+        b = str(a.email_sent_to)
+        print("\n\nThese are the authorities added to the test complaint " + b )
+
+        complaint_multival.authorities.add(new_auth2)
+        queryset = Complaints.objects.filter(description='multiple')
+        complaint_admin.send_emails(complaint_admin, request, queryset)
+        self.assertEqual(len(queryset.filter(email_sent_to='auth3, auth2')), 1)
+
+        a = Complaints.objects.get(description='multiple')
+        b = str(a.email_sent_to)
+        print("\n\nThese are the authorities added to the test complaint " + b )
 
         # Evaluating whether the correct number of recipients are being addressed in the multi recipient complaint
         self.assertEqual(len(mail.outbox[0].to), 2)

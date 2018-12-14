@@ -128,7 +128,8 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             else:
                 item.email_sent_to = auth
 
-            item.delete()
+            item.authorities.clear()
+            item.status = 'In Progress'
             item.email_status = True
             item.save()
 
