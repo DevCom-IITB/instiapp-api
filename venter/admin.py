@@ -63,7 +63,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']
 
     @staticmethod
-    def mark_as_resolved(modeladmin  , request, queryset):
+    def mark_as_resolved(modeladmin, request, queryset):
         """
         Admin action to change complaint status to 'Resolved'
         Queryset contains the selected complaints and this is a batch SQL UPDATE process for the complaint status
