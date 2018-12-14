@@ -281,13 +281,13 @@ class VenterTestCase(APITestCase):
         # Test for email_sent_to list
         complaint_multival = Complaints.objects.create(created_by=self.user.profile, description='multiple')
         new_auth3 = Authorities.objects.create(email='auth3@example.com', name='auth3')
-        new_auth2 = Authorities.objects.create(email='auth2@example.com', name='auth2')
         complaint_multival.authorities.add(new_auth3)
         queryset = Complaints.objects.filter(description='multiple')
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(queryset.filter(email_sent_to='auth3')), 1)
 
         # Test for email_sent_to for new authorities added
+        new_auth2 = Authorities.objects.create(email='auth2@example.com', name='auth2')
         complaint_multival.authorities.add(new_auth2)
         queryset = Complaints.objects.filter(description='multiple')
         complaint_admin.send_emails(complaint_admin, request, queryset)
