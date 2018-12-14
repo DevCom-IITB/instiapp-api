@@ -156,5 +156,4 @@ SSO_BAD_CERT = False
 USER_PROFILE_SERIALIZER_TRANSFORM = lambda x: x
 USER_PROFILE_FULL_SERIALIZER_TRANSFORM = lambda x: x
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
