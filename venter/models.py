@@ -20,6 +20,7 @@ class TagUris(models.Model):
     def __str__(self):
         return self.tag_uri
 
+
 class Authorities(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=30, blank=True, null=True)
@@ -31,6 +32,7 @@ class Authorities(models.Model):
 
     def __str__(self):
         return '%s <%s>' % (self.name, self.email)
+
 
 class Complaints(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
