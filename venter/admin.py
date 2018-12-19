@@ -114,7 +114,6 @@ class ComplaintModelAdmin(admin.ModelAdmin):
 
             # Retrieves a list of email ids for the selected authorities. Excludes the authority bodies with no email id
             recipient_list = queryset.values_list('authorities__email', flat=True).exclude(authorities__email=None)
-
             authority = item.authorities.values_list('name', flat=True)
             auth = ', '.join(authority)
 

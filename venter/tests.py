@@ -268,30 +268,35 @@ class VenterTestCase(APITestCase):
 
         # Complaint with no authority
         Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
+        authority_list = set(complaint_multi.authorities.values_list('email', flat=True))
 
         # Test if the email shows up in the outbox when method is called
         queryset = Complaints.objects.filter(status=STATUS_REPORTED)
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(mail.outbox), 1)
-
         queryset = Complaints.objects.filter(status=STATUS_IN_PROGRESS)
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(mail.outbox), 2)
 
         # Test for email_sent_to list
-        complaint_multival = Complaints.objects.create(created_by=self.user.profile, description='multiple')
+        Complaints.objects.create(created_by=self.user.profile, description='multiple')
         new_auth3 = Authorities.objects.create(email='auth3@example.com', name='auth3')
+        complaint_multival = Complaints.objects.get(description='multiple')
         complaint_multival.authorities.add(new_auth3)
         queryset = Complaints.objects.filter(description='multiple')
         complaint_admin.send_emails(complaint_admin, request, queryset)
-        self.assertEqual(len(queryset.filter(email_sent_to='auth3')), 1)
+        complaint_multival = Complaints.objects.get(description='multiple')
+        self.assertEqual(str(complaint_multival.email_sent_to), 'auth3')
 
         # Test for email_sent_to for new authorities added
         new_auth2 = Authorities.objects.create(email='auth2@example.com', name='auth2')
         complaint_multival.authorities.add(new_auth2)
         queryset = Complaints.objects.filter(description='multiple')
         complaint_admin.send_emails(complaint_admin, request, queryset)
-        self.assertEqual(len(queryset.filter(email_sent_to='auth3, auth2')), 1)
+        complaint_multival = Complaints.objects.get(description='multiple')
+        self.assertEqual(str(complaint_multival.email_sent_to), 'auth3, auth2')
 
         # Evaluating whether the correct number of recipients are being addressed in the multi recipient complaint
         self.assertEqual(len(mail.outbox[0].to), 2)
+        self.assertEqual(set(mail.outbox[0].to), authority_list)
+        

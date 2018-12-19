@@ -36,6 +36,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
         return Response(serialized)
 
+
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaints.objects.all()
     serializer_class = ComplaintPostSerializer
