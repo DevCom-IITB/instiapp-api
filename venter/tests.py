@@ -299,4 +299,4 @@ class VenterTestCase(APITestCase):
         # Evaluating whether the correct number of recipients are being addressed in the multi recipient complaint
         self.assertEqual(len(mail.outbox[0].to), 2)
         self.assertEqual(set(mail.outbox[0].to), authority_list)
-        
+ 
