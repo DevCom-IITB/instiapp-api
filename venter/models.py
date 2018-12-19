@@ -45,7 +45,7 @@ class Complaints(models.Model):
     tags = models.ManyToManyField(TagUris, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
     authorities = models.ManyToManyField(Authorities, related_name='complaints', blank=True)
-    email_sent_to = models.TextField(blank=True, null=True)
+    email_sent_to = models.CharField(max_length=50, blank=True, null=True)
 
     def email_list(self):
         return list(self.authorities.all().values_list('name', flat=True))
