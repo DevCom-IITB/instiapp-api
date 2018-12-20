@@ -115,16 +115,16 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             # Retrieves a list of email ids for the selected authorities. Excludes the authority bodies with no email id
             recipient_list = queryset.values_list('authorities__email', flat=True).exclude(authorities__email=None)
             authority = item.authorities.values_list('name', flat=True)
-            auth = ', '.join(authority)
+            authorities_sent = ', '.join(authority)
 
             # Composes the email to be sent to the authorities and sends it to the recipients
             send_mail(subject, message, sender_id, recipient_list)
 
             # check if email_sent_to list is empty or not, if empty assign auth value else append auth value
             if item.email_sent_to:
-                item.email_sent_to = item.email_sent_to + ', ' + auth
+                item.email_sent_to += ', ' + authorities_sent
             else:
-                item.email_sent_to = auth
+                item.email_sent_to = authorities_sent
 
             item.authorities.clear()
             item.status = 'In Progress'
