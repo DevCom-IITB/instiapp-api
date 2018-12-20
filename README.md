@@ -1,5 +1,5 @@
 # InstiApp
-Backend API in Django for the to-be comprehensive app for managing, finding and enjoying life at Indian Institute of Technology, Bombay!
+API in Django for InstiApp, the one platform for all student activities at Indian Institute of Technology, Bombay! InstiApp's features include upcoming events, placement blog, news and general information on every active club/body in the Institute.
 
 [![InstiApp](https://insti.app/instiapp-badge-gh.svg)](https://insti.app)
 [![TravisCI](https://api.travis-ci.org/wncc/IITBapp.svg?branch=master)](https://travis-ci.org/wncc/IITBapp)
