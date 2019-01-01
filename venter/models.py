@@ -38,16 +38,18 @@ class Complaints(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     created_by = models.ForeignKey(
         'users.UserProfile', on_delete=models.CASCADE, related_name='created_by')
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField()
+    suggestions = models.TextField(blank=True)
+    location_details = models.TextField(blank=True)
     report_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=30, choices=STATUS, default='reported')
     latitude = models.FloatField(max_length=8, blank=True, null=True)
     longitude = models.FloatField(max_length=8, blank=True, null=True)
-    location_description = models.TextField(blank=True, null=True)
+    location_description = models.TextField(blank=True)
     tags = models.ManyToManyField(TagUris, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
     authorities = models.ManyToManyField(Authorities, related_name='complaints', blank=True)
-    email_sent_to = models.TextField(blank=True, null=True)
+    email_sent_to = models.TextField(blank=True)
 
     def email_list(self):
         return list(self.authorities.all().values_list('name', flat=True))
