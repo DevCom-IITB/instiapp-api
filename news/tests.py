@@ -125,7 +125,13 @@ class NewsTestCase(APITestCase):
         # Assert if news was fetched
         self.assertEqual(NewsEntry.objects.filter(body=body1).count(), 2)
         self.assertEqual(NewsEntry.objects.filter(body=body2).count(), 2)
-        self.assertIn("RSS 1", NewsEntry.objects.filter(body=body1)[0].title)
+
+        # Assert fetching fields
+        entry = NewsEntry.objects.filter(body=body1)[0]
+        self.assertIn("RSS 1", entry.title)
+        self.assertIn("Item 1", entry.content)
+        self.assertIn("https://localhost", entry.link)
+        self.assertIn("sample:", entry.guid)
 
         # Assert notifications were created
         # RSS 2 Item 2 is more than 2 days old, so it should not count
