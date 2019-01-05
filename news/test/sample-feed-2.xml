@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Sample Feed 2</title>
+  <link>https://iitb.ac.in</link>
+  <description>Free sample feed</description>
+  <item>
+    <id>sample:2:1</id>
+    <title>RSS 2 Item 1</title>
+    <link>https://localhost/item21</link>
+    <description>New RSS Item 1</description>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:2:2</id>
+    <title>RSS 2 Item 2</title>
+    <link>https://localhost/item22</link>
+    <description>New RSS Item 2</description>
+    <published>2018-12-29T12:00:00+00:00</published>
+  </item>
+</channel>
+
+</rss> 

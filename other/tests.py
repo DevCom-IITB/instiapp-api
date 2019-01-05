@@ -192,6 +192,11 @@ class OtherTestCase(APITestCase):
         NewsEntry.objects.create(
             body=body2, title="NewsEntry2", blog_url=body2.blog_url, published=timezone.now())
 
+        # Test that notifications are not created if notify=False
+        NewsEntry.objects.create(
+            body=body1, title="NewsEntry3", blog_url=body1.blog_url,
+            published=timezone.now(), notify=False)
+
         # Get notifications
         url = '/api/notifications'
         response = self.client.get(url)

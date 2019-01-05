@@ -15,6 +15,7 @@ class NewsEntry(models.Model):
     link = models.CharField(max_length=200, blank=True)
     published = models.DateTimeField(default=now)
     blog_url = models.URLField(null=True)
+    notify = models.BooleanField(default=True)
     reacted_by = models.ManyToManyField(
         'users.UserProfile', through='UserNewsReaction',
         related_name='news_reactions', blank=True)
