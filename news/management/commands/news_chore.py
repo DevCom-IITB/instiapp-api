@@ -31,7 +31,7 @@ def fill_blog(url, body):
             db_entry = db_entries[0]
             existing_entries += 1
         else:
-            db_entry = NewsEntry.objects.create(guid=guid, body=body)
+            db_entry = NewsEntry(guid=guid, body=body)
             db_entry.blog_url = url
             new_entries += 1
 
