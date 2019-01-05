@@ -44,7 +44,7 @@ def event_saved(instance, created, **kwargs):  # pylint: disable=W0613
 
 def news_saved(instance, created, **kwargs):  # pylint: disable=W0613
     """Notify users when a followed body adds new news."""
-    if created and instance.body:
+    if created and instance.body and instance.notify:
         for profile in instance.body.followers.all():
             notify.send(instance, recipient=profile.user, verb=instance.body.name + " added a new news article")
 
