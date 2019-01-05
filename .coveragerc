@@ -6,3 +6,4 @@ omit =
     manage.py
     backend/wsgi.py
     */migrations/*
+    */management/*
