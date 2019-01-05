@@ -1,5 +1,9 @@
 """Unit tests for news feed."""
+import time
+from subprocess import Popen
+
 from rest_framework.test import APITestCase
+from django.core.management import call_command
 from news.models import NewsEntry
 from news.models import UserNewsReaction
 from bodies.models import Body
@@ -94,3 +98,50 @@ class NewsTestCase(APITestCase):
         url = '/api/user-me/unr/' + str(news.id)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 400)
+
+    def test_news_chore(self):
+        """Test the news chore."""
+
+        # Start mock server
+        mock_server = Popen(['python', 'news/test/test_server.py'])
+        time.sleep(1)
+
+        # Clear notifications
+        self.user.notifications.all().delete()
+
+        # Create bodies with(out) blogs
+        body0 = Body.objects.create(name='testbody0')
+        body1 = Body.objects.create(name='testbody1', blog_url='http://localhost:33000/body1blog')
+        body2 = Body.objects.create(name='testbody2', blog_url='http://localhost:33000/body2blog')
+
+        # Follow all bodies
+        self.user.profile.followed_bodies.add(body0, body1, body2)
+
+        # Run the news chore
+        call_command('news_chore')
+
+        # Assert if news was fetched
+        self.assertEqual(NewsEntry.objects.filter(body=body1).count(), 2)
+        self.assertEqual(NewsEntry.objects.filter(body=body2).count(), 2)
+        self.assertIn("RSS 1", NewsEntry.objects.filter(body=body1)[0].title)
+
+        # Assert notifications were created
+        self.assertEqual(self.user.notifications.count(), 4)
+
+        # Add third body
+        body3 = Body.objects.create(name='testbody3', blog_url='http://localhost:33000/body3blog')
+        self.user.profile.followed_bodies.add(body3)
+
+        # Run the news chore again
+        call_command('news_chore')
+
+        # Assert old news is not recreated and new news is
+        self.assertEqual(NewsEntry.objects.filter(body=body1).count(), 2)
+        self.assertEqual(NewsEntry.objects.filter(body=body2).count(), 2)
+        self.assertEqual(NewsEntry.objects.filter(body=body3).count(), 5)
+
+        # Assert notifications were created
+        self.assertEqual(self.user.notifications.count(), 9)
+
+        # Terminate server
+        mock_server.terminate()
