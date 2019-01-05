@@ -2,6 +2,7 @@
 import time
 from subprocess import Popen
 
+from freezegun import freeze_time
 from rest_framework.test import APITestCase
 from django.core.management import call_command
 from news.models import NewsEntry
@@ -99,6 +100,7 @@ class NewsTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 400)
 
+    @freeze_time('2019-01-02')
     def test_news_chore(self):
         """Test the news chore."""
 
@@ -126,7 +128,8 @@ class NewsTestCase(APITestCase):
         self.assertIn("RSS 1", NewsEntry.objects.filter(body=body1)[0].title)
 
         # Assert notifications were created
-        self.assertEqual(self.user.notifications.count(), 4)
+        # RSS 2 Item 2 is more than 2 days old, so it should not count
+        self.assertEqual(self.user.notifications.count(), 3)
 
         # Add third body
         body3 = Body.objects.create(name='testbody3', blog_url='http://localhost:33000/body3blog')
@@ -141,7 +144,8 @@ class NewsTestCase(APITestCase):
         self.assertEqual(NewsEntry.objects.filter(body=body3).count(), 5)
 
         # Assert notifications were created
-        self.assertEqual(self.user.notifications.count(), 9)
+        # Body 3 has 5 articles, only 3 notifications should be created (maximum)
+        self.assertEqual(self.user.notifications.count(), 6)
 
         # Terminate server
         mock_server.terminate()

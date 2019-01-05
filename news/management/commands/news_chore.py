@@ -1,8 +1,10 @@
 """Chore to aggregate news from all bodies."""
+from datetime import timedelta
 import feedparser
 import requests
 import urllib3
 from dateutil.parser import parse
+from django.utils import timezone
 from django.core.management.base import BaseCommand, CommandError
 from news.models import NewsEntry
 from bodies.models import Body
@@ -20,14 +22,16 @@ def fill_blog(url, body):
     # Log number of new entries
     existing_entries = 0
     new_entries = 0
+    min_pub = timezone.now() - timedelta(days=2)
 
     for entry in feeds['entries']:
         # Try to get an entry existing
         guid = entry['id']
         db_entries = NewsEntry.objects.filter(guid=guid)
+        is_new_entry = not db_entries.exists()
 
         # Reuse if entry exists, create new otherwise
-        if db_entries.exists():
+        if not is_new_entry:
             db_entry = db_entries[0]
             existing_entries += 1
         else:
@@ -42,11 +46,18 @@ def fill_blog(url, body):
             db_entry.content = entry['description']
         if 'link' in entry:
             db_entry.link = entry['link']
-        if 'published' in entry:
-            db_entry.published = parse(entry['published'])
         if 'content' in entry and db_entry.content == "":
             # Fill in content only if we don't have description
             db_entry.content = entry['content'][0]['value']
+
+        # Disable notifications if published long ago or unknown
+        has_published = 'published' in entry
+        if has_published:
+            db_entry.published = parse(entry['published'])
+
+        # Check if news article is old and for too many articles
+        if is_new_entry and not has_published or new_entries > 3 or min_pub > db_entry.published:
+            db_entry.notify = False
 
         db_entry.save()
 
