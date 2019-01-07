@@ -7,6 +7,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from roles.helpers import login_required_ajax
 
+from backend import settings_base
+
 from venter.models import Complaints
 from venter.models import Comment
 from venter.models import ComplaintMedia
@@ -46,6 +48,11 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         complaint = self.get_complaint(pk)
         serialized = ComplaintSerializer(
             complaint, context={'request': request}).data
+
+        serialized['is_subscribed'] = False
+        if request.user.profile in complaint.subscriptions.all():
+            serialized['is_subscribed'] = True
+
         return Response(serialized)
 
     @classmethod
@@ -75,6 +82,11 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         # Serialize and return
         serialized = ComplaintSerializer(
             complaint, context={'request': request}, many=True).data
+
+        for complaint_object, serialized_object in zip(complaint, serialized):
+            serialized_object['is_subscribed'] = False
+            if request.user.profile in complaint_object.subscriptions.all():
+                serialized_object['is_subscribed'] = True
         return Response(serialized)
 
     @classmethod
@@ -108,8 +120,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
                     complaint=complaint, image_url=image
                 )
             # Add the complaint creator to the subscribers list
-            complaint.subscriptions.add(complaint.created_by)
-            complaint.save()
+            if settings_base.COMPLAINT_AUTO_SUBSCRIBE:
+                complaint.subscriptions.add(complaint.created_by)
+                complaint.save()
 
         # Return new serialized response
         return Response(ComplaintSerializer(
@@ -176,8 +189,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment = Comment.objects.create(text=get_text, commented_by=request.user.profile,
                                          complaint=get_complaint)
         # Auto subscribes the commenter to the complaint
-        get_complaint.subscriptions.add(request.user.profile)
-        get_complaint.save()
+        if settings_base.COMPLAINT_AUTO_SUBSCRIBE:
+            get_complaint.subscriptions.add(request.user.profile)
+            get_complaint.save()
 
         serialized = CommentSerializer(comment)
         return Response(serialized.data, status=201)

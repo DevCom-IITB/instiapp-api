@@ -25,7 +25,6 @@ class CommentSerializer(serializers.ModelSerializer):
 class ComplaintSerializer(serializers.ModelSerializer):
     created_by = UserProfileSerializer()
     users_up_voted = UserProfileSerializer(many=True)
-    subscriptions = UserProfileSerializer(many=True)
     tags = TagSerializer(many=True)
     comments = CommentSerializer(many=True)
     images = serializers.SlugRelatedField(many=True, read_only=True, slug_field='image_url')
@@ -34,7 +33,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
         model = Complaints
         fields = (
             'id', 'created_by', 'description', 'report_date', 'status', 'latitude',
-            'longitude', 'location_description', 'tags', 'comments', 'users_up_voted', 'subscriptions', 'images'
+            'longitude', 'location_description', 'tags', 'comments', 'users_up_voted', 'images'
         )
 
 class ComplaintPostSerializer(serializers.ModelSerializer):
