@@ -327,6 +327,50 @@ class EventTestCase(APITestCase):
         response = self.client.put(self.update_url, self.update_event_data, format='json')
         self.assertEqual(response.status_code, 403)
 
+    def test_ues(self):
+        """Test user-event-status APIs."""
+
+        def assert_user_ues(t_event, t_ues):
+            """Test user_ues in event serializer."""
+
+            url = '/api/events/%s' % t_event.id
+            response = self.client.get(url, format='json')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['user_ues'], t_ues)
+
+        def mark_test(event, ues, count):
+            """Helper to mark UES and test creation/updation."""
+
+            # Mark UES for the event
+            url = '/api/user-me/ues/%s?status=%s' % (event.id, str(ues))
+            response = self.client.get(url, format='json')
+            self.assertEqual(response.status_code, 204)
+
+            # Assert creation of UES
+            self.assertEqual(event.ues.count(), count)
+            assert_user_ues(event, ues)
+
+            # Check first only if exists
+            if count > 0:
+                self.assertEqual(event.ues.first().status, ues)
+
+        # Create event with one body
+        test_body = create_body(name="Test Body1")
+        test_event = create_event(name="Test Event1")
+        test_event.bodies.add(test_body)
+        self.assertEqual(test_event.ues.count(), 0)
+        assert_user_ues(test_event, 0)
+
+        # Test interested, going and neutral
+        # When the user un-marks the event, UES must be removed
+        mark_test(test_event, 1, 1)
+        mark_test(test_event, 2, 1)
+        mark_test(test_event, 0, 0)
+
+        # Assert user_ues as anonymous
+        self.client.logout()
+        assert_user_ues(test_event, None)
+
     def test_anonymous(self):
         """Check APIs as anonymous user."""
         self.client.logout()

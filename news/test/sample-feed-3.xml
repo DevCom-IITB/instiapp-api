@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Sample Feed 3</title>
+  <link>https://iitb.ac.in/asc</link>
+  <description>Free sample feed</description>
+  <item>
+    <id>sample:3:1</id>
+    <title>RSS 3 Item 1</title>
+    <link>https://localhost/item31</link>
+    <description>New RSS Item 1</description>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:3:2</id>
+    <title>RSS 3 Item 2</title>
+    <link>https://localhost/item32</link>
+    <description>New RSS Item 2</description>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:3:3</id>
+    <title>RSS 3 Item 3</title>
+    <link>https://localhost/item33</link>
+    <description>New RSS Item 3</description>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:3:4</id>
+    <title>RSS 3 Item 4</title>
+    <link>https://localhost/item34</link>
+    <description>New RSS Item 4</description>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:3:5</id>
+    <title>RSS 3 Item 5</title>
+    <link>https://localhost/item35</link>
+    <description>New RSS Item 5</description>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+</channel>
+
+</rss> 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Sample Feed 1</title>
+  <link>https://insti.app</link>
+  <description>Free sample feed</description>
+  <item>
+    <id>sample:1:1</id>
+    <title>RSS 1 Item 1</title>
+    <link>https://localhost/item11</link>
+    <description>New RSS 1 Item 1</description>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:1:2</id>
+    <title>RSS 1 Item 2</title>
+    <link>https://localhost/item12</link>
+    <description>New RSS 1 Item 2</description>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+</channel>
+
+</rss> 
