@@ -1,10 +1,8 @@
 from types import SimpleNamespace
 from django.core import mail
 from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import User
 from rest_framework.test import APITestCase, APIClient
 from login.tests import get_new_user
-from users.models import UserProfile
 from venter.admin import ComplaintModelAdmin
 from venter.models import Complaints
 from venter.models import TagUris
@@ -65,7 +63,7 @@ class VenterTestCase(APITestCase):
     def test_complaint(self):  # pylint: disable=R0915
         """ Test all public methods of venter complaint."""
         # Testing complaint POST requests
-        url = '/api/venter/complaints'
+        base_url = '/api/venter/complaints'
         TagUris.objects.create(tag_uri='garbage')
         data = {
             'description': 'test',
@@ -76,20 +74,21 @@ class VenterTestCase(APITestCase):
             ]
         }
 
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(base_url, data, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(response.data['images']), 2)
         self.assertEqual(len(response.data['tags']), 2)
 
         # Creator should be auto-subscribed to the complaint
-        self.assertEqual(len(response.data['subscriptions']), 1)
+        response = self.client.get(base_url)
+        self.assertEqual(response.data[0]['is_subscribed'], True)
 
         data = {
             'description': 'test',
             'tags': ['Stray Dogs', 'Potholes'],
         }
 
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(base_url, data, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(response.data['images']), 0)
         self.assertEqual(len(response.data['tags']), 2)
@@ -126,8 +125,8 @@ class VenterTestCase(APITestCase):
 
         # Retreiving complaint id (cid)
         cid = str(response.data[0]['id'])
-        url = '/api/venter/complaints/' + cid
-        response = self.client.get(url)
+        complaint_url = '/api/venter/complaints/' + cid
+        response = self.client.get(complaint_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['description'], 'test')
 
@@ -170,12 +169,16 @@ class VenterTestCase(APITestCase):
         # Subscribe
         response = self.client.get(url + '1')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['subscriptions']), 1)
+
+        response = self.client.get(complaint_url)
+        self.assertEqual(response.data['is_subscribed'], True)
 
         # UnSubscribe
         response = self.client.get(url + '0')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['subscriptions']), 0)
+
+        response = self.client.get(complaint_url)
+        self.assertEqual(response.data['is_subscribed'], False)
 
     def test_comment(self):
         """Test all public venter comment APIs."""
@@ -184,8 +187,7 @@ class VenterTestCase(APITestCase):
         complaint.subscriptions.add(self.user.profile)
 
         # Creating a new user and profile to make a comment and test auto-subscription of comments
-        test_commenter_1 = User.objects.create_user(username='Commenter1', password='Commenter1@123')
-        UserProfile.objects.create(name='CommentProfile1', user=test_commenter_1)
+        test_commenter_1 = get_new_user()
         self.client.force_authenticate(user=test_commenter_1)
 
         url = '/api/venter/complaints/' + str(complaint.id) + '/comments'
@@ -199,7 +201,7 @@ class VenterTestCase(APITestCase):
         url = '/api/venter/complaints/' + str(complaint.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['subscriptions'][0]['id'], str(test_commenter_1.profile.id))
+        self.assertEqual(response.data['is_subscribed'], True)
 
         url = '/api/venter/comments/' + cid
         response = self.client.get(url)

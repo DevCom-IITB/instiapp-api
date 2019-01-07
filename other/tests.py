@@ -5,7 +5,6 @@ from freezegun import freeze_time
 
 from rest_framework.test import APITestCase, APIClient
 from django.utils import timezone
-from django.contrib.auth.models import User
 from notifications.signals import notify
 
 from login.tests import get_new_user
@@ -218,8 +217,7 @@ class OtherTestCase(APITestCase):
         url = '/api/venter/complaints/' + str(complaint.id) + '/comments'
 
         # First comment on the new complaint, should generate 1 new notification (Total = 1)
-        test_commenter_1 = User.objects.create_user(username='Commenter1', password='Commenter1@123')
-        UserProfile.objects.create(name='CommentProfile1', user=test_commenter_1)
+        test_commenter_1 = get_new_user()
         self.client.force_authenticate(user=test_commenter_1)
 
         data = {'text': 'test'}
@@ -241,8 +239,7 @@ class OtherTestCase(APITestCase):
         # Second comment on the complaint, should generate 2 new notifications.
         # One new notification each will be made for test_creator and test_commenter_1.
         # Both will be tested independently.
-        test_commenter_2 = User.objects.create_user(username='Commenter2', password='Commenter2@123')
-        UserProfile.objects.create(name='CommentProfile2', user=test_commenter_2)
+        test_commenter_2 = get_new_user()
         self.client.force_authenticate(user=test_commenter_2)
 
         data = {'text': 'test'}
