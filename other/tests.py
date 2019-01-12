@@ -3,7 +3,7 @@ from datetime import timedelta
 import xml.etree.ElementTree as ET
 from freezegun import freeze_time
 
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from django.utils import timezone
 from notifications.signals import notify
 
@@ -13,6 +13,7 @@ from events.serializers import EventSerializer
 from users.models import UserProfile
 from news.models import NewsEntry
 from placements.models import BlogEntry
+from venter.models import Complaints
 
 from helpers.test_helpers import create_usertag
 from helpers.test_helpers import create_usertagcategory
@@ -44,7 +45,8 @@ class OtherTestCase(APITestCase):
         # Fake authenticate
         self.user = get_new_user()
         self.profile = self.user.profile
-        self.client.force_authenticate(self.user)  # pylint: disable=E1101
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
 
     def test_search(self):
         """Test the search endpoint."""
@@ -203,6 +205,65 @@ class OtherTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['actor']['title'], ne1.title)
+
+    def test_comment_notifications(self):
+        """Test notifications for complaint subscribers when comments are made"""
+        # Creating dummy complaint with one subscriber (the creator)
+        test_creator = get_new_user()
+        complaint = Complaints.objects.create(created_by=test_creator.profile)
+        complaint.subscriptions.add(test_creator.profile)
+
+        # Comments url
+        url = '/api/venter/complaints/' + str(complaint.id) + '/comments'
+
+        # First comment on the new complaint, should generate 1 new notification (Total = 1)
+        test_commenter_1 = get_new_user()
+        self.client.force_authenticate(user=test_commenter_1)
+
+        data = {'text': 'test'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+
+        # Get notifications for test_creator.
+        # There should be one notification from the first comment made by test_commenter_1
+        url = '/api/notifications'
+        self.client.force_authenticate(user=test_creator)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['actor']['commented_by']['id'], str(test_commenter_1.profile.id))
+
+        # Comment url
+        url = '/api/venter/complaints/' + str(complaint.id) + '/comments'
+
+        # Second comment on the complaint, should generate 2 new notifications.
+        # One new notification each will be made for test_creator and test_commenter_1.
+        # Both will be tested independently.
+        test_commenter_2 = get_new_user()
+        self.client.force_authenticate(user=test_commenter_2)
+
+        data = {'text': 'test'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+
+        # Get notifications for test_creator.
+        # A total of two notifications should exist, one for each comment.
+        # The most recent notification should be by the person who made the corresponding comment
+        url = '/api/notifications'
+        self.client.force_authenticate(user=test_creator)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['actor']['commented_by']['id'], str(test_commenter_2.profile.id))
+
+        # Get notifications for test_commenter_1.
+        # 1 notification should exist due to the comment made by test_commenter_2
+        url = '/api/notifications'
+        self.client.force_authenticate(user=test_commenter_1)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['actor']['commented_by']['id'], str(test_commenter_2.profile.id))
 
     def test_pt_notifications(self):
         """Test notifications for placement blog (Incomplete - only serializer)"""

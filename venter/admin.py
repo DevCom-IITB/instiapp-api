@@ -23,6 +23,12 @@ class UserLikedTabularInline(admin.TabularInline):
     verbose_name = 'User up Voted'
     verbose_name_plural = 'Users up voted'
 
+class UserSubscribedTabularInline(admin.TabularInline):
+    model = Complaints.subscriptions.through
+    readonly_fields = ('userprofile',)
+    verbose_name = 'Subscribed User'
+    verbose_name_plural = 'Subscribed Users'
+
 class ComplaintMediaTabularInline(admin.TabularInline):
     model = ComplaintMedia
     readonly_fields = ('image_url',)
@@ -45,7 +51,13 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     list_editable = ['status']
     list_filter = ['status']
     filter_horizontal = ('authorities',)
-    inlines = [CommentTabularInline, TagTabularInline, UserLikedTabularInline, ComplaintMediaTabularInline]
+    inlines = [
+        CommentTabularInline,
+        TagTabularInline,
+        UserLikedTabularInline,
+        ComplaintMediaTabularInline,
+        UserSubscribedTabularInline
+    ]
     exclude = ('tags', 'users_up_voted', 'media',)
     search_fields = ['status', 'description', 'created_by__name']
     actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']

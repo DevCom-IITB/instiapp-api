@@ -49,6 +49,7 @@ class Complaints(models.Model):
     tags = models.ManyToManyField(TagUris, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
     authorities = models.ManyToManyField(Authorities, related_name='complaints', blank=True)
+    subscriptions = models.ManyToManyField('users.UserProfile', related_name='subscriptions', blank=True)
     email_sent_to = models.TextField(blank=True)
 
     def email_list(self):

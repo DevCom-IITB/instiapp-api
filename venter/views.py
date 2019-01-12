@@ -7,6 +7,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from roles.helpers import login_required_ajax
 
+from backend import settings_base
+
 from venter.models import Complaints
 from venter.models import Comment
 from venter.models import ComplaintMedia
@@ -46,6 +48,11 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         complaint = self.get_complaint(pk)
         serialized = ComplaintSerializer(
             complaint, context={'request': request}).data
+
+        serialized['is_subscribed'] = False
+        if request.user.profile in complaint.subscriptions.all():
+            serialized['is_subscribed'] = True
+
         return Response(serialized)
 
     @classmethod
@@ -75,6 +82,11 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         # Serialize and return
         serialized = ComplaintSerializer(
             complaint, context={'request': request}, many=True).data
+
+        for complaint_object, serialized_object in zip(complaint, serialized):
+            serialized_object['is_subscribed'] = False
+            if request.user.profile in complaint_object.subscriptions.all():
+                serialized_object['is_subscribed'] = True
         return Response(serialized)
 
     @classmethod
@@ -107,6 +119,10 @@ class ComplaintViewSet(viewsets.ModelViewSet):
                 ComplaintMedia.objects.create(
                     complaint=complaint, image_url=image
                 )
+            # Add the complaint creator to the subscribers list
+            if settings_base.COMPLAINT_AUTO_SUBSCRIBE:
+                complaint.subscriptions.add(complaint.created_by)
+                complaint.save()
 
         # Return new serialized response
         return Response(ComplaintSerializer(
@@ -135,6 +151,28 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             Complaints.objects.get(id=complaint.id)
         ).data, status=200)
 
+    @login_required_ajax
+    def subscribe(self, request, pk):
+        """Subscribe or Un-Subscribe from a complaint {?action}=0,1"""
+
+        complaint = self.get_complaint(pk)
+
+        value = request.GET.get("action")
+        if value is None:
+            return Response({"message": "{?action} is required"}, status=400)
+
+        # Check possible actions
+        if value == "0":
+            complaint.subscriptions.remove(self.request.user.profile)
+        elif value == "1":
+            complaint.subscriptions.add(self.request.user.profile)
+        else:
+            return Response({"message": "Invalid Action"}, status=400)
+
+        return Response(ComplaintSerializer(
+            Complaints.objects.get(id=complaint.id)
+        ).data, status=200)
+
     def get_complaint(self, pk):
         """Shortcut for get_object_or_404 with pk"""
         return get_object_or_404(self.queryset, id=pk)
@@ -150,6 +188,11 @@ class CommentViewSet(viewsets.ModelViewSet):
         get_text = request.data['text']
         comment = Comment.objects.create(text=get_text, commented_by=request.user.profile,
                                          complaint=get_complaint)
+        # Auto subscribes the commenter to the complaint
+        if settings_base.COMPLAINT_AUTO_SUBSCRIBE:
+            get_complaint.subscriptions.add(request.user.profile)
+            get_complaint.save()
+
         serialized = CommentSerializer(comment)
         return Response(serialized.data, status=201)
 
