@@ -2,12 +2,11 @@
 from functools import reduce
 import operator
 from django.db.models import Q
+from django.conf import settings
 from rest_framework.generics import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
 from roles.helpers import login_required_ajax
-
-from backend import settings_base
 
 from venter.models import Complaints
 from venter.models import Comment
@@ -120,7 +119,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
                     complaint=complaint, image_url=image
                 )
             # Add the complaint creator to the subscribers list
-            if settings_base.COMPLAINT_AUTO_SUBSCRIBE:
+            if settings.COMPLAINT_AUTO_SUBSCRIBE:
                 complaint.subscriptions.add(complaint.created_by)
                 complaint.save()
 
@@ -189,7 +188,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment = Comment.objects.create(text=get_text, commented_by=request.user.profile,
                                          complaint=get_complaint)
         # Auto subscribes the commenter to the complaint
-        if settings_base.COMPLAINT_AUTO_SUBSCRIBE:
+        if settings.COMPLAINT_AUTO_SUBSCRIBE:
             get_complaint.subscriptions.add(request.user.profile)
             get_complaint.save()
 
