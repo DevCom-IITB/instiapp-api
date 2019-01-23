@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from pyfcm import FCMNotification
 from events.models import Event
+from helpers.fcm import send_notification_fcm
 
 class Command(BaseCommand):
     help = 'Sends push notifications of event starting'
@@ -45,13 +46,9 @@ class Command(BaseCommand):
                 if not profile or not profile.user:
                     continue
 
-                try:
-                    # Send rich notification
-                    registration_id = profile.fcm_id
-                    push_service.notify_single_device(registration_id=registration_id, data_message=data_message)
-                    count += 1
-                except Exception as ex:  # pylint: disable=W0703
-                    print(profile.name, ex)
+                # Send FCM push notification
+                for device in profile.devices.all():
+                    count += send_notification_fcm(push_service, device, data_message)
 
         print('Sent', count, 'rich notifications')
         self.stdout.write(self.style.SUCCESS('Event starting chore completed successfully'))
