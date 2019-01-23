@@ -4,6 +4,7 @@ from placements.models import BlogEntry
 from events.models import Event
 from news.models import NewsEntry
 from venter.models import Comment
+from helpers.device import fill_device_firebase
 
 def send_fcm_data_message(push_service, registration_id, data_message):
     """Send a data FCM message."""
@@ -16,22 +17,6 @@ def send_fcm_notification_message(push_service, registration_id, data_message):
         registration_id=registration_id, message_title=data_message['title'],
         message_body=data_message['verb'], data_message=data_message, sound='default')
 
-def fill_device(push_service, device):
-    """Get/save information about device from Firebase."""
-    info = push_service.get_registration_id_info(device.fcm_id)
-
-    # Invalid device
-    if not info:
-        return None
-
-    # Fill up the device info
-    device.application = info['application']
-    device.app_version = info['applicationVersion']
-    device.platform = info['platform']
-    device.save()
-
-    return info
-
 def send_notification_fcm(push_service, device, data_message):
     """Attempt to send a single FCM notification."""
 
@@ -39,7 +24,7 @@ def send_notification_fcm(push_service, device, data_message):
         registration_id = device.fcm_id
 
         # Fill/check for invalid device
-        if not fill_device(push_service, device):
+        if not fill_device_firebase(push_service, device):
             device.delete()
             return 0
 

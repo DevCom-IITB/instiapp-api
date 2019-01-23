@@ -3,39 +3,10 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import login
-from django.contrib.sessions.models import Session
-from django.db.models import Q
-from django.utils import timezone
 from rest_framework.response import Response
 from users.models import UserProfile
 from users.serializer_full import UserProfileFullSerializer
-from other.models import Device
-
-def update_fcm_device(request, fcm_id):
-    if request.user.is_authenticated and fcm_id:
-        profile = request.user.profile
-        sess = Session.objects.get(pk=request.session.session_key)
-        devices = Device.objects.filter(Q(session=sess) | Q(fcm_id=fcm_id))
-        device = Device()
-
-        # Check if device is to be updated
-        if devices.exists():
-            device = devices[0]
-
-            # Delete multiple matches
-            for dev in devices[1:]:
-                dev.delete()
-
-        # Populate device
-        device.session = sess
-        device.last_ping = timezone.now()
-        device.user = profile
-        device.fcm_id = fcm_id
-        device.save()
-
-        # Reset for existing devices
-        profile.fcm_id = ''
-        profile.save()
+from helpers.device import update_fcm_device
 
 def perform_login(auth_code, redir, request):
     """Perform login with code and redir."""
