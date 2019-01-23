@@ -9,6 +9,8 @@ from users.models import UserProfile
 from other.models import Device
 from login.tests import get_new_user
 
+# pylint: disable=R0915
+
 class UserTestCase(APITestCase):
     """Unit tests for users."""
 
