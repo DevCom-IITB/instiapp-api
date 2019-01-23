@@ -37,3 +37,12 @@ class Device(models.Model):
             return int(self.app_version) >= 17
         except ValueError:
             return False
+
+    def process_rich(self, data_message):
+        """Add device specific fields to the data message."""
+
+        # Add click_action for flutter
+        if self.application == 'app.insti.flutter':
+            data_message['click_action'] = 'INSTIAPP_NOTIFICATION_CLICK'
+
+        return data_message

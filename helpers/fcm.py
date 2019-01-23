@@ -28,6 +28,9 @@ def send_notification_fcm(push_service, device, data_message):
             device.delete()
             return 0
 
+        # Process the message for device specific things
+        data_message = device.process_rich(data_message)
+
         # Check if the user supports rich notifications
         push_method = None
         if device.supports_rich():
