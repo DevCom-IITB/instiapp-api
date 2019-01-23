@@ -7,3 +7,5 @@ omit =
     backend/wsgi.py
     */migrations/*
     */management/*
+    helpers/fcm.py
+    helpers/webpush.py
