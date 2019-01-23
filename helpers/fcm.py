@@ -30,7 +30,7 @@ def send_notification_fcm(push_service, device, data_message):
 
         # Check if the user supports rich notifications
         push_method = None
-        if int(device.app_version) >= 17:
+        if device.supports_rich():
             push_method = send_fcm_data_message
         else:
             push_method = send_fcm_notification_message

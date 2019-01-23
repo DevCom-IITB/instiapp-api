@@ -22,3 +22,18 @@ class Device(models.Model):
 
     def __str__(self):
         return self.user.name
+
+    def supports_rich(self):
+        """Check if this device supports data messages."""
+
+        # Check for flutter and iOS
+        if self.application == 'app.insti.flutter':
+            return False
+        if self.application == 'app.insti.ios':
+            return True
+
+        # Try parsing the app version
+        try:
+            return int(self.app_version) >= 17
+        except ValueError:
+            return False
