@@ -21,4 +21,4 @@ class Device(models.Model):
     platform = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
-        return '%s %s' % (self.application, self.user.name)
+        return self.user.name

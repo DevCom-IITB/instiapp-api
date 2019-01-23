@@ -119,7 +119,7 @@ class UserTestCase(APITestCase):
 
         # Test device model
         dev.application = 'app.insti'
-        self.assertEqual(str(dev), 'app.insti %s' % usr().name)
+        self.assertEqual(str(dev), usr().name)
 
     def test_get_noauth(self):
         """Test privacy with no auth."""
