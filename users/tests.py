@@ -6,6 +6,7 @@ from bodies.models import Body
 from users.models import UserTag
 from users.models import UserTagCategory
 from users.models import UserProfile
+from other.models import Device
 from login.tests import get_new_user
 
 class UserTestCase(APITestCase):
@@ -14,7 +15,7 @@ class UserTestCase(APITestCase):
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()
-        self.client.force_authenticate(self.user)  # pylint: disable=E1101
+        self.client.force_login(self.user)
         self.test_body = Body.objects.create(name="test")
 
     def test_get_user(self):
@@ -40,6 +41,10 @@ class UserTestCase(APITestCase):
     def test_user_me(self):
         """Check the /api/user-me API."""
 
+        # Function to get latest user from database
+        usr = lambda: UserProfile.objects.get(id=self.user.profile.id)
+
+        # Initialize
         self.user.profile.fcm_id = 'TESTINIT'
 
         # Check GET
@@ -80,17 +85,16 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], str(event.id))
 
-        # Check updating user information
-        data = {
-            'fcm_id': 'TEST1'
-        }
+        # Check updating device
+        data = {'fcm_id': 'TEST1'}
         url = '/api/user-me'
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(UserProfile.objects.get(id=self.user.profile.id).fcm_id, 'TEST1')
+        self.assertEqual(usr().fcm_id, '')
+        self.assertEqual(usr().devices.first().fcm_id, 'TEST1')
 
         # Check patch validation
-        data = {'fcm_id': 'long' * 200}
+        data = {'android_version': 'long' * 200}
         url = '/api/user-me'
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, 400)
@@ -99,7 +103,21 @@ class UserTestCase(APITestCase):
         url = '/api/user-me?fcm_id=TESTCHANGE'
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(UserProfile.objects.get(id=self.user.profile.id).fcm_id, 'TESTCHANGE')
+        self.assertEqual(usr().fcm_id, '')
+        self.assertEqual(usr().devices.first().fcm_id, 'TESTCHANGE')
+        self.assertEqual(usr().devices.count(), 1)
+
+        # Check deletion of multiple devices
+        dev = usr().devices.first()
+        Device.objects.create(session=dev.session, user=usr(), last_ping=timezone.now())
+        url = '/api/user-me?fcm_id=TESTCHANGE'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(usr().devices.count(), 1)
+
+        # Test device model
+        dev.application = 'app.insti'
+        self.assertEqual(str(dev), 'app.insti %s' % usr().name)
 
     def test_get_noauth(self):
         """Test privacy with no auth."""

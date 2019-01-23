@@ -4,6 +4,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
+from login.helpers import update_fcm_device
+
 from events.models import UserEventStatus
 from events.models import Event
 from events.serializers import EventSerializer
@@ -41,8 +43,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         # WARNING: DEPREACATED
         # Update fcm id if present
         if 'fcm_id' in request.GET:
-            user_profile.fcm_id = request.GET['fcm_id']
-            user_profile.save()
+            update_fcm_device(request, request.GET['fcm_id'])
 
         return Response(UserProfileFullSerializer(
             user_profile, context=self.get_serializer_context()).data)
@@ -50,6 +51,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def update_me(self, request):
         """Update current user."""
+        # Create device instead of updating profile
+        if 'fcm_id' in request.data:
+            update_fcm_device(request, request.data.pop('fcm_id', None))
+
         serializer = UserProfileFullSerializer(
             request.user.profile, data=request.data, context=self.get_serializer_context())
         if not serializer.is_valid():

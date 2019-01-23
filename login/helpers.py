@@ -3,9 +3,39 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import login
+from django.contrib.sessions.models import Session
+from django.db.models import Q
+from django.utils import timezone
 from rest_framework.response import Response
 from users.models import UserProfile
 from users.serializer_full import UserProfileFullSerializer
+from other.models import Device
+
+def update_fcm_device(request, fcm_id):
+    if request.user.is_authenticated and fcm_id:
+        profile = request.user.profile
+        sess = Session.objects.get(pk=request.session.session_key)
+        devices = Device.objects.filter(Q(session=sess) | Q(fcm_id=fcm_id))
+        device = Device()
+
+        # Check if device is to be updated
+        if devices.exists():
+            device = devices[0]
+
+            # Delete multiple matches
+            for dev in devices[1:]:
+                dev.delete()
+
+        # Populate device
+        device.session = sess
+        device.last_ping = timezone.now()
+        device.user = profile
+        device.fcm_id = fcm_id
+        device.save()
+
+        # Reset for existing devices
+        profile.fcm_id = ''
+        profile.save()
 
 def perform_login(auth_code, redir, request):
     """Perform login with code and redir."""
@@ -61,14 +91,14 @@ def perform_login(auth_code, redir, request):
     # Fill models with new data
     fill_models_from_sso(user_profile, user, profile_json)
 
-    fcm_id = request.GET.get('fcm_id')
-    if fcm_id is not None:
-        user_profile.fcm_id = fcm_id
-        user_profile.save()
-
     # Log in the user
     login(request, user)
     request.session.save()
+
+    # Deprecated: update fcm id
+    fcm_id = request.GET.get('fcm_id')
+    if fcm_id is not None:
+        update_fcm_device(request, fcm_id)
 
     # Return the session id
     return Response({
