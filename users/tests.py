@@ -121,6 +121,17 @@ class UserTestCase(APITestCase):
         dev.application = 'app.insti'
         self.assertEqual(str(dev), usr().name)
 
+        # Test device rich support
+        self.assertEqual(dev.supports_rich(), False)
+        dev.app_version = '5'
+        self.assertEqual(dev.supports_rich(), False)
+        dev.app_version = '20'
+        self.assertEqual(dev.supports_rich(), True)
+        dev.application = 'app.insti.flutter'
+        self.assertEqual(dev.supports_rich(), False)
+        dev.application = 'app.insti.ios'
+        self.assertEqual(dev.supports_rich(), True)
+
     def test_get_noauth(self):
         """Test privacy with no auth."""
         self.client.logout()
