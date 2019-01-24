@@ -128,10 +128,10 @@ class UserTestCase(APITestCase):
         self.assertEqual(dev.supports_rich(), False)
         dev.app_version = '20'
         self.assertEqual(dev.supports_rich(), True)
-        self.assertEqual(len(dev.process_rich(data)), 1)
+        self.assertEqual(dev.process_rich(data)['click_action'], None)
         dev.application = 'app.insti.flutter'
         self.assertEqual(dev.supports_rich(), False)
-        self.assertEqual(len(dev.process_rich(data)), 2)
+        self.assertNotEqual(dev.process_rich(data)['click_action'], None)
         dev.application = 'app.insti.ios'
         self.assertEqual(dev.supports_rich(), True)
 
