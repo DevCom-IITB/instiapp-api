@@ -15,7 +15,7 @@ def send_fcm_notification_message(push_service, registration_id, data_message):
     """Send a notification FCM message."""
     push_service.notify_single_device(
         registration_id=registration_id, message_title=data_message['title'],
-        message_body=data_message['verb'], data_message=data_message, sound='default')
+        message_body=data_message['verb'], data_message=data_message, click_action=data_message['click_action'], sound='default')
 
 def send_notification_fcm(push_service, device, data_message):
     """Attempt to send a single FCM notification."""
