@@ -1,12 +1,12 @@
 beautifulsoup4==4.7.1
 django-extra-fields==1.0.0
-django-filter==2.0.0
+django-filter==2.1.0
 django-markdownify==0.8.0
 django-multiselectfield==0.1.8
 django-notifications-hq==1.5.0
 django-rest-swagger==2.2.0
 Django==2.1.5
-djangorestframework==3.9.0
+djangorestframework==3.9.1
 feedparser==5.2.1
 flake8==3.6.0
 freezegun==0.3.11
