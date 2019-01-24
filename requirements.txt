@@ -21,5 +21,4 @@ pylint-runner==0.5.4
 pylint==2.2.2
 python-dateutil==2.7.5
 pywebpush==1.8.0
-PyYAML==3.13
 requests==2.21.0
