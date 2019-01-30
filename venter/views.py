@@ -63,7 +63,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         complaint = Complaints.objects.exclude(status='Deleted')
 
         # Check if the user specific filter is present
-        if 'filter' in request.GET:
+        if 'filter' in request.GET and request.user.is_authenticated:
             complaint = complaint.filter(created_by=request.user.profile)
 
         # Filter for a particular word search
