@@ -20,6 +20,7 @@ class Command(BaseCommand):
 
         verified = 0
         cleaned = 0
+        size = 0
 
         # List of all valid images
         images = [x.picture.path for x in UploadedImage.objects.all()]
@@ -29,14 +30,17 @@ class Command(BaseCommand):
         for file in files:
             if not os.path.isfile(file):
                 continue
+            file = os.path.abspath(file)
 
             # Check if the file is valid
-            if os.path.abspath(file) in images or is_reserved(file):
+            if file in images or is_reserved(file):
                 verified += 1
                 print('Verified', file)
             else:
                 cleaned += 1
                 print('Cleaned', file)
-                os.remove(os.path.abspath(file))
+                size += os.path.getsize(file)
+                os.remove(file)
 
-        self.stdout.write(self.style.SUCCESS('%i uploaded image files verified, %i cleaned' % (verified, cleaned)))
+        self.stdout.write(self.style.SUCCESS(
+            '%i uploaded image files verified, %i cleaned, %fMB saved' % (verified, cleaned, (size / (1024 * 1024)))))
