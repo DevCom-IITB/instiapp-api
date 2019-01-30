@@ -24,7 +24,9 @@ class UserTestCase(APITestCase):
     def test_get_user(self):
         """Check the /api/users/<pk> API."""
 
-        profile = UserProfile.objects.create(name="TestUser", ldap_id="tu")
+        contact = '9876543210'
+        profile = UserProfile.objects.create(
+            name="TestUser", ldap_id="tu", contact_no=contact)
 
         # Check __str__
         self.assertEqual(str(profile), profile.name)
@@ -34,6 +36,14 @@ class UserTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['name'], profile.name)
+        self.assertEqual(response.data['contact_no'], contact)
+
+        # Test privacy features
+        profile.show_contact_no = False
+        profile.save()
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(response.data['contact_no'], contact)
 
         # Test GET with LDAP ID
         url = '/api/users/' + profile.ldap_id
