@@ -83,9 +83,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             complaint, context={'request': request}, many=True).data
 
         for complaint_object, serialized_object in zip(complaint, serialized):
-            serialized_object['is_subscribed'] = False
-            if request.user.profile in complaint_object.subscriptions.all():
-                serialized_object['is_subscribed'] = True
+            is_sub = request.user.is_authenticated and request.user.profile in complaint_object.subscriptions.all()
+            serialized_object['is_subscribed'] = is_sub
+
         return Response(serialized)
 
     @classmethod
