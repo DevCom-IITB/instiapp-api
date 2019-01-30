@@ -16,7 +16,7 @@ from upload.models import UploadedImage
 class UploadTestCase(APITestCase):
     """Check if logged in users can upload files."""
 
-    def test_upload(self):
+    def test_upload(self):  # pylint: disable=R0914
         """Test if logged in users can upload files."""
 
         # Try without authentication
