@@ -43,6 +43,6 @@ class Device(models.Model):
 
         # Add click_action for flutter
         if self.application == 'app.insti.flutter':
-            data_message['click_action'] = 'INSTIAPP_NOTIFICATION_CLICK'
+            data_message['click_action'] = 'FLUTTER_NOTIFICATION_CLICK'
 
         return data_message
