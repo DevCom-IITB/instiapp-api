@@ -28,7 +28,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('id', 'name', 'profile_pic', 'events_interested',
-                  'events_going', 'email', 'roll_no', 'contact_no',
+                  'events_going', 'email', 'roll_no', 'contact_no', 'show_contact_no',
                   'about', 'followed_bodies', 'fcm_id', 'android_version', 'roles',
                   'institute_roles', 'website_url', 'ldap_id', 'hostel', 'former_roles')
 
