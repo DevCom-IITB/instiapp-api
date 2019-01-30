@@ -2,6 +2,7 @@
 from uuid import uuid4
 from django.db import models
 from django.contrib.sessions.models import Session
+from django.utils import timezone
 
 class Device(models.Model):
     """A device to which a user is logged in.
@@ -10,6 +11,7 @@ class Device(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
     last_ping = models.DateTimeField()
+    last_refresh = models.DateTimeField(default='1970-01-01T00:00:00Z')
 
     user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE, related_name='devices')
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='devices')
@@ -46,3 +48,9 @@ class Device(models.Model):
             data_message['click_action'] = 'FLUTTER_NOTIFICATION_CLICK'
 
         return data_message
+
+    def needs_refresh(self):
+        """Returns if information from Firebase is stale."""
+
+        # Check if last refresh was older than 12 hours
+        return (timezone.now() - self.last_refresh).total_seconds() > 43200

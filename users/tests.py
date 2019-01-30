@@ -1,4 +1,5 @@
 """Test cases for users app."""
+from datetime import timedelta
 from django.utils import timezone
 from rest_framework.test import APITestCase
 from events.models import Event
@@ -120,6 +121,11 @@ class UserTestCase(APITestCase):
         # Test device model
         dev.application = 'app.insti'
         self.assertEqual(str(dev), usr().name)
+        self.assertTrue(dev.needs_refresh())
+        dev.last_refresh = timezone.now() - timedelta(days=2)
+        self.assertTrue(dev.needs_refresh())
+        dev.last_refresh = timezone.now() - timedelta(hours=2)
+        self.assertFalse(dev.needs_refresh())
 
         # Test device rich support
         data = {'title': 'arbit'}
