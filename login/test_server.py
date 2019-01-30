@@ -31,10 +31,10 @@ class S(BaseHTTPRequestHandler):
                 data = {
                     "id": 3,
                     "username": "username",
-                    "first_name": "First Name",
+                    "first_name": "FIRST NAME",
                     "type": "TYPE",
                     "profile_picture": "/sso/path/to/profile_picture_file",
-                    "last_name": "Last Name",
+                    "last_name": "Last name",
                     "sex": "SEX",
                     "email": "username@iitb.ac.in",
                     "mobile": "0123456789",
