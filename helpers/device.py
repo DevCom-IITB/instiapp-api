@@ -45,6 +45,7 @@ def fill_device_firebase(push_service, device):  # pragma: no cover
     device.application = info['application']
     device.app_version = info['applicationVersion']
     device.platform = info['platform']
+    device.last_refresh = timezone.now()
     device.save()
 
     return info

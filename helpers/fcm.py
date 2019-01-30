@@ -25,7 +25,7 @@ def send_notification_fcm(push_service, device, data_message):
         registration_id = device.fcm_id
 
         # Fill/check for invalid device
-        if not fill_device_firebase(push_service, device):
+        if device.needs_refresh() and not fill_device_firebase(push_service, device):
             device.delete()
             return 0
 
