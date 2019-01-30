@@ -51,6 +51,8 @@ class UserProfile(models.Model):
 
     android_version = models.IntegerField(default=0)
 
+    show_contact_no = models.BooleanField(default=True)
+
     class Meta:
         verbose_name = "Profile"
         verbose_name_plural = "Profiles"

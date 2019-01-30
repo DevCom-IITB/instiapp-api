@@ -46,7 +46,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
 
     def get_contact_no(self, obj):
         """Gets contact no only if a user is logged in."""
-        if self.context['request'].user.is_authenticated:
+        if self.context['request'].user.is_authenticated and obj.show_contact_no:
             return obj.contact_no
         return 'N/A'
 
