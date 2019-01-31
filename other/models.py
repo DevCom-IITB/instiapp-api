@@ -1,5 +1,6 @@
 """Extra models for notifications."""
 from uuid import uuid4
+from dateutil.parser import parse
 from django.db import models
 from django.contrib.sessions.models import Session
 from django.utils import timezone
@@ -11,7 +12,7 @@ class Device(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
     last_ping = models.DateTimeField()
-    last_refresh = models.DateTimeField(default='1970-01-01T00:00:00Z')
+    last_refresh = models.DateTimeField(default=parse('1970-01-01T00:00:00Z'))
 
     user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE, related_name='devices')
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='devices')

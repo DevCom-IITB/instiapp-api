@@ -22,7 +22,7 @@ To setup dependenices, make a new `virtualenv`, activate it and run `pip install
 It is recommended to set up your IDE with both `pylint` and `flake8`, since these will cause the CircleCI build to fail. Google's [Python Style Guide](https://google.github.io/styleguide/pyguide.html) is followed upto a certain extent in all modules.
 
 ## Documentation
-Static OpenAPI specification can be found at the [project page](https://wncc.github.io/IITBapp/), at [Apiary](https://instiapp.docs.apiary.io/) or at `http://server/docs/`
+Static OpenAPI specification can be found at the [project page](https://wncc.github.io/IITBapp/), at [Apiary](https://instiapp.docs.apiary.io/) or at `http://server/api/docs/`
 
 If you are modifying the API, make sure you regenerate `docs` by running `python manage.py swagger`
 

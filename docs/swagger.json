@@ -243,6 +243,20 @@
         ]
       }
     },
+    "/api/docs/": {
+      "get": {
+        "operationId": "docs_list",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "tags": [
+          "docs"
+        ]
+      }
+    },
     "/api/events": {
       "get": {
         "operationId": "events_list",
@@ -317,6 +331,13 @@
                 "notify": {
                   "description": "",
                   "type": "boolean"
+                },
+                "user_tags": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               },
               "required": [
@@ -427,6 +448,13 @@
                 "notify": {
                   "description": "",
                   "type": "boolean"
+                },
+                "user_tags": {
+                  "description": "",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               },
               "required": [
@@ -819,9 +847,7 @@
             "description": ""
           }
         },
-        "parameters": [],
-        "description": "DANGEROUS: Password Log in.\nUses the `username` and `password` query parameters.",
-        "summary": "DANGEROUS: Password Log in."
+        "parameters": []
       }
     },
     "/api/placement-blog": {
@@ -1026,9 +1052,7 @@
             "description": ""
           }
         },
-        "parameters": [],
-        "description": "EXPENSIVE: Search with query param `query` throughout the database.",
-        "summary": "EXPENSIVE: Search with query param `query` throughout the database."
+        "parameters": []
       }
     },
     "/api/training-blog": {
@@ -1167,6 +1191,10 @@
                   "description": "",
                   "type": "string"
                 },
+                "show_contact_no": {
+                  "description": "",
+                  "type": "boolean"
+                },
                 "about": {
                   "description": "",
                   "type": "string"
@@ -1229,6 +1257,10 @@
                 "roll_no": {
                   "description": "",
                   "type": "string"
+                },
+                "show_contact_no": {
+                  "description": "",
+                  "type": "boolean"
                 },
                 "about": {
                   "description": "",
@@ -1327,6 +1359,10 @@
                   "description": "",
                   "type": "string"
                 },
+                "show_contact_no": {
+                  "description": "",
+                  "type": "boolean"
+                },
                 "about": {
                   "description": "",
                   "type": "string"
@@ -1411,6 +1447,19 @@
         "tags": [
           "user-me"
         ]
+      }
+    },
+    "/api/user-tags": {
+      "get": {
+        "operationId": "get_all_user_tags",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "Get a list of categories of user tags with nested tags.",
+        "summary": "Get a list of categories of user tags with nested tags."
       }
     },
     "/api/users/{id}": {
@@ -1557,6 +1606,14 @@
                   "description": "",
                   "type": "string"
                 },
+                "suggestions": {
+                  "description": "",
+                  "type": "string"
+                },
+                "location_details": {
+                  "description": "",
+                  "type": "string"
+                },
                 "latitude": {
                   "description": "",
                   "type": "number"
@@ -1569,7 +1626,10 @@
                   "description": "",
                   "type": "string"
                 }
-              }
+              },
+              "required": [
+                "description"
+              ]
             }
           }
         ],
@@ -1598,54 +1658,8 @@
             "type": "string"
           }
         ],
-        "tags": [
-          "venter"
-        ]
-      },
-      "put": {
-        "operationId": "venter_complaints_update",
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "A UUID string identifying this Complaint.",
-            "type": "string"
-          },
-          {
-            "name": "data",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "description": {
-                  "description": "",
-                  "type": "string"
-                },
-                "latitude": {
-                  "description": "",
-                  "type": "number"
-                },
-                "longitude": {
-                  "description": "",
-                  "type": "number"
-                },
-                "location_description": {
-                  "description": "",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "consumes": [
-          "application/json"
-        ],
+        "description": "ComplaintViewSet to get the complaints",
+        "summary": "ComplaintViewSet to get the complaints",
         "tags": [
           "venter"
         ]
@@ -1687,6 +1701,70 @@
         "consumes": [
           "application/json"
         ],
+        "tags": [
+          "venter"
+        ]
+      }
+    },
+    "/api/venter/complaints/{id}/subscribe": {
+      "get": {
+        "operationId": "venter_complaints_subscribe",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Complaint.",
+            "type": "string"
+          }
+        ],
+        "description": "Subscribe or Un-Subscribe from a complaint {?action}=0,1",
+        "summary": "Subscribe or Un-Subscribe from a complaint {?action}=0,1",
+        "tags": [
+          "venter"
+        ]
+      }
+    },
+    "/api/venter/complaints/{id}/upvote": {
+      "get": {
+        "operationId": "venter_complaints_up_vote",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "A UUID string identifying this Complaint.",
+            "type": "string"
+          }
+        ],
+        "description": "UpVote or un-UpVote a complaint {?action}=0,1",
+        "summary": "UpVote or un-UpVote a complaint {?action}=0,1",
+        "tags": [
+          "venter"
+        ]
+      }
+    },
+    "/api/venter/tags": {
+      "get": {
+        "operationId": "venter_tags_list",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "parameters": [],
+        "description": "TagViewSet for the getting related tags",
+        "summary": "TagViewSet for the getting related tags",
         "tags": [
           "venter"
         ]

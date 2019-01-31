@@ -3,7 +3,8 @@ from locations.models import Location
 
 class LocationAdmin(admin.ModelAdmin):
     list_filter = ('reusable',)
-    search_fields = ['name']
+    list_display = ('short_name', 'name', 'reusable')
+    search_fields = ['short_name', 'name']
 
 
 admin.site.register(Location, LocationAdmin)
