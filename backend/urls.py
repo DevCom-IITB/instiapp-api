@@ -23,7 +23,7 @@ def api_base(prefix=None):
     """Get the base URL for an endpoint set."""
     if prefix is None:
         return 'api/'
-    return 'api/' + prefix + '/'
+    return 'api/%s/' % prefix
 
 
 urlpatterns = [
@@ -46,7 +46,7 @@ urlpatterns = [
 
     # Non-API
     path('', include('prerender.urls')),
-    path('docs/', get_swagger_view(title='InstiApp API')),
+    path(api_base('docs'), get_swagger_view(title='InstiApp API')),
     path('sitemap.xml', sitemap, {
         'sitemaps': sitemaps()
     }, name='django.contrib.sitemaps.views.sitemap')
