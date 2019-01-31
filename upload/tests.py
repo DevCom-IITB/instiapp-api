@@ -1,4 +1,5 @@
 """Unit tests for upload."""
+import os
 from os.path import isfile
 from datetime import timedelta
 from django.core.management import call_command
@@ -51,7 +52,8 @@ class UploadTestCase(APITestCase):
         url = '/api/upload'
         image = lambda: SimpleUploadedFile(
             "img.jpg", open("./upload/img.jpg", "rb").read(), content_type="image/jpeg")
-        response = self.client.post(url, {'picture': image()})
+        new_upload = lambda: self.client.post(url, {'picture': image()})
+        response = new_upload()
 
         # Check if the file was uploaded
         img_id = response.data['id']
@@ -59,31 +61,42 @@ class UploadTestCase(APITestCase):
         self.assertIn('.jpg', str(img.picture))
 
         # Check clean images chore
-        res1 = self.client.post(url, {'picture': image()})
+        res1 = new_upload()
 
         # Create images more than an hour ago
         with freeze_time(timezone.now() - timedelta(hours=3)):
-            res2 = self.client.post(url, {'picture': image()})
-            res3 = self.client.post(url, {'picture': image()})
-            res4 = self.client.post(url, {'picture': image()})
+            res2 = new_upload()
+            res3 = new_upload()
+            res4 = new_upload()
+            res5 = new_upload()
 
             event1 = create_event(image_url=res3.data['picture'])
             body1 = create_body(image_url=res4.data['picture'])
 
         # Get path for checking deletion
-        path1 = UploadedImage.objects.get(pk=res1.data['id']).picture.path
-        path2 = UploadedImage.objects.get(pk=res2.data['id']).picture.path
+        obj = lambda res: UploadedImage.objects.get(pk=res.data['id'])
+        obj_exists = lambda res: UploadedImage.objects.filter(pk=res.data['id']).exists()
+        path = lambda res: obj(res).picture.path
+        path1 = path(res1)
+        path2 = path(res2)
+        path5 = path(res5)
+
+        # Check if deleting a non existent file is fine
+        self.assertTrue(isfile(path5))
+        os.remove(path5)
+        self.assertFalse(isfile(path5))
+        obj(res5).delete()
+        self.assertFalse(obj_exists(res5))
 
         # Call the chore
         clean = lambda: call_command('clean-images')
         clean()
 
         # Check if unclaimed images were removed
-        img_exists = lambda res: UploadedImage.objects.filter(pk=res.data['id']).exists()
-        self.assertTrue(img_exists(res1))
-        self.assertFalse(img_exists(res2))
-        self.assertTrue(img_exists(res3))
-        self.assertTrue(img_exists(res4))
+        self.assertTrue(obj_exists(res1))
+        self.assertFalse(obj_exists(res2))
+        self.assertTrue(obj_exists(res3))
+        self.assertTrue(obj_exists(res4))
 
         # Check if file is deleted
         self.assertTrue(isfile(path1))
@@ -93,10 +106,10 @@ class UploadTestCase(APITestCase):
         body1.image_url = 'https://insti.app'
         body1.save()
         clean()
-        self.assertTrue(img_exists(res3))
-        self.assertFalse(img_exists(res4))
+        self.assertTrue(obj_exists(res3))
+        self.assertFalse(obj_exists(res4))
 
         # Check after deleting claimant
         event1.delete()
         clean()
-        self.assertFalse(img_exists(res3))
+        self.assertFalse(obj_exists(res3))
