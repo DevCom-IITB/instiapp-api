@@ -1,5 +1,17 @@
 from django.contrib import admin
 from events.models import Event, UserEventStatus
 
-admin.site.register(Event)
-admin.site.register(UserEventStatus)
+class EventAdmin(admin.ModelAdmin):
+    list_filter = ('start_time',)
+    list_display = ('name', 'start_time', 'end_time')
+    search_fields = ['name']
+    ordering = ('-start_time',)
+
+class UESAdmin(admin.ModelAdmin):
+    list_filter = ('event__start_time',)
+    list_display = ('event', 'user', 'status')
+    ordering = ('-event__start_time',)
+
+
+admin.site.register(Event, EventAdmin)
+admin.site.register(UserEventStatus, UESAdmin)
