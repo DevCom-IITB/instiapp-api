@@ -61,55 +61,51 @@ class UploadTestCase(APITestCase):
         self.assertIn('.jpg', str(img.picture))
 
         # Check clean images chore
-        res1 = new_upload()
+        res = [None] * 5
+        res[0] = new_upload()
 
         # Create images more than an hour ago
         with freeze_time(timezone.now() - timedelta(hours=3)):
-            res2 = new_upload()
-            res3 = new_upload()
-            res4 = new_upload()
-            res5 = new_upload()
+            for i in range(1, 5):
+                res[i] = new_upload()
 
-            event1 = create_event(image_url=res3.data['picture'])
-            body1 = create_body(image_url=res4.data['picture'])
+            event1 = create_event(image_url=res[2].data['picture'])
+            body1 = create_body(image_url=res[3].data['picture'])
 
         # Get path for checking deletion
         obj = lambda res: UploadedImage.objects.get(pk=res.data['id'])
         obj_exists = lambda res: UploadedImage.objects.filter(pk=res.data['id']).exists()
-        path = lambda res: obj(res).picture.path
-        path1 = path(res1)
-        path2 = path(res2)
-        path5 = path(res5)
+        paths = [obj(r).picture.path for r in res]
 
         # Check if deleting a non existent file is fine
-        self.assertTrue(isfile(path5))
-        os.remove(path5)
-        self.assertFalse(isfile(path5))
-        obj(res5).delete()
-        self.assertFalse(obj_exists(res5))
+        self.assertTrue(isfile(paths[4]))
+        os.remove(paths[4])
+        self.assertFalse(isfile(paths[4]))
+        obj(res[4]).delete()
+        self.assertFalse(obj_exists(res[4]))
 
         # Call the chore
         clean = lambda: call_command('clean-images')
         clean()
 
         # Check if unclaimed images were removed
-        self.assertTrue(obj_exists(res1))
-        self.assertFalse(obj_exists(res2))
-        self.assertTrue(obj_exists(res3))
-        self.assertTrue(obj_exists(res4))
+        self.assertTrue(obj_exists(res[0]))
+        self.assertFalse(obj_exists(res[1]))
+        self.assertTrue(obj_exists(res[2]))
+        self.assertTrue(obj_exists(res[3]))
 
         # Check if file is deleted
-        self.assertTrue(isfile(path1))
-        self.assertFalse(isfile(path2))
+        self.assertTrue(isfile(paths[0]))
+        self.assertFalse(isfile(paths[1]))
 
         # Check after invalidating claimant
         body1.image_url = 'https://insti.app'
         body1.save()
         clean()
-        self.assertTrue(obj_exists(res3))
-        self.assertFalse(obj_exists(res4))
+        self.assertTrue(obj_exists(res[2]))
+        self.assertFalse(obj_exists(res[3]))
 
         # Check after deleting claimant
         event1.delete()
         clean()
-        self.assertFalse(obj_exists(res3))
+        self.assertFalse(obj_exists(res[2]))
