@@ -26,6 +26,10 @@ def api_base(prefix=None):
     return 'api/%s/' % prefix
 
 
+# Set admin site titles
+admin.site.site_header = 'InstiApp admin'
+admin.site.site_title = 'InstiApp admin'
+
 urlpatterns = [
     # Admin site
     path('admin/', admin.site.urls),
