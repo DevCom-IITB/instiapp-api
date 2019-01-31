@@ -107,6 +107,13 @@ paths:
         '200': {description: ''}
       summary: List followers of body.
       tags: [bodies]
+  /api/docs/:
+    get:
+      operationId: docs_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      tags: [docs]
   /api/events:
     get:
       description: 'List Events.
@@ -140,6 +147,10 @@ paths:
             name: {description: '', type: string}
             notify: {description: '', type: boolean}
             start_time: {description: '', type: string}
+            user_tags:
+              description: ''
+              items: {type: string}
+              type: array
             venue_ids:
               description: ''
               items: {type: string}
@@ -204,6 +215,10 @@ paths:
             name: {description: '', type: string}
             notify: {description: '', type: boolean}
             start_time: {description: '', type: string}
+            user_tags:
+              description: ''
+              items: {type: string}
+              type: array
             venue_ids:
               description: ''
               items: {type: string}
@@ -380,14 +395,10 @@ paths:
       tags: [notifications]
   /api/pass-login:
     get:
-      description: 'DANGEROUS: Password Log in.
-
-        Uses the `username` and `password` query parameters.'
       operationId: pass_login
       parameters: []
       responses:
         '200': {description: ''}
-      summary: 'DANGEROUS: Password Log in.'
   /api/placement-blog:
     get:
       description: Get Placement Blog.
@@ -476,12 +487,10 @@ paths:
       tags: [roles]
   /api/search:
     get:
-      description: 'EXPENSIVE: Search with query param `query` throughout the database.'
       operationId: search
       parameters: []
       responses:
         '200': {description: ''}
-      summary: 'EXPENSIVE: Search with query param `query` throughout the database.'
   /api/training-blog:
     get:
       description: Get Training Blog.
@@ -554,6 +563,7 @@ paths:
             name: {description: '', type: string}
             profile_pic: {description: '', type: string}
             roll_no: {description: '', type: string}
+            show_contact_no: {description: '', type: boolean}
             website_url: {description: '', type: string}
           type: object
       responses:
@@ -577,6 +587,7 @@ paths:
             name: {description: '', type: string}
             profile_pic: {description: '', type: string}
             roll_no: {description: '', type: string}
+            show_contact_no: {description: '', type: boolean}
             website_url: {description: '', type: string}
           type: object
       responses:
@@ -619,6 +630,7 @@ paths:
             name: {description: '', type: string}
             profile_pic: {description: '', type: string}
             roll_no: {description: '', type: string}
+            show_contact_no: {description: '', type: boolean}
             website_url: {description: '', type: string}
           type: object
       responses:
@@ -649,6 +661,14 @@ paths:
         '200': {description: ''}
       summary: Set UNR(User News Reaction) for current user.
       tags: [user-me]
+  /api/user-tags:
+    get:
+      description: Get a list of categories of user tags with nested tags.
+      operationId: get_all_user_tags
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: Get a list of categories of user tags with nested tags.
   /api/users/{id}:
     get:
       description: UserProfile
@@ -721,37 +741,24 @@ paths:
             description: {description: '', type: string}
             latitude: {description: '', type: number}
             location_description: {description: '', type: string}
+            location_details: {description: '', type: string}
             longitude: {description: '', type: number}
+            suggestions: {description: '', type: string}
+          required: [description]
           type: object
       responses:
         '201': {description: ''}
       tags: [venter]
   /api/venter/complaints/{id}:
     get:
+      description: ComplaintViewSet to get the complaints
       operationId: venter_complaints_read
       parameters:
       - {description: A UUID string identifying this Complaint., in: path, name: id,
         required: true, type: string}
       responses:
         '200': {description: ''}
-      tags: [venter]
-    put:
-      consumes: [application/json]
-      operationId: venter_complaints_update
-      parameters:
-      - {description: A UUID string identifying this Complaint., in: path, name: id,
-        required: true, type: string}
-      - in: body
-        name: data
-        schema:
-          properties:
-            description: {description: '', type: string}
-            latitude: {description: '', type: number}
-            location_description: {description: '', type: string}
-            longitude: {description: '', type: number}
-          type: object
-      responses:
-        '200': {description: ''}
+      summary: ComplaintViewSet to get the complaints
       tags: [venter]
   /api/venter/complaints/{id}/comments:
     post:
@@ -769,6 +776,37 @@ paths:
           type: object
       responses:
         '201': {description: ''}
+      tags: [venter]
+  /api/venter/complaints/{id}/subscribe:
+    get:
+      description: Subscribe or Un-Subscribe from a complaint {?action}=0,1
+      operationId: venter_complaints_subscribe
+      parameters:
+      - {description: A UUID string identifying this Complaint., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '200': {description: ''}
+      summary: Subscribe or Un-Subscribe from a complaint {?action}=0,1
+      tags: [venter]
+  /api/venter/complaints/{id}/upvote:
+    get:
+      description: UpVote or un-UpVote a complaint {?action}=0,1
+      operationId: venter_complaints_up_vote
+      parameters:
+      - {description: A UUID string identifying this Complaint., in: path, name: id,
+        required: true, type: string}
+      responses:
+        '200': {description: ''}
+      summary: UpVote or un-UpVote a complaint {?action}=0,1
+      tags: [venter]
+  /api/venter/tags:
+    get:
+      description: TagViewSet for the getting related tags
+      operationId: venter_tags_list
+      parameters: []
+      responses:
+        '200': {description: ''}
+      summary: TagViewSet for the getting related tags
       tags: [venter]
 schemes: [http]
 securityDefinitions:
