@@ -48,9 +48,11 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         serialized = ComplaintSerializer(
             complaint, context={'request': request}).data
 
-        serialized['is_subscribed'] = False
-        if request.user.profile in complaint.subscriptions.all():
-            serialized['is_subscribed'] = True
+        is_sub = request.user.is_authenticated and request.user.profile in complaint.subscriptions.all()
+        serialized['is_subscribed'] = is_sub
+
+        upvoted = request.user.is_authenticated and request.user.profile in complaint.users_up_voted.all()
+        serialized['upvoted'] = upvoted
 
         return Response(serialized)
 
@@ -85,6 +87,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         for complaint_object, serialized_object in zip(complaint, serialized):
             is_sub = request.user.is_authenticated and request.user.profile in complaint_object.subscriptions.all()
             serialized_object['is_subscribed'] = is_sub
+
+            upvoted = request.user.is_authenticated and request.user.profile in complaint_object.users_up_voted.all()
+            serialized_object['upvoted'] = upvoted
 
         return Response(serialized)
 
