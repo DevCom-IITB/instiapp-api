@@ -107,7 +107,7 @@ class EventPrioritizer():  # pylint: disable=R0902
 
 def get_prioritized(queryset, request):
     # Prefetch related
-    queryset = EventSerializer.setup_eager_loading(queryset)
+    queryset = EventSerializer.setup_eager_loading(queryset, request)
 
     # Get profile if authenticated
     profile = None

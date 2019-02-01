@@ -29,9 +29,7 @@ class NewsEntrySerializer(serializers.ModelSerializer):
         request = self.context['request'] if 'request' in self.context else None
         if request and request.user.is_authenticated:
             profile = request.user.profile
-            for unr in obj.unr.all():
-                if unr.user == profile:
-                    return unr.reaction
+            return next((u.reaction for u in obj.unr.all() if u.user_id == profile.id), -1)
         return -1
 
     class Meta:
@@ -43,6 +41,6 @@ class NewsEntrySerializer(serializers.ModelSerializer):
     def setup_eager_loading(queryset):
         """Perform necessary eager loading of data."""
         queryset = queryset.prefetch_related(
-            'body', 'unr', 'unr__user'
+            'body', 'unr'
         )
         return queryset
