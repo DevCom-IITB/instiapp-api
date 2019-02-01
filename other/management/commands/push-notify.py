@@ -22,8 +22,7 @@ class Command(BaseCommand):
         push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
 
         # Iterate all unsent notifications
-        for notification in Notification.objects.prefetch_related(
-                'recipient', 'recipient__profile').filter(emailed=False):
+        for notification in Notification.objects.filter(emailed=False)[:1000]:
 
             # Check invalid subscriptions
             if not notification or not notification.actor:

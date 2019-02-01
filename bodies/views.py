@@ -16,8 +16,7 @@ from helpers.misc import sort_by_field
 
 class BodyViewSet(viewsets.ModelViewSet):
     """Body"""
-    queryset = Body.objects.all()
-    queryset = BodySerializer.setup_eager_loading(queryset)
+    queryset = Body.objects
     serializer_class = BodySerializer
 
     def get_serializer_context(self):
@@ -34,13 +33,14 @@ class BodyViewSet(viewsets.ModelViewSet):
         """Get Body.
         Retrieve by `uuid` or `str_id`."""
 
+        # Prefetch and annotate data
+        self.queryset = BodySerializer.setup_eager_loading(self.queryset, request)
+
         # Try UUID or fall back to str_id
         body = self.get_body(pk)
 
-        # Add user_follows to response
+        # Serialize the body
         serialized = BodySerializer(body, context={'request': request}).data
-        serialized['user_follows'] = request.user.is_authenticated and \
-            body in request.user.profile.followed_bodies.all()
         return Response(serialized)
 
     @insti_permission_required('AddB')

@@ -16,8 +16,7 @@ from locations.helpers import create_unreusable_locations
 class EventViewSet(viewsets.ModelViewSet):
     """Event"""
 
-    queryset = Event.objects.all()
-    queryset = EventSerializer.setup_eager_loading(queryset)
+    queryset = Event.objects
     serializer_class = EventFullSerializer
 
     def get_serializer_context(self):
@@ -27,6 +26,7 @@ class EventViewSet(viewsets.ModelViewSet):
         """Get Event.
         Get by `uuid` or `str_id`"""
 
+        self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
         event = self.get_event(pk)
         serialized = EventFullSerializer(event, context={'request': request}).data
 
