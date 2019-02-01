@@ -26,7 +26,7 @@ class EventViewSet(viewsets.ModelViewSet):
         """Get Event.
         Get by `uuid` or `str_id`"""
 
-        self.queryset = EventSerializer.setup_eager_loading(self.queryset)
+        self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
         event = self.get_event(pk)
         serialized = EventFullSerializer(event, context={'request': request}).data
 
@@ -35,9 +35,6 @@ class EventViewSet(viewsets.ModelViewSet):
     def list(self, request):
         """List Events.
         List fresh events prioritized for the current user."""
-
-        # Setup prefetching
-        self.queryset = EventSerializer.setup_eager_loading(self.queryset)
 
         # Check for date filtered query params
         start = request.GET.get('start')

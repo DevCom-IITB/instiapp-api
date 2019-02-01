@@ -1,8 +1,10 @@
 """Serializers for Event."""
 from rest_framework import serializers
 from django.db.models import Count
+from django.db.models import Prefetch
 from django.db.models import Q
 from events.models import Event
+from events.models import UserEventStatus
 from users.models import UserTag
 
 def get_followers(obj, status):
@@ -11,17 +13,12 @@ def get_followers(obj, status):
     followers = [ues.user for ues in obj.ues.all() if ues.status == status]
     return UserProfileSerializer(followers, many=True).data
 
-def get_user_ues(slf, obj):
+def get_user_ues(self, obj):  # pylint: disable=unused-argument
     """Get UES for current user or 0."""
-    # May not always want this
-    if 'request' not in slf.context:
-        return None
 
-    request = slf.context['request']
-    if request.user.is_authenticated:
-        profile = request.user.profile
-        ues = obj.ues.filter(user=profile).first()
-        return ues.status if ues else 0
+    # Check if the uues annotation is available
+    if hasattr(obj, 'uues'):
+        return obj.uues[0].status if obj.uues else 0
 
     return None
 
@@ -55,10 +52,22 @@ class EventSerializer(serializers.ModelSerializer):
                   'user_ues')
 
     @staticmethod
-    def setup_eager_loading(queryset):
-        """Perform necessary eager loading of data.
-        To be used for EventFullSerializer as well."""
-        queryset = queryset.prefetch_related('bodies', 'venues', 'ues', 'ues__user', 'user_tags')
+    def setup_eager_loading(queryset, request, extra_prefetch=None):
+        """Perform necessary eager loading of data."""
+
+        # Get the fields to be prefetched
+        fields = ['bodies', 'venues', 'user_tags']
+
+        # Add prefetch for user_ues
+        if request.user.is_authenticated and hasattr(request.user, 'profile'):
+            user_query = UserEventStatus.objects.filter(user_id=request.user.profile.id)
+            fields.append(Prefetch('ues', queryset=user_query, to_attr='uues'))
+
+        # Add extra prefetch fields
+        if extra_prefetch:
+            fields += extra_prefetch
+
+        queryset = queryset.prefetch_related(*fields)
 
         # Prefetch counts
         interested_count = Count('followers', distinct=True, filter=Q(ues__status=1))
@@ -111,6 +120,12 @@ class EventFullSerializer(serializers.ModelSerializer):
                   'end_time', 'all_day', 'venues', 'venue_names', 'bodies', 'bodies_id',
                   'interested_count', 'going_count', 'interested', 'going', 'venue_ids',
                   'website_url', 'user_ues', 'notify', 'user_tags')
+
+    @staticmethod
+    def setup_eager_loading(queryset, request):
+        """Calls the method in EventSerializer adding ues__user"""
+        return EventSerializer.setup_eager_loading(
+            queryset, request, extra_prefetch=['ues', 'ues__user'])
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
