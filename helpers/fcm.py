@@ -5,6 +5,7 @@ from events.models import Event
 from news.models import NewsEntry
 from venter.models import Comment
 from helpers.device import fill_device_firebase
+from other.views import get_notif_queryset
 
 def send_fcm_data_message(push_service, registration_id, data_message):
     """Send a data FCM message."""
@@ -108,7 +109,9 @@ def get_rich_notification(notification):
         "extra": notification_extra,
         "notification_id": str(notification.id),
         "title": title,
-        "verb": notification.verb
+        "verb": notification.verb,
+        "total_count": get_notif_queryset(
+            notification.recipient.notifications).count()
     }
 
     # Set rich fields if present

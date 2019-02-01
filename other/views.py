@@ -19,6 +19,9 @@ from other.notifications import NotificationSerializer
 from other.serializers import UserTagCategorySerializer
 from helpers.misc import query_search
 
+def get_notif_queryset(queryset):
+    return queryset.unread().filter(timestamp__gte=timezone.now() - timedelta(days=7))
+
 class OtherViewset(viewsets.ViewSet):
 
     @staticmethod
@@ -50,8 +53,7 @@ class OtherViewset(viewsets.ViewSet):
     @login_required_ajax
     def get_notifications(cls, request):
         """Get unread notifications for current user."""
-        notifications = request.user.notifications.unread().filter(
-            timestamp__gte=timezone.now() - timedelta(days=7))
+        notifications = get_notif_queryset(request.user.notifications)
         return Response(NotificationSerializer(notifications, many=True).data)
 
     @classmethod
