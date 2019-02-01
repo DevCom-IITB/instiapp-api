@@ -59,7 +59,14 @@ class OtherViewset(viewsets.ViewSet):
     def mark_notification_read(cls, request, pk):
         """Mark one notification as read."""
         notification = get_object_or_404(request.user.notifications, id=pk)
-        notification.mark_as_read()
+
+        # Mark as deleted if query parameter is present
+        if request.GET.get("delete") is not None:
+            notification.deleted = True
+
+        notification.unread = False
+        notification.save()
+
         return Response(status=204)
 
     @classmethod
@@ -67,6 +74,7 @@ class OtherViewset(viewsets.ViewSet):
     def mark_all_notifications_read(cls, request):
         """Mark all notifications as read."""
         request.user.notifications.mark_all_as_read()
+        request.user.notifications.mark_all_as_deleted()
         return Response(status=204)
 
     @classmethod
