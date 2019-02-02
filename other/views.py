@@ -19,6 +19,9 @@ from other.notifications import NotificationSerializer
 from other.serializers import UserTagCategorySerializer
 from helpers.misc import query_search
 
+def get_notif_queryset(queryset):
+    return queryset.unread().filter(timestamp__gte=timezone.now() - timedelta(days=7))
+
 class OtherViewset(viewsets.ViewSet):
 
     @staticmethod
@@ -50,8 +53,7 @@ class OtherViewset(viewsets.ViewSet):
     @login_required_ajax
     def get_notifications(cls, request):
         """Get unread notifications for current user."""
-        notifications = request.user.notifications.unread().filter(
-            timestamp__gte=timezone.now() - timedelta(days=7))
+        notifications = get_notif_queryset(request.user.notifications)
         return Response(NotificationSerializer(notifications, many=True).data)
 
     @classmethod
@@ -59,7 +61,14 @@ class OtherViewset(viewsets.ViewSet):
     def mark_notification_read(cls, request, pk):
         """Mark one notification as read."""
         notification = get_object_or_404(request.user.notifications, id=pk)
-        notification.mark_as_read()
+
+        # Mark as deleted if query parameter is present
+        if request.GET.get("delete") is not None:
+            notification.deleted = True
+
+        notification.unread = False
+        notification.save()
+
         return Response(status=204)
 
     @classmethod
@@ -67,6 +76,7 @@ class OtherViewset(viewsets.ViewSet):
     def mark_all_notifications_read(cls, request):
         """Mark all notifications as read."""
         request.user.notifications.mark_all_as_read()
+        request.user.notifications.mark_all_as_deleted()
         return Response(status=204)
 
     @classmethod

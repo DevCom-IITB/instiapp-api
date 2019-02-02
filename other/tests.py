@@ -6,6 +6,7 @@ from freezegun import freeze_time
 from rest_framework.test import APITestCase, APIClient
 from django.utils import timezone
 from notifications.signals import notify
+from notifications.models import Notification
 
 from login.tests import get_new_user
 from bodies.models import Body
@@ -119,8 +120,19 @@ class OtherTestCase(APITestCase):
 
         # Mark event2 as read
         e2n = [n for n in response.data if n['actor'] == EventSerializer(event2).data][0]
+        e2notif = lambda: Notification.objects.get(pk=e2n['id'])
+        self.assertEqual(e2notif().unread, True)
+        self.assertEqual(e2notif().deleted, False)
         response = self.client.get(url + '/read/' + str(e2n['id']))
         self.assertEqual(response.status_code, 204)
+        self.assertEqual(e2notif().unread, False)
+        self.assertEqual(e2notif().deleted, False)
+
+        # Mark event2 as deleted
+        response = self.client.get(url + '/read/' + str(e2n['id']) + '?delete=1')
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(e2notif().unread, False)
+        self.assertEqual(e2notif().deleted, True)
 
         # Check if notifications are correct remaining two
         response = self.client.get(url)
