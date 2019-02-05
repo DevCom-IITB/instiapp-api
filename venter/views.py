@@ -62,30 +62,30 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         To filter by current user, add a query parameter {?filter}"""
 
         # Get the list of complaints excluding objects marked deleted
-        complaint = self.queryset.prefetch_related(
+        complaints = self.queryset.prefetch_related(
             'subscriptions', 'users_up_voted').exclude(status='Deleted')
 
         # Check if the user specific filter is present
         if 'filter' in request.GET and request.user.is_authenticated:
-            complaint = complaint.filter(created_by=request.user.profile)
+            complaints = complaints.filter(created_by=request.user.profile)
 
         # Filter for a particular word search
         if 'search' in request.GET:
             val = request.query_params.get('search')
-            complaint = complaint.filter(description__icontains=val)
+            complaints = complaints.filter(description__icontains=val)
 
         # For multiple tags and single tags
         if 'tags' in request.GET:
             val = request.query_params.getlist('tags')
             clauses = (Q(tags__tag_uri__icontains=p) for p in val)
             query = reduce(operator.or_, clauses)
-            complaint = complaint.filter(query)
+            complaints = complaints.filter(query)
 
         # Serialize and return
         serialized = ComplaintSerializer(
-            complaint, context={'request': request}, many=True).data
+            complaints, context={'request': request}, many=True).data
 
-        for complaint_object, serialized_object in zip(complaint, serialized):
+        for complaint_object, serialized_object in zip(complaints, serialized):
             is_sub = request.user.is_authenticated and request.user.profile in complaint_object.subscriptions.all()
             serialized_object['is_subscribed'] = is_sub
 
