@@ -127,7 +127,7 @@ STATIC_URL = '/static/'
 REST_FRAMEWORK = {}
 
 # Do not delete notifications records from database
-DJANGO_NOTIFICATIONS_CONFIG = { 'SOFT_DELETE': True}
+DJANGO_NOTIFICATIONS_CONFIG = {'SOFT_DELETE': True}
 
 # Prerender configuration
 PRERENDER_TITLE = 'InstiApp | IIT Bombay'
