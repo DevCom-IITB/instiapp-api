@@ -20,7 +20,7 @@ from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
 
 class TagViewSet(viewsets.ModelViewSet):
-    queryset = TagUris.objects.all()
+    queryset = TagUris.objects
     serializer_class = TagSerializer
 
     @classmethod
@@ -39,7 +39,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
 
 class ComplaintViewSet(viewsets.ModelViewSet):
-    queryset = Complaints.objects.all()
+    queryset = Complaints.objects
     serializer_class = ComplaintPostSerializer
 
     def retrieve(self, request, pk):
@@ -182,7 +182,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         return get_object_or_404(self.queryset, id=pk)
 
 class CommentViewSet(viewsets.ModelViewSet):
-    queryset = Comment.objects.all()
+    queryset = Comment.objects
     serializer_class = CommentPostSerializer
 
     @classmethod
