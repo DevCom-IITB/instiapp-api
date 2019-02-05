@@ -126,7 +126,7 @@ def insti_map(request, name=None):
     locations = Location.objects.filter(str_id=name)
 
     # Check if we found a location
-    if locations.exists():
+    if name and locations.exists():
         location = locations[0]
     else:
         # Create dummy
