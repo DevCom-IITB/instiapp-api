@@ -146,12 +146,24 @@ class VenterTestCase(APITestCase):
         # UpVote
         response = self.client.get(url + '1')
         self.assertEqual(response.status_code, 200)
+
+        # Verify the addition of the user to the array for 'users_up_voted'
         self.assertEqual(len(response.data['users_up_voted']), 1)
+
+        # Verify user's upvote status for the complaint
+        response = self.client.get(complaint_url)
+        self.assertEqual(response.data['upvoted'], True)
 
         # UnUpVote
         response = self.client.get(url + '0')
         self.assertEqual(response.status_code, 200)
+
+        # Verify the removal of the user from the 'users_up_voted' array
         self.assertEqual(len(response.data['users_up_voted']), 0)
+
+        # Verify user's upvote status for the complaint
+        response = self.client.get(complaint_url)
+        self.assertEqual(response.data['upvoted'], False)
 
         # Test for Complaint Subscription
         url = '/api/venter/complaints/' + cid + '/subscribe'
