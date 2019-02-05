@@ -4,6 +4,8 @@ from django.db import migrations, models
 def set_my_defaults(apps, schema_editor):
     Location = apps.get_model('locations', 'Location')
     for location in Location.objects.all().iterator():
+        if not location.short_name:
+            continue
         temp = "-".join(location.short_name.lower().split())
         location.str_id = "".join(c for c in temp if c.isalnum() or c == "-")
         location.save()
