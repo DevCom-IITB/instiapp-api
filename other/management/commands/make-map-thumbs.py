@@ -31,11 +31,11 @@ class Command(BaseCommand):
         for location in Location.objects.filter(reusable=True):
             # Check for invalid locations
             if not location.pixel_x or not location.pixel_y:
-                return
+                continue
 
             # Check for dummy locations:
             if location.pixel_x <= 0 or location.pixel_y <= 0:
-                return
+                continue
 
             # Account for bias due to marker
             v_bias = marker_height // 4
