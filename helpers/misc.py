@@ -5,8 +5,15 @@ from bs4 import BeautifulSoup
 
 def get_url_friendly(name):
     """Converts the name to a url friendly string for use in `str_id`"""
-    temp = "-".join(name.lower().split())
-    return "".join(c for c in temp if c.isalnum() or c == "-")
+    # Return blank in case None is passed
+    if not name:
+        return ''
+
+    # Strip whitespaces and replace with dashes
+    temp = '-'.join(name.lower().split())
+
+    # Remove special characters except dashes
+    return ''.join(c for c in temp if c.isalnum() or c == '-')
 
 def query_from_num(request, default_num, queryset):
     """Returns queryset with from and num if the query parameters are valid."""
