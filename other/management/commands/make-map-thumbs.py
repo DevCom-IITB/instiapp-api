@@ -55,3 +55,6 @@ class Command(BaseCommand):
             # Save the image
             save_path = '%s/%s.jpg' % (SAVE_FOLDER, location.id)
             cropped.save(save_path, 'JPEG', quality=90, optimize=True, progressive=True)
+
+            # Print a message
+            print('Created image for', location.short_name)
