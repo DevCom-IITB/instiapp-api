@@ -11,4 +11,6 @@ urlpatterns = [
     path('event/<pk>', pr.event_details),
     path('org/<pk>', pr.body_details),
     path('body-tree/<pk>', pr.body_tree),
+    path('map', pr.insti_map),
+    path('map/<name>', pr.insti_map),
 ]

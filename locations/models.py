@@ -1,6 +1,7 @@
 """Models for Locations."""
 from uuid import uuid4
 from django.db import models
+from helpers.misc import get_url_friendly
 
 class Location(models.Model):
     """A unique location, chiefly venues for events.
@@ -11,6 +12,7 @@ class Location(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    str_id = models.CharField(max_length=50, editable=False, null=True)
     time_of_creation = models.DateTimeField(auto_now_add=True)
 
     name = models.CharField(max_length=150)
@@ -25,6 +27,10 @@ class Location(models.Model):
     lat = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     lng = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     reusable = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        self.str_id = get_url_friendly(self.short_name)
+        super(Location, self).save(*args, **kwargs)
 
     def __str__(self):
         return (self.short_name if self.short_name else '') + ' - ' + self.name
