@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='location',
             name='str_id',
-            field=models.CharField(editable=False, max_length=50, null=True),
+            field=models.CharField(editable=False, max_length=100, null=True),
         ),
         migrations.RunPython(set_my_defaults, lambda *args: None),
     ]
