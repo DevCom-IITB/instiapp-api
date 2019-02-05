@@ -30,11 +30,18 @@ class VenterTestCase(APITestCase):
         def create_complaint(user, **kwargs):
             Complaints.objects.create(created_by=user, **kwargs)
 
+        # Creating 4 dummy complaints, one of which has a "DELETED" status
         create_complaint(self.user.profile)
+        create_complaint(get_new_user().profile)
         create_complaint(get_new_user().profile)
         create_complaint(self.user.profile, status=STATUS_DELETED)
 
         url = '/api/venter/complaints'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
+
+        url = '/api/venter/complaints?from=0&num=2'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)

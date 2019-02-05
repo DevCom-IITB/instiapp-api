@@ -6,6 +6,7 @@ from django.conf import settings
 from rest_framework.generics import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
+from helpers.misc import query_from_num
 from roles.helpers import login_required_ajax
 
 from venter.models import Complaints
@@ -80,6 +81,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             clauses = (Q(tags__tag_uri__icontains=p) for p in val)
             query = reduce(operator.or_, clauses)
             complaints = complaints.filter(query)
+
+        # Paginate the complaint page using the helper function
+        complaints = query_from_num(request, 10, complaints)
 
         # Serialize and return
         serialized = ComplaintSerializer(
