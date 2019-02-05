@@ -37,7 +37,9 @@ class LocationTestCase(APITestCase):
     def test_location_get(self):
         """Check that only reusable locations are listed in get."""
         # Non reusable location
-        Location.objects.create(name='TestLocation0', reusable=False, group_id=1)
+        loc0 = Location.objects.create(
+            name='TestLocation0', short_name='Test Location & 0', reusable=False, group_id=1)
+        self.assertEqual(loc0.str_id, 'test-location--0')
 
         url = '/api/locations'
         response = self.client.get(url)
