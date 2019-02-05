@@ -44,7 +44,8 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk):
         """ComplaintViewSet to get the complaints"""
-        complaint = self.get_complaint(pk)
+        complaint = self.get_complaint(
+            pk, queryset=self.queryset.prefetch_related('subscriptions', 'users_up_voted'))
         serialized = ComplaintSerializer(
             complaint, context={'request': request}).data
 
@@ -56,13 +57,13 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
         return Response(serialized)
 
-    @classmethod
-    def list(cls, request):
+    def list(self, request):
         """Get a list of non-deleted complaints.
         To filter by current user, add a query parameter {?filter}"""
 
         # Get the list of complaints excluding objects marked deleted
-        complaint = Complaints.objects.exclude(status='Deleted')
+        complaint = self.queryset.prefetch_related(
+            'subscriptions', 'users_up_voted').exclude(status='Deleted')
 
         # Check if the user specific filter is present
         if 'filter' in request.GET and request.user.is_authenticated:
@@ -177,9 +178,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             Complaints.objects.get(id=complaint.id)
         ).data, status=200)
 
-    def get_complaint(self, pk):
+    def get_complaint(self, pk, queryset=None):
         """Shortcut for get_object_or_404 with pk"""
-        return get_object_or_404(self.queryset, id=pk)
+        return get_object_or_404(queryset or self.queryset, id=pk)
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects
