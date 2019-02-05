@@ -12,6 +12,7 @@ PIXEL_SPAN_V = 400
 MARKER_SIZE = 54, 54
 SAVE_FOLDER = '%s/map' % (settings.STATIC_ROOT)
 
+# pylint: disable=R0914
 class Command(BaseCommand):
     help = 'Generate thumbnails for all reusable locations'
 
