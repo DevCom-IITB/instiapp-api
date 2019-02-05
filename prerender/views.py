@@ -9,6 +9,7 @@ from events.models import Event
 from events.prioritizer import get_fresh_prioritized_events
 from news.models import NewsEntry
 from bodies.models import Body
+from locations.models import Location
 
 url_mapping = {
     Event: '/event/',
@@ -116,4 +117,33 @@ def body_tree(request, pk):
         'body': body,
         'settings': settings,
     })
+    return HttpResponse(rendered)
+
+def insti_map(request, name=None):
+    """Prerender for map thumbnails."""
+
+    # Filter with str_id
+    locations = Location.objects.filter(str_id=name)
+
+    # Check if we found a location
+    if locations.exists():
+        location = locations[0]
+    else:
+        # Create dummy
+        location = Location()
+        location.id = 'default'
+        location.name = "place"
+        location.str_id = None
+        location.short_name = "Map"
+
+    # (Ugly) Add slash to start of str id to display in URL
+    location.str_id = ('/%s' % location.str_id) if location.str_id else ''
+
+    # Render the response
+    rendered = render_to_string('map.html', {
+        'loc': location,
+        'image_url': '%s%smap/%s.jpg' % (settings.BASE_URL, settings.STATIC_URL, location.id),
+        'settings': settings,
+    })
+
     return HttpResponse(rendered)

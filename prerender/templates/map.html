@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ loc.short_name | safe }} | {{settings.PRERENDER_TITLE}}</title>
+    <meta name="description" content="Locate {{ loc.name | safe }} on InstiMap">
+    <meta property="og:description" content="Locate {{ loc.name | safe }} on InstiMap" />
+
+    <meta property="og:title" content="{{ loc.short_name | safe }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ settings.BASE_URL }}/map{{ loc.str_id }}" />
+    <meta property="og:image" content="{{ image_url }}" />
+    <meta property="og:site_name" content="{{settings.PRERENDER_TITLE}}">
+</head>
+
+<body>
+    <img src="{{ image_url }}" />
+</body>
