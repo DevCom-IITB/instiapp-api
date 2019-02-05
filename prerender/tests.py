@@ -6,6 +6,7 @@ from bodies.models import BodyChildRelation
 from events.models import Event
 from news.models import NewsEntry
 from users.models import UserProfile
+from locations.models import Location
 
 class PrerenderTestCase(APITestCase):
     """Check if prerender is working."""
@@ -113,3 +114,16 @@ class PrerenderTestCase(APITestCase):
         self.assertContains(response, body1.name)
         self.assertContains(response, body2.name)
         self.assertContains(response, body11.name)
+
+    def test_map(self):
+        url = '/map'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        location = Location.objects.create(
+            name='Nice location', short_name='My Big Location')
+        url = '/map/my-big-location'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, location.name)
+        self.assertContains(response, str(location.id) + '.jpg')
