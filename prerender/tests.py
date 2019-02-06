@@ -120,10 +120,13 @@ class PrerenderTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+        nonlocation = Location.objects.create(
+            name='I am great!', short_name='My Big Location', reusable=False)
         location = Location.objects.create(
-            name='Nice location', short_name='My Big Location')
+            name='Nice location', short_name='My Big Location', reusable=True)
         url = '/map/my-big-location'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, location.name)
+        self.assertNotContains(response, nonlocation.name)
         self.assertContains(response, str(location.id) + '.jpg')
