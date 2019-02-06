@@ -7,6 +7,7 @@ from backend.settings_base import *
 SECRET_KEY = 'lu3+xlyjj940k46e!h$wp#_l5^g4eb4zr(*a286=o6!@di8cbg'
 
 BASE_URL = 'http://localhost:8000'
+STATIC_BASE_URL = BASE_URL
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

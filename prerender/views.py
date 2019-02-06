@@ -142,7 +142,7 @@ def insti_map(request, name=None):
     # Render the response
     rendered = render_to_string('map.html', {
         'loc': location,
-        'image_url': '%s%smap/%s.jpg' % (settings.BASE_URL, settings.STATIC_URL, location.id),
+        'image_url': '%s%smap/%s.jpg' % (settings.STATIC_BASE_URL, settings.STATIC_URL, location.id),
         'settings': settings,
     })
 
