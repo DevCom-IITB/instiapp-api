@@ -9,10 +9,10 @@ from rest_framework.response import Response
 from helpers.misc import query_from_num
 from roles.helpers import login_required_ajax
 
-from venter.models import Complaints
-from venter.models import Comment
-from venter.models import ComplaintMedia
-from venter.models import TagUris
+from venter.models import Complaint
+from venter.models import ComplaintComment
+from venter.models import ComplaintImage
+from venter.models import ComplaintTag
 
 from venter.serializers import ComplaintSerializer
 from venter.serializers import TagSerializer
@@ -21,16 +21,16 @@ from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
 
 class TagViewSet(viewsets.ModelViewSet):
-    queryset = TagUris.objects
+    queryset = ComplaintTag.objects
     serializer_class = TagSerializer
 
     @classmethod
     def list(cls, request):
         """TagViewSet for the getting related tags"""
-        queryset = TagUris.objects.all()
+        queryset = ComplaintTag.objects.all()
         if 'tags' in request.GET:
             val = request.query_params.get('tags')
-            queryset = TagUris.objects.filter(tag_uri__icontains=val)
+            queryset = ComplaintTag.objects.filter(tag_uri__icontains=val)
 
         # Serialize and return
         serialized = TagSerializer(
@@ -40,7 +40,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
 
 class ComplaintViewSet(viewsets.ModelViewSet):
-    queryset = Complaints.objects
+    queryset = Complaint.objects
     serializer_class = ComplaintPostSerializer
 
     def retrieve(self, request, pk):
@@ -115,17 +115,17 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
             # Create and save all tags if present
             for tag in tags:
-                if TagUris.objects.filter(tag_uri=tag).exists():
-                    exist_tag = TagUris.objects.get(tag_uri=tag)
+                if ComplaintTag.objects.filter(tag_uri=tag).exists():
+                    exist_tag = ComplaintTag.objects.get(tag_uri=tag)
                     complaint.tags.add(exist_tag.id)
                 else:
-                    tag_name = TagUris(tag_uri=tag)
+                    tag_name = ComplaintTag(tag_uri=tag)
                     tag_name.save()
                     complaint.tags.add(tag_name)
 
             # Create and save all images if present
             for image in images:
-                ComplaintMedia.objects.create(
+                ComplaintImage.objects.create(
                     complaint=complaint, image_url=image
                 )
             # Add the complaint creator to the subscribers list
@@ -135,7 +135,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
         # Return new serialized response
         return Response(ComplaintSerializer(
-            Complaints.objects.get(id=complaint.id)
+            Complaint.objects.get(id=complaint.id)
         ).data, status=201)
 
     @login_required_ajax
@@ -157,7 +157,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             return Response({"message": "Invalid Action"}, status=400)
 
         return Response(ComplaintSerializer(
-            Complaints.objects.get(id=complaint.id)
+            Complaint.objects.get(id=complaint.id)
         ).data, status=200)
 
     @login_required_ajax
@@ -179,7 +179,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             return Response({"message": "Invalid Action"}, status=400)
 
         return Response(ComplaintSerializer(
-            Complaints.objects.get(id=complaint.id)
+            Complaint.objects.get(id=complaint.id)
         ).data, status=200)
 
     def get_complaint(self, pk, queryset=None):
@@ -187,16 +187,16 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         return get_object_or_404(queryset or self.queryset, id=pk)
 
 class CommentViewSet(viewsets.ModelViewSet):
-    queryset = Comment.objects
+    queryset = ComplaintComment.objects
     serializer_class = CommentPostSerializer
 
     @classmethod
     @login_required_ajax
     def create(cls, request, pk):
-        get_complaint = get_object_or_404(Complaints.objects.all(), id=pk)
+        get_complaint = get_object_or_404(Complaint.objects.all(), id=pk)
         get_text = request.data['text']
-        comment = Comment.objects.create(text=get_text, commented_by=request.user.profile,
-                                         complaint=get_complaint)
+        comment = ComplaintComment.objects.create(
+            text=get_text, commented_by=request.user.profile, complaint=get_complaint)
         # Auto subscribes the commenter to the complaint
         if settings.COMPLAINT_AUTO_SUBSCRIBE:
             get_complaint.subscriptions.add(request.user.profile)
@@ -215,7 +215,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
         # Check if the comment is done by current user
         if comment.commented_by == self.request.user.profile:
-            Comment.objects.filter(id=pk).update(text=text)
+            ComplaintComment.objects.filter(id=pk).update(text=text)
             serialized = CommentPostSerializer(self.get_comment(pk), context={'request': request}).data
             return Response(serialized)
 

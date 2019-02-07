@@ -2,13 +2,13 @@
 from rest_framework import serializers
 from users.serializers import UserProfileSerializer
 
-from venter.models import Complaints
-from venter.models import TagUris
-from venter.models import Comment
+from venter.models import Complaint
+from venter.models import ComplaintTag
+from venter.models import ComplaintComment
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TagUris
+        model = ComplaintTag
         fields = (
             'id', 'tag_uri'
         )
@@ -18,7 +18,7 @@ class CommentSerializer(serializers.ModelSerializer):
     complaint = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
-        model = Comment
+        model = ComplaintComment
         fields = ('id', 'time', 'text', 'commented_by', 'complaint')
 
 class ComplaintSerializer(serializers.ModelSerializer):
@@ -29,7 +29,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
     images = serializers.SlugRelatedField(many=True, read_only=True, slug_field='image_url')
 
     class Meta:
-        model = Complaints
+        model = Complaint
         fields = (
             'id', 'created_by', 'description', 'suggestions', 'location_details', 'report_date', 'status', 'latitude',
             'longitude', 'location_description', 'tags', 'comments', 'users_up_voted', 'images'
@@ -37,7 +37,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
 
 class ComplaintPostSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Complaints
+        model = Complaint
         fields = (
             'id', 'description', 'suggestions', 'location_details', 'report_date', 'latitude', 'longitude',
             'location_description'
@@ -49,6 +49,6 @@ class ComplaintPostSerializer(serializers.ModelSerializer):
 
 class CommentPostSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Comment
+        model = ComplaintComment
         fields = (
             'id', 'time', 'text')

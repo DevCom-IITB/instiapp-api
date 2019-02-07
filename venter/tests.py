@@ -4,11 +4,11 @@ from django.contrib.admin.sites import AdminSite
 from rest_framework.test import APITestCase, APIClient
 from login.tests import get_new_user
 from venter.admin import ComplaintModelAdmin
-from venter.models import Complaints
-from venter.models import TagUris
-from venter.models import Comment
-from venter.models import ComplaintMedia
-from venter.models import Authorities
+from venter.models import Complaint
+from venter.models import ComplaintTag
+from venter.models import ComplaintComment
+from venter.models import ComplaintImage
+from venter.models import ComplaintAuthority
 
 # Status variables for complaints
 STATUS_REPORTED = 'Reported'
@@ -28,7 +28,7 @@ class VenterTestCase(APITestCase):
         """Test getting venter complaint lists."""
 
         def create_complaint(user, **kwargs):
-            Complaints.objects.create(created_by=user, **kwargs)
+            Complaint.objects.create(created_by=user, **kwargs)
 
         # Creating 4 dummy complaints, one of which has a "DELETED" status
         create_complaint(self.user.profile)
@@ -54,8 +54,8 @@ class VenterTestCase(APITestCase):
     def test_tags_get(self):
         """ Test all tags or particular tag return."""
 
-        TagUris.objects.create(tag_uri='garbage')
-        TagUris.objects.create(tag_uri='Stray dogs')
+        ComplaintTag.objects.create(tag_uri='garbage')
+        ComplaintTag.objects.create(tag_uri='Stray dogs')
 
         url = '/api/venter/tags'
         response = self.client.get(url)
@@ -71,7 +71,7 @@ class VenterTestCase(APITestCase):
         """ Test all public methods of venter complaint."""
         # Testing complaint POST requests
         base_url = '/api/venter/complaints'
-        TagUris.objects.create(tag_uri='garbage')
+        ComplaintTag.objects.create(tag_uri='garbage')
         data = {
             'description': 'test',
             'tags': ['flexes', 'garbage'],
@@ -202,7 +202,7 @@ class VenterTestCase(APITestCase):
     def test_comment(self):
         """Test all public venter comment APIs."""
         # Dummy complaint, created by 'user'. The creator is already subscribed to the complaint
-        complaint = Complaints.objects.create(created_by=self.user.profile)
+        complaint = Complaint.objects.create(created_by=self.user.profile)
         complaint.subscriptions.add(self.user.profile)
 
         # Creating a new user and profile to make a comment and test auto-subscription of comments
@@ -236,7 +236,7 @@ class VenterTestCase(APITestCase):
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, 204)
 
-        comment = Comment.objects.create(
+        comment = ComplaintComment.objects.create(
             complaint=complaint,
             text='test_comment',
             commented_by=get_new_user().profile
@@ -251,20 +251,20 @@ class VenterTestCase(APITestCase):
     def test_model_venter(self):
         """Run other model tests for venter."""
 
-        complaint = Complaints.objects.create(
+        complaint = Complaint.objects.create(
             created_by=self.user.profile,
             description='test'
         )
 
         self.assertEqual(str(complaint), 'test')
 
-        tag = TagUris.objects.create(
+        tag = ComplaintTag.objects.create(
             tag_uri='test_tag'
         )
 
         self.assertEqual(str(tag), 'test_tag')
 
-        comment = Comment.objects.create(
+        comment = ComplaintComment.objects.create(
             complaint=complaint,
             text='test_comment',
             commented_by=self.user.profile
@@ -272,14 +272,14 @@ class VenterTestCase(APITestCase):
 
         self.assertEqual(str(comment), 'test_comment')
 
-        complaintMedia = ComplaintMedia.objects.create(
+        complaintMedia = ComplaintImage.objects.create(
             complaint=complaint,
             image_url='www.google.com'
         )
 
         self.assertEqual(str(complaintMedia), 'www.google.com')
 
-        authority = Authorities.objects.create(
+        authority = ComplaintAuthority.objects.create(
             name='dummyauth',
             email='dummyauth@example.com'
         )
@@ -288,75 +288,75 @@ class VenterTestCase(APITestCase):
 
         complaint.authorities.add(authority)
 
-        self.assertEqual(len(Complaints.email_list(complaint)), 1)
+        self.assertEqual(len(Complaint.email_list(complaint)), 1)
 
     def test_admin_actions(self):
-        complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
+        complaint_admin = ComplaintModelAdmin(Complaint, AdminSite())
         request = SimpleNamespace()
 
-        Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
-        queryset = Complaints.objects.filter(status=STATUS_REPORTED)
+        Complaint.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
+        queryset = Complaint.objects.filter(status=STATUS_REPORTED)
         complaint_admin.mark_as_resolved(complaint_admin, request, queryset)
-        self.assertEqual(Complaints.objects.get(status=STATUS_RESOLVED).status, STATUS_RESOLVED)
+        self.assertEqual(Complaint.objects.get(status=STATUS_RESOLVED).status, STATUS_RESOLVED)
 
-        Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
-        queryset = Complaints.objects.filter(status=STATUS_REPORTED)
+        Complaint.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
+        queryset = Complaint.objects.filter(status=STATUS_REPORTED)
         complaint_admin.mark_as_in_progress(complaint_admin, request, queryset)
-        self.assertEqual(Complaints.objects.get(status=STATUS_IN_PROGRESS).status, STATUS_IN_PROGRESS)
+        self.assertEqual(Complaint.objects.get(status=STATUS_IN_PROGRESS).status, STATUS_IN_PROGRESS)
 
-        Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
-        queryset = Complaints.objects.filter(status=STATUS_REPORTED)
+        Complaint.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
+        queryset = Complaint.objects.filter(status=STATUS_REPORTED)
         complaint_admin.mark_as_deleted(complaint_admin, request, queryset)
-        self.assertEqual(Complaints.objects.get(status=STATUS_DELETED).status, STATUS_DELETED)
+        self.assertEqual(Complaint.objects.get(status=STATUS_DELETED).status, STATUS_DELETED)
 
     def test_send_mass_mail(self):
-        complaint_admin = ComplaintModelAdmin(Complaints, AdminSite())
+        complaint_admin = ComplaintModelAdmin(Complaint, AdminSite())
         request = SimpleNamespace()
 
         # Adding dummy recipients for emails
-        auth_mail_1 = Authorities.objects.create(email='receiver1@example.com', name='receiver1')
-        auth_mail_2 = Authorities.objects.create(email='receiver2@example.com', name='receiver2')
+        auth_mail_1 = ComplaintAuthority.objects.create(email='receiver1@example.com', name='receiver1')
+        auth_mail_2 = ComplaintAuthority.objects.create(email='receiver2@example.com', name='receiver2')
 
         # Reported Complaint (multiple recipients)
-        complaint_multi = Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED,
-                                                    description='Test Complaint')
+        complaint_multi = Complaint.objects.create(
+            created_by=self.user.profile, status=STATUS_REPORTED, description='Test Complaint')
         complaint_multi.authorities.add(auth_mail_1, auth_mail_2)
 
         # In Progress Complaint with images (single recipient)
-        complaint_single = Complaints.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS)
+        complaint_single = Complaint.objects.create(created_by=self.user.profile, status=STATUS_IN_PROGRESS)
         complaint_single.authorities.add(auth_mail_1)
         image = []
-        image.append(ComplaintMedia.objects.create(image_url='https://www.google.com/', complaint=complaint_single))
+        image.append(ComplaintImage.objects.create(image_url='https://www.google.com/', complaint=complaint_single))
         complaint_single.images.set(image)
 
         # Complaint with no authority
-        Complaints.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
+        Complaint.objects.create(created_by=self.user.profile, status=STATUS_REPORTED)
         authority_list = set(complaint_multi.authorities.values_list('email', flat=True))
 
         # Test if the email shows up in the outbox when method is called
-        queryset = Complaints.objects.filter(status=STATUS_REPORTED)
+        queryset = Complaint.objects.filter(status=STATUS_REPORTED)
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(mail.outbox), 1)
-        queryset = Complaints.objects.filter(status=STATUS_IN_PROGRESS)
+        queryset = Complaint.objects.filter(status=STATUS_IN_PROGRESS)
         complaint_admin.send_emails(complaint_admin, request, queryset)
         self.assertEqual(len(mail.outbox), 2)
 
         # Test for email_sent_to list
-        Complaints.objects.create(created_by=self.user.profile, description='multiple')
-        new_auth3 = Authorities.objects.create(email='auth3@example.com', name='auth3')
-        complaint_multival = Complaints.objects.get(description='multiple')
+        Complaint.objects.create(created_by=self.user.profile, description='multiple')
+        new_auth3 = ComplaintAuthority.objects.create(email='auth3@example.com', name='auth3')
+        complaint_multival = Complaint.objects.get(description='multiple')
         complaint_multival.authorities.add(new_auth3)
-        queryset = Complaints.objects.filter(description='multiple')
+        queryset = Complaint.objects.filter(description='multiple')
         complaint_admin.send_emails(complaint_admin, request, queryset)
-        complaint_multival = Complaints.objects.get(description='multiple')
+        complaint_multival = Complaint.objects.get(description='multiple')
         self.assertEqual(str(complaint_multival.email_sent_to), 'auth3')
 
         # Test for email_sent_to for new authorities added
-        new_auth2 = Authorities.objects.create(email='auth2@example.com', name='auth2')
+        new_auth2 = ComplaintAuthority.objects.create(email='auth2@example.com', name='auth2')
         complaint_multival.authorities.add(new_auth2)
-        queryset = Complaints.objects.filter(description='multiple')
+        queryset = Complaint.objects.filter(description='multiple')
         complaint_admin.send_emails(complaint_admin, request, queryset)
-        complaint_multival = Complaints.objects.get(description='multiple')
+        complaint_multival = Complaint.objects.get(description='multiple')
         self.assertEqual(str(complaint_multival.email_sent_to), 'auth3, auth2')
 
         # Evaluating whether the correct number of recipients are being addressed in the multi recipient complaint

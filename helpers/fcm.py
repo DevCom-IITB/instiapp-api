@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from placements.models import BlogEntry
 from events.models import Event
 from news.models import NewsEntry
-from venter.models import Comment
+from venter.models import ComplaintComment
 from helpers.device import fill_device_firebase
 from other.views import get_notif_queryset
 
@@ -93,8 +93,8 @@ def get_rich_notification(notification):
             notification_large_content = BeautifulSoup(actor.content, features='html5lib').text
             notification_image = get_news_image(actor)
 
-        # Comment
-        if isinstance(actor, Comment):
+        # ComplaintComment
+        if isinstance(actor, ComplaintComment):
             title = actor.complaint.description
             notification_large_content = actor.text
             notification_extra = str(actor.complaint.id)

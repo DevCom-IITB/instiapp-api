@@ -14,7 +14,7 @@ from events.serializers import EventSerializer
 from users.models import UserProfile
 from news.models import NewsEntry
 from placements.models import BlogEntry
-from venter.models import Complaints
+from venter.models import Complaint
 
 from helpers.test_helpers import create_usertag
 from helpers.test_helpers import create_usertagcategory
@@ -222,7 +222,7 @@ class OtherTestCase(APITestCase):
         """Test notifications for complaint subscribers when comments are made"""
         # Creating dummy complaint with one subscriber (the creator)
         test_creator = get_new_user()
-        complaint = Complaints.objects.create(created_by=test_creator.profile)
+        complaint = Complaint.objects.create(created_by=test_creator.profile)
         complaint.subscriptions.add(test_creator.profile)
 
         # Comments url
