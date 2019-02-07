@@ -91,8 +91,6 @@ def get_rich_notification(notification):
         if isinstance(actor, NewsEntry):
             notification_large_icon = actor.body.image_url
             notification_large_content = BeautifulSoup(actor.content, features='html5lib').text
-            if len(notification_large_content) > 250:
-                notification_large_content = notification_large_content[:250] + ' ...'
             notification_image = get_news_image(actor)
 
         # Comment
@@ -109,7 +107,7 @@ def get_rich_notification(notification):
         "id": notification_id,
         "extra": notification_extra,
         "notification_id": str(notification.id),
-        "title": title,
+        "title": truncated(title, 60),
         "verb": notification.verb,
         "total_count": get_notif_queryset(
             notification.recipient.notifications).count()
@@ -119,8 +117,13 @@ def get_rich_notification(notification):
     if notification_large_icon is not None:
         data_message['large_icon'] = notification_large_icon
     if notification_large_content is not None:
-        data_message['large_content'] = notification_large_content
+        data_message['large_content'] = truncated(notification_large_content, 250)
     if notification_image is not None:
         data_message['image_url'] = notification_image
 
     return data_message
+
+def truncated(val, max_len):
+    if val and len(val) > max_len - 4:
+        return val[:max_len] + ' ...'
+    return val
