@@ -98,7 +98,7 @@ def get_rich_notification(notification):
         # Comment
         if isinstance(actor, Comment):
             title = actor.complaint.description
-            notification_extra = actor.complaint.id
+            notification_extra = str(actor.complaint.id)
 
         notification_id = str(actor.id)
 
