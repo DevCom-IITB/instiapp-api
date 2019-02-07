@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Sample Training Blog</title>
+  <link>https://iitb.ac.in/asc</link>
+  <content>Free training sample feed</content>
+  <item>
+    <id>sample:t:1</id>
+    <title>Training Item 1</title>
+    <link>https://localhost/item31</link>
+    <content>New RSS Item 1</content>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:t:2</id>
+    <title>Training Item 2</title>
+    <link>https://localhost/item32</link>
+    <content>New RSS Item 2</content>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:t:3</id>
+    <title>Training Item 3</title>
+    <link>https://localhost/item33</link>
+    <content>New RSS Item 3</content>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:t:4</id>
+    <title>Training Item 4</title>
+    <link>https://localhost/item34</link>
+    <content>New RSS Item 4</content>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:t:5</id>
+    <title>Mentioning Item</title>
+    <link>https://localhost/item35</link>
+    <content>New RSS Item 5 160010005</content>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+</channel>
+
+</rss> 
