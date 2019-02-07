@@ -1,6 +1,8 @@
 """Test server for News Chore"""
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+placement_2 = False
+
 class S(BaseHTTPRequestHandler):
     def _set_headers(self):
         self.send_response(200)
@@ -8,6 +10,8 @@ class S(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        global placement_2  # pylint: disable=global-statement
+
         p = self.path.lower()
 
         # Choose the right feed
@@ -18,6 +22,16 @@ class S(BaseHTTPRequestHandler):
             file = 'sample-feed-2.xml'
         elif 'body3blog' in p:
             file = 'sample-feed-3.xml'
+
+        # PT blogs
+        elif 'placementblog' in p:
+            if not placement_2:
+                file = 'sample-feed-p.xml'
+                placement_2 = True
+            else:
+                file = 'sample-feed-p2.xml'
+        elif 'trainingblog' in p:
+            file = 'sample-feed-t.xml'
 
         # File not found
         if not file:

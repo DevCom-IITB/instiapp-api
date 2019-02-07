@@ -1,6 +1,12 @@
 """Unit tests for Placements."""
+import time
+from subprocess import Popen
+
 from django.conf import settings
+from django.core.management import call_command
+from freezegun import freeze_time
 from rest_framework.test import APITestCase
+from helpers.test_helpers import create_body
 from placements.models import BlogEntry
 from login.tests import get_new_user
 
@@ -39,3 +45,66 @@ class PlacementsTestCase(APITestCase):
     def test_training_get(self):
         """Check auth before getting training blog."""
         test_blog(self, '/api/training-blog', 3)
+
+    @freeze_time('2019-01-02')
+    def test_placements_chore(self):
+        """Test the placement blog chore."""
+
+        # Clear table
+        BlogEntry.objects.all().delete()
+
+        # Create blog bodies
+        placement_body = create_body(name=settings.PLACEMENTS_BLOG_BODY)
+        training_body = create_body(name=settings.TRAINING_BLOG_BODY)
+
+        # Create users to follow blogs
+        second_year = get_new_user()
+        final_year = get_new_user()
+        mentioned_user = get_new_user()
+        second_year.profile.followed_bodies.add(training_body)
+        final_year.profile.followed_bodies.add(placement_body)
+        mentioned_user.profile.roll_no = '160010005'
+        mentioned_user.profile.save()
+
+        # Start mock server
+        mock_server = Popen(['python', 'news/test/test_server.py'])
+        time.sleep(1)
+
+        # Run the placement chore
+        call_command('placement_blog_chore')
+
+        # Check if posts were collected
+        placements = lambda: BlogEntry.objects.all().filter(blog_url=settings.PLACEMENTS_URL)
+        trainings = lambda: BlogEntry.objects.all().filter(blog_url=settings.TRAINING_BLOG_URL)
+        self.assertEqual(placements().count(), 3)
+        self.assertEqual(trainings().count(), 5)
+        self.assertEqual(set(x.guid for x in placements()), set('sample:p:%i' % i for i in range(1, 4)))
+        self.assertEqual(set(x.title for x in placements()), set('Placement Item %i' % i for i in range(1, 4)))
+
+        # Check if following blogs works
+        self.assertEqual(second_year.notifications.count(), 5)
+        self.assertEqual(final_year.notifications.count(), 3)
+
+        # Check if mentioned user got a notification
+        self.assertEqual(mentioned_user.notifications.count(), 1)
+        self.assertEqual(mentioned_user.notifications.first().actor.title, 'Mentioning Item')
+
+        # Update placement blog URL
+        call_command('placement_blog_chore')
+
+        # Check if new placement blog posts are got
+        self.assertEqual(trainings().all().count(), 5)
+        self.assertEqual(placements().all().count(), 4)
+        self.assertEqual(set(x.guid for x in placements()), set('sample:p:%i' % i for i in range(1, 5)))
+        self.assertEqual(set(x.title for x in placements()), set('Placement Item %i' % i for i in range(1, 5)))
+
+        # Check if existing ones are updated
+        self.assertEqual(BlogEntry.objects.get(guid='sample:p:1').content, 'Updated')
+
+        # Check if notification counts are updated
+        self.assertEqual(second_year.notifications.count(), 5)
+        self.assertEqual(final_year.notifications.count(), 4)
+        self.assertEqual(mentioned_user.notifications.count(), 2)
+
+        # Stop server
+        mock_server.terminate()

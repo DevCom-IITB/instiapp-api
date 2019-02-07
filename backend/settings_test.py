@@ -27,3 +27,7 @@ MEDIA_ROOT = './upload/static/upload'
 MEDIA_URL = '/static/upload/'
 
 USER_AVATAR_URL = '/static/upload/useravatar.jpg'
+
+# Placement blog URLs
+PLACEMENTS_URL = 'http://localhost:33000/placementblog'
+TRAINING_BLOG_URL = 'http://localhost:33000/trainingblog'

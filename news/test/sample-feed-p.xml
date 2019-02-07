@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Sample Placement Blog</title>
+  <link>https://iitb.ac.in</link>
+  <description>Free placement sample feed</description>
+  <item>
+    <id>sample:p:1</id>
+    <title>Placement Item 1</title>
+    <link>https://localhost/item1</link>
+    <content>New RSS Item 1</content>
+    <published>2019-01-01T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:p:2</id>
+    <title>Placement Item 2</title>
+    <link>https://localhost/item2</link>
+    <content>New RSS Item 2</content>
+    <published>2018-12-29T12:00:00+00:00</published>
+  </item>
+  <item>
+    <id>sample:p:3</id>
+    <title>Placement Item 3</title>
+    <link>https://localhost/item3</link>
+    <content>New RSS Item 3</content>
+    <published>2018-12-29T12:00:00+00:00</published>
+  </item>
+</channel>
+
+</rss> 
