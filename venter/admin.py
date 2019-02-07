@@ -35,10 +35,12 @@ class ComplaintMediaTabularInline(admin.TabularInline):
 
 class ComplaintMediaModelAdmin(admin.ModelAdmin):
     list_display = ['image_url', 'complaint']
+    raw_id_fields = ('complaint',)
     model = ComplaintMedia
 
 class CommentModelAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'complaint', 'time']
+    list_display = ['text', 'complaint', 'time']
+    readonly_fields = ('commented_by', 'complaint')
     model = Comment
 
 class AuthoritiesModelAdmin(admin.ModelAdmin):
@@ -58,7 +60,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         ComplaintMediaTabularInline,
         UserSubscribedTabularInline
     ]
-    exclude = ('tags', 'users_up_voted', 'media',)
+    exclude = ('tags', 'users_up_voted', 'media', 'subscriptions')
     search_fields = ['status', 'description', 'created_by__name']
     actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']
 

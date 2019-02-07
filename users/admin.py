@@ -8,9 +8,13 @@ class ProfileAdmin(admin.ModelAdmin):
     search_fields = ['name', 'roll_no']
     list_display = ('name', 'roll_no', 'department', 'degree')
     list_filter = ('join_year', 'department', 'degree')
+    raw_id_fields = ('user',)
+
+class WebPushSubscriptionAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user',)
 
 
 admin.site.register(UserProfile, ProfileAdmin)
-admin.site.register(WebPushSubscription)
+admin.site.register(WebPushSubscription, WebPushSubscriptionAdmin)
 admin.site.register(UserTagCategory)
 admin.site.register(UserTag)
