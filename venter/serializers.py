@@ -15,12 +15,11 @@ class TagSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     commented_by = UserProfileSerializer()
+    complaint = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Comment
-        fields = (
-            'id', 'time', 'text', 'commented_by'
-        )
+        fields = ('id', 'time', 'text', 'commented_by', 'complaint')
 
 class ComplaintSerializer(serializers.ModelSerializer):
     created_by = UserProfileSerializer()
