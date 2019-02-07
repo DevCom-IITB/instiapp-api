@@ -2,50 +2,50 @@
 from django.contrib import admin
 from django.core.mail import send_mail
 from django.conf import settings
-from venter.models import Complaints
-from venter.models import Comment
-from venter.models import TagUris
-from venter.models import ComplaintMedia
-from venter.models import Authorities
+from venter.models import Complaint
+from venter.models import ComplaintComment
+from venter.models import ComplaintTag
+from venter.models import ComplaintImage
+from venter.models import ComplaintAuthority
 
-class CommentTabularInline(admin.TabularInline):
-    model = Comment
+class ComplaintCommentTabularInline(admin.TabularInline):
+    model = ComplaintComment
     readonly_fields = ('text', 'time', 'commented_by',)
 
 class TagTabularInline(admin.TabularInline):
-    model = Complaints.tags.through
+    model = Complaint.tags.through
     verbose_name = 'Tag'
     verbose_name_plural = 'Tags'
 
 class UserLikedTabularInline(admin.TabularInline):
-    model = Complaints.users_up_voted.through
+    model = Complaint.users_up_voted.through
     readonly_fields = ('userprofile',)
     verbose_name = 'User up Voted'
     verbose_name_plural = 'Users up voted'
 
 class UserSubscribedTabularInline(admin.TabularInline):
-    model = Complaints.subscriptions.through
+    model = Complaint.subscriptions.through
     readonly_fields = ('userprofile',)
     verbose_name = 'Subscribed User'
     verbose_name_plural = 'Subscribed Users'
 
-class ComplaintMediaTabularInline(admin.TabularInline):
-    model = ComplaintMedia
+class ComplaintImageTabularInline(admin.TabularInline):
+    model = ComplaintImage
     readonly_fields = ('image_url',)
 
-class ComplaintMediaModelAdmin(admin.ModelAdmin):
+class ComplaintImageModelAdmin(admin.ModelAdmin):
     list_display = ['image_url', 'complaint']
     raw_id_fields = ('complaint',)
-    model = ComplaintMedia
+    model = ComplaintImage
 
-class CommentModelAdmin(admin.ModelAdmin):
+class ComplaintCommentModelAdmin(admin.ModelAdmin):
     list_display = ['text', 'complaint', 'time']
     readonly_fields = ('commented_by', 'complaint')
-    model = Comment
+    model = ComplaintComment
 
-class AuthoritiesModelAdmin(admin.ModelAdmin):
+class ComplaintAuthorityModelAdmin(admin.ModelAdmin):
     list_display = ['name', 'email']
-    model = Authorities
+    model = ComplaintAuthority
 
 class ComplaintModelAdmin(admin.ModelAdmin):
     readonly_fields = ['created_by']
@@ -54,10 +54,10 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     list_filter = ['status']
     filter_horizontal = ('authorities',)
     inlines = [
-        CommentTabularInline,
+        ComplaintCommentTabularInline,
         TagTabularInline,
         UserLikedTabularInline,
-        ComplaintMediaTabularInline,
+        ComplaintImageTabularInline,
         UserSubscribedTabularInline
     ]
     exclude = ('tags', 'users_up_voted', 'media', 'subscriptions')
@@ -111,7 +111,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             if not item.authorities.all().exists():
                 continue
 
-            input_list = [i for i in ComplaintMedia.objects.filter(complaint=item.id).values('image_url')]
+            input_list = [i for i in ComplaintImage.objects.filter(complaint=item.id).values('image_url')]
             output_list = [images[key] for images in input_list for key in images]
 
             subject = f'Complaint from {item.created_by} on {item.report_date:%A, %d %b %Y at %I:%M %p}'
@@ -146,11 +146,11 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             item.save()
 
     class Meta:
-        model = Complaints
+        model = Complaint
 
 
-admin.site.register(Complaints, ComplaintModelAdmin)
-admin.site.register(Comment, CommentModelAdmin)
-admin.site.register(TagUris)
-admin.site.register(ComplaintMedia, ComplaintMediaModelAdmin)
-admin.site.register(Authorities, AuthoritiesModelAdmin)
+admin.site.register(Complaint, ComplaintModelAdmin)
+admin.site.register(ComplaintComment, ComplaintCommentModelAdmin)
+admin.site.register(ComplaintTag)
+admin.site.register(ComplaintImage, ComplaintImageModelAdmin)
+admin.site.register(ComplaintAuthority, ComplaintAuthorityModelAdmin)

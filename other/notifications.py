@@ -10,7 +10,7 @@ from news.models import NewsEntry
 from news.serializers import NewsEntrySerializer
 from placements.models import BlogEntry
 from placements.serializers import BlogEntrySerializer
-from venter.models import Comment
+from venter.models import ComplaintComment
 from venter.serializers import CommentSerializer
 
 def notify_new_event(instance, action, **kwargs):  # pylint: disable=W0613
@@ -66,7 +66,7 @@ class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disa
             serializer = NewsEntrySerializer(value)
         elif isinstance(value, BlogEntry):
             serializer = BlogEntrySerializer(value)
-        elif isinstance(value, Comment):
+        elif isinstance(value, ComplaintComment):
             serializer = CommentSerializer(value)
 
         return serializer.data
@@ -88,4 +88,4 @@ class NotificationSerializer(serializers.Serializer):  # pylint: disable=W0223
 post_save.connect(event_saved, sender=Event)
 m2m_changed.connect(notify_new_event, sender=Event.bodies.through)
 post_save.connect(news_saved, sender=NewsEntry)
-post_save.connect(new_comment, sender=Comment)
+post_save.connect(new_comment, sender=ComplaintComment)

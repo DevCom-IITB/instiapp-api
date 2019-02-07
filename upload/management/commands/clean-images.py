@@ -3,7 +3,7 @@ from django.utils import timezone
 from upload.models import UploadedImage
 from events.models import Event
 from bodies.models import Body
-from venter.models import ComplaintMedia
+from venter.models import ComplaintImage
 
 class Command(BaseCommand):
     help = 'Check claims and clean unclaimed images.'
@@ -26,7 +26,7 @@ class Command(BaseCommand):
             queries = [
                 Event.objects.filter(image_url__contains=url),
                 Body.objects.filter(image_url__contains=url),
-                ComplaintMedia.objects.filter(image_url__contains=url)
+                ComplaintImage.objects.filter(image_url__contains=url)
             ]
 
             # Look for claimants

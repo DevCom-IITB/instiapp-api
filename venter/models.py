@@ -9,32 +9,32 @@ STATUS = (
     ('Deleted', 'Deleted'),
 )
 
-class TagUris(models.Model):
+class ComplaintTag(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     tag_uri = models.CharField(max_length=200)
 
     class Meta:
-        verbose_name = 'Tag URI'
-        verbose_name_plural = 'Tag URIs'
+        verbose_name = 'Complaint Tag'
+        verbose_name_plural = 'Complaint Tags'
 
     def __str__(self):
         return self.tag_uri
 
 
-class Authorities(models.Model):
+class ComplaintAuthority(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=30, blank=True, null=True)
     email = models.EmailField(max_length=50, blank=True, null=True, unique=True)
 
     class Meta:
-        verbose_name = 'Authority Email'
-        verbose_name_plural = 'Authority Emails'
+        verbose_name = 'Complaint Authority'
+        verbose_name_plural = 'Complaint Authorities'
 
     def __str__(self):
         return '%s <%s>' % (self.name, self.email)
 
 
-class Complaints(models.Model):
+class Complaint(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     created_by = models.ForeignKey(
         'users.UserProfile', on_delete=models.CASCADE, related_name='created_by')
@@ -46,9 +46,9 @@ class Complaints(models.Model):
     latitude = models.FloatField(max_length=8, blank=True, null=True)
     longitude = models.FloatField(max_length=8, blank=True, null=True)
     location_description = models.TextField(blank=True)
-    tags = models.ManyToManyField(TagUris, related_name='tags', blank=True)
+    tags = models.ManyToManyField(ComplaintTag, related_name='tags', blank=True)
     users_up_voted = models.ManyToManyField('users.UserProfile', related_name='users_up_voted', blank=True)
-    authorities = models.ManyToManyField(Authorities, related_name='complaints', blank=True)
+    authorities = models.ManyToManyField(ComplaintAuthority, related_name='complaints', blank=True)
     subscriptions = models.ManyToManyField('users.UserProfile', related_name='subscriptions', blank=True)
     email_sent_to = models.TextField(blank=True)
 
@@ -64,24 +64,24 @@ class Complaints(models.Model):
     def __str__(self):
         return self.description
 
-class ComplaintMedia(models.Model):
+class ComplaintImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    complaint = models.ForeignKey(Complaints, on_delete=models.CASCADE, related_name='images')
+    complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE, related_name='images')
     image_url = models.URLField()
 
     class Meta:
-        verbose_name = 'Complaint Medium'
-        verbose_name_plural = 'Complaint Media'
+        verbose_name = 'Complaint Image'
+        verbose_name_plural = 'Complaint Images'
 
     def __str__(self):
         return str(self.image_url)
 
-class Comment(models.Model):
+class ComplaintComment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time = models.DateTimeField(auto_now_add=True)
     text = models.TextField()
     commented_by = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE, related_name='commented_by')
-    complaint = models.ForeignKey(Complaints, on_delete=models.CASCADE, related_name='comments')
+    complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE, related_name='comments')
 
     class Meta:
         verbose_name = 'Comment'
