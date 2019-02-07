@@ -26,8 +26,7 @@ def handle_entry(entry, body, url):
     if db_entries.exists():
         db_entry = db_entries[0]
     else:
-        db_entry = BlogEntry.objects.create(guid=guid)
-        db_entry.blog_url = url
+        db_entry = BlogEntry(guid=guid, blog_url=url)
         new_added = True
 
     # Fill the db entry
