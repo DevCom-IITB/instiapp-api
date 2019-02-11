@@ -27,16 +27,15 @@ def fill_blog(url, body):
     for entry in feeds['entries']:
         # Try to get an entry existing
         guid = entry['id']
-        db_entries = NewsEntry.objects.filter(guid=guid)
-        is_new_entry = not db_entries.exists()
+        db_entry = NewsEntry.objects.filter(guid=guid).first()
+        is_new_entry = False
 
         # Reuse if entry exists, create new otherwise
-        if not is_new_entry:
-            db_entry = db_entries[0]
+        if db_entry:
             existing_entries += 1
         else:
-            db_entry = NewsEntry(guid=guid, body=body)
-            db_entry.blog_url = url
+            is_new_entry = True
+            db_entry = NewsEntry(guid=guid, body=body, blog_url=url)
             new_entries += 1
 
         # Fill the db entry
