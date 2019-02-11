@@ -9,7 +9,6 @@ jobs:
         environment:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: test_instiapp
 
       - image: rabbitmq:3.5.4
 
