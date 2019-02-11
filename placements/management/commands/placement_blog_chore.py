@@ -60,7 +60,7 @@ def handle_entry(entry, body, url):
         # Send notifications for mentioned users
         roll_nos = [p for p in profile_fetcher.get_roll() if p and p in db_entry.content]
         if roll_nos:
-            users = User.objects.get(profile__roll_no__in=roll_nos)
+            users = User.objects.filter(profile__roll_no__in=roll_nos)
             notify.send(db_entry, recipient=users, verb="You were mentioned in a blog post")
 
 def fill_blog(url, body_name):
