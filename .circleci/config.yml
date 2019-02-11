@@ -5,10 +5,22 @@ jobs:
     docker:
       - image: circleci/python:3.6.1
 
+      - image: postgres:latest
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+
+      - image: rabbitmq:3.5.4
+
     working_directory: ~/repo
 
     steps:
       - checkout
+
+      - run:
+          name: "Setup custom environment variables"
+          command: |
+            echo 'export DJANGO_SETTINGS_MODULE="backend.settings_test"' >> $BASH_ENV # Redirect MY_ENV_VAR into $BA
 
       # Download and cache dependencies
       - restore_cache:
@@ -35,6 +47,11 @@ jobs:
             . venv/bin/activate
             flake8
             pylint_runner
+
+      - run:
+          name: Run celery worker
+          command: celery -A proj worker -l info
+          background: true
 
       - run:
           name: Run Tests

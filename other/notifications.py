@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.db.models.signals import m2m_changed
 
+import other.tasks as tasks
+
 from events.models import Event
 from events.serializers import EventSerializer
 from news.models import NewsEntry
@@ -22,13 +24,7 @@ def notify_new_event(instance, action, **kwargs):  # pylint: disable=W0613
             return
 
         # Notify all body followers
-        for body in instance.bodies.all():
-            users = User.objects.filter(id__in=body.followers.values('user_id'))
-            notify.send(
-                instance,
-                recipient=users,
-                verb=body.name + " has added a new event"
-            )
+        tasks.notify_new_event.delay(instance.id)
 
 def notify_upd_event(instance):
     """Notify users that a followed event was updated."""
@@ -37,8 +33,7 @@ def notify_upd_event(instance):
         return
 
     # Notify all event followers
-    users = User.objects.filter(id__in=instance.followers.values('user_id'))
-    notify.send(instance, recipient=users, verb=instance.name + " was updated")
+    tasks.notify_upd_event.delay(instance.id)
 
 def event_saved(instance, created, **kwargs):  # pylint: disable=W0613
     """Notify users when an event changes."""
