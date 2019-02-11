@@ -7,7 +7,7 @@ python:
   - 3.6
 
 addons:
-  apt:
+  - apt:
     packages:
       - rabbitmq-server
   - postgresql: "9.6"
