@@ -16,7 +16,7 @@ class FaultTolerantTask(Task):  # pragma: no cover
         connection.close()
 
 
-def shared_task_conditional(**kwargs):
+def shared_task_conditional(**kwargs):  # pragma: no cover
     """Decorator to optionally disable celery tests."""
     def decorator(func):
         if settings.NO_CELERY:
