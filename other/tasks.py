@@ -5,8 +5,6 @@ from notifications.signals import notify
 from events.models import Event
 from helpers.celery_fault import FaultTolerantTask
 
-# pragma: no cover
-
 @shared_task(base=FaultTolerantTask)
 def notify_new_event(pk):
     """Notify users about event creation."""
