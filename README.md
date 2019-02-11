@@ -15,7 +15,7 @@ To setup dependenices, make a new `virtualenv`, activate it and run `pip install
 * `python manage.py migrate` to create a new database.
 * `python manage.py createsuperuser` will let you create a new user to use the admin panel for testing.
 * `python manage.py runserver` to start a local server.
-* `python manage.py test --settings backend.settings_test` to run automated tests.
+* `python manage.py test --settings backend.settings_test` to run automated tests. To run notification tests, you need to have a local RabbitMQ server and `celery -A backend worker --pool=solo -l info` running in the background, with `DJANGO_SETTINGS_MODULE` set to `backend.settings_test`. The default database backend to run tests is postgres (same as production), but you may use an in-memory backend by removing the `DATABASES` key from `backend.settings_test`.
 * `flake8` to lint with `flake8`.
 * `pylint_runner` to check for code style and other errors statically with `pylint` in all files.
 

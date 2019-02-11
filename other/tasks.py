@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from notifications.models import Notification
 from notifications.signals import notify
@@ -12,9 +13,17 @@ from helpers.fcm import send_notification_fcm
 from helpers.fcm import get_rich_notification
 from helpers.webpush import send_notification_webpush
 
+def setUp():
+    """Do initial setup for each async task"""
+    # Clear ContentType caching during development and testing.
+    if settings.DEBUG:
+        ContentType.objects.clear_cache()
+
+
 @shared_task(base=FaultTolerantTask)
 def notify_new_event(pk):
     """Notify users about event creation."""
+    setUp()
     instance = Event.objects.filter(id=pk).first()
     if not instance:
         return
@@ -30,6 +39,7 @@ def notify_new_event(pk):
 @shared_task(base=FaultTolerantTask)
 def notify_upd_event(pk):
     """Notify users about event updation."""
+    setUp()
     instance = Event.objects.filter(id=pk).first()
     if not instance:
         return
@@ -40,6 +50,7 @@ def notify_upd_event(pk):
 @shared_task(base=FaultTolerantTask)
 def push_notify(pk):
     """Push notify a notification."""
+    setUp()
     notification = Notification.objects.filter(id=pk).first()
 
     # Check invalid subscriptions
