@@ -123,13 +123,10 @@ def insti_map(request, name=None):
     """Prerender for map thumbnails."""
 
     # Filter with str_id
-    locations = Location.objects.filter(reusable=True, str_id=name)
+    location = Location.objects.filter(reusable=True, str_id=name).first()
 
-    # Check if we found a location
-    if name and locations.exists():
-        location = locations[0]
-    else:
-        # Create dummy
+    # Create dummy if we found nothing
+    if not location:
         location = Location()
         location.id = 'default'
         location.name = "place"
