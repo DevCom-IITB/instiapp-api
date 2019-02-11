@@ -61,10 +61,13 @@ class PlacementsTestCase(APITestCase):
         second_year = get_new_user()
         final_year = get_new_user()
         mentioned_user = get_new_user()
+        mentioned_dual = get_new_user()
         second_year.profile.followed_bodies.add(training_body)
         final_year.profile.followed_bodies.add(placement_body)
         mentioned_user.profile.roll_no = '160010005'
         mentioned_user.profile.save()
+        mentioned_dual.profile.roll_no = '150040010'
+        mentioned_dual.profile.save()
 
         # Start mock server
         mock_server = Popen(['python', 'news/test/test_server.py'])
@@ -85,9 +88,11 @@ class PlacementsTestCase(APITestCase):
         self.assertEqual(second_year.notifications.count(), 5)
         self.assertEqual(final_year.notifications.count(), 3)
 
-        # Check if mentioned user got a notification
+        # Check if mentioned users got a notification
         self.assertEqual(mentioned_user.notifications.count(), 1)
         self.assertEqual(mentioned_user.notifications.first().actor.title, 'Mentioning Item')
+        self.assertEqual(mentioned_dual.notifications.count(), 1)
+        self.assertEqual(mentioned_dual.notifications.first().actor.title, 'Placement Item 1')
 
         # Update placement blog URL
         call_command('placement_blog_chore')
@@ -105,6 +110,7 @@ class PlacementsTestCase(APITestCase):
         self.assertEqual(second_year.notifications.count(), 5)
         self.assertEqual(final_year.notifications.count(), 4)
         self.assertEqual(mentioned_user.notifications.count(), 2)
+        self.assertEqual(mentioned_dual.notifications.count(), 2)
 
         # Stop server
         mock_server.terminate()
