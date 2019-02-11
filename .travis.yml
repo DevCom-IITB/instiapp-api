@@ -19,6 +19,7 @@ install:
   - pip install codecov
 
 script:
+  - celery -A backend worker -l info &
   - coverage run --source ./ manage.py test -v2
   - codecov
 
