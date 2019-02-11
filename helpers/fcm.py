@@ -77,10 +77,9 @@ def get_rich_notification(notification):
         # Event
         if isinstance(actor, Event):
             title = actor.name
-            # Rich notifications
-            bodies = actor.bodies.all()
-            if bodies.exists():
-                notification_large_icon = bodies.first().image_url
+            body = actor.bodies.first()
+            if body:
+                notification_large_icon = body.image_url
 
         # News/Blog Entry
         if isinstance(actor, (BlogEntry, NewsEntry)):

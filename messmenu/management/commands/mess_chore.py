@@ -8,11 +8,9 @@ from messmenu.models import Hostel
 def update_day(sheet, day, hostel):
     """Update one day's menu."""
     # Check if object exists or create one
-    menu = MenuEntry.objects.filter(hostel=hostel, day=day)
-    if not menu.exists():
+    menu = MenuEntry.objects.filter(hostel=hostel, day=day).first()
+    if not menu:
         menu = MenuEntry.objects.create(hostel=hostel, day=day)
-    else:
-        menu = menu[0]
 
     # Fill in the mess!
     menu.breakfast = sheet[1][day]
