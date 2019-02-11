@@ -1,16 +1,13 @@
 # Run tests with Travis CI
 
 language: python
-dist: xenial
+dist: trusty
 
 python:
   - 3.6
 
 addons:
-  - apt:
-    packages:
-      - rabbitmq-server
-  - postgresql: "9.6"
+  - postgresql: "10.6"
 
 services:
   - postgresql
