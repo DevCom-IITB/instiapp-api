@@ -30,13 +30,11 @@ def handle_entry(entry, body, url):
 
     # Try to get an entry existing
     guid = entry['id']
-    db_entries = BlogEntry.objects.filter(guid=guid)
+    db_entry = BlogEntry.objects.filter(guid=guid).first()
     new_added = False
 
     # Reuse if entry exists, create new otherwise
-    if db_entries.exists():
-        db_entry = db_entries[0]
-    else:
+    if not db_entry:
         db_entry = BlogEntry(guid=guid, blog_url=url)
         new_added = True
 
@@ -67,10 +65,7 @@ def handle_entry(entry, body, url):
 
 def fill_blog(url, body_name):
     # Get the body
-    body = None
-    bodies = Body.objects.filter(name=body_name)
-    if bodies.exists():
-        body = bodies.first()
+    body = Body.objects.filter(name=body_name).first()
 
     # Get the feed
     response = requests.get(url, auth=HTTPBasicAuth(
