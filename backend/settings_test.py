@@ -2,6 +2,7 @@
 
 # pylint: disable=W0401, W0614
 from backend.settings_base import *
+import psycopg2
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'lu3+xlyjj940k46e!h$wp#_l5^g4eb4zr(*a286=o6!@di8cbg'
@@ -17,7 +18,7 @@ ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'test_instiapp',
         'USER': 'postgres',
         'PASSWORD': 'password',
