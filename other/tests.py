@@ -103,7 +103,7 @@ class OtherTestCase(TransactionTestCase):
         event4.bodies.add(body2)
         event5.bodies.add(body1)
 
-        time.sleep(3)  # Wait for Celery
+        time.sleep(2)  # Wait for Celery
 
         # Get notifications
         url = '/api/notifications'
@@ -133,7 +133,7 @@ class OtherTestCase(TransactionTestCase):
         self.assertEqual(e2notif().unread, False)
         self.assertEqual(e2notif().deleted, True)
 
-        time.sleep(3)  # Wait for Celery
+        time.sleep(2)  # Wait for Celery
 
         # Check if notifications are correct remaining two
         response = self.client.get(url)
@@ -152,7 +152,7 @@ class OtherTestCase(TransactionTestCase):
         event4.name = 'UpdatedEvent4'
         event4.save()
 
-        time.sleep(3)  # Wait for Celery
+        time.sleep(2)  # Wait for Celery
 
         # Check if notification is added for event 4
         response = self.client.get(url)
@@ -184,7 +184,7 @@ class OtherTestCase(TransactionTestCase):
         event4.name = 'AUpdatedEvent4'
         event4.save()
 
-        time.sleep(3)  # Wait for Celery
+        time.sleep(2)  # Wait for Celery
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)

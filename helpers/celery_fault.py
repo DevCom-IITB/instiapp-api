@@ -3,7 +3,7 @@ import celery
 
 # pylint: disable=W0223
 
-class FaultTolerantTask(celery.Task):
+class FaultTolerantTask(celery.Task):  # pragma: no cover
     """ Implements after return hook to close the invalid connection.
     This way, django is forced to serve a new connection for the next
     task.
