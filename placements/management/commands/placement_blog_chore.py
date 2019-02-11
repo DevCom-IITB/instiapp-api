@@ -4,6 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from dateutil.parser import parse
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from notifications.signals import notify
 from users.models import UserProfile
@@ -11,8 +12,18 @@ from bodies.models import Body
 from placements.models import BlogEntry
 from helpers.misc import table_to_markdown
 
-# Prefetch objects
-PROFILES = UserProfile.objects.all()
+class ProfileFetcher():
+    """Helper to get dictionary of profiles efficiently."""
+    def __init__(self):
+        self.profiles = None
+
+    def get(self):
+        if not self.profiles:
+            self.profiles = UserProfile.objects.values('roll_no')
+        return self.profiles
+
+
+profile_fetcher = ProfileFetcher()
 
 def handle_entry(entry, body, url):
     """Handle a single entry from a feed."""
@@ -49,9 +60,13 @@ def handle_entry(entry, body, url):
                 notify.send(db_entry, recipient=follower.user, verb="New post on " + body.name)
 
         # Send notifications for mentioned users
-        for profile in PROFILES:
-            if profile.roll_no and profile.roll_no in db_entry.content and profile.user:
-                notify.send(db_entry, recipient=profile.user, verb="You were mentioned in a blog post")
+        profiles = [p for p in profile_fetcher.get() if p['roll_no'] and p['roll_no'] in db_entry.content]
+        for profile in profiles:
+            try:
+                user = User.objects.get(profile__roll_no=profile['roll_no'])
+                notify.send(db_entry, recipient=user, verb="You were mentioned in a blog post")
+            except User.DoesNotExist:
+                pass
 
 def fill_blog(url, body_name):
     # Get the body
