@@ -1,7 +1,6 @@
 """Settings for test environment."""
 
 # pylint: disable=W0401, W0614
-import os
 from backend.settings_base import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -23,7 +22,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': 'password',
         'HOST': 'localhost',
-        'PORT': os.environ['PGPORT'],
+        'PORT': '5432',
         'TEST': {
             'NAME': 'test_instiapp',
         },
