@@ -1,6 +1,7 @@
 """Notifications Signals."""
 from notifications.signals import notify
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.db.models.signals import m2m_changed
 
@@ -47,8 +48,8 @@ def event_saved(instance, created, **kwargs):  # pylint: disable=W0613
 def news_saved(instance, created, **kwargs):  # pylint: disable=W0613
     """Notify users when a followed body adds new news."""
     if created and instance.body and instance.notify:
-        for profile in instance.body.followers.all():
-            notify.send(instance, recipient=profile.user, verb=instance.body.name + " added a new news article")
+        users = User.objects.filter(id__in=instance.body.followers.values('user_id'))
+        notify.send(instance, recipient=users, verb=instance.body.name + " added a new news article")
 
 def new_comment(instance, created, **kwargs):  # pylint: disable=W0613
     """Notify users when a followed complaint gets a new comment."""
