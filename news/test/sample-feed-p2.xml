@@ -9,13 +9,13 @@
     <id>sample:p:4</id>
     <title>Placement Item 4</title>
     <link>https://localhost/item4</link>
-    <content>New RSS Item 4 160010005</content>
+    <content>New RSS Item 4 160010005 150040010</content>
     <published>2019-01-02T12:00:00+00:00</published>
   </item>
   <item>
     <id>sample:p:1</id>
     <title>Placement Item 1</title>
-    <link>https://localhost/item1</link>
+    <link>https://localhost/item1 150040010</link>
     <content>Updated</content>
     <published>2019-01-01T12:00:00+00:00</published>
   </item>

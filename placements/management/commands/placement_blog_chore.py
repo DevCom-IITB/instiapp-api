@@ -4,6 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from dateutil.parser import parse
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from notifications.signals import notify
 from users.models import UserProfile
@@ -11,21 +12,29 @@ from bodies.models import Body
 from placements.models import BlogEntry
 from helpers.misc import table_to_markdown
 
-# Prefetch objects
-PROFILES = UserProfile.objects.all()
+class ProfileFetcher():
+    """Helper to get dictionary of profiles efficiently."""
+    def __init__(self):
+        self.roll_nos = None
+
+    def get_roll(self):
+        if not self.roll_nos:
+            self.roll_nos = UserProfile.objects.values_list('roll_no', flat=True)
+        return self.roll_nos
+
+
+profile_fetcher = ProfileFetcher()
 
 def handle_entry(entry, body, url):
     """Handle a single entry from a feed."""
 
     # Try to get an entry existing
     guid = entry['id']
-    db_entries = BlogEntry.objects.filter(guid=guid)
+    db_entry = BlogEntry.objects.filter(guid=guid).first()
     new_added = False
 
     # Reuse if entry exists, create new otherwise
-    if db_entries.exists():
-        db_entry = db_entries[0]
-    else:
+    if not db_entry:
         db_entry = BlogEntry(guid=guid, blog_url=url)
         new_added = True
 
@@ -45,20 +54,18 @@ def handle_entry(entry, body, url):
     if new_added and db_entry.content:
         # Send notifications to followers
         if body is not None:
-            for follower in body.followers.all():
-                notify.send(db_entry, recipient=follower.user, verb="New post on " + body.name)
+            users = User.objects.filter(id__in=body.followers.values('user_id'))
+            notify.send(db_entry, recipient=users, verb="New post on " + body.name)
 
         # Send notifications for mentioned users
-        for profile in PROFILES:
-            if profile.roll_no and profile.roll_no in db_entry.content and profile.user:
-                notify.send(db_entry, recipient=profile.user, verb="You were mentioned in a blog post")
+        roll_nos = [p for p in profile_fetcher.get_roll() if p and p in db_entry.content]
+        if roll_nos:
+            users = User.objects.filter(profile__roll_no__in=roll_nos)
+            notify.send(db_entry, recipient=users, verb="You were mentioned in a blog post")
 
 def fill_blog(url, body_name):
     # Get the body
-    body = None
-    bodies = Body.objects.filter(name=body_name)
-    if bodies.exists():
-        body = bodies.first()
+    body = Body.objects.filter(name=body_name).first()
 
     # Get the feed
     response = requests.get(url, auth=HTTPBasicAuth(
