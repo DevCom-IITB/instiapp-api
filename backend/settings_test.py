@@ -15,20 +15,21 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_instiapp',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': os.environ.get('PGPORT', '5432'),
-        'TEST': {
+# Use postgres for tests if celery is not disabled
+if not NO_CELERY:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'test_instiapp',
-        },
+            'USER': 'postgres',
+            'PASSWORD': 'password',
+            'HOST': 'localhost',
+            'PORT': os.environ.get('PGPORT', '5432'),
+            'TEST': {
+                'NAME': 'test_instiapp',
+            },
+        }
     }
-}
 
 SSO_TOKEN_URL = 'http://localhost:33000/CODE_TOKEN/'
 SSO_PROFILE_URL = 'http://localhost:33000/PROFILE/'

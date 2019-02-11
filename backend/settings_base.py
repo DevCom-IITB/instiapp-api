@@ -158,6 +158,9 @@ SSO_BAD_CERT = False
 USER_PROFILE_SERIALIZER_TRANSFORM = lambda x: x
 USER_PROFILE_FULL_SERIALIZER_TRANSFORM = lambda x: x
 
+# Set this to False to actually use Celery
+NO_CELERY = os.environ.get('NO_CELERY') != 'false'
+
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 COMPLAINT_AUTO_SUBSCRIBE = True
