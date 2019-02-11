@@ -33,7 +33,7 @@ install:
 
 script:
   - celery -A backend worker -l info &
-  - python run ./ manage.py test -v2
+  - python manage.py test -v2
 
 cache:
   directories:
