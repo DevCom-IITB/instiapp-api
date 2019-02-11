@@ -34,6 +34,8 @@ jobs:
           name: Install Dependencies
           command: |
             python3 -m venv venv
+            pip install coverage
+            pip install codecov
             . venv/bin/activate
             pip install -r requirements.txt
 
@@ -53,7 +55,8 @@ jobs:
           name: Run Tests
           command: |
             . venv/bin/activate
-            python manage.py test --settings backend.settings_test -v2
+            coverage run manage.py test --settings backend.settings_test -v2
+            codecov
 
       - run:
           name: Lint
