@@ -15,7 +15,7 @@ from events.prioritizer import get_prioritized
 from users.models import UserProfile
 from users.models import UserTagCategory
 from users.serializers import UserProfileSerializer
-from other.notifications import NotificationSerializer
+from other.serializers import NotificationSerializer
 from other.serializers import UserTagCategorySerializer
 from helpers.misc import query_search
 
