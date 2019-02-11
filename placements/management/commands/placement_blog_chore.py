@@ -56,8 +56,8 @@ def handle_entry(entry, body, url):
     if new_added and db_entry.content:
         # Send notifications to followers
         if body is not None:
-            for follower in body.followers.all():
-                notify.send(db_entry, recipient=follower.user, verb="New post on " + body.name)
+            users = User.objects.filter(id__in=body.followers.values('user__id'))
+            notify.send(db_entry, recipient=users, verb="New post on " + body.name)
 
         # Send notifications for mentioned users
         profiles = [p for p in profile_fetcher.get() if p['roll_no'] and p['roll_no'] in db_entry.content]
