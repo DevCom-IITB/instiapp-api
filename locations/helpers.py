@@ -12,12 +12,9 @@ def create_unreusable_locations(loc_list):
 
     # Reuse venues, add new otherwise
     for loc_name in loc_list:
-        locs = Location.objects.filter(Q(name=loc_name) | Q(short_name=loc_name))
-        if not locs.exists():
-            new_loc = Location.objects.create(name=loc_name, short_name=loc_name)
-            new_loc.save()
-            loc_ids.append(str(new_loc.id))
-        else:
-            loc_ids.append(str(locs[0].id))
+        loc = Location.objects.filter(Q(name=loc_name) | Q(short_name=loc_name)).first()
+        if not loc:
+            loc = Location.objects.create(name=loc_name, short_name=loc_name)
+        loc_ids.append(str(loc.id))
 
     return loc_ids
