@@ -21,7 +21,6 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'test_instiapp',
         'USER': 'postgres',
-        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': os.environ['PGPORT'],
         'TEST': {
