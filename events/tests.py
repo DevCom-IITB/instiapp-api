@@ -11,6 +11,8 @@ from helpers.test_helpers import create_event
 from helpers.test_helpers import create_usertag
 from helpers.test_helpers import create_usertagcategory
 
+# pylint: disable=R0902
+
 class EventTestCase(TransactionTestCase):
     """Check if we can create bodies and link events."""
 
