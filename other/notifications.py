@@ -22,13 +22,13 @@ def notify_new_event(instance, action, **kwargs):  # pylint: disable=W0613
             return
 
         # Notify all body followers
-        for body in instance.bodies.prefetch_related('followers').all():
-            for profile in body.followers.all():
-                notify.send(
-                    instance,
-                    recipient=profile.user,
-                    verb=body.name + " has added a new event"
-                )
+        for body in instance.bodies.all():
+            users = User.objects.filter(id__in=body.followers.values('user_id'))
+            notify.send(
+                instance,
+                recipient=users,
+                verb=body.name + " has added a new event"
+            )
 
 def notify_upd_event(instance):
     """Notify users that a followed event was updated."""
@@ -37,8 +37,8 @@ def notify_upd_event(instance):
         return
 
     # Notify all event followers
-    for profile in instance.followers.all():
-        notify.send(instance, recipient=profile.user, verb=instance.name + " was updated")
+    users = User.objects.filter(id__in=instance.followers.values('user_id'))
+    notify.send(instance, recipient=users, verb=instance.name + " was updated")
 
 def event_saved(instance, created, **kwargs):  # pylint: disable=W0613
     """Notify users when an event changes."""
