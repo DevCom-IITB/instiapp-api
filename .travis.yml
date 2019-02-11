@@ -23,6 +23,7 @@ services:
 before_install:
   - export DJANGO_SETTINGS_MODULE=backend.settings_test
   - export PIP_USE_MIRRORS=true
+  - psql -c "ALTER USER CURRENT_USER WITH PASSWORD 'password'" -U postgres;
 
 install:
   - pip install -r requirements.txt
