@@ -15,12 +15,12 @@ from helpers.misc import table_to_markdown
 class ProfileFetcher():
     """Helper to get dictionary of profiles efficiently."""
     def __init__(self):
-        self.profiles = None
+        self.roll_nos = None
 
-    def get(self):
-        if not self.profiles:
-            self.profiles = UserProfile.objects.values('roll_no')
-        return self.profiles
+    def get_roll(self):
+        if not self.roll_nos:
+            self.roll_nos = UserProfile.objects.values_list('roll_no', flat=True)
+        return self.roll_nos
 
 
 profile_fetcher = ProfileFetcher()
@@ -60,13 +60,10 @@ def handle_entry(entry, body, url):
             notify.send(db_entry, recipient=users, verb="New post on " + body.name)
 
         # Send notifications for mentioned users
-        profiles = [p for p in profile_fetcher.get() if p['roll_no'] and p['roll_no'] in db_entry.content]
-        for profile in profiles:
-            try:
-                user = User.objects.get(profile__roll_no=profile['roll_no'])
-                notify.send(db_entry, recipient=user, verb="You were mentioned in a blog post")
-            except User.DoesNotExist:
-                pass
+        roll_nos = [p for p in profile_fetcher.get_roll() if p and p in db_entry.content]
+        if roll_nos:
+            users = User.objects.get(profile__roll_no__in=roll_nos)
+            notify.send(db_entry, recipient=users, verb="You were mentioned in a blog post")
 
 def fill_blog(url, body_name):
     # Get the body
