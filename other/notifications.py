@@ -55,8 +55,9 @@ def new_comment(instance, created, **kwargs):  # pylint: disable=W0613
     """Notify users when a followed complaint gets a new comment."""
     if created:
         # Preventing the user who commented from being notified about their own comment
-        for profile in instance.complaint.subscriptions.all().exclude(id=instance.commented_by.id):
-            notify.send(instance, recipient=profile.user, verb="New comment on a complaint you're following")
+        profiles = instance.complaint.subscriptions.exclude(id=instance.commented_by.id)
+        users = User.objects.filter(id__in=profiles.values('user_id'))
+        notify.send(instance, recipient=users, verb="New comment on a complaint you're following")
 
 class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disable=W0223
     """Serializer for actor/target of notifications."""
