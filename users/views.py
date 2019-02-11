@@ -75,23 +75,22 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         status = int(status)
 
         # Try to get existing UES
-        ues = UserEventStatus.objects.filter(event__id=event_pk, user=request.user.profile)
+        ues = UserEventStatus.objects.filter(event__id=event_pk, user=request.user.profile).first()
 
         # Delete record if unknown status
         if status not in (1, 2):
-            if ues.exists():
+            if ues:
                 ues.delete()
             return Response(status=204)
 
         # Create new UserEventStatus if not existing
-        if not ues.exists():
+        if not ues:
             get_event = get_object_or_404(Event.objects.all(), pk=event_pk)
             UserEventStatus.objects.create(
                 event=get_event, user=request.user.profile, status=status)
             return Response(status=204)
 
         # Update existing UserEventStatus
-        ues = ues[0]
         ues.status = status
         ues.save()
         return Response(status=204)
@@ -108,17 +107,16 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return Response({"message": "reaction is required"}, status=400)
 
         # Get existing record if it exists
-        unr = UserNewsReaction.objects.filter(news__id=news_pk, user=request.user.profile)
+        unr = UserNewsReaction.objects.filter(news__id=news_pk, user=request.user.profile).first()
 
         # Create new UserNewsReaction if not existing
-        if not unr.exists():
+        if not unr:
             get_news = get_object_or_404(NewsEntry.objects.all(), pk=news_pk)
             UserNewsReaction.objects.create(
                 news=get_news, user=request.user.profile, reaction=reaction)
             return Response(status=204)
 
         # Update existing UserNewsReaction
-        unr = unr[0]
         unr.reaction = reaction
         unr.save()
         return Response(status=204)
