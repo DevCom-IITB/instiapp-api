@@ -41,11 +41,7 @@ class Command(BaseCommand):
             }
 
             # Notify all followers
-            for profile in event.followers.prefetch_related('user').all():
-                # Check bad users
-                if not profile or not profile.user:
-                    continue
-
+            for profile in event.followers.all():
                 # Send FCM push notification
                 for device in profile.devices.all():
                     count += send_notification_fcm(push_service, device, data_message)
