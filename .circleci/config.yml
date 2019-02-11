@@ -43,7 +43,9 @@ jobs:
 
       - run:
           name: Run celery worker
-          command: celery -A proj worker -l info
+          command: |
+            . venv/bin/activate
+            celery -A proj worker -l info
           background: true
 
       - run:
