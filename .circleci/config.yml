@@ -20,7 +20,8 @@ jobs:
       - run:
           name: "Setup custom environment variables"
           command: |
-            echo 'export DJANGO_SETTINGS_MODULE="backend.settings_test"' >> $BASH_ENV # Redirect MY_ENV_VAR into $BA
+            echo 'export DJANGO_SETTINGS_MODULE="backend.settings_test"' >> $BASH_ENV
+            echo 'export PGPORT=5432' >> $BASH_ENV
 
       # Download and cache dependencies
       - restore_cache:
