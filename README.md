@@ -15,11 +15,19 @@ To setup dependenices, make a new `virtualenv`, activate it and run `pip install
 * `python manage.py migrate` to create a new database.
 * `python manage.py createsuperuser` will let you create a new user to use the admin panel for testing.
 * `python manage.py runserver` to start a local server.
-* `python manage.py test --settings backend.settings_test` to run automated tests. To run notification tests, you need to have a local RabbitMQ server and `celery -A backend worker --pool=solo -l info` running in the background, with `DJANGO_SETTINGS_MODULE` set to `backend.settings_test`. The default database backend to run tests is postgres (same as production), but you may use an in-memory backend by removing the `DATABASES` key from `backend.settings_test`.
 * `flake8` to lint with `flake8`.
 * `pylint_runner` to check for code style and other errors statically with `pylint` in all files.
 
 It is recommended to set up your IDE with both `pylint` and `flake8`, since these will cause the CircleCI build to fail. Google's [Python Style Guide](https://google.github.io/styleguide/pyguide.html) is followed upto a certain extent in all modules.
+
+## Running Tests
+Tests can be run in two configurations:
+### Without Celery
+This is the recommended and default configuration, and should suffice for all developmental purposes except if you are working with async tasks or notifications. Simply use `python manage.py test --settings backend.settings_test` to run automated tests.
+### With Celery
+This is the default configuration for CircleCI builds. To test under this configuration, start a local PostgresQL and RabbitMQ server, and an instance of celery in background with `celery -A backend worker --pool=solo -l info`. Once celery is processing background tasks, you can run tests as `python manage.py test --settings backend.settings_test --keepdb`, ensuring that the database `test_instiapp` is created in postgres beforehand. The following environment variables must be set:
+* `DJANGO_SETTINGS_MODULE` to `backend.settings_test`
+* `NO_CELERY` to `false`
 
 ## Documentation
 Static OpenAPI specification can be found at the [project page](https://wncc.github.io/IITBapp/), at [Apiary](https://instiapp.docs.apiary.io/) or at `http://server/api/docs/`

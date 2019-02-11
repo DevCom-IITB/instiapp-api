@@ -4,6 +4,7 @@ import time
 import xml.etree.ElementTree as ET
 
 from rest_framework.test import APIClient
+from django.conf import settings
 from django.test import TransactionTestCase
 from django.utils import timezone
 from notifications.signals import notify
@@ -21,6 +22,11 @@ from helpers.test_helpers import create_usertag
 from helpers.test_helpers import create_usertagcategory
 from helpers.test_helpers import create_event
 from helpers.test_helpers import create_body
+
+def celery_delay(delay=2):
+    """Wait for Celery."""
+    if not settings.NO_CELERY:
+        time.sleep(delay)
 
 class OtherTestCase(TransactionTestCase):
     """Test other endpoints."""
@@ -103,7 +109,7 @@ class OtherTestCase(TransactionTestCase):
         event4.bodies.add(body2)
         event5.bodies.add(body1)
 
-        time.sleep(2)  # Wait for Celery
+        celery_delay()
 
         # Get notifications
         url = '/api/notifications'
@@ -133,7 +139,7 @@ class OtherTestCase(TransactionTestCase):
         self.assertEqual(e2notif().unread, False)
         self.assertEqual(e2notif().deleted, True)
 
-        time.sleep(2)  # Wait for Celery
+        celery_delay()
 
         # Check if notifications are correct remaining two
         response = self.client.get(url)
@@ -152,7 +158,7 @@ class OtherTestCase(TransactionTestCase):
         event4.name = 'UpdatedEvent4'
         event4.save()
 
-        time.sleep(2)  # Wait for Celery
+        celery_delay()
 
         # Check if notification is added for event 4
         response = self.client.get(url)
@@ -184,7 +190,7 @@ class OtherTestCase(TransactionTestCase):
         event4.name = 'AUpdatedEvent4'
         event4.save()
 
-        time.sleep(2)  # Wait for Celery
+        celery_delay()
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)
