@@ -1,9 +1,10 @@
 """Unit tests for news feed."""
-from datetime import timedelta
-import xml.etree.ElementTree as ET
-from freezegun import freeze_time
+import time
 
-from rest_framework.test import APITestCase, APIClient
+import xml.etree.ElementTree as ET
+
+from rest_framework.test import APIClient
+from django.test import TransactionTestCase
 from django.utils import timezone
 from notifications.signals import notify
 from notifications.models import Notification
@@ -21,7 +22,7 @@ from helpers.test_helpers import create_usertagcategory
 from helpers.test_helpers import create_event
 from helpers.test_helpers import create_body
 
-class OtherTestCase(APITestCase):
+class OtherTestCase(TransactionTestCase):
     """Test other endpoints."""
 
     def setUp(self):
@@ -78,6 +79,7 @@ class OtherTestCase(APITestCase):
         """Test notifications API."""
         # Fake authenticate
         profile = self.profile
+        profile.user.notifications.all().delete()
 
         # Add two bodies, with the user following #1
         body1 = create_body()
@@ -94,17 +96,14 @@ class OtherTestCase(APITestCase):
         event5.notify = False
         event5.save()
 
-        # Notifications older than a week shouldn't show up
-        with freeze_time(timezone.now() - timedelta(days=10)):
-            event6 = create_event()
-            event6.bodies.add(body1)
-
         # Add bodies to all events
         event1.bodies.add(body1)
         event2.bodies.add(body1)
         event3.bodies.add(body1)
         event4.bodies.add(body2)
         event5.bodies.add(body1)
+
+        time.sleep(2)  # Wait for Celery
 
         # Get notifications
         url = '/api/notifications'
@@ -134,6 +133,8 @@ class OtherTestCase(APITestCase):
         self.assertEqual(e2notif().unread, False)
         self.assertEqual(e2notif().deleted, True)
 
+        time.sleep(2)  # Wait for Celery
+
         # Check if notifications are correct remaining two
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -150,6 +151,8 @@ class OtherTestCase(APITestCase):
         # Update event 4
         event4.name = 'UpdatedEvent4'
         event4.save()
+
+        time.sleep(2)  # Wait for Celery
 
         # Check if notification is added for event 4
         response = self.client.get(url)
@@ -180,6 +183,8 @@ class OtherTestCase(APITestCase):
         self.assertEqual(response.status_code, 204)
         event4.name = 'AUpdatedEvent4'
         event4.save()
+
+        time.sleep(2)  # Wait for Celery
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)

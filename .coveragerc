@@ -9,3 +9,4 @@ omit =
     */management/*
     helpers/fcm.py
     helpers/webpush.py
+    */tasks.py

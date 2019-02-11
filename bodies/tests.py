@@ -1,18 +1,20 @@
 """Unit tests for Body."""
-from rest_framework.test import APITestCase
+from django.test import TransactionTestCase
+from rest_framework.test import APIClient
 from bodies.models import Body
 from bodies.models import BodyChildRelation
 from roles.models import InstituteRole
 from roles.models import BodyRole
 from login.tests import get_new_user
 
-class BodyTestCase(APITestCase):
+class BodyTestCase(TransactionTestCase):
     """Check if we can create bodies and link events."""
 
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()
-        self.client.force_authenticate(self.user)  # pylint: disable=E1101
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
 
         self.insti_role = InstituteRole.objects.create(
             name='TestInstiRole',

@@ -1,6 +1,7 @@
 """Unit tests for Events."""
 from django.utils import timezone
-from rest_framework.test import APITestCase
+from django.test import TransactionTestCase
+from rest_framework.test import APIClient
 from bodies.models import BodyChildRelation
 from events.models import Event
 from roles.models import BodyRole
@@ -10,13 +11,16 @@ from helpers.test_helpers import create_event
 from helpers.test_helpers import create_usertag
 from helpers.test_helpers import create_usertagcategory
 
-class EventTestCase(APITestCase):
+# pylint: disable=R0902
+
+class EventTestCase(TransactionTestCase):
     """Check if we can create bodies and link events."""
 
     def setUp(self):
         # Fake authenticate
         self.user = get_new_user()
-        self.client.force_authenticate(self.user)  # pylint: disable=E1101
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
 
         self.test_body_1 = create_body()
         self.test_body_2 = create_body()

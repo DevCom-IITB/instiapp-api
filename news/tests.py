@@ -129,7 +129,7 @@ class NewsTestCase(APITestCase):
         # Assert fetching fields
         entry = NewsEntry.objects.filter(body=body1)[0]
         self.assertIn("RSS 1", entry.title)
-        self.assertIn("Item 1", entry.content)
+        self.assertIn("RSS 1 Item", entry.content)
         self.assertIn("https://localhost", entry.link)
         self.assertIn("sample:", entry.guid)
 
