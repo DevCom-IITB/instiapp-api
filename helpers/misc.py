@@ -99,6 +99,10 @@ def table_to_markdown(html):
 def users_from_tags(tags):
     """Get a queryset of UserProfile from list of tags."""
 
+    # Check if no tags are passed
+    if not tags:
+        return UserProfile.objects.all()
+
     # Divide AND and OR categories
     categories = defaultdict(list)
     for tag in tags:
