@@ -14,10 +14,12 @@ from events.serializers import EventSerializer
 from events.prioritizer import get_prioritized
 from users.models import UserProfile
 from users.models import UserTagCategory
+from users.models import UserTag
 from users.serializers import UserProfileSerializer
 from other.serializers import NotificationSerializer
 from other.serializers import UserTagCategorySerializer
 from helpers.misc import query_search
+from helpers.misc import users_from_tags
 
 def get_notif_queryset(queryset):
     return queryset.unread().filter(timestamp__gte=timezone.now() - timedelta(days=7))
@@ -85,3 +87,10 @@ class OtherViewset(viewsets.ViewSet):
         """Get a list of categories of user tags with nested tags."""
         return Response(UserTagCategorySerializer(
             UserTagCategory.objects.all(), many=True).data)
+
+    @classmethod
+    @login_required_ajax
+    def get_user_tags_reach(cls, request):
+        """Get reach of selected user tags."""
+        tags = UserTag.objects.filter(id__in=request.data)
+        return Response({'count': users_from_tags(tags).count()})

@@ -1,5 +1,6 @@
 """Unit tests for news feed."""
 import time
+import json
 
 import xml.etree.ElementTree as ET
 
@@ -327,12 +328,31 @@ class OtherTestCase(TransactionTestCase):
         cat1 = create_usertagcategory()
         cat2 = create_usertagcategory()
 
-        create_usertag(cat1, '1')
-        create_usertag(cat1, '2')
-        create_usertag(cat2, 'ME', target='department')
+        # Create test users for matching
+        profiles = [get_new_user().profile for x in range(4)]
+        for profile in profiles:
+            profile.department = 'ME'
+        profiles[0].hostel = '1'
+        profiles[1].hostel = '2'
+        profiles[2].hostel = '3'
+        profiles[3].hostel = '1'
+        profiles[3].department = 'EP'
+        for profile in profiles:
+            profile.save()
+
+        # Create tags in 2 categories
+        t1 = create_usertag(cat1, '1')
+        t2 = create_usertag(cat1, '1', target='hostel', secondary_target='hostel', secondary_regex='2')
+        t3 = create_usertag(cat2, 'ME', target='department')
 
         url = '/api/user-tags'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
         self.assertEqual(len(response.data[0]['tags']), 2)
+
+        url = '/api/user-tags/reach'
+        data = [t1.id, t2.id, t3.id]
+        response = self.client.post(url, json.dumps(data), content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 2)
