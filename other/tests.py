@@ -352,6 +352,10 @@ class OtherTestCase(TransactionTestCase):
         self.assertEqual(len(response.data[0]['tags']), 2)
 
         url = '/api/user-tags/reach'
+        response = self.client.post(url, json.dumps([]), content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(response.data['count'], 4)
+
         data = [t1.id, t2.id, t3.id]
         response = self.client.post(url, json.dumps(data), content_type="application/json")
         self.assertEqual(response.status_code, 200)
