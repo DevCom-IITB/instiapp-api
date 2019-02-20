@@ -112,7 +112,9 @@ def users_from_tags(tags):
     def get_query(tag):
         query = Q(**{"%s__regex" % tag.target: tag.regex})
         if tag.secondary_target and tag.secondary_regex:
-            query = query | Q(**{"%s__regex" % tag.secondary_target: tag.secondary_regex})
+            t_null_q = Q(**{"%s__isnull" % tag.target: True}) | Q(**{"%s__exact" % tag.target: ''})
+            secondary_q = Q(**{"%s__regex" % tag.secondary_target: tag.secondary_regex})
+            query = query | (t_null_q & secondary_q)
         return query
 
     # Construct the query
