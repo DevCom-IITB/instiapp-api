@@ -329,20 +329,23 @@ class OtherTestCase(TransactionTestCase):
         cat2 = create_usertagcategory()
 
         # Create test users for matching
-        profiles = [get_new_user().profile for x in range(4)]
+        profiles = [get_new_user().profile for x in range(5)]
         for profile in profiles:
             profile.department = 'ME'
         profiles[0].hostel = '1'
-        profiles[1].hostel = '2'
+        profiles[1].hostel = ''
+        profiles[1].roll_no = '2'
         profiles[2].hostel = '3'
         profiles[3].hostel = '1'
         profiles[3].department = 'EP'
+        profiles[4].hostel = '2'
+        profiles[4].roll_no = '2'
         for profile in profiles:
             profile.save()
 
         # Create tags in 2 categories
         t1 = create_usertag(cat1, '1')
-        t2 = create_usertag(cat1, '1', target='hostel', secondary_target='hostel', secondary_regex='2')
+        t2 = create_usertag(cat1, '1', target='hostel', secondary_target='roll_no', secondary_regex='2')
         t3 = create_usertag(cat2, 'ME', target='department')
 
         url = '/api/user-tags'
