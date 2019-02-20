@@ -39,8 +39,8 @@ class UserProfile(models.Model):
     department_name = models.CharField(max_length=200, null=True, blank=True)
     degree = models.CharField(max_length=200, null=True, blank=True)
     degree_name = models.CharField(max_length=200, null=True, blank=True)
-    join_year = models.IntegerField(null=True, blank=True)
-    graduation_year = models.IntegerField(null=True, blank=True)
+    join_year = models.CharField(max_length=5, null=True, blank=True)
+    graduation_year = models.CharField(max_length=5, null=True, blank=True)
 
     roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
     former_roles = models.ManyToManyField('roles.BodyRole', related_name='former_users', blank=True)
