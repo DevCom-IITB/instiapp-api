@@ -1,7 +1,11 @@
 """Misc helpers."""
+import operator
+from collections import defaultdict
+from functools import reduce
 from django.db.models import Q
 from django.db.models import Count
 from bs4 import BeautifulSoup
+from users.models import UserProfile
 
 def get_url_friendly(name):
     """Converts the name to a url friendly string for use in `str_id`"""
@@ -91,3 +95,27 @@ def table_to_markdown(html):
     md = md.replace(HEADER_SEPARATOR, '---|' * MAX_COLS)
 
     return md
+
+def users_from_tags(tags):
+    """Get a queryset of UserProfile from list of tags."""
+
+    # Divide AND and OR categories
+    categories = defaultdict(list)
+    for tag in tags:
+        categories[tag.category_id].append(tag)
+
+    # Helper to get Q object from tag
+    def get_query(tag):
+        query = Q(**{"%s__regex" % tag.target: tag.regex})
+        if tag.secondary_target and tag.secondary_regex:
+            query = query | Q(**{"%s__regex" % tag.secondary_target: tag.secondary_regex})
+        return query
+
+    # Construct the query
+    clauses = []
+    for c in categories:
+        queries = (get_query(t) for t in categories[c])
+        clauses.append(reduce(operator.or_, queries))
+    query = reduce(operator.and_, clauses)
+
+    return UserProfile.objects.filter(query)

@@ -34,12 +34,12 @@ def create_usertagcategory(name=None):
     return UserTagCategory.objects.create(
         name='TestCategory %s' % create_body.i if not name else name)
 
-def create_usertag(category, regex, target='hostel', name='tag'):
+def create_usertag(category, regex, target='hostel', name='tag', **kwargs):
     """Create a test tag."""
     create_usertag.i += 1
     return UserTag.objects.create(
         name=name + str(create_usertag.i) if name == 'tag' else name,
-        category=category, target=target, regex=regex)
+        category=category, target=target, regex=regex, **kwargs)
 
 
 create_event.i = 0
