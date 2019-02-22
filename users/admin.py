@@ -13,8 +13,12 @@ class ProfileAdmin(admin.ModelAdmin):
 class WebPushSubscriptionAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
 
+class UserTagAdmin(admin.ModelAdmin):
+    list_display = ('category', 'name', 'target', 'secondary_target')
+    ordering = ('category', 'name')
+
 
 admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(WebPushSubscription, WebPushSubscriptionAdmin)
 admin.site.register(UserTagCategory)
-admin.site.register(UserTag)
+admin.site.register(UserTag, UserTagAdmin)
