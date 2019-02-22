@@ -162,6 +162,7 @@ USER_PROFILE_SERIALIZER_TRANSFORM = lambda x: x
 USER_PROFILE_FULL_SERIALIZER_TRANSFORM = lambda x: x
 NOTIFICATION_LARGE_ICON_TRANSFORM = lambda x: x
 NOTIFICATION_IMAGE_TRANSFORM = lambda x: x
+YOUTUBE_THUMB = lambda x: 'https://img.youtube.com/vi/%s/mqdefault.jpg' % x
 
 # Set this to False to actually use Celery
 NO_CELERY = os.environ.get('NO_CELERY') != 'false'

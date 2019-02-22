@@ -9,6 +9,7 @@ from news.models import NewsEntry
 from news.models import UserNewsReaction
 from bodies.models import Body
 from login.tests import get_new_user
+from helpers.fcm import get_news_image
 
 class NewsTestCase(APITestCase):
     """Test news endpoints."""
@@ -155,3 +156,9 @@ class NewsTestCase(APITestCase):
 
         # Terminate server
         mock_server.terminate()
+
+    def test_extra(self):
+        """Extra tests for helpers of News"""
+        news = self.entry1
+        news.guid = 'yt:video:VIDEOID'
+        self.assertEqual(get_news_image(news), 'https://img.youtube.com/vi/VIDEOID/mqdefault.jpg')
