@@ -119,7 +119,7 @@ def get_rich_notification(notification):
     if notification_large_content is not None:
         data_message['large_content'] = truncated(notification_large_content, 250)
     if notification_image is not None:
-        data_message['image_url'] = notification_image
+        data_message['image_url'] = settings.NOTIFICATION_IMAGE_TRANSFORM(notification_image)
 
     return data_message
 

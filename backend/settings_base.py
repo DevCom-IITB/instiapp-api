@@ -161,6 +161,7 @@ NOTIFICATION_LARGE_ICON_DEFAULT = 'assets/logo.png'
 USER_PROFILE_SERIALIZER_TRANSFORM = lambda x: x
 USER_PROFILE_FULL_SERIALIZER_TRANSFORM = lambda x: x
 NOTIFICATION_LARGE_ICON_TRANSFORM = lambda x: x
+NOTIFICATION_IMAGE_TRANSFORM = lambda x: x
 
 # Set this to False to actually use Celery
 NO_CELERY = os.environ.get('NO_CELERY') != 'false'
