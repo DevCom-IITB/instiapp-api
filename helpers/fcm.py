@@ -52,7 +52,7 @@ def send_notification_fcm(push_service, device, data_message):
 
 def get_news_image(news):
     if 'yt:video' in news.guid:
-        return 'https://img.youtube.com/vi/' + news.guid.split('video:')[1] + '/maxresdefault.jpg'
+        return 'https://img.youtube.com/vi/' + news.guid.split('video:')[1] + '/mqdefault.jpg'
     return None
 
 def get_rich_notification(notification):
