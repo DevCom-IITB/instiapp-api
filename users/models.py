@@ -63,7 +63,7 @@ class WebPushSubscription(models.Model):
     """One web push subscription."""
     user = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name='web_push_subscriptions')
-    endpoint = models.TextField()
+    endpoint = models.TextField(unique=True)
     p256dh = models.CharField(max_length=200)
     auth = models.CharField(max_length=100)
 
