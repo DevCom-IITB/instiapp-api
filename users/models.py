@@ -13,7 +13,6 @@ TAG_TARGET_CHOICES = (
     ('graduation_year', 'Graduation Year'),
     ('hostel', 'Hostel'),
     ('room', 'Room'),
-    ('android_version', 'Android Version'),
 )
 
 class UserProfile(models.Model):

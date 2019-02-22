@@ -31,7 +31,9 @@ def send_notification_webpush(subscription, data_message):
         "notification": {
             "title": data_message['title'],
             "body": data_message['verb'],
-            "icon": "assets/logo-sq-sm.png",
+            "icon": data_message.get('large_icon', settings.NOTIFICATION_LARGE_ICON_DEFAULT),
+            "image": data_message.get('image_url', None),
+            "badge": settings.NOTIFICATION_LARGE_ICON_DEFAULT,
             "vibrate": [100, 50, 100],
             "data": data_message
         }
