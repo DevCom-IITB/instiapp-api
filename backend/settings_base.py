@@ -154,9 +154,13 @@ if 'LDAP_USERNAME' in os.environ and 'LDAP_PASSWORD' in os.environ:
 # Flip for broken external server certificates
 SSO_BAD_CERT = False
 
-# Optional deployment dependent serializer transforms
+# Default icons for notifications
+NOTIFICATION_LARGE_ICON_DEFAULT = 'assets/logo.png'
+
+# Optional deployment dependent transforms
 USER_PROFILE_SERIALIZER_TRANSFORM = lambda x: x
 USER_PROFILE_FULL_SERIALIZER_TRANSFORM = lambda x: x
+NOTIFICATION_LARGE_ICON_TRANSFORM = lambda x: x
 
 # Set this to False to actually use Celery
 NO_CELERY = os.environ.get('NO_CELERY') != 'false'

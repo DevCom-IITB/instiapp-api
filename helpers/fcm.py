@@ -1,5 +1,6 @@
 """Helpers for FCM notifications."""
 from bs4 import BeautifulSoup
+from django.conf import settings
 from placements.models import BlogEntry
 from events.models import Event
 from news.models import NewsEntry
@@ -114,7 +115,7 @@ def get_rich_notification(notification):
 
     # Set rich fields if present
     if notification_large_icon is not None:
-        data_message['large_icon'] = notification_large_icon
+        data_message['large_icon'] = settings.NOTIFICATION_LARGE_ICON_TRANSFORM(notification_large_icon)
     if notification_large_content is not None:
         data_message['large_content'] = truncated(notification_large_content, 250)
     if notification_image is not None:
