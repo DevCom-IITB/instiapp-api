@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.utils import timezone
 from users.models import UserProfile
 from events.models import Event
 from events.prioritizer import get_fresh_prioritized_events
@@ -144,3 +145,15 @@ def insti_map(request, name=None):
     })
 
     return HttpResponse(rendered)
+
+def mstile(request):
+    """Prerender for UWP live tiles"""
+    images = Event.objects.filter(
+        end_time__gte=timezone.now()).order_by('start_time').values_list('image_url', flat=True)
+
+    rendered = render_to_string('ms-tile.xml', {
+        'images': images,
+        'tilenames': ['TileMedium', 'TileWide', 'TileLarge'],
+        'settings': settings,
+    })
+    return HttpResponse(rendered, content_type='text/xml')

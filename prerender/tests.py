@@ -1,12 +1,11 @@
 """Unit tests for upload."""
-from django.utils import timezone
 from rest_framework.test import APITestCase
 from bodies.models import Body
 from bodies.models import BodyChildRelation
-from events.models import Event
 from news.models import NewsEntry
 from users.models import UserProfile
 from locations.models import Location
+from helpers.test_helpers import create_event
 
 class PrerenderTestCase(APITestCase):
     """Check if prerender is working."""
@@ -15,13 +14,12 @@ class PrerenderTestCase(APITestCase):
         self.test_profile = UserProfile.objects.create(
             name="TestUser", email="my@email.com", roll_no="10000001", ldap_id='ldap')
         self.test_body = Body.objects.create(name="Test Body")
-        event1 = Event.objects.create(
-            name="Event 1", start_time=timezone.now(), end_time=timezone.now())
-        event2 = Event.objects.create(
-            name="Test Event2", start_time=timezone.now(), end_time=timezone.now())
-        self.test_body.events.add(event1)
-        self.test_body.events.add(event2)
-        self.test_event = event1
+        self.test_event = create_event(
+            name="Event 1", end_time_delta=20, image_url="https://insti.app/event1img")
+        self.test_event_2 = create_event(
+            name="Test Event 2", end_time_delta=-1, image_url="https://insti.app/event2img")
+        self.test_body.events.add(self.test_event)
+        self.test_body.events.add(self.test_event_2)
 
         self.news1 = NewsEntry.objects.create(
             guid="https://test.com", title="NewsIsGreat",
@@ -130,3 +128,11 @@ class PrerenderTestCase(APITestCase):
         self.assertContains(response, location.name)
         self.assertNotContains(response, nonlocation.name)
         self.assertContains(response, str(location.id) + '.jpg')
+
+    def test_mstile(self):
+        """Test UWP live tile prerender."""
+        url = '/mstile'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.test_event.image_url)
+        self.assertNotContains(response, self.test_event_2.image_url)

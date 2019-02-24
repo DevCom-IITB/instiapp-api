@@ -13,4 +13,5 @@ urlpatterns = [
     path('body-tree/<pk>', pr.body_tree),
     path('map', pr.insti_map),
     path('map/<name>', pr.insti_map),
+    path('mstile', pr.mstile),
 ]
