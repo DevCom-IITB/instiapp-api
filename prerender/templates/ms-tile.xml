@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<tile>
+    <visual>
+        {% for name in tilenames  %}
+        <binding template="{{ name }}" hint-presentation="photos">
+            {% for img in images  %}
+                <image src="{{ img }}" />
+            {% endfor %}
+        </binding>
+        {% endfor %}
+    </visual>
+</tile>
