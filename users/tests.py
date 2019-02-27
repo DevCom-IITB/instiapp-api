@@ -168,14 +168,25 @@ class UserTestCase(APITestCase):
             "endpoint": "http://endpoint",
             "keys": {
                 "p256dh": "sdfdsf",
-                "auth": "skjfhlsjkf"
+                "auth": "TESTAUTH"
             }
         }
+
+        # Create a new subscription
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 204)
 
-        wpn = self.user.profile.web_push_subscriptions.all()[0]
+        # Check the subscription
+        wpn = self.user.profile.web_push_subscriptions.first()
         self.assertEqual(str(wpn), self.user.profile.name)
+        self.assertEqual(wpn.auth, 'TESTAUTH')
+
+        # Update subscription and check that a new one is not created
+        data['keys']['auth'] = 'TESTAUTH2'
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 204)
+        wpn.refresh_from_db()
+        self.assertEqual(wpn.auth, 'TESTAUTH2')
 
     def test_tag_str(self):
         """Check __str__ methods for UserTag and UserTagCategory."""
