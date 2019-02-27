@@ -152,7 +152,7 @@ def mstile(request):
         end_time__gte=timezone.now()).order_by('start_time').values_list('image_url', flat=True)
 
     rendered = render_to_string('ms-tile.xml', {
-        'images': images,
+        'images': [x for x in images if x],
         'tilenames': ['TileMedium', 'TileWide', 'TileLarge'],
         'settings': settings,
     })
