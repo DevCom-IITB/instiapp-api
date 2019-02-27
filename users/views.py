@@ -134,13 +134,18 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     def subscribe_web_push(cls, request):
         """Subscribe to web push."""
         data = request.data
-        subscriptions = request.user.profile.web_push_subscriptions.filter(endpoint=data['endpoint'])
-        if not subscriptions.exists():
-            WebPushSubscription.objects.create(
+        sub = request.user.profile.web_push_subscriptions.filter(endpoint=data['endpoint']).first()
+
+        # Create new subscription if not found
+        if not sub:
+            sub = WebPushSubscription(
                 user=request.user.profile,
                 endpoint=data['endpoint'],
-                p256dh=data['keys']['p256dh'],
-                auth=data['keys']['auth']
             )
+
+        # Update values
+        sub.p256dh = data['keys']['p256dh']
+        sub.auth = data['keys']['auth']
+        sub.save()
 
         return Response(status=204)
