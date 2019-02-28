@@ -101,7 +101,7 @@ def body_details(request, pk):
     except ValueError:
         body = get_object_or_404(queryset, str_id=pk)
 
-    events = get_fresh_prioritized_events(body.events, request)
+    events = get_fresh_prioritized_events(body.events, request, delta=365)
 
     rendered = render_to_string('body-details.html', {
         'body': body,
