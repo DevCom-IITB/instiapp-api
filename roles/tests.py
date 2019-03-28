@@ -16,7 +16,7 @@ class RoleTestCase(APITestCase):
 
         self.body = Body.objects.create(name="Body1")
         self.bodyrole = BodyRole.objects.create(
-            name="Role", body=self.body, permissions=['Role'], inheritable=True,official_post=False)
+            name="Role", body=self.body, permissions=['Role'], inheritable=True, official_post=False)
         self.instirole = InstituteRole.objects.create(
             name="InstiRole", permissions=['RoleB'])
 
