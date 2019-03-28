@@ -16,7 +16,7 @@ class RoleTestCase(APITestCase):
 
         self.body = Body.objects.create(name="Body1")
         self.bodyrole = BodyRole.objects.create(
-            name="Role", body=self.body, permissions=['Role'], inheritable=True)
+            name="Role", body=self.body, permissions=['Role'], inheritable=True,official_post=False)
         self.instirole = InstituteRole.objects.create(
             name="InstiRole", permissions=['RoleB'])
 
@@ -24,6 +24,7 @@ class RoleTestCase(APITestCase):
         """Check misc parameters of Roles."""
         self.assertEqual(str(self.instirole), self.instirole.name)
         self.assertEqual(str(self.bodyrole), self.body.name + " " + self.bodyrole.name)
+        self.assertEqual(str(self.bodyrole.official_post), "False")
 
     def test_create_body_role(self):
         """Check we can create roles."""
