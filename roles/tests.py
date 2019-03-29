@@ -4,6 +4,7 @@ from bodies.models import Body
 from bodies.models import BodyChildRelation
 from roles.models import BodyRole
 from roles.models import InstituteRole
+from users.models import UserFormerRole
 from login.tests import get_new_user
 
 class RoleTestCase(APITestCase):
@@ -121,10 +122,10 @@ class RoleTestCase(APITestCase):
         # Check with former user
         url = '/api/roles/' + str(bodyrole3.id)
         profile = get_new_user().profile
-        profile.former_roles.add(bodyrole3)
+        frole = UserFormerRole.objects.create(user=profile, role=bodyrole3, year='2019')
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
-        profile.former_roles.remove(bodyrole3)
+        frole.delete()
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
 
