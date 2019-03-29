@@ -22,6 +22,7 @@ class BodyRole(models.Model):
     permissions = MultiSelectField(choices=PERMISSION_CHOICES)
     priority = models.IntegerField(default=0)
     official_post = models.BooleanField(default=True)
+    permanent = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Body Role"
