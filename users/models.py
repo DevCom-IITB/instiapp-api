@@ -42,7 +42,8 @@ class UserProfile(models.Model):
     graduation_year = models.CharField(max_length=5, null=True, blank=True)
 
     roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
-    former_roles = models.ManyToManyField('roles.BodyRole', related_name='former_users', blank=True)
+    former_roles = models.ManyToManyField(
+        'roles.BodyRole', related_name='former_users', blank=True, through='UserFormerRole')
     institute_roles = models.ManyToManyField(
         'roles.InstituteRole', related_name='users', blank=True)
     hostel = models.CharField(max_length=100, null=True, blank=True)
@@ -58,6 +59,16 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.name
+
+class UserFormerRole(models.Model):
+    """Through field for former_role from UserProfile to BodyRole."""
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE,
+                             default=uuid4, related_name='ufr')
+    role = models.ForeignKey('roles.BodyRole', on_delete=models.CASCADE,
+                             default=uuid4, related_name='ufr')
+    year = models.CharField(default='', max_length=20, blank=True)
 
 class WebPushSubscription(models.Model):
     """One web push subscription."""

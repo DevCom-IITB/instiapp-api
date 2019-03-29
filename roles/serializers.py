@@ -5,6 +5,7 @@ from roles.models import PERMISSION_CHOICES
 from roles.models import INSTITUTE_PERMISSION_CHOICES
 from bodies.serializer_min import BodySerializerMin
 from users.serializers import UserProfileSerializer
+from users.models import UserFormerRole
 from events.serializers import EventSerializer
 from events.prioritizer import get_fresh_prioritized_events
 
@@ -66,14 +67,17 @@ class RoleSerializerMin(serializers.ModelSerializer):
         model = BodyRole
         fields = ('id', 'name', 'body', 'users_detail', 'priority')
 
-class RoleSerializerMinAlt(serializers.ModelSerializer):
-    """Alternative min serializer for BodyRole"""
+class FormerRoleSerializer(serializers.ModelSerializer):
+    """Serializer for UserFormerRole"""
 
-    body_detail = BodySerializerMin(read_only=True, source='body')
+    id = serializers.ReadOnlyField(read_only=True, source='role.id')
+    name = serializers.ReadOnlyField(read_only=True, source='role.name')
+    body_detail = BodySerializerMin(read_only=True, source='role.body')
+    priority = serializers.ReadOnlyField(read_only=True, source='role.priority')
 
     class Meta:
-        model = BodyRole
-        fields = ('id', 'name', 'body_detail', 'priority')
+        model = UserFormerRole
+        fields = ('id', 'name', 'body_detail', 'priority', 'year')
 
 class InstituteRoleSerializer(serializers.ModelSerializer):
 

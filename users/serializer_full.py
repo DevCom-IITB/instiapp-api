@@ -4,7 +4,7 @@ from rest_framework import serializers
 from events.prioritizer import get_fresh_prioritized_events
 from users.models import UserProfile
 from roles.serializers import RoleSerializer
-from roles.serializers import RoleSerializerMinAlt
+from roles.serializers import FormerRoleSerializer
 from roles.serializers import InstituteRoleSerializer
 
 class UserProfileFullSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     followed_bodies = BodySerializerMin(many=True, read_only=True)
 
     roles = RoleSerializer(many=True, read_only=True)
-    former_roles = RoleSerializerMinAlt(many=True, read_only=True)
+    former_roles = FormerRoleSerializer(many=True, read_only=True, source='ufr')
     institute_roles = InstituteRoleSerializer(many=True, read_only=True)
 
     class Meta:
