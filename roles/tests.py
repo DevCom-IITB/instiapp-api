@@ -24,6 +24,7 @@ class RoleTestCase(APITestCase):
         """Check misc parameters of Roles."""
         self.assertEqual(str(self.instirole), self.instirole.name)
         self.assertEqual(str(self.bodyrole), self.body.name + " " + self.bodyrole.name)
+        self.assertEqual(self.bodyrole.official_post, True)
 
     def test_create_body_role(self):
         """Check we can create roles."""
@@ -69,7 +70,8 @@ class RoleTestCase(APITestCase):
             "name": "Updated Role",
             "body": str(self.body.id),
             "permissions": ['Role', 'AddE'],
-            "users": []
+            "users": [],
+            "official_post": False
         }
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 403)
@@ -78,6 +80,8 @@ class RoleTestCase(APITestCase):
         self.user.profile.roles.add(self.bodyrole)
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 200)
+        self.bodyrole.refresh_from_db()
+        self.assertEqual(self.bodyrole.official_post, False)
 
         # Test validation
         body2 = Body.objects.create(name="Body2")

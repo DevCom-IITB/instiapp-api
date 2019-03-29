@@ -19,7 +19,7 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = BodyRole
         fields = ('id', 'name', 'inheritable', 'body', 'body_detail', 'bodies',
-                  'permissions', 'users', 'users_detail', 'priority')
+                  'permissions', 'users', 'users_detail', 'priority', 'official_post')
 
     @classmethod
     def get_bodies(cls, obj):

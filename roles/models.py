@@ -21,6 +21,7 @@ class BodyRole(models.Model):
     inheritable = models.BooleanField(default=False)
     permissions = MultiSelectField(choices=PERMISSION_CHOICES)
     priority = models.IntegerField(default=0)
+    official_post = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = "Body Role"
