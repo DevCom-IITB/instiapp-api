@@ -4,6 +4,19 @@ from django.db import migrations, models
 import django.db.models.deletion
 import uuid
 
+former_roles_cache = None
+
+def get_former_roles(apps, schema_editor):
+    global former_roles_cache
+    BodyRole = apps.get_model('roles', 'BodyRole')
+    former_roles_cache = list(BodyRole.objects.prefetch_related('former_users').all())
+
+def put_former_roles(apps, schema_editor):
+    global former_roles_cache
+    UserFormerRole = apps.get_model('users', 'UserFormerRole')
+    for crole in former_roles_cache:
+        for user in crole.former_users.all():
+            UserFormerRole.objects.create(role_id=crole.id, user_id=user.id)
 
 class Migration(migrations.Migration):
 
@@ -13,6 +26,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(get_former_roles, reverse_code=migrations.RunPython.noop),
         migrations.CreateModel(
             name='UserFormerRole',
             fields=[
@@ -35,4 +49,5 @@ class Migration(migrations.Migration):
             name='user',
             field=models.ForeignKey(default=uuid.uuid4, on_delete=django.db.models.deletion.CASCADE, related_name='ufr', to='users.UserProfile'),
         ),
+        migrations.RunPython(put_former_roles, reverse_code=migrations.RunPython.noop),
     ]
