@@ -149,7 +149,7 @@ class UserTestCase(APITestCase):
         self.assertEqual(dev.supports_rich(), False)
         self.assertNotEqual(dev.process_rich(data)['click_action'], None)
         dev.application = 'app.insti.ios'
-        self.assertEqual(dev.supports_rich(), True)
+        self.assertEqual(dev.supports_rich(), False)
 
     def test_get_noauth(self):
         """Test privacy with no auth."""
