@@ -43,11 +43,11 @@ class EventPrioritizer():  # pylint: disable=R0902
         # Apply all bonuses/penalties
         self.apply_time_bonus()
         self.penalise_untagged()
-        self.penalise_far_off()
-        self.penalise_length()
 
         # Give bonuses to events yet to end
         if self.event.end_time > timezone.now():
+            self.penalise_far_off()
+            self.penalise_length()
             self.bonus_followed()
             self.bonus_promotion()
 
