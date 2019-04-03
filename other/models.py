@@ -33,7 +33,7 @@ class Device(models.Model):
         if self.application == 'app.insti.flutter':
             return False
         if self.application == 'app.insti.ios':
-            return True
+            return False
 
         # Try parsing the app version
         try:
