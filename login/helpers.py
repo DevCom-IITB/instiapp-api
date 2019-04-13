@@ -9,6 +9,7 @@ from users.models import UserProfile
 from users.serializer_full import UserProfileFullSerializer
 from helpers.device import update_fcm_device
 
+# pylint: disable=R0914
 def perform_login(auth_code, redir, request):
     """Perform login with code and redir."""
 
