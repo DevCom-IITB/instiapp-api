@@ -3,6 +3,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import login
+from django.db.models import Q
 from rest_framework.response import Response
 from users.models import UserProfile
 from users.serializer_full import UserProfileFullSerializer
@@ -45,11 +46,16 @@ def perform_login(auth_code, redir, request):
         return Response({'message': 'Name and roll_number not present'}, status=403)
 
     username = str(profile_json['id'])
+    roll_no = str(profile_json['roll_number'])
 
-    # Check if the User exists, otherwise create a new object
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
+    # Check if a user exists with same username or roll number
+    query = Q(username=username)
+    if roll_no:
+        query = query | Q(profile__roll_no=roll_no)
+    user = User.objects.filter(query).first()
+
+    # Create a new user if not found
+    if not user:
         user = User.objects.create_user(username)
 
     # Check if User has a profile and create if not
