@@ -59,6 +59,9 @@ def perform_login(auth_code, redir, request):
     if not user:
         user = User.objects.create_user(username)
 
+    # Set username again in case LDAP ID changed
+    user.username = username
+
     # Check if User has a profile and create if not
     try:
         queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
