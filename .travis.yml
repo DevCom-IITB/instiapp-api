@@ -1,10 +1,10 @@
 # Run tests with Travis CI
 
 language: python
-dist: trusty
+dist: xenial
 
 python:
-  - 3.6
+  - 3.7
 
 before_install:
   - export DJANGO_SETTINGS_MODULE=backend.settings_test
