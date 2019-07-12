@@ -6,7 +6,7 @@ django-markdownify==0.8.0
 django-multiselectfield==0.1.8
 django-notifications-hq==1.5.0
 django-rest-swagger==2.2.0
-Django==2.2.2
+Django==2.2.3
 djangorestframework==3.9.4
 feedparser==5.2.1
 flake8==3.7.7
