@@ -26,3 +26,6 @@ class Achievement(models.Model):
 
     event = models.ForeignKey('events.Event', null=True,
                               on_delete=models.SET_NULL, related_name='achievements')
+
+    class Meta:
+        ordering = ("-time_of_creation",)
