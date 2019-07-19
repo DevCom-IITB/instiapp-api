@@ -17,6 +17,6 @@ urlpatterns = [
         'post': 'create'
     })),
     path('achievements-offer/<pk>', OfferedAchievementViewSet.as_view({
-        'get': 'retrieve', 'put': 'update', 'delete': 'destroy'
+        'get': 'retrieve', 'put': 'update', 'delete': 'destroy', 'post': 'claim_secret'
     })),
 ]

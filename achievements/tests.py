@@ -160,10 +160,18 @@ class AchievementTestCae(APITestCase):
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 403)
 
+        # Try getting secret without privileges
+        response = self.client.get(url, data, format='json')
+        self.assertNotIn('secret', response.data)
+
         # Acquire privileges and try
         self.user.profile.roles.add(self.body_1_role)
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 200)
+
+        # Try getting secret
+        response = self.client.get(url, data, format='json')
+        self.assertIn('secret', response.data)
         self.user.profile.roles.remove(self.body_1_role)
 
         # Try delete without privileges

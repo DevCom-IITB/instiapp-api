@@ -1,4 +1,5 @@
 """Views for achievements models."""
+import pyotp
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -100,6 +101,20 @@ class OfferedAchievementViewSet(viewsets.ModelViewSet):
     serializer_class = OfferedAchievementSerializer
 
     @login_required_ajax
+    def retrieve(self, request, pk):
+        """Get a achievement offer."""
+
+        # Get current object
+        offer = get_object_or_404(self.queryset, id=pk)
+        data = OfferedAchievementSerializer(offer).data
+
+        # Check for verification privilege
+        if user_has_privilege(request.user.profile, offer.body.id, "VerA"):
+            data['secret'] = offer.secret
+
+        return Response(data)
+
+    @login_required_ajax
     def create(self, request):
         """Offer a new achievement for an event."""
 
@@ -134,3 +149,17 @@ class OfferedAchievementViewSet(viewsets.ModelViewSet):
             return forbidden_no_privileges()
 
         return super().destroy(request, pk)
+
+    @login_required_ajax
+    def claim_secret(self, request, pk):
+        """Claim and try to get an achievement with its secret."""
+
+        # Get object
+        offer = get_object_or_404(self.queryset, id=pk)
+
+        # Check if secret is valid
+        secret = request.data['secret']
+        if offer.secret and (secret == offer.secret or secret == pyotp.TOTP(offer.secret).now()):
+            return Response({'yas':pyotp.TOTP(offer.secret).now()})
+
+        return forbidden_no_privileges()
