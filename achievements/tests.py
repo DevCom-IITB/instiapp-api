@@ -1,12 +1,14 @@
+import pyotp
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from login.tests import get_new_user
 from achievements.models import Achievement
+from achievements.models import OfferedAchievement
 from helpers.test_helpers import create_body
 from helpers.test_helpers import create_event
 from roles.models import BodyRole
 
-class AchievementTestCae(APITestCase):
+class AchievementTestCase(APITestCase):
     """Check if we can create and verify achievement requests."""
 
     def setUp(self):
@@ -183,3 +185,36 @@ class AchievementTestCae(APITestCase):
         response = self.client.delete(url, data, format='json')
         self.assertEqual(response.status_code, 204)
         self.user.profile.roles.remove(self.body_1_role)
+
+    def test_totp_claim(self):
+        offer_1 = OfferedAchievement.objects.create(
+            title="Test Achievement", body=self.body_1, event=self.event_1)
+        offer_2 = OfferedAchievement.objects.create(
+            title="Test Achievement", body=self.body_1, event=self.event_1)
+
+        # Setup data
+        data = {
+            'secret': 'something'
+        }
+        url = '/api/achievements-offer/%s' % offer_1.id
+
+        # Try with invalid secret
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Try with master secret
+        data['secret'] = offer_1.secret
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+
+        # Try to get again master secret
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        # Try with TOTP for offer 2
+        url = '/api/achievements-offer/%s' % offer_2.id
+        data['secret'] = pyotp.TOTP(offer_2.secret).now()
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 200)

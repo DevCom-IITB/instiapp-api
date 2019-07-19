@@ -160,6 +160,15 @@ class OfferedAchievementViewSet(viewsets.ModelViewSet):
         # Check if secret is valid
         secret = request.data['secret']
         if offer.secret and (secret == offer.secret or secret == pyotp.TOTP(offer.secret).now()):
-            return Response({'yas':pyotp.TOTP(offer.secret).now()})
+            if request.user.profile.achievements.filter(offer=offer).exists():
+                return Response({'message': 'You already have this achievement!'})
+
+            # Create the achievement
+            Achievement.objects.create(
+                title=offer.title, description=offer.description, admin_note='SECRET',
+                body=offer.body, event=offer.event, verified=True, dismissed=True,
+                user=request.user.profile, offer=offer)
+
+            return Response({'message': 'Achievement unlocked successfully!'}, 201)
 
         return forbidden_no_privileges()
