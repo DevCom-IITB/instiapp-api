@@ -2,14 +2,14 @@
 from rest_framework import serializers
 from achievements.models import Achievement
 from bodies.serializer_min import BodySerializerMin
-from events.serializers import EventSerializer
+from events.serializers import EventMinSerializer
 from users.serializers import UserProfileSerializer
 
 class AchievementSerializer(serializers.ModelSerializer):
     """Serializer for Achievement model."""
 
     body_detail = BodySerializerMin(read_only=True, source="body")
-    event_detail = EventSerializer(read_only=True, source="event")
+    event_detail = EventMinSerializer(read_only=True, source="event")
 
     class Meta:
         model = Achievement
@@ -38,7 +38,7 @@ class AchievementUserSerializer(serializers.ModelSerializer):
     """Serializer for Achievement model."""
 
     body_detail = BodySerializerMin(read_only=True, source="body")
-    event_detail = EventSerializer(read_only=True, source="event")
+    event_detail = EventMinSerializer(read_only=True, source="event")
     user = UserProfileSerializer(read_only=True)
 
     class Meta:
