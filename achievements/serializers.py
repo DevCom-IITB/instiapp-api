@@ -19,7 +19,7 @@ class AchievementSerializer(serializers.ModelSerializer):
         queryset = queryset.prefetch_related('body')
         return queryset
 
-class VerifiedAchievementListSerializer(serializers.ListSerializer): # pylint: disable=abstract-method
+class VerifiedAchievementListSerializer(serializers.ListSerializer):  # pylint: disable=abstract-method
     """List serializer for verified achievements"""
 
     def to_representation(self, data):
