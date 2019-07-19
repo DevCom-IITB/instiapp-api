@@ -17,6 +17,9 @@ class Achievement(models.Model):
     verified_by = models.ForeignKey('users.UserProfile', null=True, blank=True,
                                     on_delete=models.SET_NULL, related_name='achievements_verified_by')
 
-    description = models.CharField(max_length=100)
+    title = models.CharField(max_length=80)
+    description = models.TextField(blank=True, null=True)
+    admin_note = models.TextField(blank=True, null=True)
+
     body = models.ForeignKey('bodies.Body', null=True,
                              on_delete=models.SET_NULL, related_name='achievements')
