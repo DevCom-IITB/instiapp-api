@@ -13,6 +13,7 @@ class OfferedAchievementAdmin(admin.ModelAdmin):
     list_filter = ('body',)
     list_display = ('event', 'body', 'title')
     ordering = ('-time_of_creation',)
+    raw_id_fields = ('event',)
 
 
 admin.site.register(Achievement, AchievementAdmin)
