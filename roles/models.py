@@ -9,6 +9,7 @@ PERMISSION_CHOICES = (
     ('DelE', 'Delete Event'),
     ('UpdB', 'Update Body'),
     ('Role', 'Modify Roles'),
+    ('VerA', 'Verify Achievements'),
 )
 
 class BodyRole(models.Model):

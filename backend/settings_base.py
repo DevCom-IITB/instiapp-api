@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_swagger',
 
+    'achievements.apps.AchievementsConfig',
     'events.apps.EventsConfig',
     'locations.apps.LocationsConfig',
     'users.apps.UsersConfig',

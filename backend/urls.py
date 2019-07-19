@@ -35,6 +35,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # API
+    path(api_base(), include('achievements.urls')),
     path(api_base(), include('bodies.urls')),
     path(api_base(), include('events.urls')),
     path(api_base(), include('locations.urls')),
