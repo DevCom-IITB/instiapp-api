@@ -1,6 +1,7 @@
 """Full serializer for UserProfile with detailed information and events."""
 from django.conf import settings
 from rest_framework import serializers
+from achievements.serializers import VerifiedAchievementSerializer
 from events.prioritizer import get_fresh_prioritized_events
 from users.models import UserProfile
 from roles.serializers import RoleSerializer
@@ -25,12 +26,15 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
     former_roles = FormerRoleSerializer(many=True, read_only=True, source='ufr')
     institute_roles = InstituteRoleSerializer(many=True, read_only=True)
 
+    achievements = VerifiedAchievementSerializer(many=True, read_only=True)
+
     class Meta:
         model = UserProfile
         fields = ('id', 'name', 'profile_pic', 'events_interested',
                   'events_going', 'email', 'roll_no', 'contact_no', 'show_contact_no',
                   'about', 'followed_bodies', 'fcm_id', 'android_version', 'roles',
-                  'institute_roles', 'website_url', 'ldap_id', 'hostel', 'former_roles')
+                  'institute_roles', 'website_url', 'ldap_id', 'hostel', 'former_roles',
+                  'achievements')
 
     def get_events_going(self, obj):
         return self.get_events(obj, 2)
