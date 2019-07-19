@@ -60,16 +60,16 @@ class AchievementViewSet(viewsets.ModelViewSet):
         # Get the achievement currently in database
         achievement = get_object_or_404(self.queryset, id=pk)
 
+        # Check if the user has privileges for updating
+        if not user_has_privilege(request.user.profile, achievement.body.id, "VerA"):
+            return forbidden_no_privileges()
+
         # Prevent achievements without any body
         if 'body' not in request.data or not request.data['body'] or request.data['body'] != str(achievement.body.id):
             return Response({
                 "message": "invalid body",
                 "detail": "The body for this achievement is changed or invalid."
             }, status=400)
-
-        # Check if the user has privileges for updating
-        if not user_has_privilege(request.user.profile, achievement.body.id, "VerA"):
-            return forbidden_no_privileges()
 
         return super().update(request, pk)
 
