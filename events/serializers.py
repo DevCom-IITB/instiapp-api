@@ -22,13 +22,6 @@ def get_user_ues(self, obj):  # pylint: disable=unused-argument
 
     return None
 
-class EventMinSerializer(serializers.ModelSerializer):
-    """Very minimalistic serializer for Event."""
-
-    class Meta:
-        model = Event
-        fields = ('id', 'str_id', 'name', 'image_url', 'start_time', 'end_time')
-
 class EventSerializer(serializers.ModelSerializer):
     """Serializer for Event.
 

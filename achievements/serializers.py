@@ -3,7 +3,7 @@ from rest_framework import serializers
 from achievements.models import Achievement
 from achievements.models import OfferedAchievement
 from bodies.serializer_min import BodySerializerMin
-from events.serializers import EventMinSerializer
+from events.serializer_min import EventMinSerializer
 from users.serializers import UserProfileSerializer
 
 class AchievementSerializer(serializers.ModelSerializer):
