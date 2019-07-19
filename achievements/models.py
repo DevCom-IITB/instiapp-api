@@ -29,3 +29,23 @@ class Achievement(models.Model):
 
     class Meta:
         ordering = ("-time_of_creation",)
+
+class OfferedAchievement(models.Model):
+    """A single achievement offered by an event."""
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    time_of_creation = models.DateTimeField(auto_now_add=True)
+    time_of_modification = models.DateTimeField(auto_now=True)
+
+    title = models.CharField(max_length=80)
+    description = models.TextField(blank=True, null=True)
+    priority = models.IntegerField(default=0)
+
+    body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE,
+                             related_name='offered_achievements')
+
+    event = models.ForeignKey('events.Event', on_delete=models.CASCADE,
+                             related_name='offered_achievements')
+
+    class Meta:
+        ordering = ("priority",)

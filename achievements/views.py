@@ -8,8 +8,10 @@ from roles.helpers import forbidden_no_privileges
 from roles.helpers import user_has_privilege
 
 from achievements.models import Achievement
+from achievements.models import OfferedAchievement
 from achievements.serializers import AchievementSerializer
 from achievements.serializers import AchievementUserSerializer
+from achievements.serializers import OfferedAchievementSerializer
 
 class AchievementViewSet(viewsets.ModelViewSet):
     """Views for Achievements"""
@@ -87,6 +89,48 @@ class AchievementViewSet(viewsets.ModelViewSet):
 
         # Check for permission
         if not user_has_privilege(request.user.profile, achievement.body.id, "VerA"):
+            return forbidden_no_privileges()
+
+        return super().destroy(request, pk)
+
+class OfferedAchievementViewSet(viewsets.ModelViewSet):
+    """Views for Achievement Offers"""
+
+    queryset = OfferedAchievement.objects
+    serializer_class = OfferedAchievementSerializer
+
+    @login_required_ajax
+    def create(self, request):
+        """Offer a new achievement for an event."""
+
+        # Check for event add privilege
+        if not user_has_privilege(request.user.profile, request.data['body'], "AddE"):
+            return forbidden_no_privileges()
+
+        return super().create(request)
+
+    @login_required_ajax
+    def update(self, request, pk):
+        """Update an offered achievement."""
+
+        # Get current object
+        offer = get_object_or_404(self.queryset, id=pk)
+
+        # Check for event add privilege
+        if not user_has_privilege(request.user.profile, offer.body.id, "AddE"):
+            return forbidden_no_privileges()
+
+        return super().update(request, pk)
+
+    @login_required_ajax
+    def destroy(self, request, pk):
+        """Update an offered achievement."""
+
+        # Get current object
+        offer = get_object_or_404(self.queryset, id=pk)
+
+        # Check for event add privilege
+        if not user_has_privilege(request.user.profile, offer.body.id, "AddE"):
             return forbidden_no_privileges()
 
         return super().destroy(request, pk)

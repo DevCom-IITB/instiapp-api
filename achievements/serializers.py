@@ -1,6 +1,7 @@
 """Serializers for Achievements."""
 from rest_framework import serializers
 from achievements.models import Achievement
+from achievements.models import OfferedAchievement
 from bodies.serializer_min import BodySerializerMin
 from events.serializers import EventMinSerializer
 from users.serializers import UserProfileSerializer
@@ -62,3 +63,10 @@ class AchievementUserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data['verified_by'] = self.context['request'].user.profile
         return super().update(instance, validated_data)
+
+class OfferedAchievementSerializer(serializers.ModelSerializer):
+    """Simple serializer for AchievementOffer model."""
+
+    class Meta:
+        model = OfferedAchievement
+        fields = ('id', 'priority', 'title', 'description', 'body', 'event')

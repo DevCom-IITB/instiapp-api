@@ -25,7 +25,7 @@ class AchievementTestCae(APITestCase):
 
         # Body roles
         self.body_1_role = BodyRole.objects.create(
-            name="Body1Role", body=self.body_1, permissions='VerA')
+            name="Body1Role", body=self.body_1, permissions='VerA,AddE')
 
     def test_get_achievement(self):
         """Test retrieve method of achievement viewset."""
@@ -132,3 +132,46 @@ class AchievementTestCae(APITestCase):
         url = '/api/achievements/%s' % achievement_1.id
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
+
+    def test_achievement_offer(self):
+        """Test offered achivements."""
+
+        # Setup data
+        data = {
+            'title': 'My Big Achievement',
+            'priority': 1,
+            'body': str(self.body_1.id),
+            'event': str(self.event_1.id),
+        }
+        url = '/api/achievements-offer'
+
+        # Try create without privileges
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Acquire privileges and try
+        self.user.profile.roles.add(self.body_1_role)
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.user.profile.roles.remove(self.body_1_role)
+
+        # Try update without privileges
+        url = '/api/achievements-offer/%s' % response.data['id']
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Acquire privileges and try
+        self.user.profile.roles.add(self.body_1_role)
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.user.profile.roles.remove(self.body_1_role)
+
+        # Try delete without privileges
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Acquire privileges and try
+        self.user.profile.roles.add(self.body_1_role)
+        response = self.client.delete(url, data, format='json')
+        self.assertEqual(response.status_code, 204)
+        self.user.profile.roles.remove(self.body_1_role)
