@@ -23,3 +23,6 @@ class Achievement(models.Model):
 
     body = models.ForeignKey('bodies.Body', null=True,
                              on_delete=models.SET_NULL, related_name='achievements')
+
+    event = models.ForeignKey('events.Event', null=True,
+                              on_delete=models.SET_NULL, related_name='achievements')

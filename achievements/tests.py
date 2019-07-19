@@ -3,6 +3,7 @@ from rest_framework.test import APIClient
 from login.tests import get_new_user
 from achievements.models import Achievement
 from helpers.test_helpers import create_body
+from helpers.test_helpers import create_event
 from roles.models import BodyRole
 
 class AchievementTestCae(APITestCase):
@@ -17,9 +18,10 @@ class AchievementTestCae(APITestCase):
         # A different user
         self.user_2 = get_new_user()
 
-        # Dummy bodiews
+        # Dummy bodies and events
         self.body_1 = create_body()
         self.body_2 = create_body()
+        self.event_1 = create_event()
 
         # Body roles
         self.body_1_role = BodyRole.objects.create(
@@ -89,10 +91,12 @@ class AchievementTestCae(APITestCase):
 
         # Create (malicious) request from user
         data['body'] = str(self.body_1.id)
+        data['event'] = str(self.event_1.id)
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['verified'], False)
         self.assertEqual(response.data['dismissed'], False)
+        self.assertEqual(response.data['event_detail']['name'], self.event_1.name)
 
         # Get achievement id for further use
         achievement_id = response.data['id']

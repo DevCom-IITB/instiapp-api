@@ -2,16 +2,19 @@
 from rest_framework import serializers
 from achievements.models import Achievement
 from bodies.serializer_min import BodySerializerMin
+from events.serializers import EventSerializer
 from users.serializers import UserProfileSerializer
 
 class AchievementSerializer(serializers.ModelSerializer):
     """Serializer for Achievement model."""
 
     body_detail = BodySerializerMin(read_only=True, source="body")
+    event_detail = EventSerializer(read_only=True, source="event")
 
     class Meta:
         model = Achievement
-        fields = ('id', 'title', 'description', 'body_detail', 'dismissed', 'verified')
+        fields = ('id', 'title', 'description', 'body_detail',
+                  'dismissed', 'verified', 'event_detail')
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -35,13 +38,14 @@ class AchievementUserSerializer(serializers.ModelSerializer):
     """Serializer for Achievement model."""
 
     body_detail = BodySerializerMin(read_only=True, source="body")
+    event_detail = EventSerializer(read_only=True, source="event")
     user = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = Achievement
         fields = ('id', 'title', 'description', 'admin_note',
                   'body_detail', 'dismissed', 'verified', 'user', 'body',
-                  'verified_by')
+                  'verified_by', 'event', 'event_detail')
 
     @staticmethod
     def setup_eager_loading(queryset):
