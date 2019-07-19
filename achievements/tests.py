@@ -78,7 +78,7 @@ class AchievementTestCae(APITestCase):
 
         # Try creating request without body
         data = {
-            'description': 'My Big Achievement',
+            'title': 'My Big Achievement',
             'image_url': 'http://example.com/image2.png',
             'verified': True,
             'dismissed': True,
