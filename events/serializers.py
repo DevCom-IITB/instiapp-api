@@ -40,6 +40,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     from locations.serializers import LocationSerializerMin
     from bodies.serializer_min import BodySerializerMin
+    from achievements.serializers import OfferedAchievementSerializer
 
     interested_count = serializers.IntegerField(read_only=True)
     going_count = serializers.IntegerField(read_only=True)
@@ -51,19 +52,21 @@ class EventSerializer(serializers.ModelSerializer):
 
     bodies = BodySerializerMin(many=True, read_only=True)
 
+    offered_achievements = OfferedAchievementSerializer(many=True, read_only=True)
+
     class Meta:
         model = Event
         fields = ('id', 'str_id', 'name', 'description', 'image_url',
                   'start_time', 'end_time', 'all_day', 'venues', 'bodies',
                   'interested_count', 'going_count', 'website_url', 'weight',
-                  'user_ues')
+                  'user_ues', 'offered_achievements')
 
     @staticmethod
     def setup_eager_loading(queryset, request, extra_prefetch=None):
         """Perform necessary eager loading of data."""
 
         # Get the fields to be prefetched
-        fields = ['bodies', 'venues', 'user_tags']
+        fields = ['bodies', 'venues', 'user_tags', 'offered_achievements']
 
         # Add prefetch for user_ues
         if request.user.is_authenticated and hasattr(request.user, 'profile'):
@@ -92,6 +95,7 @@ class EventFullSerializer(serializers.ModelSerializer):
 
     from bodies.serializer_min import BodySerializerMin
     from locations.serializers import LocationSerializerMin
+    from achievements.serializers import OfferedAchievementSerializer
     from locations.models import Location
     from bodies.models import Body
 
@@ -121,12 +125,14 @@ class EventFullSerializer(serializers.ModelSerializer):
     user_tags = serializers.PrimaryKeyRelatedField(
         many=True, read_only=False, queryset=UserTag.objects.all(), default=[])
 
+    offered_achievements = OfferedAchievementSerializer(many=True, read_only=True)
+
     class Meta:
         model = Event
         fields = ('id', 'str_id', 'name', 'description', 'image_url', 'start_time',
                   'end_time', 'all_day', 'venues', 'venue_names', 'bodies', 'bodies_id',
                   'interested_count', 'going_count', 'interested', 'going', 'venue_ids',
-                  'website_url', 'user_ues', 'notify', 'user_tags')
+                  'website_url', 'user_ues', 'notify', 'user_tags', 'offered_achievements')
 
     @staticmethod
     def setup_eager_loading(queryset, request):
