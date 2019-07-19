@@ -45,7 +45,7 @@ class OfferedAchievement(models.Model):
                              related_name='offered_achievements')
 
     event = models.ForeignKey('events.Event', on_delete=models.CASCADE,
-                             related_name='offered_achievements')
+                              related_name='offered_achievements')
 
     class Meta:
         ordering = ("priority",)
