@@ -50,6 +50,10 @@ class AchievementViewSet(viewsets.ModelViewSet):
     def create(self, request):
         """Make a request to a body for a new achievement."""
 
+        # Disallow requests without body
+        if 'body' not in request.data or not request.data['body']:
+            return forbidden_no_privileges()
+
         return super().create(request)
 
     @login_required_ajax
