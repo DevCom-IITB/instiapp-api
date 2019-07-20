@@ -14,6 +14,8 @@ from achievements.serializers import AchievementSerializer
 from achievements.serializers import AchievementUserSerializer
 from achievements.serializers import OfferedAchievementSerializer
 
+from users.serializers import UserProfileSerializer
+
 class AchievementViewSet(viewsets.ModelViewSet):
     """Views for Achievements"""
     queryset = Achievement.objects
@@ -108,9 +110,20 @@ class OfferedAchievementViewSet(viewsets.ModelViewSet):
         offer = get_object_or_404(self.queryset, id=pk)
         data = OfferedAchievementSerializer(offer).data
 
+        # Extra fields in user serializer
+        extra_fields = []
+
         # Check for verification privilege
         if user_has_privilege(request.user.profile, offer.body.id, "VerA"):
             data['secret'] = offer.secret
+
+            # Add extra fields for privileged users
+            extra_fields = ['roll_no', 'email', 'contact_no', 'department_name', 'degree']
+
+        # Get users haveing this achievement
+        users = [a.user for a in offer.achievements.prefetch_related('user')]
+        data['users'] = UserProfileSerializer(
+            users, many=True, context={'extra': extra_fields}).data
 
         return Response(data)
 
