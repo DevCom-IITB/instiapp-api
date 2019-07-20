@@ -15,7 +15,7 @@ class AchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
         fields = ('id', 'title', 'description', 'body_detail',
-                  'dismissed', 'verified', 'event_detail')
+                  'dismissed', 'verified', 'hidden', 'event_detail')
 
     @staticmethod
     def setup_eager_loading(queryset):
