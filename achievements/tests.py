@@ -49,6 +49,9 @@ class AchievementTestCase(APITestCase):
         Achievement.objects.create(
             description="Test Achievement 2", body=self.body_1, user=self.user.profile, verified=True)
         Achievement.objects.create(
+            description="Hidden Achievement", body=self.body_1, user=self.user.profile,
+            verified=True, dismissed=True, hidden=True)
+        Achievement.objects.create(
             description="Different User Ach 3", body=self.body_1, user=self.user_2.profile)
         Achievement.objects.create(
             description="Different User Body 4", body=self.body_2, user=self.user_2.profile)
@@ -57,9 +60,9 @@ class AchievementTestCase(APITestCase):
         url = '/api/achievements'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 3)
 
-        # Test user me list (only verified)
+        # Test user me list (only verified and not hidden)
         url = '/api/user-me'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -76,6 +79,27 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)
         self.user.profile.roles.remove(self.body_1_role)
+
+    def test_achievement_patch(self):
+        """Test patching (hiding) achievements."""
+
+        achievement_1 = Achievement.objects.create(
+            description="Test Achievement", body=self.body_1, user=self.user.profile, hidden=False)
+        achievement_2 = Achievement.objects.create(
+            description="Test Achievement", body=self.body_1, user=self.user_2.profile)
+
+        # Try to patch someone else's achievement
+        data = {'hidden': True}
+        url = '/api/achievements/%s' % achievement_2.id
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Try to patch own achievement
+        url = '/api/achievements/%s' % achievement_1.id
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, 204)
+        achievement_1.refresh_from_db()
+        self.assertEqual(achievement_1.hidden, True)
 
     def test_achievement_flow(self):
         """Test creation and verification flow of achievements."""
@@ -157,14 +181,25 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.user.profile.roles.remove(self.body_1_role)
 
+        # Create two achievements, one hidden
+        offer_id = response.data['id']
+        Achievement.objects.create(
+            title="Test", body=self.body_1,
+            user=self.user.profile, offer_id=offer_id)
+        Achievement.objects.create(
+            title="Test", body=self.body_1,
+            user=self.user_2.profile, offer_id=offer_id, hidden=True)
+
         # Try update without privileges
-        url = '/api/achievements-offer/%s' % response.data['id']
+        url = '/api/achievements-offer/%s' % offer_id
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 403)
 
         # Try getting secret without privileges
+        # Check if only one user is present
         response = self.client.get(url, data, format='json')
         self.assertNotIn('secret', response.data)
+        self.assertEqual(len(response.data['users']), 1)
 
         # Acquire privileges and try
         self.user.profile.roles.add(self.body_1_role)
@@ -172,8 +207,10 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         # Try getting secret
+        # Assert both users are present
         response = self.client.get(url, data, format='json')
         self.assertIn('secret', response.data)
+        self.assertEqual(len(response.data['users']), 2)
         self.user.profile.roles.remove(self.body_1_role)
 
         # Try delete without privileges

@@ -11,5 +11,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'profile_pic', 'ldap_id')
 
     def to_representation(self, instance):
-        return settings.USER_PROFILE_SERIALIZER_TRANSFORM(
+        data = settings.USER_PROFILE_SERIALIZER_TRANSFORM(
             super().to_representation(instance))
+
+        # Add any extra fields we might want
+        if 'extra' in self.context:
+            for field in self.context['extra']:
+                data[field] = getattr(instance, field)
+
+        return data

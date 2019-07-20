@@ -8,7 +8,7 @@ urlpatterns = [
         'get': 'list', 'post': 'create'
     })),
     path('achievements/<pk>', AchievementViewSet.as_view({
-        'put': 'update', 'delete': 'destroy', 'get': 'retrieve'
+        'put': 'update', 'delete': 'destroy', 'get': 'retrieve', 'patch': 'update'
     })),
     path('achievements-body/<pk>', AchievementViewSet.as_view({
         'get': 'list_body'

@@ -15,7 +15,7 @@ class AchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
         fields = ('id', 'title', 'description', 'body_detail',
-                  'dismissed', 'verified', 'event_detail')
+                  'dismissed', 'verified', 'hidden', 'event_detail')
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -27,7 +27,7 @@ class VerifiedAchievementListSerializer(serializers.ListSerializer):  # pylint: 
     """List serializer for verified achievements"""
 
     def to_representation(self, data):
-        data = data.filter(verified=True)
+        data = data.filter(verified=True, hidden=False)
         return super(VerifiedAchievementListSerializer, self).to_representation(data)
 
 class VerifiedAchievementSerializer(AchievementSerializer):
