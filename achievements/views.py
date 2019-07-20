@@ -119,15 +119,21 @@ class OfferedAchievementViewSet(viewsets.ModelViewSet):
         # Extra fields in user serializer
         extra_fields = []
 
+        # Query for getting users
+        query = offer.achievements.prefetch_related('user')
+
         # Check for verification privilege
         if user_has_privilege(request.user.profile, offer.body.id, "VerA"):
             data['secret'] = offer.secret
 
             # Add extra fields for privileged users
             extra_fields = ['roll_no', 'email', 'contact_no', 'department_name', 'degree']
+        else:
+            # Filter out hidden achievements
+            query = query.filter(hidden=False)
 
         # Get users haveing this achievement
-        users = [a.user for a in offer.achievements.prefetch_related('user')]
+        users = [a.user for a in query]
         data['users'] = UserProfileSerializer(
             users, many=True, context={'extra': extra_fields}).data
 

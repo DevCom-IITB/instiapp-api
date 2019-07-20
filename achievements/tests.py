@@ -181,14 +181,23 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.user.profile.roles.remove(self.body_1_role)
 
+        # Create two achievements, one hidden
+        offer_id = response.data['id']
+        Achievement.objects.create(title="Test", body=self.body_1,
+            user=self.user.profile, offer_id=offer_id)
+        Achievement.objects.create(title="Test", body=self.body_1,
+            user=self.user_2.profile, offer_id=offer_id, hidden=True)
+
         # Try update without privileges
-        url = '/api/achievements-offer/%s' % response.data['id']
+        url = '/api/achievements-offer/%s' % offer_id
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 403)
 
         # Try getting secret without privileges
+        # Check if only one user is present
         response = self.client.get(url, data, format='json')
         self.assertNotIn('secret', response.data)
+        self.assertEqual(len(response.data['users']), 1)
 
         # Acquire privileges and try
         self.user.profile.roles.add(self.body_1_role)
@@ -196,8 +205,10 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         # Try getting secret
+        # Assert both users are present
         response = self.client.get(url, data, format='json')
         self.assertIn('secret', response.data)
+        self.assertEqual(len(response.data['users']), 2)
         self.user.profile.roles.remove(self.body_1_role)
 
         # Try delete without privileges
