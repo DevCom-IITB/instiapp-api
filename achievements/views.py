@@ -1,4 +1,5 @@
 """Views for achievements models."""
+import pyotp
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -8,8 +9,10 @@ from roles.helpers import forbidden_no_privileges
 from roles.helpers import user_has_privilege
 
 from achievements.models import Achievement
+from achievements.models import OfferedAchievement
 from achievements.serializers import AchievementSerializer
 from achievements.serializers import AchievementUserSerializer
+from achievements.serializers import OfferedAchievementSerializer
 
 class AchievementViewSet(viewsets.ModelViewSet):
     """Views for Achievements"""
@@ -90,3 +93,82 @@ class AchievementViewSet(viewsets.ModelViewSet):
             return forbidden_no_privileges()
 
         return super().destroy(request, pk)
+
+class OfferedAchievementViewSet(viewsets.ModelViewSet):
+    """Views for Achievement Offers"""
+
+    queryset = OfferedAchievement.objects
+    serializer_class = OfferedAchievementSerializer
+
+    @login_required_ajax
+    def retrieve(self, request, pk):
+        """Get a achievement offer."""
+
+        # Get current object
+        offer = get_object_or_404(self.queryset, id=pk)
+        data = OfferedAchievementSerializer(offer).data
+
+        # Check for verification privilege
+        if user_has_privilege(request.user.profile, offer.body.id, "VerA"):
+            data['secret'] = offer.secret
+
+        return Response(data)
+
+    @login_required_ajax
+    def create(self, request):
+        """Offer a new achievement for an event."""
+
+        # Check for event add privilege
+        if not user_has_privilege(request.user.profile, request.data['body'], "AddE"):
+            return forbidden_no_privileges()
+
+        return super().create(request)
+
+    @login_required_ajax
+    def update(self, request, pk):
+        """Update an offered achievement."""
+
+        # Get current object
+        offer = get_object_or_404(self.queryset, id=pk)
+
+        # Check for event add privilege
+        if not user_has_privilege(request.user.profile, offer.body.id, "AddE"):
+            return forbidden_no_privileges()
+
+        return super().update(request, pk)
+
+    @login_required_ajax
+    def destroy(self, request, pk):
+        """Update an offered achievement."""
+
+        # Get current object
+        offer = get_object_or_404(self.queryset, id=pk)
+
+        # Check for event add privilege
+        if not user_has_privilege(request.user.profile, offer.body.id, "AddE"):
+            return forbidden_no_privileges()
+
+        return super().destroy(request, pk)
+
+    @login_required_ajax
+    def claim_secret(self, request, pk):
+        """Claim and try to get an achievement with its secret."""
+
+        # Get object
+        offer = get_object_or_404(self.queryset, id=pk)
+
+        # Check if secret is valid
+        secret = request.data['secret']
+        if offer.secret and (secret == offer.secret or secret == pyotp.TOTP(offer.secret).now()):
+            if request.user.profile.achievements.filter(offer=offer).exists():
+                return Response({'message': 'You already have this achievement!'})
+
+            # Create the achievement
+            Achievement.objects.create(
+                title=offer.title, description=offer.description, admin_note='SECRET',
+                body=offer.body, event=offer.event, verified=True, dismissed=True,
+                user=request.user.profile, offer=offer)
+
+            return Response({'message': 'Achievement unlocked successfully!'}, 201)
+
+        return forbidden_no_privileges()

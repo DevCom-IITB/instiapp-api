@@ -1,11 +1,14 @@
+import pyotp
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from login.tests import get_new_user
 from achievements.models import Achievement
+from achievements.models import OfferedAchievement
 from helpers.test_helpers import create_body
+from helpers.test_helpers import create_event
 from roles.models import BodyRole
 
-class AchievementTestCae(APITestCase):
+class AchievementTestCase(APITestCase):
     """Check if we can create and verify achievement requests."""
 
     def setUp(self):
@@ -17,13 +20,14 @@ class AchievementTestCae(APITestCase):
         # A different user
         self.user_2 = get_new_user()
 
-        # Dummy bodiews
+        # Dummy bodies and events
         self.body_1 = create_body()
         self.body_2 = create_body()
+        self.event_1 = create_event()
 
         # Body roles
         self.body_1_role = BodyRole.objects.create(
-            name="Body1Role", body=self.body_1, permissions='VerA')
+            name="Body1Role", body=self.body_1, permissions='VerA,AddE')
 
     def test_get_achievement(self):
         """Test retrieve method of achievement viewset."""
@@ -89,10 +93,12 @@ class AchievementTestCae(APITestCase):
 
         # Create (malicious) request from user
         data['body'] = str(self.body_1.id)
+        data['event'] = str(self.event_1.id)
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['verified'], False)
         self.assertEqual(response.data['dismissed'], False)
+        self.assertEqual(response.data['event_detail']['name'], self.event_1.name)
 
         # Get achievement id for further use
         achievement_id = response.data['id']
@@ -128,3 +134,87 @@ class AchievementTestCae(APITestCase):
         url = '/api/achievements/%s' % achievement_1.id
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
+
+    def test_achievement_offer(self):
+        """Test offered achivements."""
+
+        # Setup data
+        data = {
+            'title': 'My Big Achievement',
+            'priority': 1,
+            'body': str(self.body_1.id),
+            'event': str(self.event_1.id),
+        }
+        url = '/api/achievements-offer'
+
+        # Try create without privileges
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Acquire privileges and try
+        self.user.profile.roles.add(self.body_1_role)
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.user.profile.roles.remove(self.body_1_role)
+
+        # Try update without privileges
+        url = '/api/achievements-offer/%s' % response.data['id']
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Try getting secret without privileges
+        response = self.client.get(url, data, format='json')
+        self.assertNotIn('secret', response.data)
+
+        # Acquire privileges and try
+        self.user.profile.roles.add(self.body_1_role)
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        # Try getting secret
+        response = self.client.get(url, data, format='json')
+        self.assertIn('secret', response.data)
+        self.user.profile.roles.remove(self.body_1_role)
+
+        # Try delete without privileges
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Acquire privileges and try
+        self.user.profile.roles.add(self.body_1_role)
+        response = self.client.delete(url, data, format='json')
+        self.assertEqual(response.status_code, 204)
+        self.user.profile.roles.remove(self.body_1_role)
+
+    def test_totp_claim(self):
+        offer_1 = OfferedAchievement.objects.create(
+            title="Test Achievement", body=self.body_1, event=self.event_1)
+        offer_2 = OfferedAchievement.objects.create(
+            title="Test Achievement", body=self.body_1, event=self.event_1)
+
+        # Setup data
+        data = {
+            'secret': 'something'
+        }
+        url = '/api/achievements-offer/%s' % offer_1.id
+
+        # Try with invalid secret
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Try with master secret
+        data['secret'] = offer_1.secret
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+
+        # Try to get again master secret
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        # Try with TOTP for offer 2
+        url = '/api/achievements-offer/%s' % offer_2.id
+        data['secret'] = pyotp.TOTP(offer_2.secret).now()
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 200)

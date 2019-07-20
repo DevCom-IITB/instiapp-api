@@ -1,17 +1,21 @@
 """Serializers for Achievements."""
 from rest_framework import serializers
 from achievements.models import Achievement
+from achievements.models import OfferedAchievement
 from bodies.serializer_min import BodySerializerMin
+from events.serializer_min import EventMinSerializer
 from users.serializers import UserProfileSerializer
 
 class AchievementSerializer(serializers.ModelSerializer):
     """Serializer for Achievement model."""
 
     body_detail = BodySerializerMin(read_only=True, source="body")
+    event_detail = EventMinSerializer(read_only=True, source="event")
 
     class Meta:
         model = Achievement
-        fields = ('id', 'title', 'description', 'body_detail', 'dismissed', 'verified')
+        fields = ('id', 'title', 'description', 'body_detail',
+                  'dismissed', 'verified', 'event_detail')
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -35,13 +39,14 @@ class AchievementUserSerializer(serializers.ModelSerializer):
     """Serializer for Achievement model."""
 
     body_detail = BodySerializerMin(read_only=True, source="body")
+    event_detail = EventMinSerializer(read_only=True, source="event")
     user = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = Achievement
         fields = ('id', 'title', 'description', 'admin_note',
                   'body_detail', 'dismissed', 'verified', 'user', 'body',
-                  'verified_by')
+                  'verified_by', 'event', 'event_detail')
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -58,3 +63,10 @@ class AchievementUserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data['verified_by'] = self.context['request'].user.profile
         return super().update(instance, validated_data)
+
+class OfferedAchievementSerializer(serializers.ModelSerializer):
+    """Simple serializer for AchievementOffer model."""
+
+    class Meta:
+        model = OfferedAchievement
+        fields = ('id', 'priority', 'title', 'description', 'body', 'event')
