@@ -49,6 +49,9 @@ class AchievementTestCase(APITestCase):
         Achievement.objects.create(
             description="Test Achievement 2", body=self.body_1, user=self.user.profile, verified=True)
         Achievement.objects.create(
+            description="Hidden Achievement", body=self.body_1, user=self.user.profile,
+            verified=True, dismissed=True, hidden=True)
+        Achievement.objects.create(
             description="Different User Ach 3", body=self.body_1, user=self.user_2.profile)
         Achievement.objects.create(
             description="Different User Body 4", body=self.body_2, user=self.user_2.profile)
@@ -57,9 +60,9 @@ class AchievementTestCase(APITestCase):
         url = '/api/achievements'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 3)
 
-        # Test user me list (only verified)
+        # Test user me list (only verified and not hidden)
         url = '/api/user-me'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
