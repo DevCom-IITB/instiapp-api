@@ -183,9 +183,11 @@ class AchievementTestCase(APITestCase):
 
         # Create two achievements, one hidden
         offer_id = response.data['id']
-        Achievement.objects.create(title="Test", body=self.body_1,
+        Achievement.objects.create(
+            title="Test", body=self.body_1,
             user=self.user.profile, offer_id=offer_id)
-        Achievement.objects.create(title="Test", body=self.body_1,
+        Achievement.objects.create(
+            title="Test", body=self.body_1,
             user=self.user_2.profile, offer_id=offer_id, hidden=True)
 
         # Try update without privileges
