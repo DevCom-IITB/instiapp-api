@@ -77,6 +77,27 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(len(response.data), 3)
         self.user.profile.roles.remove(self.body_1_role)
 
+    def test_achievement_patch(self):
+        """Test patching (hiding) achievements."""
+
+        achievement_1 = Achievement.objects.create(
+            description="Test Achievement", body=self.body_1, user=self.user.profile, hidden=False)
+        achievement_2 = Achievement.objects.create(
+            description="Test Achievement", body=self.body_1, user=self.user_2.profile)
+
+        # Try to patch someone else's achievement
+        data = {'hidden': True}
+        url = '/api/achievements/%s' % achievement_2.id
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Try to patch own achievement
+        url = '/api/achievements/%s' % achievement_1.id
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, 204)
+        achievement_1.refresh_from_db()
+        self.assertEqual(achievement_1.hidden, True)
+
     def test_achievement_flow(self):
         """Test creation and verification flow of achievements."""
 

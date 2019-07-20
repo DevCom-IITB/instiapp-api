@@ -44,6 +44,7 @@ class Achievement(models.Model):
     user = models.ForeignKey('users.UserProfile', null=False,
                              on_delete=models.CASCADE, related_name='achievements')
 
+    hidden = models.BooleanField(default=False)
     dismissed = models.BooleanField(default=False)
     verified = models.BooleanField(default=False)
     verified_by = models.ForeignKey('users.UserProfile', null=True, blank=True,

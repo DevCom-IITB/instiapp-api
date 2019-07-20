@@ -64,10 +64,16 @@ class AchievementViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def update(self, request, pk):
         """Update/Verify an achievement.
-        Needs BodyRole with `VerA`"""
+        Needs BodyRole with `VerA` or can patch own achievement"""
 
         # Get the achievement currently in database
         achievement = get_object_or_404(self.queryset, id=pk)
+
+        # Check if this is a patch request and the user is patching
+        if request.method == 'PATCH' and request.user.profile == achievement.user:
+            achievement.hidden = bool(request.data['hidden'])
+            achievement.save()
+            return Response(status=204)
 
         # Check if the user has privileges for updating
         if not user_has_privilege(request.user.profile, achievement.body.id, "VerA"):
