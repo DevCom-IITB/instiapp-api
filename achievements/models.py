@@ -14,6 +14,7 @@ class OfferedAchievement(models.Model):
     title = models.CharField(max_length=80)
     description = models.TextField(blank=True, null=True)
     priority = models.IntegerField(default=0)
+    generic = models.CharField(max_length=20, default="generic")
 
     body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE,
                              related_name='offered_achievements')

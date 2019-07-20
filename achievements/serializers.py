@@ -69,4 +69,5 @@ class OfferedAchievementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OfferedAchievement
-        fields = ('id', 'priority', 'title', 'description', 'body', 'event')
+        fields = ('id', 'priority', 'title', 'description',
+                  'body', 'event', 'generic')
