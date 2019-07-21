@@ -66,8 +66,8 @@ class UserProfile(models.Model):
         verbose_name = "Profile"
         verbose_name_plural = "Profiles"
         indexes = [
-            models.Index(fields=['active',]),
-            models.Index(fields=['ldap_id',]),
+            models.Index(fields=['active', ]),
+            models.Index(fields=['ldap_id', ]),
         ]
 
     class ExMeta:
