@@ -2,6 +2,7 @@
 import requests
 from django.conf import settings
 from django.contrib.auth import logout
+from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.response import Response
 from login.helpers import perform_login
@@ -113,6 +114,10 @@ class LoginViewSet(viewsets.ViewSet):
                 user_profile, context={'request': request})
         except UserProfile.DoesNotExist:
             return Response({'message': "UserProfile doesn't exist"}, status=500)
+
+        # Count this as a ping
+        user_profile.last_ping = timezone.now()
+        user_profile.save(update_fields=['last_ping'])
 
         # Return the details and nested profile
         return Response({
