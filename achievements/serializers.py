@@ -46,7 +46,7 @@ class AchievementUserSerializer(serializers.ModelSerializer):
         model = Achievement
         fields = ('id', 'title', 'description', 'admin_note',
                   'body_detail', 'dismissed', 'verified', 'user', 'body',
-                  'verified_by', 'event', 'event_detail')
+                  'verified_by', 'event', 'event_detail', 'offer')
 
     @staticmethod
     def setup_eager_loading(queryset):
