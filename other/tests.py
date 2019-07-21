@@ -330,7 +330,7 @@ class OtherTestCase(TransactionTestCase):
         cat2 = create_usertagcategory()
 
         # Create test users for matching
-        profiles = [get_new_user().profile for x in range(5)]
+        profiles = [get_new_user().profile for x in range(6)]
         for profile in profiles:
             profile.department = 'ME'
         profiles[0].hostel = '1'
@@ -341,6 +341,8 @@ class OtherTestCase(TransactionTestCase):
         profiles[3].department = 'EP'
         profiles[4].hostel = '2'
         profiles[4].roll_no = '2'
+        profiles[5].hostel = '1'
+        profiles[5].active = False
         for profile in profiles:
             profile.save()
 

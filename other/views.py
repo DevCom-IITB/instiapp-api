@@ -94,4 +94,4 @@ class OtherViewset(viewsets.ViewSet):
     def get_user_tags_reach(cls, request):
         """Get reach of selected user tags."""
         tags = UserTag.objects.filter(id__in=request.data)
-        return Response({'count': users_from_tags(tags).count()})
+        return Response({'count': users_from_tags(tags).filter(active=True).count()})
