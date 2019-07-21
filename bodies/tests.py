@@ -80,6 +80,33 @@ class BodyTestCase(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['str_id'], body.str_id)
 
+        # Add some followers
+        users = [get_new_user().profile for _ in range(10)]
+        for user in users:
+            user.followed_bodies.add(body)
+
+        # Test follower count and user_follows
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['followers_count'], 10)
+        self.assertEqual(response.data['user_follows'], False)
+
+        # Add self as follower and try same thing
+        self.user.profile.followed_bodies.add(body)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['followers_count'], 11)
+        self.assertEqual(response.data['user_follows'], True)
+
+        # Mark a user as inactive and check
+        users[0].active = False
+        users[0].save()
+        self.user.profile.followed_bodies.add(body)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['followers_count'], 10)
+        self.assertEqual(response.data['user_follows'], True)
+
     def test_bodies_list(self):
         """Test if bodies can be listed."""
         url = '/api/bodies'

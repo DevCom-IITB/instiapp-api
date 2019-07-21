@@ -45,6 +45,7 @@ class UserProfile(models.Model):
     room = models.CharField(max_length=30, null=True, blank=True)
 
     # InstiApp feature fields
+    active = models.BooleanField(default=True)
     followed_bodies = models.ManyToManyField('bodies.Body', related_name='followers', blank=True)
 
     # InstiApp roles

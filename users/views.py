@@ -64,6 +64,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         # Count as a ping
         profile = request.user.profile
         profile.last_ping = timezone.now()
+        profile.active = True
 
         serializer = UserProfileFullSerializer(
             profile, data=request.data, context=self.get_serializer_context())

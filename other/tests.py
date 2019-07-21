@@ -45,6 +45,7 @@ class OtherTestCase(TransactionTestCase):
         # Create dummy users for search
         UserProfile.objects.create(name="Test User1")
         UserProfile.objects.create(name="Test User2")
+        UserProfile.objects.create(name="Test User3", active=False)
 
         # Associate events with bodies
         event1.bodies.add(body1)
