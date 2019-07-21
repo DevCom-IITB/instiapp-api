@@ -114,7 +114,6 @@ class PlacementsTestCase(APITestCase):
         self.assertEqual(mentioned_user.notifications.count(), 2)
         self.assertEqual(mentioned_dual.notifications.count(), 2)
 
-
     def tearDown(self):
         # Stop server
         self.mock_server.terminate()

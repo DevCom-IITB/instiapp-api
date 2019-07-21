@@ -1,5 +1,4 @@
 """Test cases for users app."""
-from datetime import datetime
 from datetime import timedelta
 from django.utils import timezone
 from rest_framework.test import APITestCase
