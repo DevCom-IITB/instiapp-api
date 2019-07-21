@@ -1,5 +1,6 @@
 """Test cases for users app."""
 from datetime import timedelta
+from django.core.management import call_command
 from django.utils import timezone
 from rest_framework.test import APITestCase
 from events.models import Event
@@ -208,3 +209,25 @@ class UserTestCase(APITestCase):
         tag = UserTag.objects.create(category=category, regex='abc', target='hostel')
         self.assertEqual(str(category), 'Category1')
         self.assertEqual(str(tag), 'hostel abc')
+
+    def test_inactive_chore(self):
+        """Test the chore for marking users inactive."""
+
+        def refresh(objs):
+            _ = [obj.refresh_from_db() for obj in objs]
+            return objs
+
+        users = [get_new_user().profile for _ in range(10)]
+
+        # Check if nothing is affected
+        call_command('mark-users-inactive')
+        self.assertEqual(len([user for user in refresh(users) if user.active]), 10)
+
+        # Mark two users inactive, one almost inactive
+        users[0].last_ping = users[1].last_ping = timezone.now() - timedelta(days=370)
+        users[2].last_ping = users[3].last_ping = timezone.now() - timedelta(days=360)
+        _ = [user.save() for user in users]
+
+        # Check if two are inactive now
+        call_command('mark-users-inactive')
+        self.assertEqual(len([user for user in refresh(users) if user.active]), 8)
