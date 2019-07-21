@@ -43,7 +43,8 @@ class OtherViewset(viewsets.ViewSet):
             request, MIN_LENGTH, Event.objects, ['name', 'description'])[:20], request)
 
         # Search users by only name: don't add anything else here
-        users = query_search(request, MIN_LENGTH, UserProfile.objects, ['name', 'ldap_id', 'roll_no'])[:20]
+        users = query_search(request, MIN_LENGTH, UserProfile.objects.filter(
+            active=True), ['name', 'ldap_id', 'roll_no'])[:20]
 
         return Response({
             "bodies": BodySerializerMin(bodies, many=True).data,
@@ -93,4 +94,4 @@ class OtherViewset(viewsets.ViewSet):
     def get_user_tags_reach(cls, request):
         """Get reach of selected user tags."""
         tags = UserTag.objects.filter(id__in=request.data)
-        return Response({'count': users_from_tags(tags).count()})
+        return Response({'count': users_from_tags(tags).filter(active=True).count()})

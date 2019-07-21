@@ -1,5 +1,6 @@
 """Test cases for users app."""
 from datetime import timedelta
+from django.core.management import call_command
 from django.utils import timezone
 from rest_framework.test import APITestCase
 from events.models import Event
@@ -98,19 +99,33 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], str(event.id))
 
-        # Check updating device
-        data = {'fcm_id': 'TEST1'}
+        # Set and assert ping date to past
+        profile = usr()
+        profile.last_ping = "1970-01-02 00:00Z"
+        profile.save()
+        self.assertLess(usr().last_ping.timestamp(), 300000)
+
+        # Check updating device, profile and ping
+        data = {'fcm_id': 'TEST1', 'show_contact_no': False}
         url = '/api/user-me'
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(usr().fcm_id, '')
         self.assertEqual(usr().devices.first().fcm_id, 'TEST1')
+        self.assertEqual(usr().show_contact_no, False)
+        self.assertGreater(usr().last_ping.timestamp(), 300000)
 
         # Check patch validation
         data = {'android_version': 'long' * 200}
         url = '/api/user-me'
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, 400)
+
+        # Check patch cannot update illegally
+        data = {'hostel': 'H7'}
+        url = '/api/user-me'
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
 
         # Check updating FCM Id with the deprecated API
         url = '/api/user-me?fcm_id=TESTCHANGE'
@@ -194,3 +209,25 @@ class UserTestCase(APITestCase):
         tag = UserTag.objects.create(category=category, regex='abc', target='hostel')
         self.assertEqual(str(category), 'Category1')
         self.assertEqual(str(tag), 'hostel abc')
+
+    def test_inactive_chore(self):
+        """Test the chore for marking users inactive."""
+
+        def refresh(objs):
+            _ = [obj.refresh_from_db() for obj in objs]
+            return objs
+
+        users = [get_new_user().profile for _ in range(10)]
+
+        # Check if nothing is affected
+        call_command('mark-users-inactive')
+        self.assertEqual(len([user for user in refresh(users) if user.active]), 10)
+
+        # Mark two users inactive, one almost inactive
+        users[0].last_ping = users[1].last_ping = timezone.now() - timedelta(days=370)
+        users[2].last_ping = users[3].last_ping = timezone.now() - timedelta(days=360)
+        _ = [user.save() for user in users]
+
+        # Check if two are inactive now
+        call_command('mark-users-inactive')
+        self.assertEqual(len([user for user in refresh(users) if user.active]), 8)

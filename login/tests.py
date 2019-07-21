@@ -14,14 +14,11 @@ class LoginTestCase(APITestCase):
     """Check login flow."""
 
     def setUp(self):
-        pass
+        self.mock_server = Popen(['python', 'login/test_server.py'])
+        time.sleep(1)
 
     def test_login(self):
         """Test if SSO login works."""
-
-        # Start mock SSO server and wait to be sure it has started
-        mock_server = Popen(['python', 'login/test_server.py'])
-        time.sleep(1)
 
         # Check validation
         # Without code
@@ -76,9 +73,6 @@ class LoginTestCase(APITestCase):
         self.assertEqual(user.user.first_name, "First Name")
         self.assertEqual(user.user.last_name, "Last Name")
 
-        # Terminate our server
-        mock_server.terminate()
-
         # Test logout
         url = 'http://localhost/api/logout'
         response = self.client.get(url, format='json')
@@ -99,10 +93,6 @@ class LoginTestCase(APITestCase):
 
     def test_pass_login(self):
         """Test if password login works."""
-
-        # Start mock server
-        mock_server = Popen(['python', 'login/test_server.py'])
-        time.sleep(1)
 
         # Check validation
         # Without password
@@ -130,5 +120,5 @@ class LoginTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
 
-        # Terminate server
-        mock_server.terminate()
+    def tearDown(self):
+        self.mock_server.terminate()

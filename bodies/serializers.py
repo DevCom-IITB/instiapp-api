@@ -55,7 +55,7 @@ class BodySerializer(serializers.ModelSerializer):
         queryset = queryset.prefetch_related('parents', 'children')
 
         # Annotate followers count
-        followers_count = Count('followers')
+        followers_count = Count('followers', filter=Q(followers__active=True))
 
         # Annotate user_follows
         userid = request.user.profile.id if request.user.is_authenticated else None

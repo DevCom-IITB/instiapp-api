@@ -72,7 +72,7 @@ class AchievementViewSet(viewsets.ModelViewSet):
         # Check if this is a patch request and the user is patching
         if request.method == 'PATCH' and request.user.profile == achievement.user:
             achievement.hidden = bool(request.data['hidden'])
-            achievement.save()
+            achievement.save(update_fields=['hidden'])
             return Response(status=204)
 
         # Check if the user has privileges for updating

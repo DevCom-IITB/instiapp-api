@@ -8,7 +8,7 @@ from users.models import UserTag
 class ProfileAdmin(admin.ModelAdmin):
     search_fields = ['name', 'roll_no']
     list_display = ('name', 'roll_no', 'department', 'degree')
-    list_filter = ('join_year', 'department', 'degree')
+    list_filter = ('last_ping', 'join_year', 'department', 'degree')
     raw_id_fields = ('user',)
 
 class UserFormerRoleAdmin(admin.ModelAdmin):
