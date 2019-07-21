@@ -99,18 +99,25 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.data[0]['id'], str(event.id))
 
         # Check updating device
-        data = {'fcm_id': 'TEST1'}
+        data = {'fcm_id': 'TEST1', 'show_contact_no': False}
         url = '/api/user-me'
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(usr().fcm_id, '')
         self.assertEqual(usr().devices.first().fcm_id, 'TEST1')
+        self.assertEqual(usr().show_contact_no, False)
 
         # Check patch validation
         data = {'android_version': 'long' * 200}
         url = '/api/user-me'
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, 400)
+
+        # Check patch cannot update illegally
+        data = {'hostel': 'H7'}
+        url = '/api/user-me'
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
 
         # Check updating FCM Id with the deprecated API
         url = '/api/user-me?fcm_id=TESTCHANGE'

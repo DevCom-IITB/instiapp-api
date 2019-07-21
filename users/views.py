@@ -15,6 +15,7 @@ from users.serializer_full import UserProfileFullSerializer
 from users.models import UserProfile
 from users.models import WebPushSubscription
 from roles.helpers import login_required_ajax
+from roles.helpers import forbidden_no_privileges
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """UserProfile"""
@@ -54,6 +55,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         # Create device instead of updating profile
         if 'fcm_id' in request.data:
             update_fcm_device(request, request.data.pop('fcm_id', None))
+
+        # Check if all fields are exposed ones
+        if any(f not in UserProfile.ExMeta.user_editable for f in request.data):
+            return forbidden_no_privileges()
 
         serializer = UserProfileFullSerializer(
             request.user.profile, data=request.data, context=self.get_serializer_context())

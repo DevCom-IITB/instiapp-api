@@ -57,6 +57,9 @@ class UserProfile(models.Model):
         verbose_name = "Profile"
         verbose_name_plural = "Profiles"
 
+    class ExMeta:
+        user_editable = ('show_contact_no', 'fcm_id', 'about', 'android_version')
+
     def __str__(self):
         return self.name
 
