@@ -46,9 +46,9 @@ def query_search(request, min_length, queryset, fields):
 
     return queryset
 
-def sort_by_field(queryset, field, reverse=False):
+def sort_by_field(queryset, field, reverse=False, filt=None):
     """Return a queryset ordered by a field"""
-    queryset = queryset.annotate(field_count=Count(field))
+    queryset = queryset.annotate(field_count=Count(field, filter=filt))
     return queryset.order_by(('-' if reverse else '') + 'field_count')
 
 def table_to_markdown(html):

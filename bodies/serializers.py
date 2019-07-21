@@ -31,14 +31,18 @@ class BodySerializer(serializers.ModelSerializer):
     def get_parents(obj):
         """Gets a min serialized parents of a Body."""
         parents = obj.parents.prefetch_related('parent')
-        parents = sort_by_field(parents, 'parent__followers', reverse=True)
+        parents = sort_by_field(
+            parents, 'parent__followers', reverse=True,
+            filt=Q(parent__followers__active=True))
         return [BodySerializerMin(x.parent).data for x in parents.all()]
 
     @staticmethod
     def get_children(obj):
         """Gets a min serialized children of a Body."""
         children = obj.children.prefetch_related('child')
-        children = sort_by_field(children, 'child__followers', reverse=True)
+        children = sort_by_field(
+            children, 'child__followers', reverse=True,
+            filt=Q(child__followers__active=True))
         return [BodySerializerMin(x.child).data for x in children.all()]
 
     def get_events(self, obj):

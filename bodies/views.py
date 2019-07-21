@@ -2,6 +2,7 @@
 from uuid import UUID
 from rest_framework import viewsets
 from rest_framework.response import Response
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from bodies.serializers_followers import BodyFollowersSerializer
@@ -25,7 +26,7 @@ class BodyViewSet(viewsets.ModelViewSet):
     @staticmethod
     def list(request):
         queryset = Body.objects.all()
-        queryset = sort_by_field(queryset, 'followers', reverse=True)
+        queryset = sort_by_field(queryset, 'followers', reverse=True, filt=Q(followers__active=True))
         serializer = BodySerializerMin(queryset, many=True)
         return Response(serializer.data)
 
