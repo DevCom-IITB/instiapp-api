@@ -65,6 +65,10 @@ class UserProfile(models.Model):
     class Meta:
         verbose_name = "Profile"
         verbose_name_plural = "Profiles"
+        indexes = [
+            models.Index(fields=['active',]),
+            models.Index(fields=['ldap_id',]),
+        ]
 
     class ExMeta:
         user_editable = ('show_contact_no', 'fcm_id', 'about', 'android_version', 'website_url')
