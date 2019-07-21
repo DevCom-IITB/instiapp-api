@@ -27,6 +27,9 @@ class PlacementsTestCase(APITestCase):
     """Test placements endpoints."""
 
     def setUp(self):
+        # Start mock server
+        self.mock_server = Popen(['python', 'news/test/test_server.py'])
+
         # Create dummies
         self.entry1 = BlogEntry.objects.create(title="PEntry1", blog_url=settings.PLACEMENTS_URL)
         BlogEntry.objects.create(title="PEntry2", blog_url=settings.PLACEMENTS_URL)
@@ -69,8 +72,7 @@ class PlacementsTestCase(APITestCase):
         mentioned_dual.profile.roll_no = '150040010'
         mentioned_dual.profile.save()
 
-        # Start mock server
-        mock_server = Popen(['python', 'news/test/test_server.py'])
+        # Give mock server time
         time.sleep(1)
 
         # Run the placement chore
@@ -112,5 +114,7 @@ class PlacementsTestCase(APITestCase):
         self.assertEqual(mentioned_user.notifications.count(), 2)
         self.assertEqual(mentioned_dual.notifications.count(), 2)
 
+
+    def tearDown(self):
         # Stop server
-        mock_server.terminate()
+        self.mock_server.terminate()

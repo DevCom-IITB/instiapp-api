@@ -15,6 +15,9 @@ class NewsTestCase(APITestCase):
     """Test news endpoints."""
 
     def setUp(self):
+        # Start mock server
+        self.mock_server = Popen(['python', 'news/test/test_server.py'])
+
         # Fake authenticate
         self.user = get_new_user()
         self.client.force_authenticate(self.user)  # pylint: disable=E1101
@@ -104,9 +107,7 @@ class NewsTestCase(APITestCase):
     @freeze_time('2019-01-02')
     def test_news_chore(self):
         """Test the news chore."""
-
-        # Start mock server
-        mock_server = Popen(['python', 'news/test/test_server.py'])
+        # Give server time to start up
         time.sleep(1)
 
         # Clear notifications
@@ -154,11 +155,12 @@ class NewsTestCase(APITestCase):
         # Body 3 has 5 articles, only 3 notifications should be created (maximum)
         self.assertEqual(self.user.notifications.count(), 6)
 
-        # Terminate server
-        mock_server.terminate()
-
     def test_extra(self):
         """Extra tests for helpers of News"""
         news = self.entry1
         news.guid = 'yt:video:VIDEOID'
         self.assertEqual(get_news_image(news), 'https://img.youtube.com/vi/VIDEOID/mqdefault.jpg')
+
+    def tearDown(self):
+        # Terminate server
+        self.mock_server.terminate()
