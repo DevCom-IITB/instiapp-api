@@ -4,6 +4,7 @@ import re
 from uuid import uuid4
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.timezone import now
 
 TAG_TARGET_CHOICES = (
     ('roll_no', 'Roll No'),
@@ -19,6 +20,7 @@ class UserProfile(models.Model):
     """Profile of a unique user."""
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    last_ping = models.DateTimeField(default=now)
 
     # Linked Django User object
     user = models.OneToOneField(

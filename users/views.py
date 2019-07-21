@@ -3,6 +3,7 @@ from uuid import UUID
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from login.helpers import update_fcm_device
 
@@ -60,8 +61,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         if any(f not in UserProfile.ExMeta.user_editable for f in request.data):
             return forbidden_no_privileges()
 
+        # Count as a ping
+        profile = request.user.profile
+        profile.last_ping = timezone.now()
+
         serializer = UserProfileFullSerializer(
-            request.user.profile, data=request.data, context=self.get_serializer_context())
+            profile, data=request.data, context=self.get_serializer_context())
         if not serializer.is_valid():
             return Response(serializer.errors, status=400)
         serializer.save()

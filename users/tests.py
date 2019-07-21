@@ -1,4 +1,5 @@
 """Test cases for users app."""
+from datetime import datetime
 from datetime import timedelta
 from django.utils import timezone
 from rest_framework.test import APITestCase
@@ -98,7 +99,13 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], str(event.id))
 
-        # Check updating device
+        # Set and assert ping date to past
+        profile = usr()
+        profile.last_ping = "1970-01-02 00:00Z"
+        profile.save()
+        self.assertLess(usr().last_ping.timestamp(), 300000)
+
+        # Check updating device, profile and ping
         data = {'fcm_id': 'TEST1', 'show_contact_no': False}
         url = '/api/user-me'
         response = self.client.patch(url, data, format='json')
@@ -106,6 +113,7 @@ class UserTestCase(APITestCase):
         self.assertEqual(usr().fcm_id, '')
         self.assertEqual(usr().devices.first().fcm_id, 'TEST1')
         self.assertEqual(usr().show_contact_no, False)
+        self.assertGreater(usr().last_ping.timestamp(), 300000)
 
         # Check patch validation
         data = {'android_version': 'long' * 200}
