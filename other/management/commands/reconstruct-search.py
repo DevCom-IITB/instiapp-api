@@ -1,7 +1,7 @@
 """Reconstruct all search indices."""
-import asyncio
 from django.core.management.base import BaseCommand
 from other.search import index_pair, push, consolidate
+from other.asyncio_run import run_sync
 
 from bodies.models import Body
 from events.models import Event
@@ -18,7 +18,7 @@ class Command(BaseCommand):
             pairs = [index_pair(v) for v in model.objects.all()]
 
             # Push all pairs
-            asyncio.run(push(pairs))
+            run_sync(push(pairs))
 
         # Re-consolidate
-        asyncio.run(consolidate())
+        run_sync(consolidate())

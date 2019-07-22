@@ -12,6 +12,8 @@ jobs:
 
       - image: rabbitmq:3.5.4
 
+      - image: radialapps/sonic:v1.2.1
+
     working_directory: ~/repo
 
     steps:

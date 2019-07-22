@@ -5,7 +5,7 @@ import os
 from backend.settings_test import *
 
 NO_CELERY = False
-USE_SONIC = False
+USE_SONIC = True
 
 # Use postgres for tests as celery is not disabled
 DATABASES = {
