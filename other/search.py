@@ -46,8 +46,14 @@ async def run_query(collection: str, query: str, bucket=DEFAULT_BUCKET):
     return [x.decode("utf-8") for x in res]
 
 def index_pair(obj):  # pylint: disable=too-many-return-statements
+    # Remove non-alphanumeric
+    safe_re = re.compile(r'\W+')
+    # Remove short words
+    short_re = re.compile(r'\W*\b\w{1,2}\b')
+
     def space(*args):
-        return re.sub(r'\W+', ' ', ' '.join(str(x) for x in args))
+        safe = safe_re.sub(' ', ' '.join(str(x) for x in args))
+        return short_re.sub('', safe)[:settings.SONIC_MAX_LEN]
 
     typ = type(obj).__name__
     bucket = DEFAULT_BUCKET
