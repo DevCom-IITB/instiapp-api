@@ -14,7 +14,7 @@ async def push(pairs):
         try:
             await c.push(*pair)
         except Exception as e:  # pylint: disable=broad-except
-            print('Failed to push %s to %s, %s' % (pair[2], pair[0], e))
+            print('Failed to push %s, %s' % (pair, e))
             continue
 
 async def consolidate():
