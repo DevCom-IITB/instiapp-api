@@ -30,9 +30,25 @@
 <img class="head" src="{{profile.profile_pic}}"><br>
 <br>
 
-{% for role in profile.roles.all  %}
-<a href="/org/{{role.body.str_id}}">{{role.body.name}}</a> {{ role.name }}<br>
-{% endfor %}
+<h3>Roles</h3>
+<div>
+    {% for role in profile.roles.all  %}
+    <a href="/org/{{role.body.str_id}}">{{role.body.name}}</a> {{ role.name }}<br>
+    {% endfor %}
+</div>
+
+<h3>Achievements</h3>
+<div>
+    {% for a in achievements  %}
+    <p>
+        {{ a.title }}
+        {% if a.event %}
+        at <a href="/event/{{a.event.str_id}}">{{a.event.name}}</a>
+        {% endif %}
+        (from <a href="/org/{{a.body.str_id}}">{{a.body.name}}</a>)
+    </p>
+    {% endfor %}
+</div>
 
 {%include "links.html" %}
 
