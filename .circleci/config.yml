@@ -21,8 +21,7 @@ jobs:
           name: "Setup environment"
           command: |
             python3 -m venv venv
-            echo 'export DJANGO_SETTINGS_MODULE="backend.settings_test"' >> $BASH_ENV
-            echo 'export NO_CELERY="false"' >> $BASH_ENV
+            echo 'export DJANGO_SETTINGS_MODULE="backend.settings_test_full"' >> $BASH_ENV
             echo "source venv/bin/activate" >> $BASH_ENV
 
       # Download and cache dependencies
