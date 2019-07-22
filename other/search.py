@@ -59,7 +59,7 @@ def index_pair(obj):  # pylint: disable=too-many-return-statements
     bucket = DEFAULT_BUCKET
 
     if typ == 'Body':
-        return ('bodies', bucket, str(obj.id), space(obj.name, obj.description, obj.short_description))
+        return ('bodies', bucket, str(obj.id), space(obj.name, obj.short_description, obj.description))
 
     if typ == 'Event':
         return ('events', bucket, str(obj.id), space(obj.name, obj.description))
