@@ -1,4 +1,5 @@
 """Reconstruct all search indices."""
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from other.search import index_pair, push, consolidate
 from other.asyncio_run import run_sync
@@ -13,6 +14,9 @@ class Command(BaseCommand):
     help = 'Reconstruct all search indices'
 
     def handle(self, *args, **options):
+        if not settings.USE_SONIC:
+            return
+
         for model in (Body, Event, UserProfile, BlogEntry, NewsEntry):
             # Get all pairs to be indexed
             pairs = [index_pair(v) for v in model.objects.all()]
