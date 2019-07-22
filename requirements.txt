@@ -1,3 +1,4 @@
+asonic==1.0.3
 beautifulsoup4==4.7.1
 celery==4.3.0
 django-extra-fields==1.2.2

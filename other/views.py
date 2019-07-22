@@ -45,17 +45,17 @@ class OtherViewset(viewsets.ViewSet):
 
         # Search bodies by name and description
         if 'bodies' in types:
-            bodies = query_search(request, MIN_LENGTH, Body.objects, ['name', 'description'])
+            bodies = query_search(request, MIN_LENGTH, Body.objects, ['name', 'description'], 'bodies')
 
         # Search events by name and description
         if 'events' in types:
             events = get_prioritized(query_search(
-                request, MIN_LENGTH, Event.objects, ['name', 'description'])[:20], request)
+                request, MIN_LENGTH, Event.objects, ['name', 'description'], 'events')[:20], request)
 
         # Search users by only name: don't add anything else here
         if 'users' in types:
             users = query_search(request, MIN_LENGTH, UserProfile.objects.filter(
-                active=True), ['name', 'ldap_id', 'roll_no'])[:20]
+                active=True), ['name', 'ldap_id', 'roll_no'], 'profiles')[:20]
 
         return Response({
             "bodies": BodySerializerMin(bodies, many=True).data,

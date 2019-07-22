@@ -127,6 +127,15 @@ STATIC_URL = '/static/'
 # Settings for Django REST Framework
 REST_FRAMEWORK = {}
 
+# Sonic FTS address
+SONIC_CONFIG = {
+    "host": '127.0.0.1',
+    "port": 1491,
+    "password": 'SecretPassword',
+    "max_connections": 10
+}
+USE_SONIC = False
+
 # Do not delete notifications records from database
 DJANGO_NOTIFICATIONS_CONFIG = {'SOFT_DELETE': True}
 
