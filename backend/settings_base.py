@@ -178,6 +178,9 @@ YOUTUBE_THUMB = lambda x: 'https://img.youtube.com/vi/%s/mqdefault.jpg' % x
 # Set this to False to actually use Celery
 NO_CELERY = os.environ.get('NO_CELERY') != 'false'
 
+# Number of seconds to count down
+CELERY_DELAY = 0
+
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 COMPLAINT_AUTO_SUBSCRIBE = True
