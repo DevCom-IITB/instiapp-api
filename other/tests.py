@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 
 from rest_framework.test import APIClient
 from django.conf import settings
+from django.core.management import call_command
 from django.test import TransactionTestCase
 from django.utils import timezone
 from notifications.signals import notify
@@ -34,13 +35,13 @@ class OtherTestCase(TransactionTestCase):
 
     def setUp(self):
         # Create bodies
-        body1 = create_body(name="Test Body1")
-        body2 = create_body(name="Test Body2")
+        body1 = create_body(name="Test WnCC")
+        body2 = create_body(name="Test MoodI")
 
         # Create dummy events
-        event1 = create_event(name="Test Event1")
-        event2 = create_event(name="Test Event2 Body1")
-        event3 = create_event(name="Test Event21")
+        event1 = create_event(name="Test Scratch")
+        event2 = create_event(name="Test Scratch Wncc")
+        event3 = create_event(name="Test Aaveg")
 
         # Create dummy users for search
         UserProfile.objects.create(name="Test User1")
@@ -62,6 +63,9 @@ class OtherTestCase(TransactionTestCase):
         """Test the search endpoint."""
         url = '/api/search?query='
 
+        # Consolidate
+        call_command('reconstruct-search')
+
         response = self.client.get(url + 'bo')
         self.assertEqual(response.status_code, 400)
 
@@ -71,17 +75,17 @@ class OtherTestCase(TransactionTestCase):
             self.assertEqual(len(response.data['events']), events)
             self.assertEqual(len(response.data['users']), users)
 
-        response = self.client.get(url + 'body1')
+        response = self.client.get(url + 'wncc')
         assert_len(response, 1, 1, 0)
 
-        response = self.client.get(url + 'body2')
+        response = self.client.get(url + 'moodi')
         assert_len(response, 1, 0, 0)
 
         response = self.client.get(url + 'test user')
         assert_len(response, 0, 0, 2)
 
         # Test partial fields
-        response = self.client.get(url + 'body1&types=bodies')
+        response = self.client.get(url + 'wncc&types=bodies')
         assert_len(response, 1, 0, 0)
 
     def test_notifications(self):  # pylint: disable=R0914,R0915
