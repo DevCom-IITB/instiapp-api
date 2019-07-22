@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 
 from rest_framework.test import APIClient
 from django.conf import settings
+from django.core.management import call_command
 from django.test import TransactionTestCase
 from django.utils import timezone
 from notifications.signals import notify
@@ -34,13 +35,13 @@ class OtherTestCase(TransactionTestCase):
 
     def setUp(self):
         # Create bodies
-        body1 = create_body(name="Test Body1")
-        body2 = create_body(name="Test Body2")
+        body1 = create_body(name="Test WnCC")
+        body2 = create_body(name="Test MoodI")
 
         # Create dummy events
-        event1 = create_event(name="Test Event1")
-        event2 = create_event(name="Test Event2 Body1")
-        event3 = create_event(name="Test Event21")
+        event1 = create_event(name="Test Scratch")
+        event2 = create_event(name="Test Scratch Wncc")
+        event3 = create_event(name="Test Aaveg")
 
         # Create dummy users for search
         UserProfile.objects.create(name="Test User1")
@@ -62,26 +63,57 @@ class OtherTestCase(TransactionTestCase):
         """Test the search endpoint."""
         url = '/api/search?query='
 
+        # Consolidate
+        call_command('reconstruct-search')
+
         response = self.client.get(url + 'bo')
         self.assertEqual(response.status_code, 400)
 
-        response = self.client.get(url + 'body1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['bodies']), 1)
-        self.assertEqual(len(response.data['events']), 1)
-        self.assertEqual(len(response.data['users']), 0)
+        def assert_len(response, bodies, events, users):
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['bodies']), bodies)
+            self.assertEqual(len(response.data['events']), events)
+            self.assertEqual(len(response.data['users']), users)
 
-        response = self.client.get(url + 'body2')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['bodies']), 1)
-        self.assertEqual(len(response.data['events']), 0)
-        self.assertEqual(len(response.data['users']), 0)
+        response = self.client.get(url + 'wncc')
+        assert_len(response, 1, 1, 0)
+
+        response = self.client.get(url + 'moodi')
+        assert_len(response, 1, 0, 0)
 
         response = self.client.get(url + 'test user')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['bodies']), 0)
-        self.assertEqual(len(response.data['events']), 0)
-        self.assertEqual(len(response.data['users']), 2)
+        assert_len(response, 0, 0, 2)
+
+        # Test partial fields
+        response = self.client.get(url + 'wncc&types=bodies')
+        assert_len(response, 1, 0, 0)
+
+    def test_search_misc(self):
+        """Try to index an invalid object."""
+
+        if not settings.USE_SONIC:  # pragma: no cover
+            return
+
+        from other.asyncio_run import run_sync
+        from other.search import push, index_pair, run_query_sync, push_obj_sync
+
+        # Test invalid sync doesn't panic
+        run_sync(push((None, None)))
+        self.assertEqual(True, True)
+
+        # Test indexing of PT blog
+        ent = BlogEntry(title='strategy comp', blog_url=settings.PLACEMENTS_URL)
+        self.assertEqual(index_pair(ent)[0], 'placement')
+        ent = BlogEntry(title='ecomm comp', blog_url=settings.TRAINING_BLOG_URL)
+        self.assertEqual(index_pair(ent)[0], 'training')
+        ent = BlogEntry(title='why this', blog_url='https://google.com')
+        self.assertEqual(index_pair(ent)[0], 'blogs')
+
+        # Test indexing of news
+        ent = NewsEntry(id='bigid', title='insightiitb', blog_url='https://google.com')
+        self.assertEqual(index_pair(ent)[0], 'news')
+        push_obj_sync(ent)
+        self.assertIn('bigid', run_query_sync('news', 'insightiitb'))
 
     def test_notifications(self):  # pylint: disable=R0914,R0915
         """Test notifications API."""

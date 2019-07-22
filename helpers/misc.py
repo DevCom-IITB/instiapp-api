@@ -2,10 +2,12 @@
 import operator
 from collections import defaultdict
 from functools import reduce
+from django.conf import settings
 from django.db.models import Q
 from django.db.models import Count
 from bs4 import BeautifulSoup
 from users.models import UserProfile
+from other.search import run_query_sync
 
 def get_url_friendly(name):
     """Converts the name to a url friendly string for use in `str_id`"""
@@ -35,16 +37,25 @@ def query_from_num(request, default_num, queryset):
 
     return queryset[from_i: from_i + num]
 
-def query_search(request, min_length, queryset, fields):
+def query_search(request, min_length, queryset, fields, collection):
     """Returns queryset with search filter."""
     search = request.GET.get('query')
     if search is not None and len(search) >= min_length:
-        all_queries = Q()
-        for field in fields:
-            all_queries = all_queries | Q(**{field + '__icontains': search})
-        return queryset.filter(all_queries)
+        # Use a FTS backend if we have one
+        if settings.USE_SONIC:
+            return queryset.filter(id__in=run_query_sync(collection, search))
+
+        # Fallback if we are so quiet ;)
+        return query_search_fallback(queryset, fields, search)  # pragma: no cover
 
     return queryset
+
+def query_search_fallback(queryset, fields, search):  # pragma: no cover
+    """Perform query search by falling back to icontains."""
+    all_queries = Q()
+    for field in fields:
+        all_queries = all_queries | Q(**{field + '__icontains': search})
+    return queryset.filter(all_queries)
 
 def sort_by_field(queryset, field, reverse=False, filt=None):
     """Return a queryset ordered by a field"""

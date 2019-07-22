@@ -18,7 +18,7 @@ class NewsFeedViewset(viewsets.ViewSet):
             queryset = NewsEntry.objects.all()
 
         # Paging and search
-        queryset = query_search(request, 3, queryset, ['title', 'content'])
+        queryset = query_search(request, 3, queryset, ['title', 'content'], 'news')
         queryset = query_from_num(request, 20, queryset)
 
         # Eagerly load data

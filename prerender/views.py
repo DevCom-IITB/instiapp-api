@@ -62,16 +62,21 @@ def explore(request):
     return HttpResponse(rendered)
 
 def user_details(request, pk):
+    queryset = UserProfile.objects.prefetch_related('roles', 'roles__body')
     try:
         UUID(pk, version=4)
-        profile = get_object_or_404(UserProfile.objects, pk=pk)
+        profile = get_object_or_404(queryset, pk=pk)
     except ValueError:
-        profile = get_object_or_404(UserProfile.objects, ldap_id=pk)
+        profile = get_object_or_404(queryset, ldap_id=pk)
 
     if profile.profile_pic is None:
         profile.profile_pic = settings.USER_AVATAR_URL
 
-    rendered = render_to_string('user-details.html', {'profile': profile, 'settings': settings})
+    rendered = render_to_string('user-details.html', {
+        'profile': profile,
+        'achievements': profile.achievements.prefetch_related('body', 'event').filter(hidden=False),
+        'settings': settings
+    })
     return HttpResponse(rendered)
 
 def event_details(request, pk):

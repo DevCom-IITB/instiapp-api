@@ -35,16 +35,27 @@ class OtherViewset(viewsets.ViewSet):
         if not req_query or len(req_query) < MIN_LENGTH:
             return Response({"message": "No query or too short!"}, status=400)
 
+        types = ('bodies', 'events', 'users')
+        req_types = request.GET.get('types')
+        if req_types:
+            types = tuple(req_types.split(','))
+
+        # Include only the types we want
+        bodies, events, users = ([] for i in range(3))
+
         # Search bodies by name and description
-        bodies = query_search(request, MIN_LENGTH, Body.objects, ['name', 'description'])
+        if 'bodies' in types:
+            bodies = query_search(request, MIN_LENGTH, Body.objects, ['name', 'description'], 'bodies')
 
         # Search events by name and description
-        events = get_prioritized(query_search(
-            request, MIN_LENGTH, Event.objects, ['name', 'description'])[:20], request)
+        if 'events' in types:
+            events = get_prioritized(query_search(
+                request, MIN_LENGTH, Event.objects, ['name', 'description'], 'events')[:20], request)
 
         # Search users by only name: don't add anything else here
-        users = query_search(request, MIN_LENGTH, UserProfile.objects.filter(
-            active=True), ['name', 'ldap_id', 'roll_no'])[:20]
+        if 'users' in types:
+            users = query_search(request, MIN_LENGTH, UserProfile.objects.filter(
+                active=True), ['name', 'ldap_id', 'roll_no'], 'profiles')[:20]
 
         return Response({
             "bodies": BodySerializerMin(bodies, many=True).data,
