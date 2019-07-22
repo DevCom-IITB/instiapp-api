@@ -22,15 +22,15 @@ async def consolidate():
     await c.trigger('consolidate')
 
 async def run_query(collection: str, query: str, bucket=DEFAULT_BUCKET):
-    def remove_small(string):
-        return ' '.join(x for x in string.split(' ') if len(x) > 3)
+    async def query_small(string):
+        f = [x for x in string.split(' ') if len(x) > 3]
+        return await c.query(collection, bucket, ' '.join(f)) if f else []
 
     # Run basic query
     c = SonicClient(**settings.SONIC_CONFIG)
     await c.channel(SonicChannels.SEARCH.value)
     res = await c.query(collection, bucket, query)
-    res += [x for x in await c.query(
-        collection, bucket, remove_small(query)) if x not in res]
+    res += [x for x in await query_small(query) if x not in res]
 
     # Run suggestions for last word
     lw = query.split(' ')[-1]
@@ -41,20 +41,25 @@ async def run_query(collection: str, query: str, bucket=DEFAULT_BUCKET):
         # Query after adding each word
         for s in suggestions:
             q = '%s %s' % (query, s.decode('utf-8'))
-            res += [x for x in await c.query(
-                collection, bucket, remove_small(q)) if x not in res]
+            res += [x for x in await query_small(q) if x not in res]
 
     return [x.decode("utf-8") for x in res]
 
 def index_pair(obj):  # pylint: disable=too-many-return-statements
+    # Remove non-alphanumeric
+    safe_re = re.compile(r'\W+')
+    # Remove short words
+    short_re = re.compile(r'\W*\b\w{1,2}\b')
+
     def space(*args):
-        return re.sub(r'\W+', ' ', ' '.join(str(x) for x in args))
+        safe = safe_re.sub(' ', ' '.join(str(x) for x in args))
+        return short_re.sub('', safe)[:settings.SONIC_MAX_LEN]
 
     typ = type(obj).__name__
     bucket = DEFAULT_BUCKET
 
     if typ == 'Body':
-        return ('bodies', bucket, str(obj.id), space(obj.name, obj.description, obj.short_description))
+        return ('bodies', bucket, str(obj.id), space(obj.name, obj.short_description, obj.description))
 
     if typ == 'Event':
         return ('events', bucket, str(obj.id), space(obj.name, obj.description))

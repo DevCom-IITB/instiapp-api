@@ -135,6 +135,7 @@ SONIC_CONFIG = {
     "max_connections": 10
 }
 USE_SONIC = False
+SONIC_MAX_LEN = 1024
 
 # Do not delete notifications records from database
 DJANGO_NOTIFICATIONS_CONFIG = {'SOFT_DELETE': True}

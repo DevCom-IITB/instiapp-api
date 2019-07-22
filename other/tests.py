@@ -81,6 +81,9 @@ class OtherTestCase(TransactionTestCase):
         response = self.client.get(url + 'moodi')
         assert_len(response, 1, 0, 0)
 
+        response = self.client.get(url + 'moo')
+        assert_len(response, 1, 0, 0)
+
         response = self.client.get(url + 'test user')
         assert_len(response, 0, 0, 2)
 

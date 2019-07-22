@@ -28,6 +28,8 @@ This is the recommended and default configuration, and should suffice for all de
 This is the default configuration for CircleCI builds. To test under this configuration, start a local PostgresQL and RabbitMQ server, and an instance of celery in background with `celery -A backend worker --pool=solo -l info`. Once celery is processing background tasks, you can run tests as `python manage.py test --settings backend.settings_test --keepdb`, ensuring that the database `test_instiapp` is created in postgres beforehand. The following environment variables must be set:
 * `DJANGO_SETTINGS_MODULE` to `backend.settings_test`
 * `NO_CELERY` to `false`
+### FTS
+Full-Text Search is implemented with [Sonic](https://github.com/valeriansaliou/sonic). To set up, install `cargo` and `sonic` and start it on `localhost`. Then set the `USE_SONIC` setting to `True`.
 
 ## Documentation
 Static OpenAPI specification can be found at the [project page](https://wncc.github.io/IITBapp/), at [Apiary](https://instiapp.docs.apiary.io/) or at `http://server/api/docs/`

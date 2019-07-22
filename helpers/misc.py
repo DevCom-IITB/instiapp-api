@@ -5,6 +5,7 @@ from functools import reduce
 from django.conf import settings
 from django.db.models import Q
 from django.db.models import Count
+from django.db.models import Case, When
 from bs4 import BeautifulSoup
 from users.models import UserProfile
 from other.search import run_query_sync
@@ -43,7 +44,9 @@ def query_search(request, min_length, queryset, fields, collection):
     if search is not None and len(search) >= min_length:
         # Use a FTS backend if we have one
         if settings.USE_SONIC:
-            return queryset.filter(id__in=run_query_sync(collection, search))
+            ids = run_query_sync(collection, search)
+            preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ids)])
+            return queryset.filter(id__in=ids).order_by(preserved)
 
         # Fallback if we are so quiet ;)
         return query_search_fallback(queryset, fields, search)  # pragma: no cover
