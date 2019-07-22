@@ -88,6 +88,33 @@ class OtherTestCase(TransactionTestCase):
         response = self.client.get(url + 'wncc&types=bodies')
         assert_len(response, 1, 0, 0)
 
+    def test_search_misc(self):
+        """Try to index an invalid object."""
+
+        if not settings.USE_SONIC:  # pragma: no cover
+            return
+
+        from other.asyncio_run import run_sync
+        from other.search import push, index_pair, run_query_sync, push_obj_sync
+
+        # Test invalid sync doesn't panic
+        run_sync(push((None, None)))
+        self.assertEqual(True, True)
+
+        # Test indexing of PT blog
+        ent = BlogEntry(title='strategy comp', blog_url=settings.PLACEMENTS_URL)
+        self.assertEqual(index_pair(ent)[0], 'placement')
+        ent = BlogEntry(title='ecomm comp', blog_url=settings.TRAINING_BLOG_URL)
+        self.assertEqual(index_pair(ent)[0], 'training')
+        ent = BlogEntry(title='why this', blog_url='https://google.com')
+        self.assertEqual(index_pair(ent)[0], 'blogs')
+
+        # Test indexing of news
+        ent = NewsEntry(id='bigid', title='insightiitb', blog_url='https://google.com')
+        self.assertEqual(index_pair(ent)[0], 'news')
+        push_obj_sync(ent)
+        self.assertIn('bigid', run_query_sync('news', 'insightiitb'))
+
     def test_notifications(self):  # pylint: disable=R0914,R0915
         """Test notifications API."""
         # Fake authenticate

@@ -45,12 +45,17 @@ def query_search(request, min_length, queryset, fields, collection):
         if settings.USE_SONIC:
             return queryset.filter(id__in=run_query_sync(collection, search))
 
-        all_queries = Q()
-        for field in fields:
-            all_queries = all_queries | Q(**{field + '__icontains': search})
-        return queryset.filter(all_queries)
+        # Fallback if we are so quiet ;)
+        return query_search_fallback(queryset, fields, search)  # pragma: no cover
 
     return queryset
+
+def query_search_fallback(queryset, fields, search):  # pragma: no cover
+    """Perform query search by falling back to icontains."""
+    all_queries = Q()
+    for field in fields:
+        all_queries = all_queries | Q(**{field + '__icontains': search})
+    return queryset.filter(all_queries)
 
 def sort_by_field(queryset, field, reverse=False, filt=None):
     """Return a queryset ordered by a field"""

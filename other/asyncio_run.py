@@ -6,7 +6,7 @@ def run_sync(main, debug=False):
     For compatibility with python3.6
     """
 
-    if sys.version_info >= (3, 7):
+    if sys.version_info >= (3, 7):  # pragma: no cover
         return asyncio.run(main, debug=debug)
 
     # Emulate asyncio.run() on older versions

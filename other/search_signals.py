@@ -14,7 +14,7 @@ from news.models import NewsEntry
 model_classes = (Body, Event, UserProfile, BlogEntry, NewsEntry)
 
 @shared_task_conditional(base=FaultTolerantTask)
-def update_index(typ, pk):
+def update_index(typ, pk):  # pragma: no cover
     """Notify users about event creation."""
 
     types = {m.__name__: m for m in model_classes}
