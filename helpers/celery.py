@@ -22,5 +22,17 @@ def shared_task_conditional(**kwargs):  # pragma: no cover
         if settings.NO_CELERY:
             setattr(func, 'delay', func)
             return func
-        return shared_task(func, **kwargs)
+
+        # Get the real decorator
+        dec = shared_task(func, **kwargs)
+
+        # Create a stub to apply a countdown and run
+        def patched(*args, **kwargs):
+            return dec.apply_async(
+                args=args, kwargs=kwargs, countdown=settings.CELERY_DELAY)
+
+        # Substitute the delay method
+        dec.delay = patched
+        return dec
+
     return decorator
