@@ -5,3 +5,4 @@ class OtherConfig(AppConfig):
 
     def ready(self):
         import other.notifications  # noqa: F401 pylint: disable=W0612, W0611
+        import other.search_signals  # noqa: F401 pylint: disable=W0612, W0611

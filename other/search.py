@@ -75,7 +75,7 @@ def index_pair(obj):  # pylint: disable=too-many-return-statements
         return ('news', bucket, str(obj.id), space(obj.title, obj.content))
 
 def push_obj_sync(obj):
-    return asyncio.run([index_pair(obj)])
+    return asyncio.run(push([index_pair(obj)]))
 
 def run_query_sync(collection: str, query: str, bucket=DEFAULT_BUCKET):
     return asyncio.run(run_query(collection, query, bucket))
