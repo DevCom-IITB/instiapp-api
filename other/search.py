@@ -7,15 +7,14 @@ from other.asyncio_run import run_sync
 
 DEFAULT_BUCKET = 'bucket'
 
-async def push(pairs):
-    c = SonicClient(**settings.SONIC_CONFIG)
-    await c.channel(SonicChannels.INGEST.value)
-    for pair in pairs:
-        try:
-            await c.push(*pair)
-        except Exception as e:  # pylint: disable=broad-except
-            print('Failed to push %s, %s' % (pair, e))
-            continue
+async def push(pair, client=None):
+    if not client:
+        client = SonicClient(**settings.SONIC_CONFIG)
+        await client.channel(SonicChannels.INGEST.value)
+    try:
+        await client.push(*pair)
+    except Exception as e:  # pylint: disable=broad-except
+        print('Failed to push %s, %s' % (pair, e))
 
 async def consolidate():
     c = SonicClient(**settings.SONIC_CONFIG)
@@ -75,7 +74,7 @@ def index_pair(obj):  # pylint: disable=too-many-return-statements
         return ('news', bucket, str(obj.id), space(obj.title, obj.content))
 
 def push_obj_sync(obj):
-    return run_sync(push([index_pair(obj)]))
+    return run_sync(push(index_pair(obj)))
 
 def run_query_sync(collection: str, query: str, bucket=DEFAULT_BUCKET):
     return run_sync(run_query(collection, query, bucket))
