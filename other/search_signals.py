@@ -29,6 +29,7 @@ def model_saved(instance, created, **kwargs):  # pylint: disable=unused-argument
 
     update_index.delay(type(instance).__name__, instance.id)
 
+
 if settings.USE_SONIC:
     for model in model_classes:
         post_save.connect(model_saved, sender=model)

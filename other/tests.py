@@ -84,7 +84,6 @@ class OtherTestCase(TransactionTestCase):
         response = self.client.get(url + 'body1&types=bodies')
         assert_len(response, 1, 0, 0)
 
-
     def test_notifications(self):  # pylint: disable=R0914,R0915
         """Test notifications API."""
         # Fake authenticate
