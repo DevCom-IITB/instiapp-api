@@ -65,23 +65,25 @@ class OtherTestCase(TransactionTestCase):
         response = self.client.get(url + 'bo')
         self.assertEqual(response.status_code, 400)
 
+        def assert_len(response, bodies, events, users):
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['bodies']), bodies)
+            self.assertEqual(len(response.data['events']), events)
+            self.assertEqual(len(response.data['users']), users)
+
         response = self.client.get(url + 'body1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['bodies']), 1)
-        self.assertEqual(len(response.data['events']), 1)
-        self.assertEqual(len(response.data['users']), 0)
+        assert_len(response, 1, 1, 0)
 
         response = self.client.get(url + 'body2')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['bodies']), 1)
-        self.assertEqual(len(response.data['events']), 0)
-        self.assertEqual(len(response.data['users']), 0)
+        assert_len(response, 1, 0, 0)
 
         response = self.client.get(url + 'test user')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['bodies']), 0)
-        self.assertEqual(len(response.data['events']), 0)
-        self.assertEqual(len(response.data['users']), 2)
+        assert_len(response, 0, 0, 2)
+
+        # Test partial fields
+        response = self.client.get(url + 'body1&types=bodies')
+        assert_len(response, 1, 0, 0)
+
 
     def test_notifications(self):  # pylint: disable=R0914,R0915
         """Test notifications API."""
