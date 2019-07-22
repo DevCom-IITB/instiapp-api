@@ -26,13 +26,25 @@ async def run_query(collection: str, query: str, bucket=DEFAULT_BUCKET):
     def remove_small(string):
         return ' '.join(x for x in string.split(' ') if len(x) > 3)
 
+    # Run basic query
     c = SonicClient(**settings.SONIC_CONFIG)
     await c.channel(SonicChannels.SEARCH.value)
     res = await c.query(collection, bucket, query)
     res += [x for x in await c.query(
         collection, bucket, remove_small(query)) if x not in res]
 
-    # FIXME: print(await c.suggest(collection, 'bucket', 'c', 5))
+    # Run suggestions for last word
+    lw = query.split(' ')[-1]
+    if len(lw) >= 3:
+        # Get word suggestions
+        suggestions = await c.suggest(collection, bucket, lw, 4)
+
+        # Query after adding each word
+        for s in suggestions:
+            q = '%s %s' % (query, s.decode('utf-8'))
+            res += [x for x in await c.query(
+                collection, bucket, remove_small(q)) if x not in res]
+
     return [x.decode("utf-8") for x in res]
 
 def index_pair(obj):  # pylint: disable=too-many-return-statements
