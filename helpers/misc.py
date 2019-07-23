@@ -38,15 +38,21 @@ def query_from_num(request, default_num, queryset):
 
     return queryset[from_i: from_i + num]
 
-def query_search(request, min_length, queryset, fields, collection):
+def query_search(request, min_length, queryset, fields, collection, order_relevance=False):
     """Returns queryset with search filter."""
     search = request.GET.get('query')
     if search is not None and len(search) >= min_length:
         # Use a FTS backend if we have one
         if settings.USE_SONIC:
             ids = run_query_sync(collection, search)
-            preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ids)])
-            return queryset.filter(id__in=ids).order_by(preserved)
+            queryset = queryset.filter(id__in=ids)
+
+            # Preserve order of returned results
+            if order_relevance:
+                preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ids)])
+                queryset = queryset.order_by(preserved)
+
+            return queryset
 
         # Fallback if we are so quiet ;)
         return query_search_fallback(queryset, fields, search)  # pragma: no cover
