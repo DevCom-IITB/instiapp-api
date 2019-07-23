@@ -38,7 +38,8 @@ def query_from_num(request, default_num, queryset):
 
     return queryset[from_i: from_i + num]
 
-def query_search(request, min_length, queryset, fields, collection, order_relevance=False):
+def query_search(  # pylint: disable=too-many-arguments
+        request, min_length, queryset, fields, collection, order_relevance=False):
     """Returns queryset with search filter."""
     search = request.GET.get('query')
     if search is not None and len(search) >= min_length:
