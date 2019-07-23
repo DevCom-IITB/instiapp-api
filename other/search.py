@@ -40,7 +40,7 @@ async def run_query(collection: str, query: str, bucket=DEFAULT_BUCKET):
 
         # Query after adding each word
         for s in suggestions:
-            q = '%s %s' % (query, s.decode('utf-8'))
+            q = '%s %s' % (query.rsplit(' ', 1)[0], s.decode('utf-8'))
             res += [x for x in await query_small(q) if x not in res]
 
     return [x.decode("utf-8") for x in res]
