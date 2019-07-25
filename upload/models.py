@@ -48,7 +48,7 @@ class UploadedImage(models.Model):
     def resize_convert(path):
         """Resize image and convert to JPG."""
         # Maximum Dimension
-        MAX_DIM = 800
+        MAX_DIM = 1200
 
         # Load image
         image = Image.open(path).convert('RGB')
