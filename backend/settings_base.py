@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
 
     'rest_framework',
-    'rest_framework_swagger',
+    'drf_yasg',
 
     'achievements.apps.AchievementsConfig',
     'events.apps.EventsConfig',

@@ -16,7 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.sitemaps.views import sitemap
-from rest_framework_swagger.views import get_swagger_view
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 from backend.sitemap import sitemaps
 
 def api_base(prefix=None):
@@ -29,6 +31,20 @@ def api_base(prefix=None):
 # Set admin site titles
 admin.site.site_header = 'InstiApp admin'
 admin.site.site_title = 'InstiApp admin'
+
+# Swagger schema view
+schema_view = get_schema_view(
+    openapi.Info(
+        title="InstiApp API",
+        default_version='v1',
+        description="InstiApp IIT Bombay API",
+        terms_of_service="https://insti.app/tos.html",
+        contact=openapi.Contact(email="support@insti.app"),
+        license=openapi.License(name="AGPLv3"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 urlpatterns = [
     # Admin site
@@ -51,7 +67,7 @@ urlpatterns = [
 
     # Non-API
     path('', include('prerender.urls')),
-    path(api_base('docs'), get_swagger_view(title='InstiApp API')),
+    path(api_base('docs'), schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('sitemap.xml', sitemap, {
         'sitemaps': sitemaps()
     }, name='django.contrib.sitemaps.views.sitemap')
