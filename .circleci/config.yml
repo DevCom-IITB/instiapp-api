@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:3.6.4
 
       - image: postgres:latest
         environment:
@@ -22,42 +22,41 @@ jobs:
       - run:
           name: "Setup environment"
           command: |
-            python3 -m venv venv
+            echo 'export PIPENV_VENV_IN_PROJECT=true' >> $BASH_ENV
             echo 'export DJANGO_SETTINGS_MODULE="backend.settings_test_full"' >> $BASH_ENV
-            echo "source venv/bin/activate" >> $BASH_ENV
 
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "requirements.txt" }}
+          - v1-dependencies-{{ checksum "Pipfile.lock" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
       - run:
           name: Install Dependencies
           command: |
-            pip install -r requirements.txt
-            pip install coverage codecov
+            pipenv install
+            sudo pip install coverage codecov
 
       - save_cache:
           paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+            - ./.venv
+          key: v1-dependencies-{{ checksum "Pipfile.lock" }}
 
       - run:
           name: Run celery worker
           command: |
-            celery -A backend worker -l info
+            pipenv run celery -A backend worker -l info
           background: true
 
       - run:
           name: Run Tests
           command: |
-            coverage run manage.py test -v2
-            codecov
+            pipenv run coverage run manage.py test -v2
+            pipenv run codecov
 
       - run:
           name: Lint
           command: |
-            flake8
-            pylint_runner
+            pipenv run flake8
+            pipenv run pylint_runner

@@ -11,7 +11,7 @@ API in Django for InstiApp, the one platform for all student activities at India
 [![GitHub license](https://img.shields.io/github/license/wncc/IITBapp.svg)](https://github.com/wncc/IITBapp/blob/master/LICENSE)
 
 ## Setup
-To setup dependenices, make a new `virtualenv`, activate it and run `pip install -r requirements.txt`. Then you can run
+To setup dependenices, install `pipenv` and run `pipenv sync`. You might want to run `export PIPENV_VENV_IN_PROJECT=true` first to create the `virtualenv` in the project folder. You can then activate the virtual environment with `pipenv shell`.
 * `python manage.py migrate` to create a new database.
 * `python manage.py createsuperuser` will let you create a new user to use the admin panel for testing.
 * `python manage.py runserver` to start a local server.
