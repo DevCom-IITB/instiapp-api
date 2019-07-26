@@ -54,7 +54,7 @@ def handle_entry(entry, body, url):
     if new_added and db_entry.content:
         # Send notifications to followers
         if body is not None:
-            users = User.objects.filter(id__in=body.followers.values('user_id'))
+            users = User.objects.filter(id__in=body.followers.filter(active=True).values('user_id'))
             notify.send(db_entry, recipient=users, verb="New post on " + body.name)
 
         # Send notifications for mentioned users

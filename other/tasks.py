@@ -29,7 +29,7 @@ def notify_new_event(pk):
         return
 
     for body in instance.bodies.all():
-        users = User.objects.filter(id__in=body.followers.values('user_id'))
+        users = User.objects.filter(id__in=body.followers.filter(active=True).values('user_id'))
         notify.send(
             instance,
             recipient=users,
@@ -44,7 +44,7 @@ def notify_upd_event(pk):
     if not instance:
         return
 
-    users = User.objects.filter(id__in=instance.followers.values('user_id'))
+    users = User.objects.filter(id__in=instance.followers.filter(active=True).values('user_id'))
     notify.send(instance, recipient=users, verb=instance.name + " was updated")
 
 @shared_task_conditional(base=FaultTolerantTask)

@@ -38,7 +38,7 @@ def event_saved(instance, created, **kwargs):
 def news_saved(instance, created, **kwargs):
     """Notify users when a followed body adds new news."""
     if created and instance.body and instance.notify:
-        users = User.objects.filter(id__in=instance.body.followers.values('user_id'))
+        users = User.objects.filter(id__in=instance.body.followers.filter(active=True).values('user_id'))
         notify.send(instance, recipient=users, verb=instance.body.name + " added a new news article")
 
 def new_comment(instance, created, **kwargs):
