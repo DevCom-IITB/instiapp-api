@@ -19,7 +19,7 @@ class ProfileFetcher():
 
     def get_roll(self):
         if not self.roll_nos:
-            self.roll_nos = UserProfile.objects.values_list('roll_no', flat=True)
+            self.roll_nos = UserProfile.objects.filter(active=True).values_list('roll_no', flat=True)
         return self.roll_nos
 
 
