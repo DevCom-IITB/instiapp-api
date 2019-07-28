@@ -1,0 +1,38 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+asonic = "*"
+beautifulsoup4 = "*"
+celery = "*"
+django-extra-fields = "*"
+django-filter = "*"
+django-markdownify = "*"
+django-multiselectfield = "*"
+django-notifications-hq = "*"
+djangorestframework = "*"
+feedparser = "*"
+flake8 = "*"
+freezegun = "*"
+gspread = "*"
+html5lib = "*"
+oauth2client = "*"
+pyfcm = "*"
+pylint-django = "*"
+pylint = "*"
+pyotp = "*"
+psycopg2-binary = "*"
+python-dateutil = "*"
+pywebpush = "*"
+requests = "*"
+Django = "*"
+Markdown = "*"
+Pillow = "*"
+pylint_runner = "*"
+PyYAML = "*"
+drf-yasg = "*"
+packaging = "*"

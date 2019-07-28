@@ -4,18 +4,20 @@ language: python
 dist: xenial
 
 python:
-  - 3.7
+  - '3.7'
 
 before_install:
   - export DJANGO_SETTINGS_MODULE=backend.settings_test
   - export PIP_USE_MIRRORS=true
+  - export PIPENV_VENV_IN_PROJECT=true
 
 install:
-  - pip install -r requirements.txt
+  - pip install pipenv
+  - pipenv sync
 
 script:
-  - python manage.py test -v2
+  - pipenv run python manage.py test -v2
 
 cache:
   directories:
-    - $HOME/.cache/pip
+    - '.venv'
