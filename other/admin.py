@@ -1,4 +1,6 @@
 from django.contrib import admin
+from notifications.models import Notification
+from notifications.admin import NotificationAdmin
 from other.models import Device
 
 class DeviceAdmin(admin.ModelAdmin):
@@ -8,5 +10,12 @@ class DeviceAdmin(admin.ModelAdmin):
     search_fields = ['user__name']
     raw_id_fields = ('user', 'session')
 
+class CustomNotificationAdmin(NotificationAdmin):
+    list_display = ('recipient', 'actor', 'level', 'unread', 'deleted', 'emailed')
+    list_filter = ('level', 'unread', 'deleted', 'emailed', 'timestamp',)
+
 
 admin.site.register(Device, DeviceAdmin)
+
+admin.site.unregister(Notification)
+admin.site.register(Notification, CustomNotificationAdmin)
