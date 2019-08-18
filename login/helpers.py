@@ -42,9 +42,9 @@ def perform_login(auth_code, redir, request):
         return Response(profile_response, status=400)
 
     # Check that we have basic details like name and roll no.
-    required_fields = ['first_name', 'roll_number']
-    if not all([(field in profile_json) for field in required_fields]):
-        return Response({'message': 'Name and roll_number not present'}, status=403)
+    required_fields = ['first_name', 'roll_number', 'username']
+    if not all([((field in profile_json) and profile_json[field]) for field in required_fields]):
+        return Response({'message': 'All required fields not present'}, status=403)
 
     username = str(profile_json['id'])
     roll_no = str(profile_json['roll_number'])
