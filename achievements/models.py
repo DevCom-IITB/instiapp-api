@@ -12,7 +12,7 @@ class OfferedAchievement(models.Model):
     time_of_modification = models.DateTimeField(auto_now=True)
 
     title = models.CharField(max_length=80)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, default="")
     priority = models.IntegerField(default=0)
     generic = models.CharField(max_length=20, default="generic")
 
@@ -51,7 +51,7 @@ class Achievement(models.Model):
                                     on_delete=models.SET_NULL, related_name='achievements_verified_by')
 
     title = models.CharField(max_length=80)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, default="")
     admin_note = models.TextField(blank=True, null=True)
 
     body = models.ForeignKey('bodies.Body', null=True,
