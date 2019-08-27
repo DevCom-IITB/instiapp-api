@@ -198,11 +198,11 @@ class AchievementTestCase(APITestCase):
         # Test if no users are present without verification
         response = self.client.get(url, data, format='json')
         self.assertEqual(len(response.data['users']), 0)
-        
+
         # Verify both achievements
         a1.verified = True
         a1.save()
-        
+
         # Try getting secret without privileges
         # Check if only one user is present
         response = self.client.get(url, data, format='json')
