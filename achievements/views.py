@@ -120,7 +120,7 @@ class OfferedAchievementViewSet(viewsets.ModelViewSet):
         extra_fields = []
 
         # Query for getting users
-        query = offer.achievements.prefetch_related('user')
+        query = offer.achievements.filter(verified=True).prefetch_related('user')
 
         # Check for verification privilege
         if user_has_privilege(request.user.profile, offer.body.id, "VerA"):
