@@ -186,8 +186,8 @@ class AchievementTestCase(APITestCase):
         a1 = Achievement.objects.create(
             title="Test", body=self.body_1,
             user=self.user.profile, offer_id=offer_id)
-        a2 = Achievement.objects.create(
-            title="Test", body=self.body_1,
+        Achievement.objects.create(
+            title="Test", body=self.body_1, verified=True,
             user=self.user_2.profile, offer_id=offer_id, hidden=True)
 
         # Try update without privileges
@@ -200,8 +200,8 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(len(response.data['users']), 0)
         
         # Verify both achievements
-        a1.update(verified=True)
-        a2.update(verified=True)
+        a1.verified = True
+        a1.save()
         
         # Try getting secret without privileges
         # Check if only one user is present
