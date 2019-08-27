@@ -183,10 +183,10 @@ class AchievementTestCase(APITestCase):
 
         # Create two achievements, one hidden
         offer_id = response.data['id']
-        Achievement.objects.create(
+        a1 = Achievement.objects.create(
             title="Test", body=self.body_1,
             user=self.user.profile, offer_id=offer_id)
-        Achievement.objects.create(
+        a2 = Achievement.objects.create(
             title="Test", body=self.body_1,
             user=self.user_2.profile, offer_id=offer_id, hidden=True)
 
@@ -195,6 +195,14 @@ class AchievementTestCase(APITestCase):
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 403)
 
+        # Test if no users are present without verification
+        response = self.client.get(url, data, format='json')
+        self.assertEqual(len(response.data['users']), 0)
+        
+        # Verify both achievements
+        a1.update(verified=True)
+        a2.update(verified=True)
+        
         # Try getting secret without privileges
         # Check if only one user is present
         response = self.client.get(url, data, format='json')
