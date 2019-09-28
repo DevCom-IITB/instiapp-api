@@ -39,7 +39,7 @@ class EventSerializer(serializers.ModelSerializer):
     going_count = serializers.IntegerField(read_only=True)
 
     user_ues = serializers.SerializerMethodField()
-    get_user_ues = get_user_ues
+    get_user_ues = get_user_ues  # pylint: disable=self-assigning-variable
 
     venues = LocationSerializerMin(many=True, read_only=True)
 
@@ -102,7 +102,7 @@ class EventFullSerializer(serializers.ModelSerializer):
     get_going = lambda self, obj: get_followers(obj, 2)
 
     user_ues = serializers.SerializerMethodField()
-    get_user_ues = get_user_ues
+    get_user_ues = get_user_ues  # pylint: disable=self-assigning-variable
 
     venues = LocationSerializerMin(many=True, read_only=True)
     venue_names = serializers.SlugRelatedField(
