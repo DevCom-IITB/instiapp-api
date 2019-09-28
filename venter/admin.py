@@ -111,7 +111,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             if not item.authorities.all().exists():
                 continue
 
-            input_list = [i for i in ComplaintImage.objects.filter(complaint=item.id).values('image_url')]
+            input_list = list(ComplaintImage.objects.filter(complaint=item.id).values('image_url'))
             output_list = [images[key] for images in input_list for key in images]
 
             subject = f'Complaint from {item.created_by} on {item.report_date:%A, %d %b %Y at %I:%M %p}'
