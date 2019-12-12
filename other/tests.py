@@ -35,7 +35,8 @@ class OtherTestCase(TransactionTestCase):
 
     def setUp(self):
         # Create bodies
-        body1 = create_body(name="Test WnCC")
+        body1 = create_body(
+            name="Test WnCC", description="<script> var js = 'XSS'; </script>")
         body2 = create_body(name="Test MoodI")
 
         # Create dummy events
@@ -90,6 +91,11 @@ class OtherTestCase(TransactionTestCase):
         # Test partial fields
         response = self.client.get(url + 'wncc&types=bodies')
         assert_len(response, 1, 0, 0)
+
+        # Test sanitization with sonic
+        if settings.USE_SONIC:
+            response = self.client.get(url + 'script')
+            assert_len(response, 0, 0, 0)
 
     def test_search_misc(self):
         """Try to index an invalid object."""
