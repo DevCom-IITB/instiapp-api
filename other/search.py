@@ -1,6 +1,11 @@
 import re
+from contextlib import suppress
+
 from asonic import Client as SonicClient
 from asonic.enums import Channels as SonicChannels
+
+from bs4 import BeautifulSoup
+from markdown import markdown
 
 from django.conf import settings
 from other.asyncio_run import run_sync
@@ -52,7 +57,22 @@ def index_pair(obj):  # pylint: disable=too-many-return-statements
     short_re = re.compile(r'\W*\b\w{1,2}\b')
 
     def space(*args):
-        safe = safe_re.sub(' ', ' '.join(str(x) for x in args))
+        # Get joined text
+        text = ' '.join(str(x) for x in args)
+
+        # Render markdown to HTML
+        with suppress(Exception):
+            soup = BeautifulSoup(markdown(text), features='html.parser')
+
+            # Remove script and styles
+            for s in soup(['script', 'style', 'meta', 'noscript']):
+                s.decompose()
+
+            # Get text
+            text = soup.get_text()
+
+        # Remove unsafe stuff
+        safe = safe_re.sub(' ', text)
         return short_re.sub('', safe)[:settings.SONIC_MAX_LEN]
 
     typ = type(obj).__name__
