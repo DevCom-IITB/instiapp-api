@@ -4,7 +4,7 @@ language: python
 dist: xenial
 
 python:
-  - '3.7'
+  - '3.7.5'
 
 before_install:
   - export DJANGO_SETTINGS_MODULE=backend.settings_test
