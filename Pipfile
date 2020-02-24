@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-asonic = "*"
+asonic = "<2"
 beautifulsoup4 = "*"
 celery = "*"
 django-extra-fields = "*"
@@ -29,7 +29,7 @@ psycopg2-binary = "*"
 python-dateutil = "*"
 pywebpush = "*"
 requests = "*"
-Django = "*"
+Django = "<=2.2.10"
 Markdown = "*"
 Pillow = "*"
 pylint_runner = "*"
