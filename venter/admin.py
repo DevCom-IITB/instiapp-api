@@ -65,7 +65,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
     actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']
 
     @staticmethod
-    def mark_as_resolved(modeladmin, request, queryset):
+    def mark_as_resolved(modeladmin, request, queryset):  # pylint: disable=unused-argument
         """
         Admin action to change complaint status to 'Resolved'
         Queryset contains the selected complaints and this is a batch SQL UPDATE process for the complaint status
@@ -73,7 +73,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         queryset.update(status='Resolved')
 
     @staticmethod
-    def mark_as_in_progress(modeladmin, request, queryset):
+    def mark_as_in_progress(modeladmin, request, queryset):  # pylint: disable=unused-argument
         """
         Admin action to change complaint status to 'In Progress'
         Queryset contains the selected complaints, and this is a batch SQL UPDATE process for the complaint status
@@ -81,7 +81,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         queryset.update(status='In Progress')
 
     @staticmethod
-    def mark_as_deleted(modeladmin, request, queryset):
+    def mark_as_deleted(modeladmin, request, queryset):  # pylint: disable=unused-argument
         """
         Admin action to change complaint status to 'In Progress'
         Queryset contains the selected complaints, and this is a batch SQL UPDATE process for the complaint status
@@ -89,7 +89,7 @@ class ComplaintModelAdmin(admin.ModelAdmin):
         queryset.update(status='Deleted')
 
     @staticmethod
-    def send_emails(modeladmin, request, queryset):
+    def send_emails(modeladmin, request, queryset):  # pylint: disable=unused-argument
         """
         Admin action to compose a preformatted email message and to send it to the selected authority's email ID
         Queryset contains selected complaints. This is a process to send a preformatted batch of emails to authorities
