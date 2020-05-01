@@ -50,7 +50,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pipenv wheel
         pipenv sync
-        pipenv install --skip-lock coverage codecov
+        pipenv install --skip-lock --keep-outdated coverage codecov
 
     - name: Run Celery
       run: |
