@@ -24,7 +24,7 @@ Tests can be run in two configurations:
 ### Without Celery
 This is the recommended and default configuration, and should suffice for all developmental purposes except if you are working with async tasks or notifications. Simply use `python manage.py test --settings backend.settings_test` to run automated tests.
 ### With Celery
-This is the default configuration for CircleCI builds. To test under this configuration, start a local PostgresQL and RabbitMQ server, and an instance of celery in background with `celery -A backend worker --pool=solo -l info`. Once celery is processing background tasks, you can run tests as `python manage.py test --settings backend.settings_test --keepdb`, ensuring that the database `test_instiapp` is created in postgres beforehand. The following environment variables must be set:
+This is the default configuration for `full-test` GitHub builds. To test under this configuration, start a local PostgresQL and RabbitMQ server, and an instance of celery in background with `celery -A backend worker --pool=solo -l info`. Once celery is processing background tasks, you can run tests as `python manage.py test --settings backend.settings_test --keepdb`, ensuring that the database `test_instiapp` is created in postgres beforehand. The following environment variables must be set:
 * `DJANGO_SETTINGS_MODULE` to `backend.settings_test`
 * `NO_CELERY` to `false`
 ### FTS
