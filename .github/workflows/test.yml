@@ -1,0 +1,59 @@
+name: Full Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+  services:
+    postgres:
+      image: postgres
+      env:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: password
+      options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    rabbitmq:
+      image: rabbitmq:3.5.4
+
+    sonic:
+      image: radialapps/sonic:v1.2.1
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pipenv
+        pipenv install
+        pipenv install --skip-lock coverage codecov
+
+    - name: Run Celery
+        pipenv run celery -A backend worker -l info &
+
+    - name: Run Tests
+      run: |
+        pipenv run coverage run manage.py test -v2
+        pipenv run codecov
+
+      env:
+        DJANGO_SETTINGS_MODULE: backend.settings_test_full
