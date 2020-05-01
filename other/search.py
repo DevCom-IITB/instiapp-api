@@ -2,7 +2,7 @@ import re
 from contextlib import suppress
 
 from asonic import Client as SonicClient
-from asonic.enums import Channels as SonicChannels
+from asonic.enums import Channel as SonicChannel
 
 from bs4 import BeautifulSoup
 from markdown import markdown
@@ -15,7 +15,7 @@ DEFAULT_BUCKET = 'bucket'
 async def push(pair, client=None):
     if not client:
         client = SonicClient(**settings.SONIC_CONFIG)
-        await client.channel(SonicChannels.INGEST.value)
+        await client.channel(SonicChannel.INGEST)
     try:
         await client.push(*pair)
     except Exception as e:  # pylint: disable=broad-except
@@ -23,7 +23,7 @@ async def push(pair, client=None):
 
 async def consolidate():
     c = SonicClient(**settings.SONIC_CONFIG)
-    await c.channel(SonicChannels.CONTROL.value)
+    await c.channel(SonicChannel.CONTROL)
     await c.trigger('consolidate')
 
 async def run_query(collection: str, query: str, bucket=DEFAULT_BUCKET):
@@ -33,7 +33,7 @@ async def run_query(collection: str, query: str, bucket=DEFAULT_BUCKET):
 
     # Run basic query
     c = SonicClient(**settings.SONIC_CONFIG)
-    await c.channel(SonicChannels.SEARCH.value)
+    await c.channel(SonicChannel.SEARCH)
     res = await c.query(collection, bucket, query)
     res += [x for x in await query_small(query) if x not in res]
 
