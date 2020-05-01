@@ -29,7 +29,7 @@ jobs:
 
     - name: Run Tests
       run: |
-        pipenv run manage.py test -v2
+        pipenv run python manage.py test -v2
       env:
         DJANGO_SETTINGS_MODULE: backend.settings_test
 
