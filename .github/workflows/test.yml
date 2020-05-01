@@ -7,6 +7,32 @@ on:
     branches: [ master ]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pipenv wheel
+        pipenv sync
+
+    - name: Run Tests
+      run: |
+        pipenv run manage.py test -v2
+      env:
+        DJANGO_SETTINGS_MODULE: backend.settings_test
+
   test-full:
     services:
       postgres:
@@ -36,7 +62,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.6]
+        python-version: [3.7]
 
     steps:
     - uses: actions/checkout@v2
@@ -50,7 +76,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pipenv wheel
         pipenv sync
-        pipenv install coverage codecov --keep-outdated
+        pipenv install coverage --keep-outdated --skip-lock
 
     - name: Run Celery
       run: |
@@ -61,6 +87,7 @@ jobs:
     - name: Run Tests
       run: |
         pipenv run coverage run manage.py test -v2
-        pipenv run codecov
       env:
         DJANGO_SETTINGS_MODULE: backend.settings_test_full
+
+    - uses: codecov/codecov-action@v1
