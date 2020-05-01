@@ -1,7 +1,7 @@
 """Reconstruct all search indices."""
 from datetime import timedelta
 from asonic import Client as SonicClient
-from asonic.enums import Channel as SonicChannels
+from asonic.enums import Channels as SonicChannels
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
