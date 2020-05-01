@@ -1,4 +1,4 @@
-name: Full Test
+name: Github Actions
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  test-full:
     services:
       postgres:
         image: postgres
@@ -55,11 +55,12 @@ jobs:
     - name: Run Celery
       run: |
         pipenv run celery -A backend worker -l info &
+      env:
+        DJANGO_SETTINGS_MODULE: backend.settings_test_full
 
     - name: Run Tests
       run: |
         pipenv run coverage run manage.py test -v2
         pipenv run codecov
-
       env:
         DJANGO_SETTINGS_MODULE: backend.settings_test_full
