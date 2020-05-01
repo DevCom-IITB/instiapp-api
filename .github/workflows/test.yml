@@ -8,24 +8,23 @@ on:
 
 jobs:
   build:
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
 
-  services:
-    postgres:
-      image: postgres
-      env:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: password
-      options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+      rabbitmq:
+        image: rabbitmq:3.5.4
 
-    rabbitmq:
-      image: rabbitmq:3.5.4
-
-    sonic:
-      image: radialapps/sonic:v1.2.1
+      sonic:
+        image: radialapps/sonic:v1.2.1
 
     runs-on: ubuntu-latest
     strategy:
