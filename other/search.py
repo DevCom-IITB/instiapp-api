@@ -3,6 +3,7 @@ from contextlib import suppress
 
 from asonic import Client as SonicClient
 from asonic.enums import Channel as SonicChannel
+from asonic.enums import Action as SonicAction
 
 from bs4 import BeautifulSoup
 from markdown import markdown
@@ -24,7 +25,7 @@ async def push(pair, client=None):
 async def consolidate():
     c = SonicClient(**settings.SONIC_CONFIG)
     await c.channel(SonicChannel.CONTROL)
-    await c.trigger('consolidate')
+    await c.trigger(SonicAction.CONSOLIDATE)
 
 async def run_query(collection: str, query: str, bucket=DEFAULT_BUCKET):
     async def query_small(string):
