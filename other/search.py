@@ -2,7 +2,7 @@ import re
 from contextlib import suppress
 
 from asonic import Client as SonicClient
-from asonic.enums import Channels as SonicChannels
+from asonic.enums import Channel as SonicChannels
 
 from bs4 import BeautifulSoup
 from markdown import markdown
