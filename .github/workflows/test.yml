@@ -90,4 +90,5 @@ jobs:
       env:
         DJANGO_SETTINGS_MODULE: backend.settings_test_full
 
-    - uses: codecov/codecov-action@v1
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
