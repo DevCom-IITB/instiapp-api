@@ -2,12 +2,12 @@
 API in Django for InstiApp, the one platform for all student activities at Indian Institute of Technology, Bombay! InstiApp's features include upcoming events, placement blog, news and general information on every active club/body in the Institute.
 
 [![InstiApp](https://insti.app/instiapp-badge-gh.svg)](https://insti.app)
-[![Github Actions](https://github.com/wncc/IITBapp/workflows/Github%20Actions/badge.svg)](https://github.com/wncc/IITBapp/actions)
+[![Github Actions](https://github.com/wncc/instiapp-api/workflows/Github%20Actions/badge.svg)](https://github.com/wncc/instiapp-api/actions)
 
-[![codecov](https://codecov.io/gh/wncc/IITBapp/branch/master/graph/badge.svg)](https://codecov.io/gh/wncc/IITBapp)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7e6a386dbec649c99aa6a10218cc3768)](https://www.codacy.com/app/pulsejet/IITBapp?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wncc/IITBapp&amp;utm_campaign=Badge_Grade)
-[![Requirements Status](https://requires.io/github/wncc/IITBapp/requirements.svg?branch=master)](https://requires.io/github/wncc/IITBapp/requirements/?branch=master)
-[![GitHub license](https://img.shields.io/github/license/wncc/IITBapp.svg)](https://github.com/wncc/IITBapp/blob/master/LICENSE)
+[![codecov](https://codecov.io/gh/wncc/instiapp-api/branch/master/graph/badge.svg)](https://codecov.io/gh/wncc/instiapp-api)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7e6a386dbec649c99aa6a10218cc3768)](https://www.codacy.com/manual/pulsejet/instiapp-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wncc/instiapp-api&amp;utm_campaign=Badge_Grade)
+[![Requirements Status](https://requires.io/github/wncc/instiapp-api/requirements.svg?branch=master)](https://requires.io/github/wncc/instiapp-api/requirements/?branch=master)
+[![GitHub license](https://img.shields.io/github/license/wncc/instiapp-api.svg)](https://github.com/wncc/instiapp-api/blob/master/LICENSE)
 
 ## Setup
 To setup dependenices, install `pipenv` and run `pipenv sync`. You might want to run `export PIPENV_VENV_IN_PROJECT=true` first to create the `virtualenv` in the project folder. You can then activate the virtual environment with `pipenv shell`.
