@@ -74,7 +74,7 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pipenv wheel coverage
+        python -m pip install pipenv wheel
         pipenv sync
         pipenv run python -m pip install coverage
 
@@ -87,6 +87,7 @@ jobs:
     - name: Run Tests
       run: |
         pipenv run python -m coverage run manage.py test -v2
+        pipenv run python -m coverage xml -i
       env:
         DJANGO_SETTINGS_MODULE: backend.settings_test_full
 
