@@ -2,8 +2,7 @@
 API in Django for InstiApp, the one platform for all student activities at Indian Institute of Technology, Bombay! InstiApp's features include upcoming events, placement blog, news and general information on every active club/body in the Institute.
 
 [![InstiApp](https://insti.app/instiapp-badge-gh.svg)](https://insti.app)
-[![TravisCI](https://api.travis-ci.org/wncc/IITBapp.svg?branch=master)](https://travis-ci.org/wncc/IITBapp)
-[![CircleCI](https://circleci.com/gh/wncc/IITBapp.svg?style=shield)](https://circleci.com/gh/wncc/IITBapp)
+[![Github Actions](https://github.com/wncc/IITBapp/workflows/Github%20Actions/badge.svg)](https://github.com/wncc/IITBapp/actions)
 
 [![codecov](https://codecov.io/gh/wncc/IITBapp/branch/master/graph/badge.svg)](https://codecov.io/gh/wncc/IITBapp)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7e6a386dbec649c99aa6a10218cc3768)](https://www.codacy.com/app/pulsejet/IITBapp?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wncc/IITBapp&amp;utm_campaign=Badge_Grade)
@@ -25,7 +24,7 @@ Tests can be run in two configurations:
 ### Without Celery
 This is the recommended and default configuration, and should suffice for all developmental purposes except if you are working with async tasks or notifications. Simply use `python manage.py test --settings backend.settings_test` to run automated tests.
 ### With Celery
-This is the default configuration for CircleCI builds. To test under this configuration, start a local PostgresQL and RabbitMQ server, and an instance of celery in background with `celery -A backend worker --pool=solo -l info`. Once celery is processing background tasks, you can run tests as `python manage.py test --settings backend.settings_test --keepdb`, ensuring that the database `test_instiapp` is created in postgres beforehand. The following environment variables must be set:
+This is the default configuration for `full-test` GitHub builds. To test under this configuration, start a local PostgresQL and RabbitMQ server, and an instance of celery in background with `celery -A backend worker --pool=solo -l info`. Once celery is processing background tasks, you can run tests as `python manage.py test --settings backend.settings_test --keepdb`, ensuring that the database `test_instiapp` is created in postgres beforehand. The following environment variables must be set:
 * `DJANGO_SETTINGS_MODULE` to `backend.settings_test`
 * `NO_CELERY` to `false`
 ### FTS

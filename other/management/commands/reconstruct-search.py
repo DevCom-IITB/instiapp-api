@@ -1,7 +1,7 @@
 """Reconstruct all search indices."""
 from datetime import timedelta
 from asonic import Client as SonicClient
-from asonic.enums import Channels as SonicChannels
+from asonic.enums import Channel as SonicChannel
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -18,7 +18,7 @@ from news.models import NewsEntry
 async def refresh(queryset):
     # Get client
     client = SonicClient(**settings.SONIC_CONFIG)
-    await client.channel(SonicChannels.INGEST.value)
+    await client.channel(SonicChannel.INGEST)
 
     # Index all objects
     for i, obj in enumerate(queryset):
