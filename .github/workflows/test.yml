@@ -48,6 +48,7 @@ jobs:
         pipenv install --skip-lock coverage codecov
 
     - name: Run Celery
+      run: |
         pipenv run celery -A backend worker -l info &
 
     - name: Run Tests
