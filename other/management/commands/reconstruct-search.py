@@ -39,19 +39,23 @@ class Command(BaseCommand):
             return
 
         # Refresh all bodies and news
-        run_sync(refresh(Body.objects.all()))
-        run_sync(refresh(NewsEntry.objects.all()))
+        bodies = list(Body.objects.all())
+        run_sync(refresh(bodies))
+        news_entries = list(NewsEntry.objects.all())
+        run_sync(refresh(news_entries))
 
         # Refresh events younger than two years
-        run_sync(refresh(get_fresh_events(Event.objects, delta=600)))
+        fresh_events = list(get_fresh_events(Event.objects, delta=600))
+        run_sync(refresh(fresh_events))
 
         # Refresh entries younger than two years
-        placement = BlogEntry.objects.filter(
-            published__gte=timezone.now() - timedelta(days=600))
+        placement = list(BlogEntry.objects.filter(
+            published__gte=timezone.now() - timedelta(days=600)))
         run_sync(refresh(placement))
 
         # Refresh active users
-        run_sync(refresh(UserProfile.objects.filter(active=True)))
+        active_user_profiles = list(UserProfile.objects.filter(active=True))
+        run_sync(refresh(active_user_profiles))
 
         # Re-consolidate
         run_sync(consolidate())

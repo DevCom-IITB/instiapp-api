@@ -20,7 +20,7 @@ class Body(models.Model):
     cover_url = models.URLField(blank=True, null=True)
     blog_url = models.URLField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(
             self.name if not self.canonical_name else self.canonical_name)
         super(Body, self).save(*args, **kwargs)

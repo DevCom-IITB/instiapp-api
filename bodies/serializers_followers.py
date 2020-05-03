@@ -5,7 +5,7 @@ from bodies.models import Body
 class BodyFollowersSerializer(serializers.ModelSerializer):
     """Serizlizer with list of followers of body."""
 
-    from users.serializers import UserProfileSerializer
+    from users.serializers import UserProfileSerializer     # pylint: disable=C0415
 
     followers = UserProfileSerializer(many=True, read_only=True)
 

@@ -42,7 +42,7 @@ class Event(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super(Event, self).save(*args, **kwargs)
 

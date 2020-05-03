@@ -9,7 +9,7 @@ from users.models import UserTag
 
 def get_followers(obj, status):
     """Get serialized followers with specified status."""
-    from users.serializers import UserProfileSerializer
+    from users.serializers import UserProfileSerializer     # pylint: disable=C0415
     followers = [ues.user for ues in obj.ues.all() if ues.status == status]
     return UserProfileSerializer(followers, many=True).data
 
@@ -31,6 +31,7 @@ class EventSerializer(serializers.ModelSerializer):
     on individual users and venues.
     """
 
+    # pylint: disable=C0415
     from locations.serializers import LocationSerializerMin
     from bodies.serializer_min import BodySerializerMin
     from achievements.serializers import OfferedAchievementSerializer
@@ -86,6 +87,7 @@ class EventFullSerializer(serializers.ModelSerializer):
     detailed information on venues.
     """
 
+    # pylint: disable=C0415
     from bodies.serializer_min import BodySerializerMin
     from locations.serializers import LocationSerializerMin
     from achievements.serializers import OfferedAchievementSerializer

@@ -11,8 +11,8 @@ from roles.serializers import InstituteRoleSerializer
 class UserProfileFullSerializer(serializers.ModelSerializer):
     """Full serializer for UserProfile with detailed information and events."""
 
-    from bodies.serializer_min import BodySerializerMin
-    from bodies.models import Body
+    from bodies.serializer_min import BodySerializerMin     # pylint: disable=C0415
+    from bodies.models import Body                          # pylint: disable=C0415
 
     email = serializers.SerializerMethodField()
     contact_no = serializers.SerializerMethodField()
@@ -56,7 +56,7 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
 
     def get_events(self, obj, status):
         """Returns serialized events for given status."""
-        from events.serializers import EventSerializer
+        from events.serializers import EventSerializer      # pylint: disable=C0415
         request = self.context['request']
         return EventSerializer(get_fresh_prioritized_events(
             obj.followed_events.filter(ues__status=status), request, delta=60), many=True).data
