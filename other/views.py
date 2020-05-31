@@ -20,6 +20,7 @@ from other.serializers import NotificationSerializer
 from other.serializers import UserTagCategorySerializer
 from helpers.misc import query_search
 from helpers.misc import users_from_tags
+from notifications.signals import notify
 
 def get_notif_queryset(queryset):
     return queryset.unread().filter(timestamp__gte=timezone.now() - timedelta(days=7))
@@ -109,3 +110,9 @@ class OtherViewset(viewsets.ViewSet):
         """Get reach of selected user tags."""
         tags = UserTag.objects.filter(id__in=request.data)
         return Response({'count': users_from_tags(tags).filter(active=True).count()})
+
+    @login_required_ajax
+    def create_test_notification(self, request):
+        user = request.user
+        notify.send(user, recipient=user, verb='Test notification')
+        return Response(status=200)
