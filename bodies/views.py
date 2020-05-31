@@ -102,7 +102,7 @@ class BodyViewSet(viewsets.ModelViewSet):
         if archived not in ('0', '1'):
             return Response({"message": "Invalid archived parameter"}, status=400)
 
-        queryset = Event.objects.filter(bodies=body, archived=archived)
+        queryset = Event.objects.filter(bodies=body, archived=archived).order_by('-start_time')
         serialized = EventMinSerializer(queryset, many=True)
         return Response(serialized.data)
 
