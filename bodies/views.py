@@ -9,6 +9,8 @@ from bodies.serializers_followers import BodyFollowersSerializer
 from bodies.serializers import BodySerializer
 from bodies.serializer_min import BodySerializerMin
 from bodies.models import Body
+from events.models import Event
+from events.serializer_min import EventMinSerializer
 from roles.helpers import user_has_privilege
 from roles.helpers import forbidden_no_privileges
 from roles.helpers import login_required_ajax
@@ -87,6 +89,19 @@ class BodyViewSet(viewsets.ModelViewSet):
             return Response({"message": "Invalid Action"}, status=400)
 
         return Response(status=204)
+
+    def get_events(self, request, pk):
+        """Get all events from pk uuid or strid.
+        {?archived} is optional arguement to fetch old events"""
+        body = self.get_body(pk)
+        # Get query param
+        archived = request.GET.get("archived")
+        if archived is None:
+            archived = False
+
+        queryset = Event.objects.filter(bodies=body, archived=archived)
+        serialized = EventMinSerializer(queryset, many=True)
+        return Response(serialized.data)
 
     def get_body(self, pk):
         """Get a body from pk uuid or strid."""
