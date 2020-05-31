@@ -28,7 +28,7 @@ class Location(models.Model):
     lng = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     reusable = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(self.short_name)
         super(Location, self).save(*args, **kwargs)
 

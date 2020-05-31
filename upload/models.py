@@ -33,7 +33,7 @@ class UploadedImage(models.Model):
             models.Index(fields=['is_claimed', ]),
         ]
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):        # pylint: disable=W0222
         # Super
         super(UploadedImage, self).save(*args, **kwargs)
 

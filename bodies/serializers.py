@@ -10,7 +10,7 @@ from helpers.misc import sort_by_field
 class BodySerializer(serializers.ModelSerializer):
     """Serializer for Body."""
 
-    from roles.serializers import RoleSerializerMin
+    from roles.serializers import RoleSerializerMin     # pylint: disable=C0415
 
     followers_count = serializers.IntegerField(read_only=True)
     user_follows = serializers.BooleanField(read_only=True)
@@ -47,7 +47,7 @@ class BodySerializer(serializers.ModelSerializer):
 
     def get_events(self, obj):
         """Gets filtred events."""
-        from events.serializers import EventSerializer
+        from events.serializers import EventSerializer      # pylint: disable=C0415
         return EventSerializer(get_fresh_prioritized_events(
             obj.events, self.context['request'], delta=365), many=True, read_only=True).data
 

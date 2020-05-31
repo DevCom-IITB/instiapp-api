@@ -103,6 +103,7 @@ class OtherTestCase(TransactionTestCase):
         if not settings.USE_SONIC:  # pragma: no cover
             return
 
+        # pylint: disable=C0415
         from other.asyncio_run import run_sync
         from other.search import push, index_pair, run_query_sync, push_obj_sync
 
