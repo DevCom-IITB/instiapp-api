@@ -422,3 +422,7 @@ class OtherTestCase(TransactionTestCase):
 
         notif = Notification.objects.get(recipient=self.user)
         self.assertEqual(notif.verb, 'Test notification')
+
+        # Check throttling
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 429)
