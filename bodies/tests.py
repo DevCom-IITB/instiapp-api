@@ -208,7 +208,8 @@ class BodyTestCase(TransactionTestCase):
         event2.bodies.add(body)
         eventP1 = create_event(-5, -4)
         eventP1.bodies.add(body)
-        eventA = create_event(-5, -4, archived=True)
+        # Create an event before 1 year
+        eventA = create_event(-24 * 370, -24 * 370 + 2)
         eventA.bodies.add(body)
 
         response = self.client.get(url)
@@ -221,14 +222,9 @@ class BodyTestCase(TransactionTestCase):
         self.assertEqual(response.data[1]['id'], str(event2.id))
         self.assertEqual(response.data[2]['id'], str(eventP1.id))
 
-        url += '?archived='
+        # Check response for ?archived parameter in url
+        response = self.client.get(url + '?archived')
 
-        # Check response for invalid archived value
-        response = self.client.get(url + 'a')
-        self.assertEqual(response.status_code, 400)
-
-        # Check response for archived events
-        response = self.client.get(url + '1')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['id'], str(eventA.id))
+        self.assertEqual(len(response.data), 4)
+        self.assertEqual(response.data[3]['id'], str(eventA.id))

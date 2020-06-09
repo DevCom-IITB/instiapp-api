@@ -1,7 +1,9 @@
 """Views for bodies app."""
 from uuid import UUID
+from datetime import date
 from rest_framework import viewsets
 from rest_framework.response import Response
+from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -92,17 +94,17 @@ class BodyViewSet(viewsets.ModelViewSet):
 
     def get_events(self, request, pk):
         """Get all events from pk uuid or strid.
-        {?archived} is optional arguement to fetch old events"""
+        {?archived} is optional arguement to fetch all events"""
         body = self.get_body(pk)
+
         # Get query param
-        archived = request.GET.get("archived")
-        if archived is None:
-            archived = '0'
+        archived = 'archived' in request.GET
 
-        if archived not in ('0', '1'):
-            return Response({"message": "Invalid archived parameter"}, status=400)
-
-        queryset = Event.objects.filter(bodies=body, archived=archived).order_by('-start_time')
+        if archived:
+            queryset = Event.objects.filter(bodies=body).order_by('-start_time')
+        else:
+            last_year = date.today() + relativedelta(years=-1)
+            queryset = Event.objects.filter(bodies=body, start_time__gte=last_year).order_by('-start_time')
         serialized = EventMinSerializer(queryset, many=True)
         return Response(serialized.data)
 
