@@ -6,6 +6,7 @@ from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework import viewsets
 
+from notifications.signals import notify
 from roles.helpers import login_required_ajax
 from bodies.models import Body
 from bodies.serializer_min import BodySerializerMin
@@ -109,3 +110,22 @@ class OtherViewset(viewsets.ViewSet):
         """Get reach of selected user tags."""
         tags = UserTag.objects.filter(id__in=request.data)
         return Response({'count': users_from_tags(tags).filter(active=True).count()})
+
+    @classmethod
+    @login_required_ajax
+    def create_test_notification(cls, request):
+        user = request.user
+
+        # Throttle test notification
+        test_notifications = request.user.notifications.filter(verb='Test notification').first()
+
+        if test_notifications is not None:
+            last_notif_timestamp = test_notifications.timestamp
+            if last_notif_timestamp > timezone.now() - timedelta(minutes=15):
+                return Response({
+                    "message": "Too soon",
+                    "detail": "Last test notification was sent within last 15 minutes."
+                }, status=429)
+
+        notify.send(user, recipient=user, verb='Test notification')
+        return Response(status=200)

@@ -408,3 +408,21 @@ class OtherTestCase(TransactionTestCase):
         response = self.client.post(url, json.dumps(data), content_type="application/json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 2)
+
+    def test_test_notifications(self):
+        """Test test notifications API."""
+        # Fake authenticate
+        profile = self.profile
+        profile.user.notifications.all().delete()
+
+        url = '/api/test/notification'
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        notif = Notification.objects.get(recipient=self.user)
+        self.assertEqual(notif.verb, 'Test notification')
+
+        # Check throttling
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 429)

@@ -9,4 +9,5 @@ urlpatterns = [
     path('notifications/read/<pk>', OtherViewset.as_view({'get': 'mark_notification_read'})),
     path('user-tags', OtherViewset.as_view({'get': 'get_all_user_tags'})),
     path('user-tags/reach', OtherViewset.as_view({'post': 'get_user_tags_reach'})),
+    path('test/notification', OtherViewset.as_view({'get': 'create_test_notification'})),
 ]
