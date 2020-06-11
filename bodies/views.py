@@ -1,9 +1,9 @@
 """Views for bodies app."""
 from uuid import UUID
-from datetime import date
+from datetime import timedelta
 from rest_framework import viewsets
 from rest_framework.response import Response
-from dateutil.relativedelta import relativedelta
+from django.utils import timezone
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -103,7 +103,7 @@ class BodyViewSet(viewsets.ModelViewSet):
         if archived:
             queryset = Event.objects.filter(bodies=body).order_by('-start_time')
         else:
-            last_year = date.today() + relativedelta(years=-1)
+            last_year = timezone.now() - timedelta(days=366)
             queryset = Event.objects.filter(bodies=body, start_time__gte=last_year).order_by('-start_time')
         serialized = EventMinSerializer(queryset, many=True)
         return Response(serialized.data)
