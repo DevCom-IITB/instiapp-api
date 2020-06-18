@@ -19,4 +19,8 @@ urlpatterns = [
     path('bodies/<pk>/follow', BodyViewSet.as_view({
         'get': 'follow'
     })),
+
+    path('bodies/<pk>/events', BodyViewSet.as_view({
+        'get': 'get_events'
+    })),
 ]

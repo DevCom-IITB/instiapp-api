@@ -3,6 +3,7 @@ from django.test import TransactionTestCase
 from rest_framework.test import APIClient
 from bodies.models import Body
 from bodies.models import BodyChildRelation
+from helpers.test_helpers import create_event
 from roles.models import InstituteRole
 from roles.models import BodyRole
 from login.tests import get_new_user
@@ -193,3 +194,37 @@ class BodyTestCase(TransactionTestCase):
         response = self.client.get('/api/bodies/' + str(body.id))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['user_follows'], False)
+
+    def test_body_get_events(self):
+        """Test if get events API works."""
+
+        body = Body.objects.create(name="TestBody1")
+        url = '/api/bodies/' + str(body.id) + '/events'
+
+        # Create events for the body
+        event1 = create_event(48, 48)
+        event1.bodies.add(body)
+        event2 = create_event(4, 5)
+        event2.bodies.add(body)
+        eventP1 = create_event(-5, -4)
+        eventP1.bodies.add(body)
+        # Create an event before 1 year
+        eventA = create_event(-24 * 370, -24 * 370 + 2)
+        eventA.bodies.add(body)
+
+        response = self.client.get(url)
+
+        # Check response status and length
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
+
+        self.assertEqual(response.data[0]['id'], str(event1.id))
+        self.assertEqual(response.data[1]['id'], str(event2.id))
+        self.assertEqual(response.data[2]['id'], str(eventP1.id))
+
+        # Check response for ?archived parameter in url
+        response = self.client.get(url + '?archived')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 4)
+        self.assertEqual(response.data[3]['id'], str(eventA.id))

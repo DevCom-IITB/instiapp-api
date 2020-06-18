@@ -1,7 +1,9 @@
 """Views for bodies app."""
 from uuid import UUID
+from datetime import timedelta
 from rest_framework import viewsets
 from rest_framework.response import Response
+from django.utils import timezone
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -9,6 +11,8 @@ from bodies.serializers_followers import BodyFollowersSerializer
 from bodies.serializers import BodySerializer
 from bodies.serializer_min import BodySerializerMin
 from bodies.models import Body
+from events.models import Event
+from events.serializer_min import EventMinSerializer
 from roles.helpers import user_has_privilege
 from roles.helpers import forbidden_no_privileges
 from roles.helpers import login_required_ajax
@@ -87,6 +91,22 @@ class BodyViewSet(viewsets.ModelViewSet):
             return Response({"message": "Invalid Action"}, status=400)
 
         return Response(status=204)
+
+    def get_events(self, request, pk):
+        """Get all events from pk uuid or strid.
+        {?archived} is optional arguement to fetch all events"""
+        body = self.get_body(pk)
+
+        # Get query param
+        archived = 'archived' in request.GET
+
+        if archived:
+            queryset = Event.objects.filter(bodies=body).order_by('-start_time')
+        else:
+            last_year = timezone.now() - timedelta(days=366)
+            queryset = Event.objects.filter(bodies=body, start_time__gte=last_year).order_by('-start_time')
+        serialized = EventMinSerializer(queryset, many=True)
+        return Response(serialized.data)
 
     def get_body(self, pk):
         """Get a body from pk uuid or strid."""
