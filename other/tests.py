@@ -361,7 +361,7 @@ class OtherTestCase(TransactionTestCase):
 
         # Test each URL in the sitemap
         for urlobj in urlset:
-            for loc in [l for l in urlobj if 'loc' in l.tag]:
+            for loc in [L for L in urlobj if 'loc' in L.tag]:
                 response = self.client.get(loc.text)
                 self.assertEqual(response.status_code, 200)
 
