@@ -23,7 +23,7 @@ class Body(models.Model):
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(
             self.name if not self.canonical_name else self.canonical_name)
-        super(Body, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
