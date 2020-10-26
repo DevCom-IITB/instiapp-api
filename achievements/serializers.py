@@ -28,7 +28,7 @@ class VerifiedAchievementListSerializer(serializers.ListSerializer):  # pylint: 
 
     def to_representation(self, data):
         data = data.filter(verified=True, hidden=False)
-        return super(VerifiedAchievementListSerializer, self).to_representation(data)
+        return super().to_representation(data)
 
 class VerifiedAchievementSerializer(AchievementSerializer):
     """Verified achievement serializer."""

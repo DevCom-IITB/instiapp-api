@@ -44,7 +44,7 @@ class Event(models.Model):
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
-        super(Event, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return '/event/' + self.str_id

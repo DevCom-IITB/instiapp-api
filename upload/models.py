@@ -35,7 +35,7 @@ class UploadedImage(models.Model):
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         # Super
-        super(UploadedImage, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
         # Resize Image
         if self.pk and self.picture:
