@@ -1,5 +1,6 @@
 """Model for UserProfile."""
 from __future__ import unicode_literals
+import hashlib
 import re
 from uuid import uuid4
 from django.db import models
@@ -90,9 +91,18 @@ class WebPushSubscription(models.Model):
     """One web push subscription."""
     user = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name='web_push_subscriptions')
-    endpoint = models.TextField(unique=True)
+    endpoint = models.TextField()
+    endpoint_hash = models.CharField(max_length=60, unique=True)
     p256dh = models.CharField(max_length=200)
     auth = models.CharField(max_length=100)
+
+    def save(self, *args, **kwargs):        # pylint: disable=W0222
+        # Create hash of endpoint
+        ehash = hashlib.sha1()
+        ehash.update(str(self.endpoint).encode('utf-8'))
+        self.endpoint_hash = ehash.hexdigest()
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.user.name
