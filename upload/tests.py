@@ -31,22 +31,18 @@ class UploadTestCase(APITestCase):
 
         # Try without authentication
         self.client.logout()
-        url = '/api/upload'
-        data = {
-            "picture": open('./upload/b64img.txt', 'r').read()
-        }
-        response = self.client.post(url, data, format='json')
+        response = new_upload(self)
         self.assertEqual(response.status_code, 401)
 
         # Try again with login
         self.client.force_login(self.user)
-        response = self.client.post(url, data, format='json')
+        response = new_upload(self)
         self.assertEqual(response.status_code, 201)
 
         # Check if extension was guessed right
         img_id = response.data['id']
         img = UploadedImage.objects.get(pk=img_id)
-        self.assertIn('.png', str(img.picture))
+        self.assertIn('.jpg', str(img.picture))
 
         # Check __str__
         self.assertEqual(str(img), str(img.time_of_creation))
@@ -55,14 +51,6 @@ class UploadTestCase(APITestCase):
         url = '/api/upload/' + img_id
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, 204)
-
-        # Check POST file upload
-        response = new_upload(self)
-
-        # Check if the file was uploaded
-        img_id = response.data['id']
-        img = UploadedImage.objects.get(pk=img_id)
-        self.assertIn('.jpg', str(img.picture))
 
     def test_clean_images_chore(self):
         """Check clean images chore."""
