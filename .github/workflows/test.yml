@@ -68,7 +68,19 @@ jobs:
       sonic:
         image: radialapps/sonic:v1.2.1
         ports:
-        - 1491:1491
+          - 1491:1491
+
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=8
 
     runs-on: ubuntu-latest
     strategy:
@@ -81,10 +93,6 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-
-    - name: Start mysql
-      run: |
-        sudo systemctl start mysql
 
     - name: Install Dependencies
       run: |
