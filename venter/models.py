@@ -38,7 +38,7 @@ class Complaint(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     created_by = models.ForeignKey(
         'users.UserProfile', on_delete=models.CASCADE, related_name='created_by')
-    description = models.TextField()
+    description = models.TextField(blank=True)
     suggestions = models.TextField(blank=True)
     location_details = models.TextField(blank=True)
     report_date = models.DateTimeField(auto_now_add=True)

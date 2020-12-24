@@ -39,12 +39,12 @@ class Migration(migrations.Migration):
             name='Complaints',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('description', models.TextField(blank=True, null=True)),
+                ('description', models.TextField(blank=True)),
                 ('report_date', models.DateTimeField(auto_now_add=True)),
                 ('status', models.CharField(choices=[('Reported', 'Reported'), ('In Progress', 'In Progress'), ('Resolved', 'Resolved'), ('Deleted', 'Deleted')], default='reported', max_length=30)),
                 ('latitude', models.FloatField(blank=True, max_length=8, null=True)),
                 ('longitude', models.FloatField(blank=True, max_length=8, null=True)),
-                ('location_description', models.TextField(blank=True, null=True)),
+                ('location_description', models.TextField(blank=True)),
                 ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='created_by', to='users.UserProfile')),
             ],
             options={

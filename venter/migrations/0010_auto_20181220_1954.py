@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='complaints',
             name='email_sent_to',
-            field=models.TextField(blank=True, null=True),
+            field=models.TextField(blank=True),
         ),
     ]
