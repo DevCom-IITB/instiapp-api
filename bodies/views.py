@@ -92,6 +92,28 @@ class BodyViewSet(viewsets.ModelViewSet):
 
         return Response(status=204)
 
+    def block(self, request, pk):
+        """block or unblock a body {?block}=0,1"""
+
+        body = self.get_body(pk)
+
+        # Get query param
+        value = request.GET.get("block")
+        if value is None:
+            return Response({"message": "{?block} is required"}, status=400)
+
+        # check possible actions
+        if value == "0":
+            request.user.profile.blocked_bodies.remove(body)
+        elif value == "1":
+            request.user.profile.blocked_bodies.add(body)
+        else:
+            return Response({"message": "Invalid Action"}, status=400)
+
+        return Response(status=204)    
+
+
+
     def get_events(self, request, pk):
         """Get all events from pk uuid or strid.
         {?archived} is optional arguement to fetch all events"""

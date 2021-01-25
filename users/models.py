@@ -47,6 +47,7 @@ class UserProfile(models.Model):
     # InstiApp feature fields
     active = models.BooleanField(default=True)
     followed_bodies = models.ManyToManyField('bodies.Body', related_name='followers', blank=True)
+    blocked_bodies = models.ManyToManyField('bodies.Body', related_name='blockers', blank=True)
 
     # InstiApp roles
     roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
