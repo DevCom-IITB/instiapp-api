@@ -263,3 +263,17 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 200)
+
+    def test_description_non_null(self):
+        """Make sure description doesn't return NULL (a67becd8)"""
+        offer_1 = OfferedAchievement.objects.create(
+            title="Test Achievement", body=self.body_1, event=self.event_1)
+        self.assertEqual(offer_1.description, "")
+
+        achievement_1 = Achievement.objects.create(
+            body=self.body_1, user=self.user.profile)
+        self.assertEqual(achievement_1.description, "")
+
+        url = '/api/achievements/%s' % achievement_1.id
+        response = self.client.get(url)
+        self.assertEqual(response.data['description'], "")

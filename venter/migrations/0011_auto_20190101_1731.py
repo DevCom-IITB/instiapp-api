@@ -20,19 +20,4 @@ class Migration(migrations.Migration):
             name='suggestions',
             field=models.TextField(blank=True),
         ),
-        migrations.AlterField(
-            model_name='complaints',
-            name='description',
-            field=models.TextField(),
-        ),
-        migrations.AlterField(
-            model_name='complaints',
-            name='email_sent_to',
-            field=models.TextField(blank=True),
-        ),
-        migrations.AlterField(
-            model_name='complaints',
-            name='location_description',
-            field=models.TextField(blank=True),
-        ),
     ]

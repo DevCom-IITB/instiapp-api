@@ -58,6 +58,61 @@ jobs:
       env:
         DJANGO_SETTINGS_MODULE: backend.settings_test
 
+  test-mysql:
+    services:
+      rabbitmq:
+        image: rabbitmq:3.5.4
+        ports:
+          - 5672:5672
+
+      sonic:
+        image: radialapps/sonic:v1.2.1
+        ports:
+          - 1491:1491
+
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=8
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pipenv wheel
+        pipenv sync
+        pipenv run python -m pip install mysqlclient
+
+    - name: Run Celery
+      run: |
+        pipenv run celery -A backend worker -l info &
+      env:
+        DJANGO_SETTINGS_MODULE: backend.settings_test_full_mysql
+
+    - name: Run Tests
+      run: |
+        pipenv run python manage.py test -v2
+      env:
+        DJANGO_SETTINGS_MODULE: backend.settings_test_full_mysql
+
   test-full:
     services:
       postgres:
@@ -100,7 +155,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pipenv wheel
         pipenv sync
-        pipenv run python -m pip install coverage
+        pipenv run python -m pip install coverage psycopg2-binary
 
     - name: Run Celery
       run: |

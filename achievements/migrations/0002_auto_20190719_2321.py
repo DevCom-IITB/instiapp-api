@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='achievement',
             name='description',
-            field=models.TextField(blank=True, null=True),
+            field=models.TextField(blank=True),
         ),
         migrations.AlterField(
             model_name='achievement',

@@ -9,15 +9,4 @@ class Migration(migrations.Migration):
         ('achievements', '0008_achievement_hidden'),
     ]
 
-    operations = [
-        migrations.AlterField(
-            model_name='achievement',
-            name='description',
-            field=models.TextField(blank=True, default=''),
-        ),
-        migrations.AlterField(
-            model_name='offeredachievement',
-            name='description',
-            field=models.TextField(blank=True, default=''),
-        ),
-    ]
+    operations = []
