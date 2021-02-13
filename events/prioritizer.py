@@ -5,7 +5,7 @@ from django.utils import timezone
 from events.serializers import EventSerializer
 
 BASE = 1000                              # Base points
-BLOCKED_PENALTY = 3000                   # Penalty for blocking a body
+BLOCKED_PENALTY = 30000                   # Penalty for blocking a body
 FINISHED_PENALTY = 600                   # Direct penalty if event is done
 WEIGHT_START_TIME = 800                  # Weight of time from event start
 WEIGHT_END_TIME = 800                    # Weight of time from event end
