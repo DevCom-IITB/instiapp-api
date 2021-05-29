@@ -5,9 +5,18 @@ from django.contrib.auth import logout
 from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.response import Response
-from login.helpers import perform_login
+from login.helpers import perform_google_login, perform_login
 from users.models import UserProfile
 from users.serializer_full import UserProfileFullSerializer
+
+# Google login
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import requests
+
+CLIENT_SECRETS_FILE = "client_secret.json"
+SCOPES = ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']
+
 
 # pylint: disable=C0301
 
@@ -126,6 +135,45 @@ class LoginViewSet(viewsets.ViewSet):
             'profile_id': user_profile.id,
             'profile': profile_serialized.data
         })
+
+    @staticmethod
+    def g_login(request):
+
+        # Check if we have the auth code
+        auth_code = request.GET.get('code')
+        if auth_code is None:
+            return Response({"message": "{?code} is required"}, status=400)
+
+        # Check we have redir param
+        redir = request.GET.get('redir')
+        if redir is None:
+            return Response({"message": "{?redir} is required"}, status=400)
+
+        import os
+        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+        flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+            CLIENT_SECRETS_FILE, scopes=SCOPES)
+        flow.redirect_uri = 'http://localhost:4200/glogin'
+
+        # Use the authorization server's response to fetch the OAuth 2.0 tokens.
+        flow.fetch_token(authorization_response=request.get_full_path())
+
+        # Store credentials in the session.
+        # ACTION ITEM: In a production app, you likely want to save these
+        #              credentials in a persistent database instead.
+        credentials = flow.credentials
+
+        userinfo_req = requests.post('https://www.googleapis.com/oauth2/v3/userinfo',
+            params={'access_token': credentials.token},
+            headers = {'content-type': 'application/json'})
+
+        userinfo = userinfo_req.json()
+        print(userinfo['name'], userinfo['email'])
+
+        name = str(userinfo['name'])
+        email = str(userinfo['email'])
+
+        return perform_google_login(name, email, request)
 
     @staticmethod
     def logout(request):

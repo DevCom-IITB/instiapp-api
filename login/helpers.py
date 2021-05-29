@@ -9,6 +9,32 @@ from users.models import UserProfile
 from users.serializer_full import UserProfileFullSerializer
 from helpers.device import update_fcm_device
 
+def perform_google_login(name, email, request):
+    query = Q(profile__name=name)
+    if email:
+        query = query & Q(profile__email=email)
+    user = User.objects.filter(query).first()
+
+    if not user:
+        return Response({'message': 'User does not exist, please login by sso'}, status=403)
+
+    queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
+    user_profile = queryset.get(user=user)
+
+    # Log in the user
+    login(request, user)
+    request.session.save()
+
+    # Return the session id
+    return Response({
+        'sessionid': request.session.session_key,
+        'user': user.username,
+        'profile_id': user_profile.id,
+        'profile': UserProfileFullSerializer(
+            user_profile, context={'request': request}).data
+    })
+
+
 # pylint: disable=R0914
 def perform_login(auth_code, redir, request):
     """Perform login with code and redir."""
