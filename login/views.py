@@ -153,7 +153,7 @@ class LoginViewSet(viewsets.ViewSet):
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
         flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
             CLIENT_SECRETS_FILE, scopes=SCOPES)
-        flow.redirect_uri = 'http://localhost:4200/glogin'
+        flow.redirect_uri = settings.GOOGLE_REDIR
 
         # Use the authorization server's response to fetch the OAuth 2.0 tokens.
         flow.fetch_token(authorization_response=request.get_full_path())
@@ -168,7 +168,6 @@ class LoginViewSet(viewsets.ViewSet):
             headers = {'content-type': 'application/json'})
 
         userinfo = userinfo_req.json()
-        print(userinfo['name'], userinfo['email'])
 
         name = str(userinfo['name'])
         email = str(userinfo['email'])
