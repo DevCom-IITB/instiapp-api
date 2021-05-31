@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='room',
-            field=models.TextField(blank=True, default=1, null=True),
+            field=models.TextField(blank=True, null=True),
         ),
     ]
