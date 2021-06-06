@@ -40,7 +40,7 @@ class UserTestCase(APITestCase):
         self.assertNotEqual(response.data['contact_no'], contact)
 
         # Test privacy features
-        profile.show_contact_no = False
+        profile.show_contact_no = True
         profile.save()
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
