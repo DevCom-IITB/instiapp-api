@@ -36,9 +36,6 @@ class PlacementsTestCase(APITestCase):
         BlogEntry.objects.create(title="TEntry1", blog_url=settings.TRAINING_BLOG_URL)
         BlogEntry.objects.create(title="TEntry2", blog_url=settings.TRAINING_BLOG_URL)
         BlogEntry.objects.create(title="TEntry3", blog_url=settings.TRAINING_BLOG_URL)
-        
-        
-       
 
     def test_placement_other(self):
         """Check misc parameters of Placement."""
@@ -53,36 +50,24 @@ class PlacementsTestCase(APITestCase):
         test_blog(self, '/api/training-blog', 3)
 
     # Adding test for pin_unpin feature
-    
-    def test_blog_order(obj):
+
+    def test_blog_order(self):
         """Test ordering of the pinned blogs"""
+        BlogEntry.objects.create(title="UnpinnedEntry2", blog_url=settings.PLACEMENTS_URL,)
+        pinnedEntry1 = BlogEntry.objects.create(title="PinnedEntry1", blog_url=settings.PLACEMENTS_URL, pinned=True)
 
-
-        unpinnedEntry2 = BlogEntry.objects.create(title="UnpinnedEntry2", blog_url=settings.PLACEMENTS_URL,)
-        pinnedEntry1 = BlogEntry.objects.create(title="PinnedEntry1", blog_url=settings.PLACEMENTS_URL, pinned = "True")
-        
-        unpinnedEntry3 = BlogEntry.objects.create(title="UnpinnedEntry3", blog_url=settings.PLACEMENTS_URL,)
-        unpinnedEntry4 = BlogEntry.objects.create(title="UnpinnedEntry4", blog_url=settings.PLACEMENTS_URL,)
+        BlogEntry.objects.create(title="UnpinnedEntry3", blog_url=settings.PLACEMENTS_URL,)
+        BlogEntry.objects.create(title="UnpinnedEntry4", blog_url=settings.PLACEMENTS_URL,)
 
         user = get_new_user()
-        obj.client.force_authenticate(user)  # pylint: disable=E1101
+        self.client.force_authenticate(user)  # pylint: disable=E1101
 
         url = '/api/placement-blog'
-        response = obj.client.get(url)
+        response = self.client.get(url)
 
-        
-
-        
-
-        
-
-        obj.assertEqual(response.status_code, 200)
-        obj.assertEqual(response.data[0]['id'], str(pinnedEntry1.id))
-        obj.assertEqual(response.data[0]['pinned'], True )
-
-
-
-        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], str(pinnedEntry1.id))
+        self.assertEqual(response.data[0]['pinned'], True)
 
     @freeze_time('2019-01-02')
     def test_placements_chore(self):
