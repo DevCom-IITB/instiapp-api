@@ -13,6 +13,7 @@ class BlogEntry(models.Model):
     link = models.CharField(max_length=200, blank=True)
     published = models.DateTimeField(default=now)
     blog_url = models.URLField(null=True)
+    pin_unpin = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

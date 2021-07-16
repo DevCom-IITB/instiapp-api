@@ -7,4 +7,4 @@ class BlogEntrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BlogEntry
-        fields = ('id', 'guid', 'link', 'title', 'content', 'published')
+        fields = ('id', 'guid', 'link', 'title', 'content', 'published', 'pin_unpin')
