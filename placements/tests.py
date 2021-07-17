@@ -49,6 +49,26 @@ class PlacementsTestCase(APITestCase):
         """Check auth before getting training blog."""
         test_blog(self, '/api/training-blog', 3)
 
+    # Adding test for pin_unpin feature
+
+    def test_blog_order(self):
+        """Test ordering of the pinned blogs"""
+        BlogEntry.objects.create(title="UnpinnedEntry2", blog_url=settings.PLACEMENTS_URL,)
+        pinnedEntry1 = BlogEntry.objects.create(title="PinnedEntry1", blog_url=settings.PLACEMENTS_URL, pinned=True)
+
+        BlogEntry.objects.create(title="UnpinnedEntry3", blog_url=settings.PLACEMENTS_URL,)
+        BlogEntry.objects.create(title="UnpinnedEntry4", blog_url=settings.PLACEMENTS_URL,)
+
+        user = get_new_user()
+        self.client.force_authenticate(user)  # pylint: disable=E1101
+
+        url = '/api/placement-blog'
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], str(pinnedEntry1.id))
+        self.assertEqual(response.data[0]['pinned'], True)
+
     @freeze_time('2019-01-02')
     def test_placements_chore(self):
         """Test the placement blog chore."""
