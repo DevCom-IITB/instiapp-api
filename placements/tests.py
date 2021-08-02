@@ -70,6 +70,27 @@ class PlacementsTestCase(APITestCase):
         self.assertEqual(response.data[0]['pinned'], True)
         # to test that the latest blog appears just below the pinned one
         self.assertEqual(response.data[1]['id', str(un_pinnedEntry2.id)])
+        BlogEntry.objects.all().delete()
+
+    def test_blog_order_without_pin(self):
+        """Test ordering of blog with no blog is pinned"""
+
+        self.entry1 = BlogEntry.objects.create(title="PEntry1", blog_url=settings.PLACEMENTS_URL)
+        BlogEntry.objects.create(title="PEntry2", blog_url=settings.PLACEMENTS_URL)
+        BlogEntry.objects.create(title="PEntry3", blog_url=settings.PLACEMENTS_URL)
+        BlogEntry.objects.create(title="PEntry4", blog_url=settings.PLACEMENTS_URL)
+        self.entry_latest = BlogEntry.objects.create(title="PEntry5", blog_url=settings.PLACEMENTS_URL)
+
+        user = get_new_user()
+        self.client.force_authenticate(user)  # pylint: disable=E1101
+
+        url = '/api/placement-blog'
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'],str(self.entry_latest.id))
+        self.assertEqual(response.data[4]['id'],str(self.entry1.id))
+
 
 
     @freeze_time('2019-01-02')
