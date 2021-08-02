@@ -69,7 +69,7 @@ class PlacementsTestCase(APITestCase):
         self.assertEqual(response.data[0]['id'], str(pinnedEntry1.id))
         self.assertEqual(response.data[0]['pinned'], True)
         # to test that the latest blog appears just below the pinned one
-        self.assertEqual(response.data[1]['id', str(un_pinnedEntry2.id)])
+        
         BlogEntry.objects.all().delete()
 
     def test_blog_order_without_pin(self):
