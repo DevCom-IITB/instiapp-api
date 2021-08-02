@@ -57,7 +57,7 @@ class UserProfile(models.Model):
         'roles.InstituteRole', related_name='users', blank=True)
 
     # User exposed fields
-    show_contact_no = models.BooleanField(default=True)
+    show_contact_no = models.BooleanField(default=False)
     fcm_id = models.CharField(max_length=200, null=True, blank=True)
     about = models.TextField(blank=True, null=True)
     android_version = models.IntegerField(default=0)

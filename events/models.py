@@ -15,7 +15,7 @@ class Event(models.Model):
     time_of_creation = models.DateTimeField(auto_now_add=True)
     time_of_modification = models.DateTimeField(auto_now=True)
 
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=60)
     description = models.TextField(blank=True)
     bodies = models.ManyToManyField('bodies.Body', related_name='events', blank=True)
     image_url = models.URLField(blank=True, null=True)
