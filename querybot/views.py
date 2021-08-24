@@ -4,6 +4,8 @@ from rest_framework import viewsets
 from querybot.models import Query, UnresolvedQuery
 from querybot.serializers import QuerySerializer, UnresolvedQuerySerializer
 from roles.helpers import login_required_ajax
+from .documents import QueryDocument
+from elasticsearch_dsl import Q
 
 class QueryBotViewset(viewsets.ViewSet):
 
@@ -11,7 +13,22 @@ class QueryBotViewset(viewsets.ViewSet):
     # @login_required_ajax
     def search(cls, request):
         """Get Search Results."""
-        queryset = Query.objects.all()
+        query = request.data.get('query', '')
+
+        if query == '':
+            queryset = Query.objects.all()
+            return Response(QuerySerializer(queryset, many=True).data)
+        
+        querydic = { \
+            "match": { \
+                "question": { \
+                    "query": query, \
+                    "fuzziness": "AUTO" \
+                    } \
+                } \
+            }
+        res = QueryDocument.search().query(Q(querydic))[:20]
+        queryset = res.to_queryset()
         return Response(QuerySerializer(queryset, many=True).data)
 
     @classmethod
