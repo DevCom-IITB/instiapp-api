@@ -1,3 +1,4 @@
 from django.contrib import admin
+from external.models import ExternalBlogEntry
 
-# Register your models here.
+admin.site.register(ExternalBlogEntry)

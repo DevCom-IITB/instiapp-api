@@ -15,7 +15,7 @@ class ExternalBlogViewset(viewsets.ViewSet):
     # @login_required_ajax
     def external_blog(cls, request):
         """Get External Blog."""
-        queryset = ExternalBlogEntry.objects.filter(blog_url=settings.PLACEMENTS_URL)
+        queryset = ExternalBlogEntry.objects.filter()
         """Checking for the search query"""
         queryset = query_search(request, 3, queryset, ['title', 'content'], 'placement')
         queryset = query_from_num(request, 20, queryset)

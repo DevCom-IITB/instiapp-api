@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'messmenu.apps.MessmenuConfig',
     'other.apps.OtherConfig',
     'venter.apps.VenterConfig',
+    'external.apps.ExternalConfig',
 
     'notifications',
     'markdownify',
