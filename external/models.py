@@ -12,6 +12,7 @@ class ExternalBlogEntry(models.Model):
     content = models.TextField(blank=True)
     link = models.CharField(max_length=200, blank=True)
     published = models.DateTimeField(default=now)
+    body = models.TextField(max_length=50, blank=False)
 
     def __str__(self):
         return self.title

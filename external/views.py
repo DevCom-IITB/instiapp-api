@@ -17,7 +17,7 @@ class ExternalBlogViewset(viewsets.ViewSet):
         """Get External Blog."""
         queryset = ExternalBlogEntry.objects.filter()
         """Checking for the search query"""
-        queryset = query_search(request, 3, queryset, ['title', 'content'], 'placement')
+        queryset = query_search(request, 3, queryset, ['title', 'content', 'body'], 'external')
         queryset = query_from_num(request, 20, queryset)
 
         return Response(ExternalBlogEntrySerializer(queryset, many=True).data)

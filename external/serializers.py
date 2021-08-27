@@ -7,4 +7,4 @@ class ExternalBlogEntrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BlogEntry
-        fields = ('id', 'guid', 'link', 'title', 'content', 'published')
+        fields = ('id', 'guid', 'body', 'link', 'title', 'content', 'published')
