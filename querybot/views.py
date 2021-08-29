@@ -13,8 +13,10 @@ class QueryBotViewset(viewsets.ViewSet):
     # @login_required_ajax
     def search(cls, request):
         """Get Search Results."""
-        query = request.data.get('query', '')
-
+        query = request.GET.get('query', '')
+        print(request.data)
+        print(query)
+        print(request.GET)
         if query == '':
             queryset = Query.objects.all()
             return Response(QuerySerializer(queryset, many=True).data)

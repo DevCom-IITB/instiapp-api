@@ -17,8 +17,8 @@ ALLOWED_HOSTS = ['*']
 # SSO Config
 SSO_TOKEN_URL = 'https://gymkhana.iitb.ac.in/sso/oauth/token/'
 SSO_PROFILE_URL = 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number'
-SSO_CLIENT_ID = 'vR1pU7wXWyve1rUkg0fMS6StL1Kr6paoSmRIiLXJ'
-SSO_CLIENT_ID_SECRET_BASE64 = 'dlIxcFU3d1hXeXZlMXJVa2cwZk1TNlN0TDFLcjZwYW9TbVJJaUxYSjpaR2J6cHR2dXlVZmh1d3NVWHZqdXJRSEhjMU51WXFmbDJrSjRmSm90YWhyc2tuYklxa2o1NUNKdDc0UktQMllwaXlabHpXaGVZWXNiNGpKVG1RMFVEZUU4M1B6bVViNzRaUjJCakhhYkVqWVJPVEwxSnIxY1ZwTWdZTzFiOWpPWQ=='
+SSO_CLIENT_ID = 'g0QTDQxmhfH9izhezy61k2hfEgsGzbtQvF26gwP4'
+SSO_CLIENT_ID_SECRET_BASE64 = 'ZzBRVERReG1oZkg5aXpoZXp5NjFrMmhmRWdzR3pidFF2RjI2Z3dQNDpRZkRIS3I5OTlKVzhUNXJSNmJlUTFTS25Hc1hCcDJnTUtkQmlYdUY4Q2hnVE12Z3M3N05oSklSTmx2MWZGODVCaXlvYjRuYXk2azgxZmN3SzRLRWNvZ0dKdTY0eFBIYk9wMDlDVm95OVp0Tm1BVmdjUG5TeTczR04zdGg3YmRsdQ=='
 
 # Password Login
 SSO_DEFAULT_REDIR = 'https://insti.app/login'
