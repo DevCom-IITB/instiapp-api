@@ -1,10 +1,10 @@
 """Serializer for ExternalBlog."""
 from rest_framework import serializers
-from placements.models import BlogEntry
+from external.models import ExternalBlogEntry
 
 class ExternalBlogEntrySerializer(serializers.ModelSerializer):
     """Serializer for ExternalPlacementBlogEntry."""
 
     class Meta:
-        model = BlogEntry
+        model = ExternalBlogEntry
         fields = ('id', 'guid', 'body', 'link', 'title', 'content', 'published')
