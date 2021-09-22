@@ -11,6 +11,7 @@ from users.models import UserProfile
 from external.models import ExternalBlogEntry
 from helpers.misc import table_to_markdown
 
+
 # class ProfileFetcher():
 #     """Helper to get dictionary of profiles efficiently."""
 #     def __init__(self):
@@ -92,5 +93,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Run the chore."""
 
-        fill_blog('http://127.0.0.1:8000/blog/feed')
+        fill_blog(settings.EXTERNAL_BLOG_URL)
         self.stdout.write(self.style.SUCCESS('External Blog Chore completed successfully'))

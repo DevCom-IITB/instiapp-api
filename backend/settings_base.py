@@ -149,6 +149,7 @@ LOGO_URL = 'https://insti.app/assets/logo.png'
 # Placement blog URLs
 PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
 TRAINING_BLOG_URL = 'http://placements.iitb.ac.in/trainingblog/?feed=rss2'
+EXTERNAL_BLOG_URL = 'http://127.0.0.1:8000/blog/feed'
 
 # Names of bodies to notify when there are new posts on placement/training blog
 PLACEMENTS_BLOG_BODY = 'Placement Blog'
