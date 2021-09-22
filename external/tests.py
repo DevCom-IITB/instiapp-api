@@ -75,10 +75,10 @@ class ExternalTestCase(APITestCase):
         call_command('external_blog_chore')
 
         # Check if posts were collected
-        placements = lambda: ExternalBlogEntry.objects.all()
-        self.assertEqual(placements().count(), 5)
-        self.assertEqual(set(x.guid for x in placements()), set('sample:t:%i' % i for i in range(1, 6)))
-        self.assertEqual(set(x.title for x in placements()), set('Training Item %i' % i for i in range(1, 6)))
+        placements = ExternalBlogEntry.objects.all()
+        self.assertEqual(placements.count(), 5)
+        self.assertEqual(set(x.guid for x in placements), set('sample:t:%i' % i for i in range(1, 6)))
+        self.assertEqual(set(x.title for x in placements), set('Training Item %i' % i for i in range(1, 6)))
 
     def tearDown(self):
         # Stop server
