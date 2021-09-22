@@ -12,7 +12,7 @@ from external.models import ExternalBlogEntry
 class ExternalBlogViewset(viewsets.ViewSet):
 
     @classmethod
-    # @login_required_ajax
+    @login_required_ajax
     def external_blog(cls, request):
         """Get External Blog."""
         queryset = ExternalBlogEntry.objects.filter()

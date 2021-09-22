@@ -38,6 +38,8 @@ def handle_entry(entry):
         new_added = True
 
     # Fill the db entry
+    if 'author' in entry:
+        db_entry.body = entry['author']
     if 'title' in entry:
         db_entry.title = entry['title']
     if 'summary' in entry and entry['summary']:
