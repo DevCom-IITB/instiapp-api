@@ -1,11 +1,8 @@
-import time
 from subprocess import Popen
 
-from django.conf import settings
 from django.core.management import call_command
 from freezegun import freeze_time
 from rest_framework.test import APITestCase
-from helpers.test_helpers import create_body
 from external.models import ExternalBlogEntry
 from login.tests import get_new_user
 
@@ -74,26 +71,7 @@ class ExternalTestCase(APITestCase):
         # Clear table
         ExternalBlogEntry.objects.all().delete()
 
-        # # Create blog bodies
-        # placement_body = create_body(name=settings.PLACEMENTS_BLOG_BODY)
-        # training_body = create_body(name=settings.TRAINING_BLOG_BODY)
-
-        # # Create users to follow blogs
-        # second_year = get_new_user()
-        # final_year = get_new_user()
-        # mentioned_user = get_new_user()
-        # mentioned_dual = get_new_user()
-        # second_year.profile.followed_bodies.add(training_body)
-        # final_year.profile.followed_bodies.add(placement_body)
-        # mentioned_user.profile.roll_no = '160010005'
-        # mentioned_user.profile.save()
-        # mentioned_dual.profile.roll_no = '150040010'
-        # mentioned_dual.profile.save()
-
-        # # Give mock server time
-        # time.sleep(1)
-
-        # Run the placement chore
+        # Call the external blog command
         call_command('external_blog_chore')
 
         # Check if posts were collected
@@ -101,7 +79,6 @@ class ExternalTestCase(APITestCase):
         self.assertEqual(placements().count(), 5)
         self.assertEqual(set(x.guid for x in placements()), set('sample:t:%i' % i for i in range(1, 6)))
         self.assertEqual(set(x.title for x in placements()), set('Training Item %i' % i for i in range(1, 6)))
-
 
     def tearDown(self):
         # Stop server

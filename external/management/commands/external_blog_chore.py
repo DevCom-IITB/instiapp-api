@@ -1,13 +1,9 @@
 import re
 import feedparser
 import requests
-from requests.auth import HTTPBasicAuth
 from dateutil.parser import parse
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
-from notifications.signals import notify
-from users.models import UserProfile
 from external.models import ExternalBlogEntry
 from helpers.misc import table_to_markdown
 
@@ -31,12 +27,12 @@ def handle_entry(entry):
     # Try to get an entry existing
     guid = entry['id']
     db_entry = ExternalBlogEntry.objects.filter(guid=guid).first()
-    new_added = False
+    # new_added = False
 
     # Reuse if entry exists, create new otherwise
     if not db_entry:
         db_entry = ExternalBlogEntry(guid=guid)
-        new_added = True
+        # new_added = True
 
     # Fill the db entry
     if 'author' in entry:
