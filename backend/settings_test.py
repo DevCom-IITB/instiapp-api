@@ -32,3 +32,4 @@ USER_AVATAR_URL = '/static/upload/useravatar.jpg'
 # Placement blog URLs
 PLACEMENTS_URL = 'http://localhost:33000/placementblog'
 TRAINING_BLOG_URL = 'http://localhost:33000/trainingblog'
+EXTERNAL_BLOG_URL = 'http://localhost:33000/externalblog'

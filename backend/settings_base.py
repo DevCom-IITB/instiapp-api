@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'messmenu.apps.MessmenuConfig',
     'other.apps.OtherConfig',
     'venter.apps.VenterConfig',
+    'external.apps.ExternalConfig',
 
     'notifications',
     'markdownify',
@@ -148,6 +149,7 @@ LOGO_URL = 'https://insti.app/assets/logo.png'
 # Placement blog URLs
 PLACEMENTS_URL = 'https://campus.placements.iitb.ac.in/blog/placement/?feed=rss2'
 TRAINING_BLOG_URL = 'https://campus.placements.iitb.ac.in/blog/internship/?feed=rss2'
+EXTERNAL_BLOG_URL = 'https://insti.app/blog/feed'
 
 # Names of bodies to notify when there are new posts on placement/training blog
 PLACEMENTS_BLOG_BODY = 'Placement Blog'
