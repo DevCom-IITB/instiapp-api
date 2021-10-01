@@ -14,6 +14,7 @@ from events.prioritizer import get_fresh_events
 from users.models import UserProfile
 from placements.models import BlogEntry
 from news.models import NewsEntry
+from external.models import ExternalBlogEntry
 
 async def refresh(queryset):
     # Get client
@@ -56,6 +57,12 @@ class Command(BaseCommand):
         # Refresh active users
         active_user_profiles = list(UserProfile.objects.filter(active=True))
         run_sync(refresh(active_user_profiles))
+
+        # Refresh external blog entries younger than two years
+        external = list(ExternalBlogEntry.objects.filter(
+            published__gte=timezone.now() - timedelta(days=600)
+        ))
+        run_sync(refresh(external))
 
         # Re-consolidate
         run_sync(consolidate())
