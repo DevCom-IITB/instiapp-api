@@ -81,6 +81,8 @@ def fill_blog(url, body_name):
 
 def handle_html(content):
     # Convert tables to markdown
+    figregex = re.compile(r"<figure class=\"wp-block-table\"><table.*?/table></figure>", re.DOTALL)
+    content = figregex.sub(convert_table_md, content)
     regex = re.compile(r"<table.*?/table>", re.DOTALL)
     content = regex.sub(convert_table_md, content)
     return content
