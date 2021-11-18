@@ -6,6 +6,8 @@ from querybot.serializers import QuerySerializer, UnresolvedQuerySerializer
 from roles.helpers import login_required_ajax
 from .documents import QueryDocument
 from elasticsearch_dsl import Q
+import operator
+
 
 class QueryBotViewset(viewsets.ViewSet):
 
@@ -14,22 +16,32 @@ class QueryBotViewset(viewsets.ViewSet):
     def search(cls, request):
         """Get Search Results."""
         query = request.GET.get('query', '')
-        print(request.data)
-        print(query)
-        print(request.GET)
+        categories = request.GET.get('category', [])
+        categories = [x for x in categories.split("\'")]
+        # print(request.data)
+        # print(query)
+        # print(request.GET)
         if query == '':
             queryset = Query.objects.all()
             return Response(QuerySerializer(queryset, many=True).data)
         
+        category_dic = {}
         querydic = { \
             "match": { \
                 "question": { \
                     "query": query, \
                     "fuzziness": "AUTO" \
                     } \
-                } \
+                }, \
             }
-        res = QueryDocument.search().query(Q(querydic))[:20]
+        if len(categories) == 0:
+            res = QueryDocument.search().query(Q(querydic))[:20]
+        else:
+            category_dic = [Q('match', category=category_id) for category_id in categories ]
+            query = category_dic.pop()
+            for x in category_dic:
+                query |= x
+            res = QueryDocument.search().query(query & Q(querydic))[:20]
         queryset = res.to_queryset()
         return Response(QuerySerializer(queryset, many=True).data)
 
