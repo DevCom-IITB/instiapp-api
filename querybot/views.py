@@ -16,7 +16,7 @@ class QueryBotViewset(viewsets.ViewSet):
     def search(cls, request):
         """Get Search Results."""
         query = request.GET.get('query', '')
-        categories = request.GET.get('category', [])
+        categories = request.GET.get('category', '')
         categories = [x for x in categories.split("\'")]
         # print(request.data)
         # print(query)
