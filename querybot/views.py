@@ -54,7 +54,7 @@ class QueryBotViewset(viewsets.ViewSet):
         if ques == '':
             return Response({'error': 'Question cannot be blank.'})
 
-        new_q = UnresolvedQuery(question = ques, category = cat)
+        new_q = UnresolvedQuery(question = ques, category = cat, user = request.user)
         new_q.save()
         return Response(UnresolvedQuerySerializer(new_q).data)
 

@@ -18,3 +18,5 @@ class UnresolvedQuery(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     question = models.TextField(blank=False)
     category = models.CharField(max_length=30, blank=True)
+    user = models.ForeignKey('users.UserProfile', null=False, on_delete=models.CASCADE, related_name='Query')
+    resolved = models.BooleanField(default=False)
