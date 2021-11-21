@@ -50,12 +50,13 @@ class QueryBotViewset(viewsets.ViewSet):
     def ask_question(cls, request):
         """New Question Asked."""
         ques = request.data.get('question', '')
-        cat = request.data.get('category', '')
+        cat = request.data.get('category', 'Others')
         if ques == '':
             return Response({'error': 'Question cannot be blank.'})
 
-        new_q = UnresolvedQuery(question = ques, category = cat, user = request.user)
-        new_q.save()
+        user = request.user
+
+        new_q = UnresolvedQuery.objects.create(question = ques, category = cat, user = user.profile)
         return Response(UnresolvedQuerySerializer(new_q).data)
 
     @classmethod
