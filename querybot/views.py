@@ -21,7 +21,7 @@ class QueryBotViewset(viewsets.ViewSet):
         # print(request.data)
         # print(query)
         # print(request.GET)
-        if query == '':
+        if query == '' and categories[0] == '':
             queryset = Query.objects.all()
             return Response(QuerySerializer(queryset, many=True).data)
         
@@ -34,16 +34,23 @@ class QueryBotViewset(viewsets.ViewSet):
                     } \
                 }, \
             }
-        if len(categories) == 0:
+        if categories[0] == '':
             res = QueryDocument.search().query(Q(querydic))[:20]
+        elif query == '':
+            category_dic = [Q('match', category=category_id) for category_id in categories ]
+            query = category_dic.pop()
+            for x in category_dic:
+                query |= x
+            res = QueryDocument.search().query(query)
         else:
             category_dic = [Q('match', category=category_id) for category_id in categories ]
             query = category_dic.pop()
             for x in category_dic:
                 query |= x
-            res = QueryDocument.search().query(query & Q(querydic))[:20]
+            res = QueryDocument.search().query(query)
+            res = res.query(Q(querydic))
         queryset = res.to_queryset()
-        return Response(QuerySerializer(queryset, many=True).data)
+        return Response(QuerySerializer(queryset[0:20], many=True).data)
 
     @classmethod
     # @login_required_ajax
