@@ -15,6 +15,7 @@ class PlacementBlogViewset(viewsets.ViewSet):
         """Get Placement Blog."""
         queryset = BlogEntry.objects.filter(blog_url=settings.PLACEMENTS_URL)
         queryset = query_search(request, 3, queryset, ['title', 'content'], 'placement')
+        queryset = queryset.order_by('-pinned', "-published")
         queryset = query_from_num(request, 20, queryset)
 
         return Response(BlogEntrySerializer(queryset, many=True).data)
@@ -25,5 +26,6 @@ class PlacementBlogViewset(viewsets.ViewSet):
         """Get Training Blog."""
         queryset = BlogEntry.objects.filter(blog_url=settings.TRAINING_BLOG_URL)
         queryset = query_search(request, 3, queryset, ['title', 'content'], 'training')
+        queryset = queryset.order_by('-pinned', "-published")
         queryset = query_from_num(request, 20, queryset)
         return Response(BlogEntrySerializer(queryset, many=True).data)

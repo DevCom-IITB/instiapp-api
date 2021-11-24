@@ -1,9 +1,9 @@
-"""Models for placements."""
+"""Models for external opportunities."""
 from uuid import uuid4
 from django.db import models
 from django.utils.timezone import now
 
-class BlogEntry(models.Model):
+class ExternalBlogEntry(models.Model):
     """A single entry on the placements blog."""
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -12,15 +12,14 @@ class BlogEntry(models.Model):
     content = models.TextField(blank=True)
     link = models.CharField(max_length=200, blank=True)
     published = models.DateTimeField(default=now)
-    blog_url = models.URLField(null=True)
-    pinned = models.BooleanField(default=False)
+    body = models.TextField(max_length=50, blank=True)
 
     def __str__(self):
         return self.title
 
     class Meta:
-        verbose_name = "Placement Blog Entry"
-        verbose_name_plural = "Placement Blog Entries"
+        verbose_name = "External Blog Entry"
+        verbose_name_plural = "External Blog Entries"
         ordering = ("-published",)
         indexes = [
             models.Index(fields=['guid', ]),

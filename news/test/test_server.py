@@ -32,6 +32,8 @@ class S(BaseHTTPRequestHandler):
                 file = 'sample-feed-p2.xml'
         elif 'trainingblog' in p:
             file = 'sample-feed-t.xml'
+        elif 'externalblog' in p:
+            file = 'sample-feed-e.xml'
 
         # File not found
         if not file:
