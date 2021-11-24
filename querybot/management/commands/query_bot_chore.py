@@ -8,13 +8,13 @@ def handle_entry(entry):
 
     # Try to get an entry existing
     id = entry.id
-    db_entry = UnresolvedQuery.objects.filter(id = id).first()
+    db_entry = UnresolvedQuery.objects.filter(id=id).first()
 
     # Send notification to mentioned people
     if db_entry.resolved:
         # Send notifications to user
         users = User.objects.filter(id=db_entry.user.user.id)
-        # notify.send(db_entry, recipient=users, verb="Your query has been resolved")
+        notify.send(db_entry, recipient=users, verb="Your query has been resolved")
 
         db_entry.delete()
 
