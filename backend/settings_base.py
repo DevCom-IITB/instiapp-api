@@ -157,7 +157,7 @@ LOGO_URL = 'https://insti.app/assets/logo.png'
 # Placement blog URLs
 PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
 TRAINING_BLOG_URL = 'http://placements.iitb.ac.in/trainingblog/?feed=rss2'
-EXTERNAL_BLOG_URL = 'http://127.0.0.1:8000/blog/feed'
+EXTERNAL_BLOG_URL = 'https://gymkhana.iitb.ac.in/externalblog'
 
 # Names of bodies to notify when there are new posts on placement/training blog
 PLACEMENTS_BLOG_BODY = 'Placement Blog'
@@ -194,3 +194,5 @@ CELERY_DELAY = 0
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 COMPLAINT_AUTO_SUBSCRIBE = True
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
