@@ -10,6 +10,8 @@ from venter.models import ComplaintComment
 from venter.serializers import CommentSerializer
 from users.models import UserTag
 from users.models import UserTagCategory
+from querybot.models import UnresolvedQuery
+from querybot.serializers import UnresolvedQuerySerializer
 
 class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disable=W0223
     """Serializer for actor/target of notifications."""
@@ -22,6 +24,8 @@ class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disa
             serializer = BlogEntrySerializer(value)
         elif isinstance(value, ComplaintComment):
             serializer = CommentSerializer(value)
+        elif isinstance(value, UnresolvedQuery):
+            serializer = UnresolvedQuerySerializer
 
         return serializer.data
 

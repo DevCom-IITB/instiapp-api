@@ -12,6 +12,10 @@ class Query(models.Model):
     sub_category = models.CharField(max_length=30, blank=True)
     sub_sub_category = models.CharField(max_length=30, blank=True)
 
+    class Meta:
+        verbose_name = "Query"
+        verbose_name_plural = "Queries"
+
 class UnresolvedQuery(models.Model):
     """New question asked by someone."""
 
@@ -20,3 +24,7 @@ class UnresolvedQuery(models.Model):
     category = models.CharField(max_length=30, blank=True)
     user = models.ForeignKey('users.UserProfile', null=False, on_delete=models.CASCADE, related_name='Query')
     resolved = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "UnresolvedQuery"
+        verbose_name_plural = "UnresolvedQueries"
