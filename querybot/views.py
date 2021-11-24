@@ -1,10 +1,10 @@
+from elasticsearch_dsl import Q
 from rest_framework.response import Response
 from rest_framework import viewsets
 from querybot.models import Query, UnresolvedQuery
 from querybot.serializers import QuerySerializer, UnresolvedQuerySerializer
 from roles.helpers import login_required_ajax
 from .documents import QueryDocument
-from elasticsearch_dsl import Q
 
 
 class QueryBotViewset(viewsets.ViewSet):
