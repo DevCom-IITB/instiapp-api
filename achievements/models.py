@@ -63,8 +63,16 @@ class Achievement(models.Model):
     offer = models.ForeignKey(OfferedAchievement, null=True,
                               on_delete=models.SET_NULL, related_name='achievements')
 
+    isSkill = models.BooleanField(default=False)
+
     class Meta:
         ordering = ("-time_of_creation",)
+
+class Skill(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    title = models.CharField(max_length=80)
+    body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE,
+                             related_name='skills')
 
 
 post_save.connect(OfferedAchievement.post_create, sender=OfferedAchievement)

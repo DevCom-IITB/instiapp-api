@@ -56,7 +56,7 @@ class AchievementViewSet(viewsets.ModelViewSet):
         """Make a request to a body for a new achievement."""
 
         # Disallow requests without body
-        if 'body' not in request.data or not request.data['body']:
+        if ('body' not in request.data or not request.data['body']) and (not request.data['isSkill']):
             return forbidden_no_privileges()
 
         return super().create(request)

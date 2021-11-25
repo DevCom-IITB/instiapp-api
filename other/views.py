@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 
 from notifications.signals import notify
+from achievements.models import Skill
+from achievements.serializers import SkillSerializer
 from roles.helpers import login_required_ajax
 from bodies.models import Body
 from bodies.serializer_min import BodySerializerMin
@@ -36,7 +38,7 @@ class OtherViewset(viewsets.ViewSet):
         if not req_query or len(req_query) < MIN_LENGTH:
             return Response({"message": "No query or too short!"}, status=400)
 
-        types = ('bodies', 'events', 'users')
+        types = ('bodies', 'events', 'users', 'skills')
         req_types = request.GET.get('types')
         if req_types:
             types = tuple(req_types.split(','))
@@ -61,10 +63,17 @@ class OtherViewset(viewsets.ViewSet):
                 request, MIN_LENGTH, UserProfile.objects.filter(active=True),
                 ['name', 'ldap_id', 'roll_no'], 'profiles', order_relevance=True)[:20]
 
+        # Search skills by title
+        if 'skills' in types:
+            skills = query_search(
+                request, MIN_LENGTH, Skill.objects.all(),
+                ["title"], 'skills', order_relevance=True)
+
         return Response({
             "bodies": BodySerializerMin(bodies, many=True).data,
             "events": EventSerializer(events, many=True).data,
-            "users": UserProfileSerializer(users, many=True).data
+            "users": UserProfileSerializer(users, many=True).data,
+            "skills": SkillSerializer(skills, many=True).data
         })
 
     @classmethod

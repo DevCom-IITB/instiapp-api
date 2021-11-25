@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from achievements.models import Achievement
 from achievements.models import OfferedAchievement
+from achievements.models import Skill
 from bodies.serializer_min import BodySerializerMin
 from events.serializer_min import EventMinSerializer
 from users.serializers import UserProfileSerializer
@@ -15,7 +16,7 @@ class AchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
         fields = ('id', 'title', 'description', 'body_detail',
-                  'dismissed', 'verified', 'hidden', 'event_detail')
+                  'dismissed', 'verified', 'hidden', 'event_detail', 'isSkill')
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -46,7 +47,7 @@ class AchievementUserSerializer(serializers.ModelSerializer):
         model = Achievement
         fields = ('id', 'title', 'description', 'admin_note',
                   'body_detail', 'dismissed', 'verified', 'user', 'body',
-                  'verified_by', 'event', 'event_detail', 'offer')
+                  'verified_by', 'event', 'event_detail', 'offer', 'isSkill')
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -58,6 +59,9 @@ class AchievementUserSerializer(serializers.ModelSerializer):
         validated_data['user'] = self.context['request'].user.profile
         validated_data['dismissed'] = False
         validated_data['verified'] = False
+        if validated_data['isSkill']:
+            skill = Skill.objects.filter(title=validated_data['title']).first()
+            validated_data['body'] = skill.body
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
@@ -71,3 +75,10 @@ class OfferedAchievementSerializer(serializers.ModelSerializer):
         model = OfferedAchievement
         fields = ('id', 'priority', 'title', 'description',
                   'body', 'event', 'generic')
+
+class SkillSerializer(serializers.ModelSerializer):
+    """Serializer for Skill."""
+
+    class Meta:
+        model = Skill
+        fields = ('title',)
