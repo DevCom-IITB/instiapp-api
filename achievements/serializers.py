@@ -1,6 +1,6 @@
 """Serializers for Achievements."""
 from rest_framework import serializers
-from achievements.models import Achievement
+from achievements.models import Achievement, Interest, UserInterest
 from achievements.models import OfferedAchievement
 from achievements.models import Skill
 from bodies.serializer_min import BodySerializerMin
@@ -82,3 +82,18 @@ class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = ('title',)
+
+class InterestSerializer(serializers.ModelSerializer):
+    """Serializer for Interest."""
+
+    class Meta:
+        model = Interest
+        fields = ('id', 'title')
+
+class UserInterestSerializer(serializers.ModelSerializer):
+    """Serializer for UserInterest."""
+    user = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = UserInterest
+        fields = ('id', 'title', 'user')

@@ -74,5 +74,15 @@ class Skill(models.Model):
     body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE,
                              related_name='skills')
 
+class Interest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    title = models.CharField(max_length=80)
+
+class UserInterest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    title = models.CharField(max_length=80)
+    user = models.ForeignKey('users.UserProfile', null=False,
+                             on_delete=models.CASCADE, related_name='interests')
+
 
 post_save.connect(OfferedAchievement.post_create, sender=OfferedAchievement)

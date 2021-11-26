@@ -1,5 +1,5 @@
 from django.contrib import admin
-from achievements.models import Achievement, Skill
+from achievements.models import Achievement, Interest, Skill
 from achievements.models import OfferedAchievement
 
 class AchievementAdmin(admin.ModelAdmin):
@@ -21,7 +21,14 @@ class SkillAdmin(admin.ModelAdmin):
     # ordering = ('-time_of_creation',)
     # raw_id_fields = ('user', 'verified_by')
 
+class InterestAdmin(admin.ModelAdmin):
+    # list_filter = ('body', 'verified', 'dismissed')
+    list_display = ('title',)
+    # ordering = ('-time_of_creation',)
+    # raw_id_fields = ('user', 'verified_by')
+
 
 admin.site.register(Achievement, AchievementAdmin)
 admin.site.register(OfferedAchievement, OfferedAchievementAdmin)
 admin.site.register(Skill, SkillAdmin)
+admin.site.register(Interest, InterestAdmin)
