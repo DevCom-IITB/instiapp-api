@@ -76,7 +76,7 @@ class Skill(models.Model):
 
 class Interest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    title = models.CharField(max_length=80)
+    title = models.CharField(max_length=80, unique=True)
 
 class UserInterest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)

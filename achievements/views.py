@@ -8,9 +8,9 @@ from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
 from roles.helpers import user_has_privilege
 
-from achievements.models import Achievement
+from achievements.models import Achievement, Interest, UserInterest
 from achievements.models import OfferedAchievement
-from achievements.serializers import AchievementSerializer
+from achievements.serializers import AchievementSerializer, UserInterestSerializer
 from achievements.serializers import AchievementUserSerializer
 from achievements.serializers import OfferedAchievementSerializer
 
@@ -197,3 +197,30 @@ class OfferedAchievementViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Achievement unlocked successfully!'}, 201)
 
         return forbidden_no_privileges()
+
+
+class UserInterestViewSet(viewsets.ModelViewSet):
+    """Views for User Interests"""
+
+    queryset = UserInterest.objects
+    serializer_class = UserInterestSerializer
+
+    def delete(self, request, pk):
+        """Delete a user interest."""
+
+        interest = self.queryset.filter(user=request.user.profile, id=pk).first()
+        interest.delete()
+
+        return Response({'message': 'Interest Deleted Successfully'}, 201)
+
+    def create(self, request):
+        """Add a user interest."""
+
+        interest = get_object_or_404(Interest.objects, id=request.data['interestId'])
+        if self.queryset.filter(user=request.user.profile, interest=interest).exists():
+            return Response({'message': 'You already have this interest!'}, 400)
+
+        userInterest = UserInterest.objects.create(user=request.user.profile, title=interest.title)
+        userInterest.save()
+
+        return Response({'message': 'Interest Added Successfully'}, 201)

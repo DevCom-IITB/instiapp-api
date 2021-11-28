@@ -1,6 +1,6 @@
 """URLs for events."""
 from django.urls import path
-from achievements.views import AchievementViewSet
+from achievements.views import AchievementViewSet, UserInterestViewSet
 from achievements.views import OfferedAchievementViewSet
 
 urlpatterns = [
@@ -19,4 +19,10 @@ urlpatterns = [
     path('achievements-offer/<pk>', OfferedAchievementViewSet.as_view({
         'get': 'retrieve', 'put': 'update', 'delete': 'destroy', 'post': 'claim_secret'
     })),
+    path('interest', UserInterestViewSet.as_view({
+         'post': 'create',
+         })),
+    path('interests/<pk>', UserInterestViewSet.as_view({
+         'delete': 'delete',
+         })),
 ]
