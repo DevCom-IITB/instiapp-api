@@ -59,9 +59,6 @@ class AchievementUserSerializer(serializers.ModelSerializer):
         validated_data['user'] = self.context['request'].user.profile
         validated_data['dismissed'] = False
         validated_data['verified'] = False
-        if validated_data['isSkill']:
-            skill = Skill.objects.filter(title=validated_data['title']).first()
-            validated_data['body'] = skill.body
         return super().create(validated_data)
 
     def update(self, instance, validated_data):

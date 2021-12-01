@@ -1,7 +1,7 @@
 """Views for achievements models."""
 import pyotp
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import serializers, viewsets
 from rest_framework.response import Response
 
 from roles.helpers import login_required_ajax
@@ -15,6 +15,7 @@ from achievements.serializers import AchievementUserSerializer
 from achievements.serializers import OfferedAchievementSerializer
 
 from users.serializers import UserProfileSerializer
+from achievements.models import Skill
 
 class AchievementViewSet(viewsets.ModelViewSet):
     """Views for Achievements"""
@@ -54,6 +55,13 @@ class AchievementViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def create(self, request):
         """Make a request to a body for a new achievement."""
+        if request.data['isSkill']:
+            skill = Skill.objects.filter(title=request.data['title']).first()
+            if skill:
+                request.data['body'] = skill.body.id
+                request.data['description'] = ''
+            else:
+                return forbidden_no_privileges()
 
         # Disallow requests without body
         if ('body' not in request.data or not request.data['body']) and (not request.data['isSkill']):

@@ -19,7 +19,7 @@ urlpatterns = [
     path('achievements-offer/<pk>', OfferedAchievementViewSet.as_view({
         'get': 'retrieve', 'put': 'update', 'delete': 'destroy', 'post': 'claim_secret'
     })),
-    path('interest', UserInterestViewSet.as_view({
+    path('interests', UserInterestViewSet.as_view({
          'post': 'create',
          })),
     path('interests/<pk>', UserInterestViewSet.as_view({
