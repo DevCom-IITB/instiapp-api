@@ -39,9 +39,10 @@ INSTALLED_APPS = [
     'other.apps.OtherConfig',
     'venter.apps.VenterConfig',
     'external.apps.ExternalConfig',
-
+    
     'notifications',
     'markdownify',
+    'buyandsell',
 ]
 
 MIDDLEWARE = [
