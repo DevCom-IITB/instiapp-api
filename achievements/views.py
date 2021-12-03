@@ -215,8 +215,9 @@ class UserInterestViewSet(viewsets.ModelViewSet):
 
     def delete(self, request, pk):
         """Delete a user interest."""
-
-        interest = self.queryset.filter(user=request.user.profile, id=pk).first()
+        print(pk)
+        print ("reached backend")
+        interest = self.queryset.filter(user=request.user.profile, title= pk).first()
         interest.delete()
 
         return Response({'message': 'Interest Deleted Successfully'}, 201)
@@ -224,8 +225,8 @@ class UserInterestViewSet(viewsets.ModelViewSet):
     def create(self, request):
         """Add a user interest."""
 
-        interest = get_object_or_404(Interest.objects, id=request.data['interestId'])
-        if self.queryset.filter(user=request.user.profile, interest=interest).exists():
+        interest = get_object_or_404(Interest.objects, id=request.data['id'])
+        if self.queryset.filter(user=request.user.profile, title=request.data['title']).exists():
             return Response({'message': 'You already have this interest!'}, 400)
 
         userInterest = UserInterest.objects.create(user=request.user.profile, title=interest.title)
