@@ -215,8 +215,7 @@ class UserInterestViewSet(viewsets.ModelViewSet):
 
     def delete(self, request, pk):
         """Delete a user interest."""
-        print(pk)
-        print ("reached backend")
+        
         interest = self.queryset.filter(user=request.user.profile, title= pk).first()
         interest.delete()
 

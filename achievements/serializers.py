@@ -91,8 +91,7 @@ class InterestSerializer(serializers.ModelSerializer):
 
 class UserInterestSerializer(serializers.ModelSerializer):
     """Serializer for UserInterest."""
-    user = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = UserInterest
-        fields = ('id', 'title', 'user')
+        fields = ('id', 'title')
