@@ -9,6 +9,8 @@ class Product(models.Model):
     ###Display followers to buyers, sellers.
     ###Add product tags.
     ###multiselect for action?
+    ##achievements, events, users 
+    # placement
     CONDITION_CHOICES = (
         ('1','01/10'),
         ('2','02/10'),
@@ -33,8 +35,8 @@ class Product(models.Model):
     warranty = models.BooleanField(default=False)
     packaging = models.BooleanField(default=False)
     condition = models.CharField(max_length=2,choices=CONDITION_CHOICES, default='7',blank=False)
-    ###This or image url or foreign key into UploadedImage.
-    images = models.ManyToManyField('upload.UploadedImage', related_name='images+', blank=True)
+    
+    
     followers = models.ManyToManyField('users.UserProfile', related_name='followers+', blank=True)
 
 
@@ -58,3 +60,10 @@ class Product(models.Model):
             models.Index(fields=['time_of_creation', ]),
         ]
         #order by count of followers
+class ImageURL(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    url = models.URLField(blank=False, null=False)
+class Category(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    name = models.CharField(max_length=60, blank=False, null=False)
+    numproducts = models.IntegerField(default=0, null=False, blank=False)
