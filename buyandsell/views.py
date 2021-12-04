@@ -17,7 +17,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         queryset = query_search(request, 3, queryset, ['name', 'description'], 'buyandsell')
         queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
         data = ProductSerializer(queryset, many=True).data
-        return Response({'data':data, 'user':request.user.username})
+        return Response(data)
     def create(self, request, *args, **kwargs):
         """Creates product if the user isn't banned and form is filled
         correctly. Ban checking is yet to be incorporated.
