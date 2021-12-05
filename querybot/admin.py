@@ -1,5 +1,19 @@
 from django.contrib import admin
 from querybot.models import Query, UnresolvedQuery
+from django.contrib.auth.models import User
+from notifications.signals import notify
+
+def handle_entry(entry):
+    """Handle a single entry from a feed."""
+
+    # Try to get an entry existing
+    db_entry = UnresolvedQuery.objects.filter(id=entry.id).first()
+
+    # Send notifications to user
+    users = User.objects.filter(id=db_entry.user.user.id)
+    notify.send(db_entry, recipient=users, verb="Your query has been resolved check the updated list of questions")
+
+    db_entry.delete()
 
 class QueryAdmin(admin.ModelAdmin):
     search_fields = ['question', 'category']
@@ -11,7 +25,8 @@ admin.site.register(Query, QueryAdmin)
 
 @admin.action(description='Mark selected queries as resolved')
 def make_resolved(modeladmin, request, queryset):
-    queryset.update(resolved=True)
+    for entry in queryset:
+        handle_entry(entry)
 
 class UnresolvedQueryAdmin(admin.ModelAdmin):
     search_fields = ['question', 'category']
