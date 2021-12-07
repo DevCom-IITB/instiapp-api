@@ -25,7 +25,7 @@ class QueryBotViewset(viewsets.ViewSet):
         ques = request.data.get('question', '')
         cat = request.data.get('category', 'Others')
         if ques == '':
-            return Response({'error': 'Question cannot be blank.'})
+            return Response({'error': 'Question cannot be blank.'}, status=403)
 
         user = request.user
 

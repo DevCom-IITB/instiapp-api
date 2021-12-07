@@ -3,7 +3,7 @@ from django.conf import settings
 from querybot.models import Query
 from .documents import QueryDocument
 
-def query_search(query, categories):
+def query_search(query, categories): # pragma: no cover
 
     if settings.USE_ELASTIC:
         querydic = {"match": {"question": {"query": query, "fuzziness": "AUTO"}}}

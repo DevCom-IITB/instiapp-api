@@ -50,6 +50,11 @@ class QueryTestCase(APITestCase):
 
     def test_query_add(self):
         """Test `/api/query/add`"""
+        data = {}
+        url = '/api/query/add'
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+        
         data = {
             'question': 'test'
         }
