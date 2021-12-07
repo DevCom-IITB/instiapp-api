@@ -25,7 +25,7 @@ class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disa
         elif isinstance(value, ComplaintComment):
             serializer = CommentSerializer(value)
         elif isinstance(value, UnresolvedQuery):
-            serializer = UnresolvedQuerySerializer
+            serializer = UnresolvedQuerySerializer(value)
 
         return serializer.data
 

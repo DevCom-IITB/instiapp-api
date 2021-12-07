@@ -103,8 +103,7 @@ def get_rich_notification(notification):
 
         # UnresolvedQuery
         if isinstance(actor, UnresolvedQuery):
-            title = actor.title
-            # notification_extra = actor.link
+            title = actor.question
 
         notification_id = str(actor.id)
 

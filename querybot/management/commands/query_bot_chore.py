@@ -11,7 +11,7 @@ def handle_entry_fromsheet(row):
     # Try to get an entry existing
     if row[0] == '':
         return
-    db_entry = Query(question=row[1], answer=row[2], category=row[3])
+    db_entry = Query(question=row[1], answer=row[2], category=row[3].strip())
     # Fill the db entry
     if row[4] in row:
         db_entry.sub_category = row[4]

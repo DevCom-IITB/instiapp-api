@@ -16,9 +16,6 @@ class QueryBotViewset(viewsets.ViewSet):
         query = request.GET.get('query', '')
         categories = request.GET.get('category', '')
         categories = [x for x in categories.split("\'")]
-        # print(request.data)
-        # print(query)
-        # print(request.GET)
         if query == '' and categories[0] == '':
             queryset = Query.objects.all()
             return Response(QuerySerializer(queryset, many=True).data)
@@ -56,3 +53,11 @@ class QueryBotViewset(viewsets.ViewSet):
 
         new_q = UnresolvedQuery.objects.create(question=ques, category=cat, user=user.profile)
         return Response(UnresolvedQuerySerializer(new_q).data)
+
+    @classmethod
+    @login_required_ajax
+    def get_categories(cls, request):
+        """Method to get all categories"""
+        queryset = Query.objects.all().values('category').distinct()
+        values = [x['category'] for x in queryset]
+        return Response(values)

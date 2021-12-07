@@ -15,7 +15,8 @@ def handle_entry(entry, notify_user=True):
     if notify_user:
         notify.send(db_entry, recipient=users, verb="Your query has been resolved check the updated list of questions")
 
-    db_entry.delete()
+    db_entry.resolved = True
+    db_entry.save()
 
 class QueryAdmin(admin.ModelAdmin):
     search_fields = ['question', 'category']
@@ -33,7 +34,7 @@ def make_resolved(modeladmin, request, queryset):
 class UnresolvedQueryAdmin(admin.ModelAdmin):
     search_fields = ['question', 'category']
     list_display = ('user', 'question', 'category')
-    list_filter = ['category']
+    list_filter = ['category', 'resolved']
     actions = [make_resolved]
 
 
