@@ -1,9 +1,10 @@
-from django.contrib import admin
-from querybot.models import Query, UnresolvedQuery
-from django.contrib.auth.models import User
 from notifications.signals import notify
 
-def handle_entry(entry):
+from django.contrib import admin
+from django.contrib.auth.models import User
+from querybot.models import Query, UnresolvedQuery
+
+def handle_entry(entry, notify_user=True):
     """Handle a single entry from a feed."""
 
     # Try to get an entry existing
@@ -11,7 +12,8 @@ def handle_entry(entry):
 
     # Send notifications to user
     users = User.objects.filter(id=db_entry.user.user.id)
-    notify.send(db_entry, recipient=users, verb="Your query has been resolved check the updated list of questions")
+    if notify_user:
+        notify.send(db_entry, recipient=users, verb="Your query has been resolved check the updated list of questions")
 
     db_entry.delete()
 

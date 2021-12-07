@@ -11,7 +11,7 @@ class Query(models.Model):
     category = models.CharField(max_length=30, blank=False)
     sub_category = models.CharField(max_length=30, blank=True)
     sub_sub_category = models.CharField(max_length=30, blank=True)
-    
+
     def __str__(self):
         return self.question
 

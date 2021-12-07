@@ -1,7 +1,8 @@
-from django.core.management.base import BaseCommand
-from querybot.models import Query
 from googleapiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
+
+from django.core.management.base import BaseCommand
+from querybot.models import Query
 
 
 def handle_entry_fromsheet(row):
@@ -10,7 +11,7 @@ def handle_entry_fromsheet(row):
     # Try to get an entry existing
     if row[0] == '':
         return
-    db_entry = Query(question = row[1], answer = row[2], category = row[3])
+    db_entry = Query(question=row[1], answer=row[2], category=row[3])
     # Fill the db entry
     if row[4] in row:
         db_entry.sub_category = row[4]

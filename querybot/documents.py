@@ -1,8 +1,9 @@
 from django_elasticsearch_dsl import Document
-from django_elasticsearch_dsl.registries import registry
+# from django_elasticsearch_dsl.registries import registry
 from .models import Query
 
-@registry.register_document
+# Uncomment to run queries
+# @registry.register_document
 class QueryDocument(Document):
     class Index:
         name = 'query'
