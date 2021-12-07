@@ -1,10 +1,9 @@
-from elasticsearch_dsl import Q
 from rest_framework.response import Response
 from rest_framework import viewsets
+from querybot.helpers import query_search
 from querybot.models import Query, UnresolvedQuery
 from querybot.serializers import QuerySerializer, UnresolvedQuerySerializer
 from roles.helpers import login_required_ajax
-from .documents import QueryDocument
 
 
 class QueryBotViewset(viewsets.ViewSet):
@@ -16,29 +15,8 @@ class QueryBotViewset(viewsets.ViewSet):
         query = request.GET.get('query', '')
         categories = request.GET.get('category', '')
         categories = [x for x in categories.split("\'")]
-        if query == '' and categories[0] == '':
-            queryset = Query.objects.all()
-            return Response(QuerySerializer(queryset, many=True).data)
-
-        category_dic = {}
-        querydic = {"match": {"question": {"query": query, "fuzziness": "AUTO"}}}
-        if categories[0] == '':
-            res = QueryDocument.search().query(Q(querydic))[:20]
-        elif query == '':
-            category_dic = [Q('match', category=category_id) for category_id in categories]
-            query = category_dic.pop()
-            for x in category_dic:
-                query |= x
-            res = QueryDocument.search().query(query)
-        else:
-            category_dic = [Q('match', category=category_id) for category_id in categories]
-            query = category_dic.pop()
-            for x in category_dic:
-                query |= x
-            res = QueryDocument.search().query(query)
-            res = res.query(Q(querydic))
-        queryset = res.to_queryset()
-        return Response(QuerySerializer(queryset[0:20], many=True).data)
+        queryset = query_search(query, categories)
+        return Response(QuerySerializer(queryset, many=True).data)
 
     @classmethod
     @login_required_ajax

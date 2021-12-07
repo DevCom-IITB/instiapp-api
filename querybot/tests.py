@@ -2,7 +2,7 @@
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from querybot.admin import handle_entry, make_resolved
-from querybot.models import UnresolvedQuery
+from querybot.models import Query, UnresolvedQuery
 from querybot.management.commands.query_bot_chore import handle_entry_fromsheet
 from login.tests import get_new_user
 
@@ -23,8 +23,14 @@ class QueryTestCase(APITestCase):
 
         # Dummy Unresolved queries
         self.new_user = get_new_user()
-        UnresolvedQuery.objects.create(question="test", category="cat1", user=self.new_user.profile)
+        entry_1 = UnresolvedQuery.objects.create(question="test", category="cat1", user=self.new_user.profile)
         UnresolvedQuery.objects.create(question="test", category="cat2", user=self.new_user.profile)
+
+        # Checking the __str__ methods
+        self.assertEqual(str(entry_1), entry_1.question)
+
+        entry_2 = Query.objects.first()
+        self.assertEqual(str(entry_2), entry_2.question)
 
     def test_query(self):
         """Test `/api/query`"""
