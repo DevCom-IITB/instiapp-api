@@ -41,7 +41,6 @@ class QueryTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0], 'cat1')
 
     def test_query_add(self):
         """Test `/api/query/add`"""
