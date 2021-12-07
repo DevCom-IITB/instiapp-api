@@ -54,7 +54,7 @@ class QueryTestCase(APITestCase):
         url = '/api/query/add'
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 403)
-        
+
         data = {
             'question': 'test'
         }
