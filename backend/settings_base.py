@@ -196,3 +196,6 @@ DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 COMPLAINT_AUTO_SUBSCRIBE = True
 
 DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
+# true when elasticsearch is configured
+USE_ELASTIC = True

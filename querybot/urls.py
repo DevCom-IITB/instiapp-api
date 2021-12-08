@@ -9,4 +9,7 @@ urlpatterns = [
     path('query/add', QueryBotViewset.as_view({
         'post': 'ask_question'
     })),
+    path('query/categories', QueryBotViewset.as_view({
+        'get': 'get_categories'
+    })),
 ]
