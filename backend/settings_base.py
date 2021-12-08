@@ -155,15 +155,9 @@ PRERENDER_DESCRIPTION = 'InstiApp is the front page of all student activities at
 LOGO_URL = 'https://insti.app/assets/logo.png'
 
 # Placement blog URLs
-<<<<<<< HEAD
 PLACEMENTS_URL = 'https://campus.placements.iitb.ac.in/blog/placement/?feed=rss2'
 TRAINING_BLOG_URL = 'https://campus.placements.iitb.ac.in/blog/internship/?feed=rss2'
-EXTERNAL_BLOG_URL = 'https://insti.app/blog/feed'
-=======
-PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
-TRAINING_BLOG_URL = 'http://placements.iitb.ac.in/trainingblog/?feed=rss2'
 EXTERNAL_BLOG_URL = 'https://gymkhana.iitb.ac.in/externalblog'
->>>>>>> 37ca22dbce8daa64a1f00caa93fe0e7b6c474b70
 
 # Names of bodies to notify when there are new posts on placement/training blog
 PLACEMENTS_BLOG_BODY = 'Placement Blog'
