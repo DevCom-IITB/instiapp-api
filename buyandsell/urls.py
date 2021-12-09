@@ -8,6 +8,9 @@ urlpatterns = [
     })),
 
     path('buy/<pk>', BuyAndSellViewSet.as_view({
-        'get': 'retrieve', 'put': 'update', 'delete': 'destroy'
+        'put': 'update', 'delete': 'destroy'
     })),
+    path('buy-search', BuyAndSellViewSet.as_view({
+        'get':'retrieve'
+    }))
 ]
