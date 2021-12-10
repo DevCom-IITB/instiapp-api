@@ -3,14 +3,12 @@ from django.urls import path
 from buyandsell.views import BuyAndSellViewSet
 
 urlpatterns = [
+    #use list for search too to make use of pagination.
     path('buy', BuyAndSellViewSet.as_view({
         'get': 'list', 'post': 'create'
     })),
 
     path('buy/<pk>', BuyAndSellViewSet.as_view({
-        'put': 'update', 'delete': 'destroy'
+        'get':'retrieve','put': 'update', 'delete': 'destroy'
     })),
-    path('buy-search', BuyAndSellViewSet.as_view({
-        'get':'retrieve'
-    }))
 ]
