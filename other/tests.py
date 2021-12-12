@@ -111,7 +111,7 @@ class OtherTestCase(TransactionTestCase):
 
         # Test sanitization with sonic
         if settings.USE_SONIC:
-            response = self.client.get(url + 'script')
+            response = self.client.get(url + 'script&types=bodies,users,skills,events,interests')
             assert_len(response, 0, 0, 0, [0, 0])
 
     def test_search_misc(self):
