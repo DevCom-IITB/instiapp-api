@@ -12,6 +12,13 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Elasticsearch configuration
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'localhost:9200'
+    },
+}
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -25,6 +32,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'drf_yasg',
+    'django_elasticsearch_dsl',
 
     'achievements.apps.AchievementsConfig',
     'events.apps.EventsConfig',
@@ -38,8 +46,8 @@ INSTALLED_APPS = [
     'messmenu.apps.MessmenuConfig',
     'other.apps.OtherConfig',
     'venter.apps.VenterConfig',
+    'querybot.apps.QuerybotConfig',
     'external.apps.ExternalConfig',
-
     'notifications',
     'markdownify',
 ]
@@ -149,7 +157,7 @@ LOGO_URL = 'https://insti.app/assets/logo.png'
 # Placement blog URLs
 PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
 TRAINING_BLOG_URL = 'http://placements.iitb.ac.in/trainingblog/?feed=rss2'
-EXTERNAL_BLOG_URL = 'http://127.0.0.1:8000/blog/feed'
+EXTERNAL_BLOG_URL = 'https://gymkhana.iitb.ac.in/externalblog'
 
 # Names of bodies to notify when there are new posts on placement/training blog
 PLACEMENTS_BLOG_BODY = 'Placement Blog'
@@ -186,3 +194,8 @@ CELERY_DELAY = 0
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 COMPLAINT_AUTO_SUBSCRIBE = True
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
+# true when elasticsearch is configured
+USE_ELASTIC = True

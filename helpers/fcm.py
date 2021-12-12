@@ -5,6 +5,7 @@ from placements.models import BlogEntry
 from events.models import Event
 from news.models import NewsEntry
 from venter.models import ComplaintComment
+from querybot.models import UnresolvedQuery
 from helpers.device import fill_device_firebase
 from other.views import get_notif_queryset
 
@@ -99,6 +100,10 @@ def get_rich_notification(notification):
             title = actor.complaint.description
             notification_large_content = actor.text
             notification_extra = str(actor.complaint.id)
+
+        # UnresolvedQuery
+        if isinstance(actor, UnresolvedQuery):
+            title = actor.question
 
         notification_id = str(actor.id)
 
