@@ -5,6 +5,7 @@ from django.utils import timezone
 from events.serializers import EventSerializer
 
 BASE = 1000                              # Base points
+BLOCKED_PENALTY = 30000                   # Penalty for blocking a body
 FINISHED_PENALTY = 600                   # Direct penalty if event is done
 WEIGHT_START_TIME = 800                  # Weight of time from event start
 WEIGHT_END_TIME = 800                    # Weight of time from event end
@@ -25,6 +26,7 @@ class EventPrioritizer():  # pylint: disable=R0902
     def __init__(self, event, profile):
         self.event = event
         self.followed_bodies = profile.followed_bodies.all() if profile else None
+        self.blocked_bodies = profile.blocked_bodies.all() if profile else None
         self.profile = profile
 
         # Get time differences in days
@@ -43,6 +45,7 @@ class EventPrioritizer():  # pylint: disable=R0902
         # Apply all bonuses/penalties
         self.apply_time_bonus()
         self.penalise_untagged()
+        self.penalise_block_body()
 
         # Give bonuses to events yet to end
         if self.event.end_time > timezone.now():
@@ -90,6 +93,11 @@ class EventPrioritizer():  # pylint: disable=R0902
                 if body in self.followed_bodies:
                     body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * self.start_time_factor))
             self.weight += body_bonus
+
+    def penalise_block_body(self):
+        """Penalise events for blocking."""
+        if self.blocked_bodies:
+            self.weight -= BLOCKED_PENALTY           
 
     def penalise_far_off(self):
         """Penalise events that have a long time to start linearly."""

@@ -23,4 +23,8 @@ urlpatterns = [
     path('bodies/<pk>/events', BodyViewSet.as_view({
         'get': 'get_events'
     })),
+
+    path('bodies/<pk>/block', BodyViewSet.as_view({
+        'get': 'block'
+    })),
 ]
