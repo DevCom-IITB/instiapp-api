@@ -10,8 +10,9 @@ from events.models import Event
 from users.models import UserProfile
 from placements.models import BlogEntry
 from news.models import NewsEntry
+from achievements.models import Interest, Skill
 
-model_classes = (Body, Event, UserProfile, BlogEntry, NewsEntry)
+model_classes = (Body, Event, UserProfile, BlogEntry, NewsEntry, Skill, Interest)
 
 @shared_task_conditional(base=FaultTolerantTask)
 def update_index(typ, pk):  # pragma: no cover

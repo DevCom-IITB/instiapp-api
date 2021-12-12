@@ -1,7 +1,8 @@
 """Serializers for Achievements."""
 from rest_framework import serializers
-from achievements.models import Achievement
+from achievements.models import Achievement, Interest, UserInterest
 from achievements.models import OfferedAchievement
+from achievements.models import Skill
 from bodies.serializer_min import BodySerializerMin
 from events.serializer_min import EventMinSerializer
 from users.serializers import UserProfileSerializer
@@ -15,7 +16,7 @@ class AchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
         fields = ('id', 'title', 'description', 'body_detail',
-                  'dismissed', 'verified', 'hidden', 'event_detail')
+                  'dismissed', 'verified', 'hidden', 'event_detail', 'isSkill')
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -46,7 +47,7 @@ class AchievementUserSerializer(serializers.ModelSerializer):
         model = Achievement
         fields = ('id', 'title', 'description', 'admin_note',
                   'body_detail', 'dismissed', 'verified', 'user', 'body',
-                  'verified_by', 'event', 'event_detail', 'offer')
+                  'verified_by', 'event', 'event_detail', 'offer', 'isSkill')
 
     @staticmethod
     def setup_eager_loading(queryset):
@@ -71,3 +72,26 @@ class OfferedAchievementSerializer(serializers.ModelSerializer):
         model = OfferedAchievement
         fields = ('id', 'priority', 'title', 'description',
                   'body', 'event', 'generic')
+
+class SkillSerializer(serializers.ModelSerializer):
+    """Serializer for Skill."""
+    
+    body = BodySerializerMin(many=False, read_only=True)
+
+    class Meta:
+        model = Skill
+        fields = ('title', 'body')
+
+class InterestSerializer(serializers.ModelSerializer):
+    """Serializer for Interest."""
+
+    class Meta:
+        model = Interest
+        fields = ('id', 'title')
+
+class UserInterestSerializer(serializers.ModelSerializer):
+    """Serializer for UserInterest."""
+
+    class Meta:
+        model = UserInterest
+        fields = ('id', 'title')

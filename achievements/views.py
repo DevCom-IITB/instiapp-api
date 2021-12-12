@@ -1,20 +1,21 @@
 """Views for achievements models."""
 import pyotp
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import serializers, viewsets
 from rest_framework.response import Response
 
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
 from roles.helpers import user_has_privilege
 
-from achievements.models import Achievement
+from achievements.models import Achievement, Interest, UserInterest
 from achievements.models import OfferedAchievement
-from achievements.serializers import AchievementSerializer
+from achievements.serializers import AchievementSerializer, UserInterestSerializer
 from achievements.serializers import AchievementUserSerializer
 from achievements.serializers import OfferedAchievementSerializer
 
 from users.serializers import UserProfileSerializer
+from achievements.models import Skill
 
 class AchievementViewSet(viewsets.ModelViewSet):
     """Views for Achievements"""
@@ -54,9 +55,16 @@ class AchievementViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def create(self, request):
         """Make a request to a body for a new achievement."""
+        if request.data['isSkill']:
+            skill = Skill.objects.filter(title=request.data['title']).first()
+            if skill:
+                request.data['body'] = skill.body.id
+                request.data['description'] = ''
+            else:
+                return forbidden_no_privileges()
 
         # Disallow requests without body
-        if 'body' not in request.data or not request.data['body']:
+        if ('body' not in request.data or not request.data['body']) and (not request.data['isSkill']):
             return forbidden_no_privileges()
 
         return super().create(request)
@@ -197,3 +205,30 @@ class OfferedAchievementViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Achievement unlocked successfully!'}, 201)
 
         return forbidden_no_privileges()
+
+
+class UserInterestViewSet(viewsets.ModelViewSet):
+    """Views for User Interests"""
+
+    queryset = UserInterest.objects
+    serializer_class = UserInterestSerializer
+
+    def delete(self, request, pk):
+        """Delete a user interest."""
+        
+        interest = self.queryset.filter(user=request.user.profile, title= pk).first()
+        interest.delete()
+
+        return Response({'message': 'Interest Deleted Successfully'}, 201)
+
+    def create(self, request):
+        """Add a user interest."""
+
+        interest = get_object_or_404(Interest.objects, id=request.data['id'])
+        if self.queryset.filter(user=request.user.profile, title=request.data['title']).exists():
+            return Response({'message': 'You already have this interest!'}, 400)
+
+        userInterest = UserInterest.objects.create(user=request.user.profile, title=interest.title)
+        userInterest.save()
+
+        return Response({'message': 'Interest Added Successfully'}, 201)

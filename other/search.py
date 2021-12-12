@@ -102,6 +102,12 @@ def index_pair(obj):  # pylint: disable=too-many-return-statements
     if typ == 'ExternalBlogEntry':
         return ('external', bucket, str(obj.id), space(obj.title, obj.content, obj.body))
 
+    if typ == 'Skill':
+        return ('skills', bucket, str(obj.id), space(obj.title))
+
+    if typ == 'Interest':
+        return ('interests', bucket, str(obj.id), space(obj.title))
+
 def push_obj_sync(obj):
     return run_sync(push(index_pair(obj)))
 
