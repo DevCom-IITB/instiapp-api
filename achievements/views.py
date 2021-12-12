@@ -2,21 +2,20 @@
 from uuid import UUID
 import pyotp
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers, viewsets
+from rest_framework import viewsets
 from rest_framework.response import Response
 
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
 from roles.helpers import user_has_privilege
 
-from achievements.models import Achievement, Interest, UserInterest
+from achievements.models import Achievement, Interest, UserInterest, Skill
 from achievements.models import OfferedAchievement
 from achievements.serializers import AchievementSerializer, UserInterestSerializer
 from achievements.serializers import AchievementUserSerializer
 from achievements.serializers import OfferedAchievementSerializer
 
 from users.serializers import UserProfileSerializer
-from achievements.models import Skill
 
 class AchievementViewSet(viewsets.ModelViewSet):
     """Views for Achievements"""
@@ -217,18 +216,18 @@ class UserInterestViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def delete(self, request, pk):
         """Delete a user interest."""
-        
-        interest = self.queryset.filter(user=request.user.profile, title= pk).first()
+
+        interest = self.queryset.filter(user=request.user.profile, title=pk).first()
         if interest:
             interest.delete()
             return Response({'message': 'Interest Deleted Successfully'}, 201)
-        
+
         return Response({'message': 'Interest Doesn\'t Exist'}, 404)
 
     @login_required_ajax
     def create(self, request):
         """Add a user interest."""
-        
+
         id = request.data['id']
         try:
             UUID(id, version=4)

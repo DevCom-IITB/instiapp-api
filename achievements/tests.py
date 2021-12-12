@@ -281,7 +281,7 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(response.data['description'], "")
 
     def test_skill_create(self):
-        s1 = Skill.objects.create(title="a Real Skill", body=self.body_1)
+        Skill.objects.create(title="a Real Skill", body=self.body_1)
 
         data = {
             'title': 'Not a Skill',
@@ -304,9 +304,9 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(response.data['isSkill'], True)
         self.assertEqual(response.data['verified'], False)
         self.assertEqual(response.data['dismissed'], False)
-        
+
     def test_user_interest(self):
-        i1 = Interest.objects.create(title= "Interest-1")
+        i1 = Interest.objects.create(title="Interest-1")
 
         url = '/api/interests'
         data = {}
@@ -335,17 +335,15 @@ class AchievementTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['interests']), 1)
 
-
         # Deleting the interest
-        response = self.client.delete(url+'/Interest-1', format='json')
-        self.assertEqual(response.status_code,201)
-        
+        response = self.client.delete(url + '/Interest-1', format='json')
+        self.assertEqual(response.status_code, 201)
+
         # Checking the user endpoint to confirm deletion
         response = self.client.get('/api/user-me', format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['interests']), 0)
 
         # Trying to Delete it again
-        response = self.client.delete(url+'/{i1.title}', format='json')
+        response = self.client.delete(url + '/{i1.title}', format='json')
         self.assertEqual(response.status_code, 404)
-        

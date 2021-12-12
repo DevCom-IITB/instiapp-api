@@ -75,7 +75,7 @@ class OfferedAchievementSerializer(serializers.ModelSerializer):
 
 class SkillSerializer(serializers.ModelSerializer):
     """Serializer for Skill."""
-    
+
     body = BodySerializerMin(many=False, read_only=True)
 
     class Meta:
