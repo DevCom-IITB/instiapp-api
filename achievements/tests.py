@@ -1,8 +1,9 @@
+from uuid import uuid4
 import pyotp
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from login.tests import get_new_user
-from achievements.models import Achievement
+from achievements.models import Achievement, Skill, Interest
 from achievements.models import OfferedAchievement
 from helpers.test_helpers import create_body
 from helpers.test_helpers import create_event
@@ -110,6 +111,7 @@ class AchievementTestCase(APITestCase):
             'image_url': 'http://example.com/image2.png',
             'verified': True,
             'dismissed': True,
+            'isSkill': False
         }
         url = '/api/achievements'
         response = self.client.post(url, data, format='json')
@@ -277,3 +279,73 @@ class AchievementTestCase(APITestCase):
         url = '/api/achievements/%s' % achievement_1.id
         response = self.client.get(url)
         self.assertEqual(response.data['description'], "")
+
+    def test_skill_create(self):
+        s1 = Skill.objects.create(title="a Real Skill", body=self.body_1)
+
+        data = {
+            'title': 'Not a Skill',
+            'image_url': 'http://example.com/image2.png',
+            'verified': False,
+            'dismissed': False,
+            'isSkill': True
+        }
+        url = '/api/achievements'
+
+        # Create request without legitimate title from user
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+
+        # Creating a legitimate request
+        data['title'] = "a Real Skill"
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['isSkill'], True)
+        self.assertEqual(response.data['verified'], False)
+        self.assertEqual(response.data['dismissed'], False)
+        
+    def test_user_interest(self):
+        i1 = Interest.objects.create(title= "Interest-1")
+
+        url = '/api/interests'
+        data = {}
+        data['id'] = 'fake'
+
+        # Create request without legitimate interest
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 404)
+
+        data['id'] = uuid4()
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 404)
+
+        # Creating a legitimate request
+        data['id'] = i1.id
+        data['title'] = i1.title
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+
+        # Adding same interest again
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+
+        # Checking the user endpoint for the interest
+        response = self.client.get('/api/user-me', format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['interests']), 1)
+
+
+        # Deleting the interest
+        response = self.client.delete(url+'/Interest-1', format='json')
+        self.assertEqual(response.status_code,201)
+        
+        # Checking the user endpoint to confirm deletion
+        response = self.client.get('/api/user-me', format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['interests']), 0)
+
+        # Trying to Delete it again
+        response = self.client.delete(url+'/{i1.title}', format='json')
+        self.assertEqual(response.status_code, 404)
+        

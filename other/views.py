@@ -38,7 +38,7 @@ class OtherViewset(viewsets.ViewSet):
         if not req_query or len(req_query) < MIN_LENGTH:
             return Response({"message": "No query or too short!"}, status=400)
 
-        types = ('bodies', 'events', 'users', 'skills')
+        types = ('bodies', 'events', 'users')
         req_types = request.GET.get('types')
         if req_types:
             types = tuple(req_types.split(','))

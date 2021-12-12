@@ -1,4 +1,5 @@
 """Views for achievements models."""
+from uuid import UUID
 import pyotp
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, viewsets
@@ -213,22 +214,31 @@ class UserInterestViewSet(viewsets.ModelViewSet):
     queryset = UserInterest.objects
     serializer_class = UserInterestSerializer
 
+    @login_required_ajax
     def delete(self, request, pk):
         """Delete a user interest."""
         
         interest = self.queryset.filter(user=request.user.profile, title= pk).first()
-        interest.delete()
+        if interest:
+            interest.delete()
+            return Response({'message': 'Interest Deleted Successfully'}, 201)
+        
+        return Response({'message': 'Interest Doesn\'t Exist'}, 404)
 
-        return Response({'message': 'Interest Deleted Successfully'}, 201)
-
+    @login_required_ajax
     def create(self, request):
         """Add a user interest."""
+        
+        id = request.data['id']
+        try:
+            UUID(id, version=4)
+            interest = get_object_or_404(Interest.objects, id=id)
+            if self.queryset.filter(user=request.user.profile, title=request.data['title']).exists():
+                return Response({'message': 'You already have this interest!'}, 400)
 
-        interest = get_object_or_404(Interest.objects, id=request.data['id'])
-        if self.queryset.filter(user=request.user.profile, title=request.data['title']).exists():
-            return Response({'message': 'You already have this interest!'}, 400)
+            userInterest = UserInterest.objects.create(user=request.user.profile, title=interest.title)
+            userInterest.save()
 
-        userInterest = UserInterest.objects.create(user=request.user.profile, title=interest.title)
-        userInterest.save()
-
-        return Response({'message': 'Interest Added Successfully'}, 201)
+            return Response({'message': 'Interest Added Successfully'}, 201)
+        except ValueError:
+            return Response({'message': 'Invalid ID'}, 404)

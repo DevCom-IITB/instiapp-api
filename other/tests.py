@@ -19,6 +19,7 @@ from users.models import UserProfile
 from news.models import NewsEntry
 from placements.models import BlogEntry
 from venter.models import Complaint
+from achievements.models import Skill, Interest
 
 from helpers.test_helpers import create_usertag
 from helpers.test_helpers import create_usertagcategory
@@ -54,6 +55,14 @@ class OtherTestCase(TransactionTestCase):
         event2.bodies.add(body1)
         event3.bodies.add(body2)
 
+        # Create skills
+        Skill.objects.create(title="Skill-1", body=body1)
+        Skill.objects.create(title="Skill-2", body=body1)
+
+        # Create Interests
+        Interest.objects.create(title="Interest-1")
+        Interest.objects.create(title="Interest-2")
+
         # Fake authenticate
         self.user = get_new_user()
         self.profile = self.user.profile
@@ -70,32 +79,40 @@ class OtherTestCase(TransactionTestCase):
         response = self.client.get(url + 'bo')
         self.assertEqual(response.status_code, 400)
 
-        def assert_len(response, bodies, events, users):
+        def assert_len(response, bodies, events, users, skills, interests):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(len(response.data['bodies']), bodies)
             self.assertEqual(len(response.data['events']), events)
             self.assertEqual(len(response.data['users']), users)
+            self.assertEqual(len(response.data['skills']), skills)
+            self.assertEqual(len(response.data['interests']), interests)
 
         response = self.client.get(url + 'wncc')
-        assert_len(response, 1, 1, 0)
+        assert_len(response, 1, 1, 0, 0, 0)
 
         response = self.client.get(url + 'moodi')
-        assert_len(response, 1, 0, 0)
+        assert_len(response, 1, 0, 0, 0, 0)
 
         response = self.client.get(url + 'moo')
-        assert_len(response, 1, 0, 0)
+        assert_len(response, 1, 0, 0, 0, 0)
 
         response = self.client.get(url + 'test user')
-        assert_len(response, 0, 0, 2)
+        assert_len(response, 0, 0, 2, 0, 0)
+
+        response = self.client.get(url + 'skill' + '&types=skills')
+        assert_len(response, 0, 0, 0, 2, 0)
+
+        response = self.client.get(url + 'Interest' + '&types=interests')
+        assert_len(response, 0, 0, 0, 0, 2)
 
         # Test partial fields
         response = self.client.get(url + 'wncc&types=bodies')
-        assert_len(response, 1, 0, 0)
+        assert_len(response, 1, 0, 0, 0, 0)
 
         # Test sanitization with sonic
         if settings.USE_SONIC:
             response = self.client.get(url + 'script')
-            assert_len(response, 0, 0, 0)
+            assert_len(response, 0, 0, 0, 0, 0)
 
     def test_search_misc(self):
         """Try to index an invalid object."""
