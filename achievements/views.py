@@ -228,10 +228,9 @@ class UserInterestViewSet(viewsets.ModelViewSet):
     def create(self, request):
         """Add a user interest."""
 
-        id = request.data['id']
         try:
-            UUID(id, version=4)
-            interest = get_object_or_404(Interest.objects, id=id)
+            UUID(request.data['id'], version=4)
+            interest = get_object_or_404(Interest.objects, id=request.data['id'])
             if self.queryset.filter(user=request.user.profile, title=request.data['title']).exists():
                 return Response({'message': 'You already have this interest!'}, 400)
 
