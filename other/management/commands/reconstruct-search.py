@@ -5,6 +5,7 @@ from asonic.enums import Channel as SonicChannel
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from achievements.models import Skill, Interest
 from other.search import push, index_pair, consolidate
 from other.asyncio_run import run_sync
 
@@ -63,6 +64,14 @@ class Command(BaseCommand):
             published__gte=timezone.now() - timedelta(days=600)
         ))
         run_sync(refresh(external))
+
+        # refresh all skills
+        skills = list(Skill.objects.all())
+        run_sync(refresh(skills))
+
+        # refresh all interests
+        interests = list(Interest.objects.all())
+        run_sync(refresh(interests))
 
         # Re-consolidate
         run_sync(consolidate())
