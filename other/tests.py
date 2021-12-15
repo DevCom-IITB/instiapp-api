@@ -131,7 +131,7 @@ class OtherTestCase(TransactionTestCase):
 
         # Create Fake External Blog Entry
         ent = ExternalBlogEntry.objects.create(title="entry-1")
-        self.assertEqual(index_pair(ent)[0], 'placement')
+        self.assertEqual(index_pair(ent)[0], 'external')
 
         # Test indexing of PT blog
         ent = BlogEntry(title='strategy comp', blog_url=settings.PLACEMENTS_URL)
