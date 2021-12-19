@@ -11,4 +11,7 @@ urlpatterns = [
     path('buy/<pk>', BuyAndSellViewSet.as_view({
         'get':'retrieve','put': 'update', 'delete': 'destroy'
     })),
+    path('report/<pk>', BuyAndSellViewSet.as_view({
+        'get':'report'
+    }))
 ]
