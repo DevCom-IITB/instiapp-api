@@ -1,6 +1,7 @@
 """Helpers for login functions."""
-import requests
 import random
+from datetime import timedelta
+import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import login
@@ -12,10 +13,9 @@ from users.models import UserProfile
 from users.serializer_full import UserProfileFullSerializer
 from helpers.device import update_fcm_device
 from alumni.models import AlumniUser
-from datetime import timedelta
 from backend.settings import EMAIL_HOST_USER
 
-# pylint: disable=R0914
+# pylint: disable=R0914,W0702
 def perform_login(auth_code, redir, request):
     """Perform login with code and redir."""
 
@@ -191,12 +191,12 @@ def create_key_send_mail(ldap_req):
         return False, "User doesn't exist"
 
     # Check 15 minute window
-    pastRequests = AlumniUser.objects.filter(ldap = ldap_req)
+    pastRequests = AlumniUser.objects.filter(ldap=ldap_req)
     if pastRequests:
         lastRequest = pastRequests.order_by('-timeLoginRequest').first()
         if timezone.now() <= lastRequest.timeLoginRequest + timedelta(minutes=15):
             return True, "An OTP was already sent to your mail before"
-    
+
     # Beyond 15 minute window, retry
     key = generate_alumni_key()
     try:
@@ -204,19 +204,19 @@ def create_key_send_mail(ldap_req):
             'Alumni Login Request on InstiApp',
             'Your OTP for Alumni Login on Instiapp is ' + str(key),
             EMAIL_HOST_USER,
-            [str(ldap_req)+'@iitb.ac.in'],
+            [str(ldap_req) + '@iitb.ac.in'],
             fail_silently=False
         )
-    except:
+    except:  # noqa: E722
         # Mail couldn't be sent
         return False, 'Server issues, please retry later'
 
     # Generate instance
-    new_otp_req = AlumniUser(ldap = ldap_req, keyStored = str(key), timeLoginRequest = timezone.now())
+    new_otp_req = AlumniUser(ldap=ldap_req, keyStored=str(key), timeLoginRequest=timezone.now())
     new_otp_req.save()
     return True, 'fine'
 
-def perform_alumni_login (request, ldap_entered):
+def perform_alumni_login(request, ldap_entered):
     query = Q(ldap_id=ldap_entered)
     user = UserProfile.objects.filter(query).first().user
     login(request, user)

@@ -1,4 +1,5 @@
 """Login Viewset."""
+from datetime import timedelta
 import requests
 from django.conf import settings
 from django.contrib.auth import logout
@@ -10,9 +11,8 @@ from login.helpers import perform_login, create_key_send_mail, perform_alumni_lo
 from users.models import UserProfile
 from users.serializer_full import UserProfileFullSerializer
 from alumni.models import AlumniUser
-from datetime import timedelta
 from backend.settings import EMAIL_HOST_USER
-# pylint: disable=C0301
+# pylint: disable=C0301,W0702
 
 class LoginViewSet(viewsets.ViewSet):
     """Login"""
@@ -148,9 +148,9 @@ class LoginViewSet(viewsets.ViewSet):
         # Check existence of LDAP
         if ldap_entered is None:
             return Response({'error_status': True, 'msg': 'Please enter correct LDAP'})
-        
+
         # Check past requests
-        pastRequests = AlumniUser.objects.filter(ldap = ldap_entered)
+        pastRequests = AlumniUser.objects.filter(ldap=ldap_entered)
         if not pastRequests:
             return Response({'error_status': True, 'msg': 'No past OTP Requests found'})
         lastRequest = pastRequests.order_by('-timeLoginRequest').first()
@@ -158,14 +158,14 @@ class LoginViewSet(viewsets.ViewSet):
         # Check time limit of OTP
         if timezone.now() > lastRequest.timeLoginRequest + timedelta(minutes=15):
             return Response({'error_status': True, 'msg': 'Time Limit Exceeded'})
-        
+
         # Check key
         if lastRequest.isCorrectKey(key):
             # Perform login
             perform_alumni_login(request, ldap_entered)
             return Response({'error_status': False, 'msg': 'Logged in'})
-        else:
-            return Response({'error_status': True, 'msg': 'Wrong OTP, retry'})
+
+        return Response({'error_status': True, 'msg': 'Wrong OTP, retry'})
 
     @staticmethod
     def resend_alumni_otp(request):
@@ -174,9 +174,9 @@ class LoginViewSet(viewsets.ViewSet):
         # Check existence of LDAP
         if ldap_entered is None:
             return Response({'error_status': True, 'msg': 'Please enter correct LDAP'})
-        
+
         # Check if OTP was ever generated
-        pastRequests = AlumniUser.objects.filter(ldap = ldap_entered)
+        pastRequests = AlumniUser.objects.filter(ldap=ldap_entered)
         if not pastRequests:
             return Response({'error_status': True, 'msg': 'No OTP generated'})
 
@@ -190,22 +190,22 @@ class LoginViewSet(viewsets.ViewSet):
         sameKeys = AlumniUser.objects.filter(ldap=ldap_entered, keyStored=lastKey)
         if len(sameKeys) == 3:
             return Response({'error_status': True, 'msg': 'Limit reached: 3 emails sent for this OTP'})
-        
+
         # Resend mail
         try:
             send_mail(
                 'Login Request on Alumni Portal',
                 'Your OTP for Alumni Login on Instiapp is ' + str(lastKey),
                 EMAIL_HOST_USER,
-                [str(ldap_entered)+'@iitb.ac.in'],
+                [str(ldap_entered) + '@iitb.ac.in'],
                 fail_silently=False
             )
-        except:
+        except:  # noqa: E722
             # Mail couldn't be sent
             return Response({'error_status': True, 'msg': 'Server issues, please retry later'})
 
         # Save request
-        new_otp_req = AlumniUser(ldap = ldap_entered, keyStored = str(lastKey), timeLoginRequest = timezone.now())
+        new_otp_req = AlumniUser(ldap=ldap_entered, keyStored=str(lastKey), timeLoginRequest=timezone.now())
         new_otp_req.save()
         return Response({'error_status': False, 'msg': 'Resent OTP'})
 
