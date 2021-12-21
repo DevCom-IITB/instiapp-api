@@ -133,7 +133,8 @@ class AlumniLoginTestCase(APITestCase):
     def setUp(self):
         self.user = get_new_user()
         self.client = APIClient()
-        AlumniUser.objects.create(ldap='test-1', keyStored='100000', timeLoginRequest=datetime.now())
+        self.alumni = AlumniUser.objects.create(ldap='test-1', keyStored='100000', timeLoginRequest=datetime.now())
+        self.assertEqual(str(self.alumni), 'test-1')
 
     @freeze_time('2019-01-02')
     def test_alumni_login(self):
@@ -212,3 +213,20 @@ class AlumniLoginTestCase(APITestCase):
             otp = AlumniUser.objects.order_by('-timeLoginRequest').first().keyStored
             response = self.client.get(url + 'test&otp=' + otp, format='json')
             self.assertEqual(response.data['error_status'], False)
+
+    @freeze_time('2020-01-02')
+    def test_send_mail_error(self):
+        # Testing the try and except blocks
+
+        url = '/api/alumniLogin?ldap='
+        response = self.client.get(url + 'test', format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['exist'], False)
+
+        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+            response = self.client.get(url + 'test', format='json')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['exist'], True)
+
+        response = self.client.get(url + 'test', format='json')
+        self.assertEqual(response.data['error_status'], True)
