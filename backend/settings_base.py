@@ -184,6 +184,12 @@ NO_CELERY = os.environ.get('NO_CELERY') != 'false'
 # Number of seconds to count down
 CELERY_DELAY = 0
 
-DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+# DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'keepwatch354@gmail.com'
+EMAIL_HOST_PASSWORD = 'WalterPinkman'
 COMPLAINT_AUTO_SUBSCRIBE = True

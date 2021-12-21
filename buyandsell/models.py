@@ -9,8 +9,6 @@ CONTACT_MAX_LENGTH = 300
 MOD_EMAIL = 'hardikraj08@gmail.com'
 # Create your models here.
 class Category(models.Model):
-    """
-    Remove this model after discussion with Dev."""
     CHOICES = (
         ('electronics', 'Electronics'),
         ('stationery','Stationery'),

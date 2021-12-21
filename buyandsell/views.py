@@ -1,6 +1,8 @@
 """Views for BuyAndSell."""
 from datetime import tzinfo
 from uuid import UUID
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db.models.query import QuerySet
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
@@ -20,6 +22,12 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     RESULTS_PER_PAGE = 1#testing purposes.
     queryset = Product.objects
+    
+    def mail_moderator(self, report:Report):
+        msg = f"""
+{str(report.reporter)} lodged a report against the product {str(report.product)} posted by {str(report.product.user)}.
+Alleged Reason: {report.reason}."""
+        send_mail('New Report', msg, settings.DEFAULT_FROM_EMAIL, [report.moderator_email])
     def update_bans(self, product=None):
         if(product!=None):
             """Get the existing reports on this product that have been accepted by the moderator
@@ -119,7 +127,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def report(self, request, pk):
         product = self.get_product(pk)
-
+        self.update_bans(product)
         if(len(Ban.objects.filter(user=product.user))>0):
             """If user is banned, their products don't show up in the list. 
             This if-block is for calls made to the api manually."""
@@ -127,10 +135,11 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
 
 
         reporter = UserProfile.objects.get(user=request.user)
+        # reporter = product.user
         report_by_user,created = Report.objects.get_or_create(product=product, reporter=reporter)
         report_by_user:Report
         report_by_user.reason = request.data['reason']
         report_by_user.save()
-        """SEND EMAIL TO MODERATOR"""
-        self.update_bans(product)
+        self.mail_moderator(report_by_user)
+
         return Response(ProductSerializer(product).data)
