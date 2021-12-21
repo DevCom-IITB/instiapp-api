@@ -229,7 +229,7 @@ class AlumniLoginTestCase(APITestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data['exist'], True)
 
-        url = '/api/alumniOTP?ldap='
+        url = '/api/resendAlumniOTP?ldap='
         with self.settings(EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'):
             response = self.client.get(url + 'test', format='json')
             self.assertEqual(response.data['error_status'], True)

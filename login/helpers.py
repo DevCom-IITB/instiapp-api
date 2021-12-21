@@ -1,5 +1,5 @@
 """Helpers for login functions."""
-import random
+import secrets
 from datetime import timedelta
 import requests
 from django.conf import settings
@@ -181,7 +181,7 @@ class SSOFiller():
             setattr(self.user_profile, data_key, target[response_key])
 
 def generate_alumni_key():
-    return random.randint(100000, 999999)
+    return secrets.choice(range(100000, 999999))
 
 def create_key_send_mail(ldap_req):
     # Checking if LDAP is right
