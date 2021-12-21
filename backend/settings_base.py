@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'venter.apps.VenterConfig',
     'querybot.apps.QuerybotConfig',
     'external.apps.ExternalConfig',
+    'alumni.apps.AlumniConfig',
     'notifications',
     'markdownify',
 ]

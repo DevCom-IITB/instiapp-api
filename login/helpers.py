@@ -183,7 +183,7 @@ class SSOFiller():
 def generate_alumni_key():
     return random.randint(100000, 999999)
 
-def create_key_send_mail(ldap_req, request):
+def create_key_send_mail(ldap_req):
     # Checking if LDAP is right
     query = Q(ldap_id=ldap_req)
     user = UserProfile.objects.filter(query).first()
@@ -201,7 +201,7 @@ def create_key_send_mail(ldap_req, request):
     key = generate_alumni_key()
     try:
         send_mail(
-            'Login Request on Alumni Portal',
+            'Alumni Login Request on InstiApp',
             'Your OTP for Alumni Login on Instiapp is ' + str(key),
             EMAIL_HOST_USER,
             [str(ldap_req)+'@iitb.ac.in'],

@@ -133,8 +133,10 @@ class LoginViewSet(viewsets.ViewSet):
     @staticmethod
     def alumni_login(request):
         ldap = request.GET.get('ldap')
+        if not ldap:
+            return Response({'exist': False, 'msg': 'Ldap not defined'})
         # Helper function
-        exist, msg = create_key_send_mail(ldap, request)
+        exist, msg = create_key_send_mail(ldap)
         # msg stores error message
         return Response({'exist': exist, 'ldap': ldap, 'msg': msg})
 
@@ -168,6 +170,10 @@ class LoginViewSet(viewsets.ViewSet):
     @staticmethod
     def resend_alumni_otp(request):
         ldap_entered = request.GET.get('ldap')
+
+        # Check existence of LDAP
+        if ldap_entered is None:
+            return Response({'error_status': True, 'msg': 'Please enter correct LDAP'})
         
         # Check if OTP was ever generated
         pastRequests = AlumniUser.objects.filter(ldap = ldap_entered)
