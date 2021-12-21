@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from roles.helpers import login_required_ajax
-from buyandsell.models import Ban, ImageURL, Product, Report
+from buyandsell.models import Ban, ImageURL, Limit, Product, Report
 from buyandsell.serializers import ProductSerializer
 from helpers.misc import query_from_num, query_search
 from users.models import UserProfile
@@ -28,7 +28,14 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
 {str(report.reporter)} lodged a report against the product {str(report.product)} posted by {str(report.product.user)}.
 Alleged Reason: {report.reason}."""
         send_mail('New Report', msg, settings.DEFAULT_FROM_EMAIL, [report.moderator_email])
-    def update_bans(self, product=None):
+
+
+    def update_limits(self):
+        for limit in Limit.objects.all():
+            if(limit.endtime<timezone.localtime()):
+                limit.delete()
+    
+    def update_bans(self, product:Product=None):
         if(product!=None):
             """Get the existing reports on this product that have been accepted by the moderator
             but have not been addressed (by initiating a ban)."""
@@ -37,6 +44,7 @@ Alleged Reason: {report.reason}."""
                 """Create a ban for the user lasting three days."""
                 endtime = timezone.localtime()+timezone.timedelta(days=3)
                 Ban.objects.create(user=product.user, endtime=endtime)
+                product.deleted=True
                 reports.update(addressed=True)
         else:
             """Calls the above if-block on products that have accepted but unaddressed reports."""
@@ -50,13 +58,6 @@ Alleged Reason: {report.reason}."""
                     endtime = timezone.localtime()+timezone.timedelta(days=3)
                     Ban.objects.create(user=product.user, endtime=endtime)
                     reports.update(addressed=True)
-        """Delete expired bans."""
-        bans = Ban.objects.all()
-        #check: Ban.objects.filter(endtime__lte=timezone.localtime())
-        for ban in bans:
-            ban:Ban
-            if(ban.endtime<timezone.localtime()):
-                ban.delete()
     def list(self, request):
         ##introduce tags?
         self.update_bans()
@@ -64,7 +65,10 @@ Alleged Reason: {report.reason}."""
         """remove products from banned users"""
         bans = Ban.objects.all()
         for ban in bans:
-            queryset = queryset.filter(~Q(user=ban.user))
+            if(ban.endtime>timezone.localtime()):
+                """Remove products from users whose bans are still running."""
+                queryset = queryset.filter(~Q(user=ban.user))
+        #TODO: allow category to be passed here too.
         queryset = query_search(request, 3, queryset, ['name', 'description'], 'buyandsell')
         queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
         data = ProductSerializer(queryset, many=True).data
@@ -83,14 +87,24 @@ Alleged Reason: {report.reason}."""
         request.data['user'] = UserProfile.objects.get(user=request.user).id
         request.data['contact_details'] = BuyAndSellViewSet.get_contact_details(UserProfile.objects.get(user=request.user))
         return request  
+    
+
     @login_required_ajax
     def create(self, request):
         """Creates product if the user isn't banned and form is filled
         correctly. Ban checking is yet to be incorporated.
         """
+        self.update_limits()
         from users.models import UserProfile
         userpro = UserProfile.objects.get(user=request.user)
         userpro:UserProfile
+        limit,created = Limit.objects.get_or_create(user=userpro)
+        if(limit.strikes>=3):
+            return Response("Limit of Three Products per Day Reached.")
+        limit.strikes+=1
+        if(limit.strikes==3):
+            limit.endtime = timezone.localtime()+timezone.timedelta(days=1)
+        limit.save()
         request.data._mutable = True
         request.data['status'] = True
         image_urls = json.loads(request.data['image_urls'])
@@ -113,6 +127,8 @@ Alleged Reason: {report.reason}."""
     @login_required_ajax
     def update(self, request, pk):
         product = self.get_product(pk)
+        ##TO TEST:
+        product.category.numproducts-=1
         if(product.user == UserProfile.objects.get(user=request.user)):
             request.data._mutable = True
             request = self.update_user_details(request)

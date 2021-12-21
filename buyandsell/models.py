@@ -1,34 +1,29 @@
+from django.db.models import deletion
 from django.db.models.deletion import SET
 from django.db.models.fields.related import ForeignKey
 from django.utils import timezone
 from django.db import models
 from django.db.models.enums import IntegerChoices
 from uuid import uuid4
+
+from helpers.misc import get_url_friendly
 PDT_NAME_MAX_LENGTH = 60
 CONTACT_MAX_LENGTH = 300
 MOD_EMAIL = 'hardikraj08@gmail.com'
 # Create your models here.
 class Category(models.Model):
-    CHOICES = (
-        ('electronics', 'Electronics'),
-        ('stationery','Stationery'),
-        ('other', 'Other')
-    )
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    name = models.CharField(max_length=60, choices=CHOICES,blank=False, null=False)
+    id = models.IntegerField(primary_key=True,editable=False)
+    name = models.CharField(max_length=100,blank=False, null=False)
     numproducts = models.IntegerField(default=0, null=False, blank=False)
     def __str__(self):
         return self.name
 class Product(models.Model):
-    ###Display followers to buyers, sellers.
-    ###Add product tags.
-    ###multiselect for action?
     ##achievements, events, users 
     # placement
     CATEGORY_CHOICES = (
         ('electronics', 'Electronics'),
         ('stationery','Stationery'),
-        ('other', 'Other')
+        ('Other', 'Other')
     )
     CONDITION_CHOICES = (
         ('1','01/10'),
@@ -48,9 +43,11 @@ class Product(models.Model):
         ('rent', 'Rent'),
     )
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    str_id = models.CharField(max_length=58, editable=False, null=True)
     name = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=False, null=False)
     description = models.TextField(blank=True, default='', null=False)
-    category = models.CharField(max_length=30, choices=CATEGORY_CHOICES, default='other', blank=False)
+    ##TODO: Change the on_delete function to .
+    category = models.ForeignKey(Category, on_delete=models.SET_DEFAULT, default=0)
     brand = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=True,null=False,default='')
     warranty = models.BooleanField(default=False)
     packaging = models.BooleanField(default=False)
@@ -62,6 +59,7 @@ class Product(models.Model):
 
     action = models.CharField(max_length=10,choices=ACTION_CHOICES, default='sell', blank=False)
     status = models.BooleanField(default=True)
+    deleted = models.BooleanField(default=False)
     price = models.IntegerField(blank=False, default=100)
     negotiable = models.BooleanField(default=True)
     
@@ -71,7 +69,13 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-    
+    def save(self, *args, **kwargs):
+        self.category.numproducts+=1
+        self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
+        super().save(*args, **kwargs)
+    def delete(self, *args, **kwargs):
+        self.category.numproducts-=1
+        return super().delete(*args, **kwargs)
     class Meta:
         verbose_name = "Product"
         verbose_name_plural = "Products"
@@ -87,11 +91,16 @@ class ImageURL(models.Model):
         return self.url
 
 class Ban(models.Model):
-    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE)
+    user = models.ManyToManyField('users.UserProfile')
     endtime = models.DateTimeField()
     def __str__(self):
         return str(self.user)
-
+class Limit(models.Model):
+    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE)
+    endtime = models.DateTimeField()
+    strikes = models.IntegerField(default=0)
+    def __str__(self):
+        return str(self.user)
 class Report(models.Model):
     moderator_email = MOD_EMAIL
     product=ForeignKey(Product, on_delete=models.CASCADE)
