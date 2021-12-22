@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from roles.helpers import login_required_ajax
-from buyandsell.models import Ban, ImageURL, Limit, Product, Report
+from buyandsell.models import Ban, Category, ImageURL, Limit, Product, Report
 from buyandsell.serializers import ProductSerializer
 from helpers.misc import query_from_num, query_search
 from users.models import UserProfile
@@ -25,8 +25,8 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     
     def mail_moderator(self, report:Report):
         msg = f"""
-{str(report.reporter)} lodged a report against the product {str(report.product)} posted by {str(report.product.user)}.
-Alleged Reason: {report.reason}."""
+        {str(report.reporter)} lodged a report against the product {str(report.product)} posted by {str(report.product.user)}.
+        Alleged Reason: {report.reason}."""
         send_mail('New Report', msg, settings.DEFAULT_FROM_EMAIL, [report.moderator_email])
 
 
@@ -58,6 +58,17 @@ Alleged Reason: {report.reason}."""
                     endtime = timezone.localtime()+timezone.timedelta(days=3)
                     Ban.objects.create(user=product.user, endtime=endtime)
                     reports.update(addressed=True)
+    
+    def category_filter(self, request, queryset):
+        category = request.GET.get('category')
+        if(category!=None and len(Category.objects.filter(name=category))>0):
+            queryset = queryset.filter(category__name=category)
+        return queryset
+    def seller_filter(self,request, queryset):
+        seller = request.GET.get('seller')
+        if(seller!=None and len(UserProfile.objects.filter(ldap_id=seller))>0):
+            queryset = queryset.filter(user=UserProfile.objects.get(ldap_id=seller))
+        return queryset
     def list(self, request):
         ##introduce tags?
         self.update_bans()
@@ -70,6 +81,8 @@ Alleged Reason: {report.reason}."""
                 queryset = queryset.filter(~Q(user=ban.user))
         #TODO: allow category to be passed here too.
         queryset = query_search(request, 3, queryset, ['name', 'description'], 'buyandsell')
+        queryset = self.category_filter(request, queryset)
+        queryset = self.seller_filter(request, queryset)
         queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
         data = ProductSerializer(queryset, many=True).data
         return Response(data)
@@ -94,10 +107,12 @@ Alleged Reason: {report.reason}."""
         """Creates product if the user isn't banned and form is filled
         correctly. Ban checking is yet to be incorporated.
         """
+        
         self.update_limits()
         from users.models import UserProfile
         userpro = UserProfile.objects.get(user=request.user)
-        userpro:UserProfile
+        
+        """Limit checking:"""
         limit,created = Limit.objects.get_or_create(user=userpro)
         if(limit.strikes>=3):
             return Response("Limit of Three Products per Day Reached.")
@@ -105,6 +120,8 @@ Alleged Reason: {report.reason}."""
         if(limit.strikes==3):
             limit.endtime = timezone.localtime()+timezone.timedelta(days=1)
         limit.save()
+
+        """Create the product, modifying some fields."""
         request.data._mutable = True
         request.data['status'] = True
         image_urls = json.loads(request.data['image_urls'])
@@ -159,3 +176,7 @@ Alleged Reason: {report.reason}."""
         self.mail_moderator(report_by_user)
 
         return Response(ProductSerializer(product).data)
+    
+
+    def get_categories(self, request):
+        return Response(json.dumps({x.name:x.numproducts for x in Category.objects.all()}))
