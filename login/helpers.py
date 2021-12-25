@@ -1,15 +1,21 @@
 """Helpers for login functions."""
+import secrets
+from datetime import timedelta
 import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.db.models import Q
+from django.core.mail import send_mail
+from django.utils import timezone
 from rest_framework.response import Response
 from users.models import UserProfile
 from users.serializer_full import UserProfileFullSerializer
 from helpers.device import update_fcm_device
+from alumni.models import AlumniUser
+from backend.settings import EMAIL_HOST_USER
 
-# pylint: disable=R0914
+# pylint: disable=R0914,W0702
 def perform_login(auth_code, redir, request):
     """Perform login with code and redir."""
 
@@ -173,3 +179,45 @@ class SSOFiller():
             target = self.profile_json
         if self.jhas(response_key, target):
             setattr(self.user_profile, data_key, target[response_key])
+
+def generate_alumni_key():
+    return secrets.choice(range(100000, 999999))
+
+def create_key_send_mail(ldap_req):
+    # Checking if LDAP is right
+    query = Q(ldap_id=ldap_req)
+    user = UserProfile.objects.filter(query).first()
+    if not user:
+        return False, "User doesn't exist"
+
+    # Check 15 minute window
+    pastRequests = AlumniUser.objects.filter(ldap=ldap_req)
+    if pastRequests:
+        lastRequest = pastRequests.order_by('-timeLoginRequest').first()
+        if timezone.now() <= lastRequest.timeLoginRequest + timedelta(minutes=15):
+            return True, "An OTP was already sent to your mail before"
+
+    # Beyond 15 minute window, retry
+    key = generate_alumni_key()
+    try:
+        send_mail(
+            'Alumni Login Request on InstiApp',
+            'Your OTP for Alumni Login on Instiapp is ' + str(key),
+            EMAIL_HOST_USER,
+            [str(ldap_req) + '@iitb.ac.in'],
+            fail_silently=False
+        )
+    except:  # noqa: E722
+        # Mail couldn't be sent
+        return False, 'Server issues, please retry later'
+
+    # Generate instance
+    new_otp_req = AlumniUser(ldap=ldap_req, keyStored=str(key), timeLoginRequest=timezone.now())
+    new_otp_req.save()
+    return True, 'fine'
+
+def perform_alumni_login(request, ldap_entered):
+    query = Q(ldap_id=ldap_entered)
+    user = UserProfile.objects.filter(query).first().user
+    login(request, user)
+    request.session.save()

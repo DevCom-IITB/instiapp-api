@@ -20,6 +20,7 @@ from news.models import NewsEntry
 from placements.models import BlogEntry
 from venter.models import Complaint
 from achievements.models import Skill, Interest
+from external.models import ExternalBlogEntry
 
 from helpers.test_helpers import create_usertag
 from helpers.test_helpers import create_usertagcategory
@@ -127,6 +128,10 @@ class OtherTestCase(TransactionTestCase):
         # Test invalid sync doesn't panic
         run_sync(push((None, None)))
         self.assertEqual(True, True)
+
+        # Create Fake External Blog Entry
+        ent = ExternalBlogEntry.objects.create(title="entry-1")
+        self.assertEqual(index_pair(ent)[0], 'external')
 
         # Test indexing of PT blog
         ent = BlogEntry(title='strategy comp', blog_url=settings.PLACEMENTS_URL)
