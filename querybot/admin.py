@@ -10,13 +10,14 @@ def handle_entry(entry, notify_user=True):
     # Try to get an entry existing
     db_entry = UnresolvedQuery.objects.filter(id=entry.id).first()
 
+    db_entry.resolved = True
+    db_entry.save()
+
     # Send notifications to user
     users = User.objects.filter(id=db_entry.user.user.id)
     if notify_user:
         notify.send(db_entry, recipient=users, verb="Your query has been resolved check the updated list of questions")
 
-    db_entry.resolved = True
-    db_entry.save()
 
 class QueryAdmin(admin.ModelAdmin):
     search_fields = ['question', 'category']
