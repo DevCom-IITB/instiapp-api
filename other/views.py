@@ -34,14 +34,14 @@ class OtherViewset(viewsets.ViewSet):
         """EXPENSIVE: Search with query param `query` throughout the database."""
         MIN_LENGTH = 3
 
-        req_query = request.GET.get("query")
-        if not req_query or len(req_query) < MIN_LENGTH:
-            return Response({"message": "No query or too short!"}, status=400)
-
         types = ('bodies', 'events', 'users')
         req_types = request.GET.get('types')
         if req_types:
             types = tuple(req_types.split(','))
+
+        req_query = request.GET.get("query")
+        if (not req_query or len(req_query) < MIN_LENGTH) and not ('interests' in types or 'skills' in types):
+            return Response({"message": "No query or too short!"}, status=400)
 
         # Include only the types we want
         bodies, events, users, skills, interests = ([] for i in range(5))
@@ -66,14 +66,14 @@ class OtherViewset(viewsets.ViewSet):
         # Search skills by title
         if 'skills' in types:
             skills = query_search(
-                request, MIN_LENGTH, Skill.objects.all(),
-                ["title"], 'skills', order_relevance=True)
+                request, 0, Skill.objects.all(),
+                ["title"], 'skills', order_relevance=True)[:20]
 
         # Search interests by title
         if 'interests' in types:
             interests = query_search(
-                request, MIN_LENGTH, Interest.objects.all(),
-                ["title"], 'interests', order_relevance=True)
+                request, 0, Interest.objects.all(),
+                ["title"], 'interests', order_relevance=True)[:20]
 
         return Response({
             "bodies": BodySerializerMin(bodies, many=True).data,
