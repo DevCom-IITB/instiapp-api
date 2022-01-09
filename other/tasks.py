@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
+from achievements.models import UserInterest
 from notifications.models import Notification
 from notifications.signals import notify
 from pyfcm import FCMNotification
@@ -34,6 +35,14 @@ def notify_new_event(pk):
             instance,
             recipient=users,
             verb=body.name + " has added a new event"
+        )
+    
+    for interest in instance.event_interest.all():
+        users = User.objects.filter(id__in=UserInterest.filter(title=interest.title).user.filter(active=True).values('user_id'))
+        notify.send(
+            instance,
+            recipient=users,
+            verb=f"A new event with tag {interest.title} has been added"
         )
 
 @shared_task_conditional(base=FaultTolerantTask)

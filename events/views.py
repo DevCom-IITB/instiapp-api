@@ -68,6 +68,13 @@ class EventViewSet(viewsets.ModelViewSet):
 
             # Fill in ids of venues
             request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])
+            try:
+                request.data['event_interest']
+                request.data['interests_id']
+            except(KeyError):
+                request.data['event_interest'] = []
+                request.data['interests_id'] = []
+
             return super().create(request)
 
         return forbidden_no_privileges()
@@ -92,6 +99,13 @@ class EventViewSet(viewsets.ModelViewSet):
 
         # Create added unreusable venues, unlink deleted ones
         request.data['venue_ids'] = get_update_venue_ids(request.data['venue_names'], event)
+
+        try:
+            request.data['event_interest']
+            request.data['interests_id']
+        except(KeyError):
+            request.data['event_interest'] = []
+            request.data['interests_id'] = []
 
         return super().update(request, pk)
 
