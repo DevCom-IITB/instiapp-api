@@ -1,8 +1,8 @@
 """Views for mess menu."""
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from messmenu.models import Hostel
-from messmenu.serializers import HostelSerializer
+from messmenu.models import Hostel, MessCalEvent
+from messmenu.serializers import HostelSerializer, MessCalEventSerializer
 from roles.helpers import login_required_ajax
 import requests
 from datetime import datetime
@@ -57,11 +57,18 @@ def getUserMess(request):
             
             date = datetime(curr.year, curr.month, k["day"], k["time"]//60, k["time"]%60)
             hostel = k["hostel"]
-            items.append({"title":title, "datetime":date, "hostel":hostel})
+            
+            item, c = MessCalEvent.objects.get_or_create(user = user, datetime = date)
+            if c:
+                item.title = title
+                item.hostel = hostel
+                item.save()
+            
+            items.append(item)
             
         curr = curr + relativedelta(months=1)
     
-    return Response({"items":items})    
+    return Response(MessCalEventSerializer(items, many=True).data)    
     
 
 def binaryDecode(x):
