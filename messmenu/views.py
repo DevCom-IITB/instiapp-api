@@ -7,6 +7,7 @@ from roles.helpers import login_required_ajax
 import requests
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 
 @api_view(['GET', ])
 def get_mess(request):
@@ -33,7 +34,7 @@ def getUserMess(request):
     items = []
     
     while curr<=end:
-        res = requests.get(""+"/api/get_details/", {"roll":rollno, "year":curr.year, "month":curr.month})
+        res = requests.get(settings.MESSI_BASE_URL+"/api/get_details/", {"roll":rollno, "year":curr.year, "month":curr.month})
         if res.status_code!=200:
             print("Error in getting details")
             return Response({"error":"Error in getting mess calendar"})

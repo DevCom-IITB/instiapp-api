@@ -160,6 +160,8 @@ PLACEMENTS_URL = 'http://placements.iitb.ac.in/blog/?feed=rss2'
 TRAINING_BLOG_URL = 'http://placements.iitb.ac.in/trainingblog/?feed=rss2'
 EXTERNAL_BLOG_URL = 'https://gymkhana.iitb.ac.in/externalblog'
 
+MESSI_BASE_URL = ""
+
 # Names of bodies to notify when there are new posts on placement/training blog
 PLACEMENTS_BLOG_BODY = 'Placement Blog'
 TRAINING_BLOG_BODY = 'Internship Blog'
