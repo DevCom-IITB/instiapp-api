@@ -21,7 +21,9 @@ def get_mess(request):
 def getUserMess(request):
     """Get mess status for a user"""
 
-    if not request.user:
+    try: 
+        request.user
+    except:
         return Response({
             'message': 'unauthenticated',
             'detail': 'Log in to continue!'
