@@ -9,7 +9,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
-from users.models import UserProfile
 
 @api_view(['GET', ])
 def get_mess(request):
@@ -19,9 +18,14 @@ def get_mess(request):
     return Response(HostelSerializer(queryset, many=True).data)
 
 @api_view(['GET', ])
-@login_required_ajax
 def getUserMess(request):
     """Get mess status for a user"""
+
+    if not request.user:
+        return Response({
+            'message': 'unauthenticated',
+            'detail': 'Log in to continue!'
+        }, status=401)
 
     user = request.user.profile
     rollno = user.roll_no
