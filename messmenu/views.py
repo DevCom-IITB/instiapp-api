@@ -9,6 +9,8 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
+from users.models import UserProfile
+
 @api_view(['GET', ])
 def get_mess(request):
     """Get mess menus of all hostels."""
@@ -20,11 +22,11 @@ def get_mess(request):
 @login_required_ajax
 def getUserMess(request):
     """Get mess status for a user"""
-    reqData = request.data
+
     user = request.user.profile
-    rollno = user.rollno
-    start = reqData['start']
-    end = reqData['end']
+    rollno = user.roll_no
+    start = request.GET.get('start')
+    end = request.GET.get('end')
     
     start = datetime.strptime(start, '%Y-%m-%d %H:%M:%S')
     end = datetime.strptime(end, '%Y-%m-%d %H:%M:%S')
@@ -34,38 +36,46 @@ def getUserMess(request):
     items = []
     
     while curr<=end:
-        res = requests.get(settings.MESSI_BASE_URL+"/api/get_details/", {"roll":rollno, "year":curr.year, "month":curr.month})
+        res = requests.get(f"{settings.MESSI_BASE_URL}/api/get_details?roll={rollno}&year={curr.year}&month={curr.month}")
+
         if res.status_code!=200:
-            print("Error in getting details")
-            return Response({"error":"Error in getting mess calendar"})
+            curr = curr + relativedelta(months=1)
+            continue
+            # print("Error in getting details")
+            # return Response({"error":"Error in getting mess calendar"})
         
         data = res.json()
-        details = data["details"]
-        
-        for d in details:
-            k = binaryDecode(d)
-            mealnum = k["meal"]
-            if(mealnum == "000"):
-                title = "Breakfast"
-            elif(mealnum == "001"):
-                title = "Lunch"
-            elif(mealnum == "010"):
-                title = "Snacks"
-            elif(mealnum == "011"):
-                title = "Dinner"
-            else:
-                title = "Error"
+
+        try:
+            details = data["details"]
             
-            date = datetime(curr.year, curr.month, k["day"], k["time"]//60, k["time"]%60)
-            hostel = k["hostel"]
-            
-            item, c = MessCalEvent.objects.get_or_create(user = user, datetime = date)
-            if c:
-                item.title = title
-                item.hostel = hostel
-                item.save()
-            
-            items.append(item)
+            for d in details:
+                k = binaryDecode(d)
+                mealnum = k["meal"]
+                if(mealnum == "000"):
+                    title = "Breakfast"
+                elif(mealnum == "001"):
+                    title = "Lunch"
+                elif(mealnum == "010"):
+                    title = "Snacks"
+                elif(mealnum == "011"):
+                    title = "Dinner"
+                else:
+                    title = "Error"
+                
+                date = datetime(curr.year, curr.month, k["day"], k["time"]//60, k["time"]%60)
+                hostel = k["hostel"]
+                
+                item, c = MessCalEvent.objects.get_or_create(user = user, datetime = date, hostel = hostel)
+                if c:
+                    item.title = title
+                    item.save()
+                
+                items.append(item)
+
+        except KeyError:
+            curr = curr + relativedelta(months=1)
+            continue
             
         curr = curr + relativedelta(months=1)
     
