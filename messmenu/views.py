@@ -22,7 +22,7 @@ def getUserMess(request):
     """Get mess status for a user"""
 
     try: 
-        request.user
+        request.user.profile
     except:
         return Response({
             'message': 'unauthenticated',
