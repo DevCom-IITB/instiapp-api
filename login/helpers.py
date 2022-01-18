@@ -221,3 +221,6 @@ def perform_alumni_login(request, ldap_entered):
     user = UserProfile.objects.filter(query).first().user
     login(request, user)
     request.session.save()
+    queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
+    user_profile = queryset.get(user=user)
+    return request.session.session_key, user.username, user_profile.id, UserProfileFullSerializer(user_profile, context={'request': request}).data
