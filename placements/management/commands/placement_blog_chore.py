@@ -69,7 +69,7 @@ def fill_blog(url, body_name):
 
     # Get the feed
     response = requests.get(url, auth=HTTPBasicAuth(
-        settings.LDAP_USERNAME, settings.LDAP_PASSWORD), verify=False)
+        settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
     feeds = feedparser.parse(response.content)
 
     if not feeds['feed']:
