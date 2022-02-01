@@ -71,7 +71,7 @@ class EventViewSet(viewsets.ModelViewSet):
             try:
                 request.data['event_interest']
                 request.data['interests_id']
-            except(KeyError):
+            except KeyError:
                 request.data['event_interest'] = []
                 request.data['interests_id'] = []
 
@@ -103,7 +103,7 @@ class EventViewSet(viewsets.ModelViewSet):
         try:
             request.data['event_interest']
             request.data['interests_id']
-        except(KeyError):
+        except KeyError:
             request.data['event_interest'] = []
             request.data['interests_id'] = []
 

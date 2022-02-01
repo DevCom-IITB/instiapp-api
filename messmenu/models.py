@@ -36,6 +36,10 @@ class MessCalEvent(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     hostel = models.IntegerField()
     datetime = models.DateTimeField()
-    title = models.CharField(max_length=100) # Breakfast, Lunch, Snacks, Dinner
-    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE,
-                             default=uuid4, related_name='ums')
+    title = models.CharField(max_length=100)  # Breakfast, Lunch, Snacks, Dinner
+    user = models.ForeignKey(
+        'users.UserProfile',
+        on_delete=models.CASCADE,
+        default=uuid4,
+        related_name='ums'
+    )
