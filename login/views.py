@@ -162,8 +162,15 @@ class LoginViewSet(viewsets.ViewSet):
         # Check key
         if lastRequest.isCorrectKey(key):
             # Perform login
-            perform_alumni_login(request, ldap_entered)
-            return Response({'error_status': False, 'msg': 'Logged in'})
+            session_key, user, profile_id, profile = perform_alumni_login(request, ldap_entered)
+            return Response({
+                'error_status': False,
+                'msg': 'Logged in',
+                'sessionid': session_key,
+                'user': user,
+                'profile_id': profile_id,
+                'profile': profile
+            })
 
         return Response({'error_status': True, 'msg': 'Wrong OTP, retry'})
 

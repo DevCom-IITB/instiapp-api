@@ -35,6 +35,9 @@ class Event(models.Model):
 
     starting_notified = models.BooleanField(default=False)
 
+    event_interest = models.ManyToManyField('achievements.Interest', related_name='events',
+                                            blank=True)
+
     promotion_boost = models.IntegerField(default=0)
 
     weight = 0

@@ -1,6 +1,6 @@
 """Serializers for mess menu."""
 from rest_framework import serializers
-from messmenu.models import MenuEntry
+from messmenu.models import MenuEntry, MessCalEvent
 from messmenu.models import Hostel
 
 class MenuEntrySerializer(serializers.ModelSerializer):
@@ -22,3 +22,9 @@ class HostelSerializer(serializers.ModelSerializer):
         """Perform necessary eager loading of data."""
         queryset = queryset.prefetch_related('mess')
         return queryset
+
+class MessCalEventSerializer(serializers.ModelSerializer):
+    """Serializer for mess calendar event."""
+    class Meta:
+        model = MessCalEvent
+        fields = '__all__'
