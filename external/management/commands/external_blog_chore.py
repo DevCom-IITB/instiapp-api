@@ -1,10 +1,13 @@
 import re
 import feedparser
 import requests
+from notifications.signals import notify
 from dateutil.parser import parse
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from external.models import ExternalBlogEntry
+from bodies.models import Body
 from helpers.misc import table_to_markdown
 
 
@@ -32,7 +35,7 @@ def handle_entry(entry):
     # Reuse if entry exists, create new otherwise
     if not db_entry:
         db_entry = ExternalBlogEntry(guid=guid)
-        # new_added = True
+        new_added = True
 
     # Fill the db entry
     if 'author' in entry:
@@ -46,12 +49,16 @@ def handle_entry(entry):
 
     db_entry.save()
 
-    # # Send notification to mentioned people
-    # if new_added and db_entry.content:
-    #     # Send notifications to followers
-    #     if body is not None:
-    #         users = User.objects.filter(id__in=body.followers.filter(active=True).values('user_id'))
-    #         notify.send(db_entry, recipient=users, verb="New post on " + body.name)
+    # Finding the External Blog Body
+    body = Body.objects.filter(name="External Blog").first()
+
+
+    # Send notification to mentioned people
+    if new_added and db_entry.content:
+        # Send notifications to followers
+        if body is not None:
+            users = User.objects.filter(id__in=body.followers.filter(active=True).values('user_id'))
+            notify.send(db_entry, recipient=users, verb="New post on " + body.name)
 
     #     # Send notifications for mentioned users
     #     roll_nos = [p for p in profile_fetcher.get_roll() if p and p in db_entry.content]
