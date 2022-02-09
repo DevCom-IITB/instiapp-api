@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from events.models import Event
 from events.serializers import EventSerializer
+from external.models import ExternalBlogEntry
 from placements.models import BlogEntry
 from placements.serializers import BlogEntrySerializer
 from news.models import NewsEntry
@@ -26,6 +27,8 @@ class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disa
             serializer = CommentSerializer(value)
         elif isinstance(value, UnresolvedQuery):
             serializer = UnresolvedQuerySerializer(value)
+        elif isinstance(value, ExternalBlogEntry):
+            serializer = ExternalBlogEntry(value)
 
         return serializer.data
 
