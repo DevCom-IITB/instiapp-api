@@ -113,7 +113,7 @@ def getRnoQR(request):
 
     try:
         user = request.user.profile
-        rollno = str(user.rollno)
+        rollno = str(user.roll_no)
         # rollno = "200020087"
         time = str(datetime.now())
         rnom = (rollno + "," + time).encode()
