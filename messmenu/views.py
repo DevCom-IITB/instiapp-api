@@ -102,17 +102,17 @@ def binaryDecode(x):
 @api_view(['GET', ])
 def getRnoQR(request):
 
-    # try:
-    #     request.user.profile
-    # except AttributeError:
-    #     return Response({
-    #         'message': 'unauthenticated',
-    #         'detail': 'Log in to continue!'
-    #     }, status=401)
+    try:
+        request.user.profile
+    except AttributeError:
+        return Response({
+            'message': 'unauthenticated',
+            'detail': 'Log in to continue!'
+        }, status=401)
 
-    # user = request.user.profile
-    # rollno = user.rollno
-    rollno = "200020087"
+    user = request.user.profile
+    rollno = user.rollno
+    # rollno = "200020087"
     time = str(datetime.now())
     rnom = (rollno + "," + time).encode()
 
