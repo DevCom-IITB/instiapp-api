@@ -32,6 +32,7 @@ def getUserMess(request):
 
     user = request.user.profile
     rollno = user.roll_no
+
     start = request.GET.get('start')
     end = request.GET.get('end')
 
@@ -110,13 +111,18 @@ def getRnoQR(request):
             'detail': 'Log in to continue!'
         }, status=401)
 
-    user = request.user.profile
-    rollno = user.rollno
-    # rollno = "200020087"
-    time = str(datetime.now())
-    rnom = (rollno + "," + time).encode()
+    try:
+        user = request.user.profile
+        rollno = str(user.rollno)
+        # rollno = "200020087"
+        time = str(datetime.now())
+        rnom = (rollno + "," + time).encode()
 
-    f = Fernet(b'Tolm_fRDkfoN5WMU4oUXWxNwmn1E0MmYlbeh1LA29cU=')
-    encrRno = f.encrypt(rnom)
+        f = Fernet(b'Tolm_fRDkfoN5WMU4oUXWxNwmn1E0MmYlbeh1LA29cU=')
+        encrRno = f.encrypt(rnom)
 
-    return Response({"qrstring": encrRno})
+        return Response({"qrstring": encrRno})
+    except Exception as e:
+        return Response({
+            'qrstring': str(e),
+        }, status=401)
