@@ -125,4 +125,4 @@ def getRnoQR(request):
     except Exception as e:
         return Response({
             'qrstring': str(e),
-        }, status=401)
+        })
