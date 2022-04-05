@@ -1,5 +1,6 @@
 """Views for mess menu."""
 from datetime import datetime
+import imp
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import requests
@@ -7,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from messmenu.models import Hostel, MessCalEvent
 from messmenu.serializers import HostelSerializer, MessCalEventSerializer
+from cryptography.fernet import Fernet
 
 
 @api_view(['GET', ])
@@ -30,6 +32,7 @@ def getUserMess(request):
 
     user = request.user.profile
     rollno = user.roll_no
+
     start = request.GET.get('start')
     end = request.GET.get('end')
 
@@ -96,3 +99,30 @@ def binaryDecode(x):
     time = int(b_x[len(b_x) - 19:len(b_x) - 8], 2)
     hostel = int(b_x[0:len(b_x) - 19], 2)
     return {'hostel': hostel, 'time': time, 'meal': meal, 'day': day}
+
+@api_view(['GET', ])
+def getRnoQR(request):
+
+    try:
+        request.user.profile
+    except AttributeError:
+        return Response({
+            'message': 'unauthenticated',
+            'detail': 'Log in to continue!'
+        }, status=401)
+
+    try:
+        user = request.user.profile
+        rollno = str(user.roll_no)
+        # rollno = "200020087"
+        time = str(datetime.now())
+        rnom = (rollno + "," + time).encode()
+
+        f = Fernet(b'Tolm_fRDkfoN5WMU4oUXWxNwmn1E0MmYlbeh1LA29cU=')
+        encrRno = f.encrypt(rnom)
+
+        return Response({"qrstring": encrRno})
+    except Exception as e:
+        return Response({
+            'qrstring': str(e),
+        })
