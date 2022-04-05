@@ -1,4 +1,5 @@
 import re
+from urllib import response
 import feedparser
 import requests
 from requests.auth import HTTPBasicAuth
@@ -68,8 +69,10 @@ def fill_blog(url, body_name):
     body = Body.objects.filter(name=body_name).first()
 
     # Get the feed
-    response = requests.get(url, auth=HTTPBasicAuth(
-        settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
+    # response = requests.get(url, auth=HTTPBasicAuth(
+    #     settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
+    cookies = {'mod_auth_openidc_session': '48cbc955-f90d-4db3-8b35-6be5fe841e34'}
+    response = requests.get(url, cookies=cookies)
     feeds = feedparser.parse(response.content)
 
     if not feeds['feed']:
