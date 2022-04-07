@@ -1,14 +1,13 @@
 """Views for mess menu."""
 from datetime import datetime
-import imp
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import requests
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from cryptography.fernet import Fernet
 from messmenu.models import Hostel, MessCalEvent
 from messmenu.serializers import HostelSerializer, MessCalEventSerializer
-from cryptography.fernet import Fernet
 
 
 @api_view(['GET', ])

@@ -1,10 +1,10 @@
 import pickle
 import re
+from os.path import exists
 from requests.auth import HTTPBasicAuth
 # from urllib import response
 import feedparser
 import requests
-from os.path import exists
 # from requests.auth import HTTPBasicAuth
 from dateutil.parser import parse
 from django.conf import settings
@@ -106,7 +106,6 @@ def fill_blog(url, body_name, url_val):
         # Add each entry if doesn't exist
         for entry in feeds['entries']:
             handle_entry(entry, body, url)
-
 
 
 def handle_html(content):

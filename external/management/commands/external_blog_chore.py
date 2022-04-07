@@ -52,7 +52,6 @@ def handle_entry(entry):
     # Finding the External Blog Body
     body = Body.objects.filter(name="External Blog").first()
 
-
     # Send notification to mentioned people
     if new_added and db_entry.content:
         # Send notifications to followers
