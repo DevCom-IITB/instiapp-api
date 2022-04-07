@@ -1,6 +1,6 @@
 import pickle
 import re
-from urllib.request import HTTPBasicAuthHandler
+from requests.auth import HTTPBasicAuth
 # from urllib import response
 import feedparser
 import requests
@@ -96,7 +96,7 @@ def fill_blog(url, body_name, url_val):
         body = Body.objects.filter(name=body_name).first()
 
         # Get the feed
-        response = requests.get(url, auth=HTTPBasicAuthHandler(
+        response = requests.get(url, auth=HTTPBasicAuth(
             settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
         feeds = feedparser.parse(response.content)
 
