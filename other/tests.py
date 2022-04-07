@@ -134,9 +134,9 @@ class OtherTestCase(TransactionTestCase):
         self.assertEqual(index_pair(ent)[0], 'external')
 
         # Test indexing of PT blog
-        ent = BlogEntry(title='strategy comp', blog_url=settings.PLACEMENTS_URL)
+        ent = BlogEntry(title='strategy comp', blog_url=settings.PLACEMENTS_URL_VAL)
         self.assertEqual(index_pair(ent)[0], 'placement')
-        ent = BlogEntry(title='ecomm comp', blog_url=settings.TRAINING_BLOG_URL)
+        ent = BlogEntry(title='ecomm comp', blog_url=settings.TRAINING_BLOG_URL_VAL)
         self.assertEqual(index_pair(ent)[0], 'training')
         ent = BlogEntry(title='why this', blog_url='https://google.com')
         self.assertEqual(index_pair(ent)[0], 'blogs')

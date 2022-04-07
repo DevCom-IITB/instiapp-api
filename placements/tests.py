@@ -31,11 +31,11 @@ class PlacementsTestCase(APITestCase):
         self.mock_server = Popen(['python', 'news/test/test_server.py'])
 
         # Create dummies
-        self.entry1 = BlogEntry.objects.create(title="PEntry1", blog_url=settings.PLACEMENTS_URL)
-        BlogEntry.objects.create(title="PEntry2", blog_url=settings.PLACEMENTS_URL)
-        BlogEntry.objects.create(title="TEntry1", blog_url=settings.TRAINING_BLOG_URL)
-        BlogEntry.objects.create(title="TEntry2", blog_url=settings.TRAINING_BLOG_URL)
-        BlogEntry.objects.create(title="TEntry3", blog_url=settings.TRAINING_BLOG_URL)
+        self.entry1 = BlogEntry.objects.create(title="PEntry1", blog_url=settings.PLACEMENTS_URL_VAL)
+        BlogEntry.objects.create(title="PEntry2", blog_url=settings.PLACEMENTS_URL_VAL)
+        BlogEntry.objects.create(title="TEntry1", blog_url=settings.TRAINING_BLOG_URL_VAL)
+        BlogEntry.objects.create(title="TEntry2", blog_url=settings.TRAINING_BLOG_URL_VAL)
+        BlogEntry.objects.create(title="TEntry3", blog_url=settings.TRAINING_BLOG_URL_VAL)
 
     def test_placement_other(self):
         """Check misc parameters of Placement."""
@@ -53,11 +53,11 @@ class PlacementsTestCase(APITestCase):
 
     def test_blog_order(self):
         """Test ordering of the pinned blogs"""
-        BlogEntry.objects.create(title="UnpinnedEntry2", blog_url=settings.PLACEMENTS_URL,)
-        pinnedEntry1 = BlogEntry.objects.create(title="PinnedEntry1", blog_url=settings.PLACEMENTS_URL, pinned=True)
+        BlogEntry.objects.create(title="UnpinnedEntry2", blog_url=settings.PLACEMENTS_URL_VAL,)
+        pinnedEntry1 = BlogEntry.objects.create(title="PinnedEntry1", blog_url=settings.PLACEMENTS_URL_VAL, pinned=True)
 
-        BlogEntry.objects.create(title="UnpinnedEntry3", blog_url=settings.PLACEMENTS_URL,)
-        BlogEntry.objects.create(title="UnpinnedEntry4", blog_url=settings.PLACEMENTS_URL,)
+        BlogEntry.objects.create(title="UnpinnedEntry3", blog_url=settings.PLACEMENTS_URL_VAL,)
+        BlogEntry.objects.create(title="UnpinnedEntry4", blog_url=settings.PLACEMENTS_URL_VAL,)
 
         user = get_new_user()
         self.client.force_authenticate(user)  # pylint: disable=E1101
@@ -77,11 +77,11 @@ class PlacementsTestCase(APITestCase):
         BlogEntry.objects.all().delete()
 
         # creating new posts with no pinned post
-        first_entry = BlogEntry.objects.create(title="PEntry1", blog_url=settings.PLACEMENTS_URL)
-        BlogEntry.objects.create(title="PEntry2", blog_url=settings.PLACEMENTS_URL)
-        BlogEntry.objects.create(title="PEntry3", blog_url=settings.PLACEMENTS_URL)
-        BlogEntry.objects.create(title="PEntry4", blog_url=settings.PLACEMENTS_URL)
-        latest_entry = BlogEntry.objects.create(title="PEntry5", blog_url=settings.PLACEMENTS_URL)
+        first_entry = BlogEntry.objects.create(title="PEntry1", blog_url=settings.PLACEMENTS_URL_VAL)
+        BlogEntry.objects.create(title="PEntry2", blog_url=settings.PLACEMENTS_URL_VAL)
+        BlogEntry.objects.create(title="PEntry3", blog_url=settings.PLACEMENTS_URL_VAL)
+        BlogEntry.objects.create(title="PEntry4", blog_url=settings.PLACEMENTS_URL_VAL)
+        latest_entry = BlogEntry.objects.create(title="PEntry5", blog_url=settings.PLACEMENTS_URL_VAL)
 
         user = get_new_user()
         self.client.force_authenticate(user)  # pylint: disable=E1101
@@ -123,8 +123,8 @@ class PlacementsTestCase(APITestCase):
         call_command('placement_blog_chore')
 
         # Check if posts were collected
-        placements = lambda: BlogEntry.objects.all().filter(blog_url=settings.PLACEMENTS_URL)
-        trainings = lambda: BlogEntry.objects.all().filter(blog_url=settings.TRAINING_BLOG_URL)
+        placements = lambda: BlogEntry.objects.all().filter(blog_url=settings.PLACEMENTS_URL_VAL)
+        trainings = lambda: BlogEntry.objects.all().filter(blog_url=settings.TRAINING_BLOG_URL_VAL)
         self.assertEqual(placements().count(), 3)
         self.assertEqual(trainings().count(), 5)
         self.assertEqual(set(x.guid for x in placements()), set('sample:p:%i' % i for i in range(1, 4)))
