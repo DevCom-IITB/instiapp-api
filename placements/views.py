@@ -13,7 +13,7 @@ class PlacementBlogViewset(viewsets.ViewSet):
     @login_required_ajax
     def placement_blog(cls, request):
         """Get Placement Blog."""
-        queryset = BlogEntry.objects.filter(blog_url=settings.PLACEMENTS_URL)
+        queryset = BlogEntry.objects.filter(blog_url=settings.PLACEMENTS_URL_VAL)
         queryset = query_search(request, 3, queryset, ['title', 'content'], 'placement')
         queryset = queryset.order_by('-pinned', "-published")
         queryset = query_from_num(request, 20, queryset)
@@ -24,7 +24,7 @@ class PlacementBlogViewset(viewsets.ViewSet):
     @login_required_ajax
     def training_blog(cls, request):
         """Get Training Blog."""
-        queryset = BlogEntry.objects.filter(blog_url=settings.TRAINING_BLOG_URL)
+        queryset = BlogEntry.objects.filter(blog_url=settings.TRAINING_BLOG_URL_VAL)
         queryset = query_search(request, 3, queryset, ['title', 'content'], 'training')
         queryset = queryset.order_by('-pinned', "-published")
         queryset = query_from_num(request, 20, queryset)

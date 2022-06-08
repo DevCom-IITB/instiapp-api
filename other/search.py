@@ -90,9 +90,9 @@ def index_pair(obj):  # pylint: disable=too-many-return-statements
 
     if typ == 'BlogEntry':
         val = space(obj.title, obj.content)
-        if obj.blog_url == settings.TRAINING_BLOG_URL:
+        if obj.blog_url == settings.TRAINING_BLOG_URL_VAL:
             return ('training', bucket, str(obj.id), val)
-        if obj.blog_url == settings.PLACEMENTS_URL:
+        if obj.blog_url == settings.PLACEMENTS_URL_VAL:
             return ('placement', bucket, str(obj.id), val)
         return ('blogs', bucket, str(obj.id), val)
 
