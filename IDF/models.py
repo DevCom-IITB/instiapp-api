@@ -15,6 +15,7 @@ class IDF_Post_Comment(models.Model):
     comments = models.ForeignKey("self", null=True, related_name="IDF_Post_Comment")
     gif = models.FileField(upload_to = 'Videos/', blank = True)
     tag_checkIn = models.URLField(blank=True, null=True)
+    notify=models.BooleanField(default=True)
 
 class UserNewsReaction(models.Model):
     """ Reaction:
