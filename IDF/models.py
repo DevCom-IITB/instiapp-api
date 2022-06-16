@@ -19,7 +19,7 @@ class IDF_Post_Comment(models.Model):
     posted_by = models.ForeignKey('users.UserProfile', null=True, blank=True,
                                    on_delete=models.SET_NULL, related_name='created_events')
     tag_body = models.ManyToManyField('bodies.Body', related_name="Tagged_Body", blank=True)
-    
+    notify=models.BooleanField(default=True)
     #if we are going to user the users.UserTag to tag the user then i will also create a class in events for event tag
 
 class UserReaction(models.Model):
