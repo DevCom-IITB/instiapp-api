@@ -32,7 +32,7 @@ class UserNewsReaction(models.Model):
 
     user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE,
                              default=uuid4, related_name='unr')
-    news = models.ForeignKey(NewsEntry, on_delete=models.CASCADE,
+    news = models.ForeignKey(IDF_Post_Comment, on_delete=models.CASCADE,
                              default=uuid4, related_name='unr')
 
     reaction = models.IntegerField(default=0)
