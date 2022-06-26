@@ -43,3 +43,6 @@ class MessCalEvent(models.Model):
         default=uuid4,
         related_name='ums'
     )
+
+    def __str__(self):
+        return f"{str(self.user)}, {self.title}"

@@ -15,7 +15,7 @@ class ExternalBlogEntry(models.Model):
     body = models.TextField(max_length=50, blank=True)
 
     def __str__(self):
-        return self.title
+        return f"{self.title} - {self.body}"
 
     class Meta:
         verbose_name = "External Blog Entry"
