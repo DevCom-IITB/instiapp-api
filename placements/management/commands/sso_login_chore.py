@@ -2,7 +2,6 @@ import pickle
 from requests import Session
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from notifications.signals import notify
 import pyotp
 
 class Command(BaseCommand):
@@ -10,7 +9,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # """Run the chore."""
-        
+
         s = Session()
 
         init_response = s.get('https://sso.iitb.ac.in/login')
