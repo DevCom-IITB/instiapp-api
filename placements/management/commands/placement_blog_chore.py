@@ -1,8 +1,11 @@
+import pickle
 import re
-from urllib import response
+from urllib.request import HTTPBasicAuthHandler
+# from urllib import response
 import feedparser
 import requests
-from requests.auth import HTTPBasicAuth
+from os.path import exists
+# from requests.auth import HTTPBasicAuth
 from dateutil.parser import parse
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -64,23 +67,47 @@ def handle_entry(entry, body, url):
             users = User.objects.filter(profile__roll_no__in=roll_nos)
             notify.send(db_entry, recipient=users, verb="You were mentioned in a blog post")
 
-def fill_blog(url, body_name):
+def fill_blog(url, body_name, url_val):
     # Get the body
     body = Body.objects.filter(name=body_name).first()
 
-    # Get the feed
-    # response = requests.get(url, auth=HTTPBasicAuth(
-    #     settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
-    cookies = {'mod_auth_openidc_session': '48cbc955-f90d-4db3-8b35-6be5fe841e34'}
-    response = requests.get(url, cookies=cookies)
-    feeds = feedparser.parse(response.content)
+    if exists('session.obj'):
+        f = open('session.obj', 'rb')
+        s = pickle.load(f)
+        f.close()
 
-    if not feeds['feed']:
-        raise CommandError('PLACEMENTS BLOG CHORE FAILED')
+        # Get the feed
+        # response = requests.get(url, auth=HTTPBasicAuth(
+        #     settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
 
-    # Add each entry if doesn't exist
-    for entry in feeds['entries']:
-        handle_entry(entry, body, url)
+        response = s.get(url)
+
+        feeds = feedparser.parse(response.content)
+
+        if not feeds['feed']:
+            raise CommandError('PLACEMENTS BLOG CHORE FAILED')
+
+        # Add each entry if doesn't exist
+        for entry in feeds['entries']:
+            handle_entry(entry, body, url_val)
+
+    else:
+        # Get the body
+        body = Body.objects.filter(name=body_name).first()
+
+        # Get the feed
+        response = requests.get(url, auth=HTTPBasicAuthHandler(
+            settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
+        feeds = feedparser.parse(response.content)
+
+        if not feeds['feed']:
+            raise CommandError('PLACEMENTS BLOG CHORE FAILED')
+
+        # Add each entry if doesn't exist
+        for entry in feeds['entries']:
+            handle_entry(entry, body, url)
+
+
 
 def handle_html(content):
     # Convert tables to markdown
@@ -101,7 +128,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Run the chore."""
 
-        fill_blog(settings.PLACEMENTS_URL, settings.PLACEMENTS_BLOG_BODY)
-        fill_blog(settings.TRAINING_BLOG_URL, settings.TRAINING_BLOG_BODY)
+        fill_blog(settings.PLACEMENTS_URL, settings.PLACEMENTS_BLOG_BODY, settings.PLACEMENTS_URL_VAL)
+        fill_blog(settings.TRAINING_BLOG_URL, settings.TRAINING_BLOG_BODY, settings.TRAINING_BLOG_URL_VAL)
 
         self.stdout.write(self.style.SUCCESS('Placement Blog Chore completed successfully'))
