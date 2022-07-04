@@ -2,6 +2,9 @@ from uuid import UUID
 from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
+from community.models import Community
+from community.serializer_min import CommunitySerializerMin
+from community.serializers import CommunitySerializers
 from events.prioritizer import get_fresh_prioritized_events
 from events.prioritizer import get_prioritized
 from events.serializers import EventSerializer
@@ -19,7 +22,7 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = EventFullSerializer
 
     def get_serializer_context(self):
-        return {'request': self.request}    
+        return {'request': self.request}
 
     def retrieve(self, request, pk):
         """Get Post.
@@ -65,7 +68,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if all([user_has_privilege(request.user.profile, id, 'AddE')
                 for id in request.data['bodies_id']]):
 
-            # Fill in the 
+            # Fill in the
             request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])
             try:
                 request.data['event_interest']
@@ -163,3 +166,36 @@ def get_update_venue_ids(venue_names, event):
     added_venue_ids = create_unreusable_locations(added_venues)
 
     return added_venue_ids + common_venue_ids
+
+
+class CommunityViewSet(viewsets.ModelViewSet):
+    queryset = Community.objects
+    serializer_class = CommunitySerializers
+
+    def get_serializer_context(self):
+        return super().get_serializer_context()
+
+    def list(self, request):
+        queryset = Community.objects.all()
+        serializer = CommunitySerializerMin(queryset, many=True)
+        data = serializer.data
+        return Response(data)
+
+    def retrieve(self, request, pk):
+
+        # Prefetch and annotate data
+        self.queryset = CommunitySerializers.setup_eager_loading(self.queryset, request)
+
+        # Try UUID or fall back to str_id
+        body = self.get_body(pk)
+
+        # Serialize the body
+        serialized = CommunitySerializers(body, context={'request': request}).data
+        return Response(serialized)
+
+    def get_body(self, pk):
+        try:
+            UUID(pk, version=4)
+            return get_object_or_404(self.queryset, id=pk)
+        except ValueError:
+            return get_object_or_404(self.queryset, str_id=pk)
