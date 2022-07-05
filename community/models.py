@@ -23,7 +23,7 @@ class Community(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = "Community"
+        verbose_name = "Community" 
         verbose_name_plural = "Communities"
         ordering = ("-created_at",)
 

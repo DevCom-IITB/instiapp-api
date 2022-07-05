@@ -3,8 +3,9 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from community.models import Community
-from community.serializer_min import CommunitySerializerMin
-from community.serializers import CommunitySerializers
+from community.models import CommunityPost
+from community.serializer_min import CommunitySerializerMin,CommunityPostSerializerMin
+from community.serializers import CommunitySerializers,CommunityPostSerializers
 from events.prioritizer import get_fresh_prioritized_events
 from events.prioritizer import get_prioritized
 from events.serializers import EventSerializer
@@ -18,8 +19,8 @@ from locations.helpers import create_unreusable_locations
 class PostViewSet(viewsets.ModelViewSet):
     """Post"""
 
-    queryset = Event.objects
-    serializer_class = EventFullSerializer
+    queryset = CommunityPost.objects
+    serializer_class = CommunityPostSerializers
 
     def get_serializer_context(self):
         return {'request': self.request}
