@@ -15,43 +15,56 @@ from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
+from helpers.misc import query_from_num
+from helpers.misc import query_search
 
 class PostViewSet(viewsets.ModelViewSet):
     """Post"""
 
     queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
+    serializer_class_min = CommunityPostSerializerMin
 
     def get_serializer_context(self):
         return {'request': self.request}
 
-    def retrieve(self, request, pk):
-        """Get Post.
+    def retrieve_full(self, request, pk):
+        """Get full Post.
         Get by `uuid` or `str_id`"""
 
-        self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
-        event = self.get_event(pk)
-        serialized = EventFullSerializer(event, context={'request': request}).data
+        self.queryset = CommunityPostSerializers.setup_eager_loading(self.queryset, request)
+        post = self.get_event(pk)
+        serialized = CommunityPostSerializers(post, context={'request': request}).data
+
+        return Response(serialized)
+    
+    def retrieve_min(self, request, pk):
+        """Get min Post.
+        Get by `uuid` or `str_id`"""
+
+        self.queryset = CommunityPostSerializerMin.setup_eager_loading(self.queryset, request)
+        post = self.get_event(pk)
+        serialized = CommunityPostSerializerMin(post, context={'request': request}).data
 
         return Response(serialized)
 
     def list(self, request):
         """List Of Posts.
-        List fresh events prioritized for the current user."""
+        List fresh posts arranged chronologiaclly for the current user."""
 
-        # Check for date filtered query params
-        start = request.GET.get('start')
-        end = request.GET.get('end')
+        # Check for time and date filtered query params
+        create_time = request.GET.get('created')
+        update_time = request.GET.get('updated')
+        
+        if update_time is None:
+            update_time = create_time
 
-        if start is not None and end is not None:
-            # Try date-filtered if we have the params
-            queryset = get_prioritized(self.queryset.filter(
-                start_time__range=(start, end)), request)
-        else:
-            # Respond with recent events
-            queryset = get_fresh_prioritized_events(self.queryset, request)
+        Queryset = CommunityPost.objects.all()
+        
+        queryset = sorted(Queryset, key=lambda post: post.updated_at , reverse=True)
+        queryset = query_from_num(request, 20, queryset)
 
-        serializer = EventSerializer(queryset, many=True, context={'request': request})
+        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
