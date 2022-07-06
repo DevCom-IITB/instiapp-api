@@ -54,6 +54,7 @@ class PostViewSet(viewsets.ModelViewSet):
         List fresh posts arranged chronologiaclly for the current user."""
 
         # Check for time and date filtered query params
+
         Queryset = CommunityPost.objects.all()
         
         queryset = sorted(Queryset, key=lambda post: post.updated_at , reverse=True)
@@ -69,18 +70,18 @@ class PostViewSet(viewsets.ModelViewSet):
         """Create Post.
         Needs `AddE` permission for each body to be associated."""
 
-        # Prevent events without any body
-        if 'bodies_id' not in request.data or not request.data['bodies_id']:
+        # Prevent posts without any community
+        if 'community_id' not in request.data or not request.data['community_id']:
             return forbidden_no_privileges()
 
-        # Check privileges for all bodies
+        # Check privileges for all communities
         if all([user_has_privilege(request.user.profile, id, 'AddE')
-                for id in request.data['bodies_id']]):
+                for id in request.data['communities_id']]):
 
-            # Fill in the
-            request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])
+            """# Fill in the
+            request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])"""
             try:
-                request.data['event_interest']
+                request.data['']
                 request.data['interests_id']
             except KeyError:
                 request.data['event_interest'] = []
