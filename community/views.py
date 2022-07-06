@@ -76,7 +76,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # Check privileges for all communities
         if all([user_has_privilege(request.user.profile, id, 'AddE')
-                for id in request.data['communities_id']]):
+                for id in request.data['community_id']]):
 
             """# Fill in the
             request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])"""
