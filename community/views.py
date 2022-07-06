@@ -34,7 +34,7 @@ class PostViewSet(viewsets.ModelViewSet):
         Get by `uuid` or `str_id`"""
 
         self.queryset = CommunityPostSerializers.setup_eager_loading(self.queryset, request)
-        post = self.get_event(pk)
+        post = self.get_community_post(pk)
         serialized = CommunityPostSerializers(post, context={'request': request}).data
 
         return Response(serialized)
@@ -44,7 +44,7 @@ class PostViewSet(viewsets.ModelViewSet):
         Get by `uuid` or `str_id`"""
 
         self.queryset = CommunityPostSerializerMin.setup_eager_loading(self.queryset, request)
-        post = self.get_event(pk)
+        post = self.get_community_post(pk)
         serialized = CommunityPostSerializerMin(post, context={'request': request}).data
 
         return Response(serialized)
@@ -103,7 +103,7 @@ class PostViewSet(viewsets.ModelViewSet):
             return forbidden_no_privileges()
 
         # Get the event currently in database
-        event = self.get_event(pk)
+        event = self.get_community_post(pk)
 
         # Check if difference in bodies is valid
         if not can_update_bodies(request.data['bodies_id'], event, request.user.profile):
@@ -126,15 +126,15 @@ class PostViewSet(viewsets.ModelViewSet):
         """Delete Event.
         Needs `DelE` permission for all associated bodies."""
 
-        event = self.get_event(pk)
+        event = self.get_community_post(pk)
         if all([user_has_privilege(request.user.profile, str(body.id), 'DelE')
                 for body in event.bodies.all()]):
             return super().destroy(request, pk)
 
         return forbidden_no_privileges()
 
-    def get_event(self, pk):
-        """Get an event from pk uuid or strid."""
+    def get_community_post(self, pk):
+        """Get a community post from pk uuid or strid."""
         try:
             UUID(pk, version=4)
             return get_object_or_404(self.queryset, id=pk)

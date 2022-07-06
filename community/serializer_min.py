@@ -48,6 +48,16 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
         return obj.image_url.split(',')
 
     @staticmethod
+    def setup_eager_loading(queryset, request):
+        """Perform necessary eager loading of data."""
+
+        # Prefetch body child relations
+
+        # Annotate followers count
+
+        return queryset
+
+    @staticmethod
     def get_reactions_count(obj):
         """Get number of user reactions on community post item."""
         # Get all UNR for news item
