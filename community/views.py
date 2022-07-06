@@ -1,5 +1,10 @@
+from collections import UserList
 from pickle import GET
+from unicodedata import name
 from uuid import UUID
+from bodies.models import Body
+from users.models import UserProfile
+from locations.models import Location
 from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
@@ -64,7 +69,6 @@ class PostViewSet(viewsets.ModelViewSet):
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
-
     @login_required_ajax
     def create(self, request):
         """Create Post.
@@ -75,17 +79,22 @@ class PostViewSet(viewsets.ModelViewSet):
             return forbidden_no_privileges()
 
         # Check privileges for all communities
-        if all([user_has_privilege(request.user.profile, id, 'AddE')
-                for id in request.data['community_id']]):
-
+        if all(user_has_privilege(request.user.profile, id, 'AddE')):
             """# Fill in the
             request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])"""
             try:
-                request.data['']
-                request.data['interests_id']
+                request.data["content"]
+                if request.data["tag_user_call"]:
+                     request.data["tag_user_call"]=UserProfile.objects.get(name)
+                if request.data["tag_body_call"]:
+                     print(Body.objects.get(name))
+                if request.data["tag_location_call"]:
+                     print(Location.objects.get(name))
             except KeyError:
-                request.data['event_interest'] = []
-                request.data['interests_id'] = []
+                request.data['content'] = []
+                request.data['tag_user_call'] = []
+                request.data["tag_body_call"]=[]
+                request.data["tag_location_call"]=[]
 
             return super().create(request)
 
