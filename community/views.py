@@ -53,11 +53,6 @@ class PostViewSet(viewsets.ModelViewSet):
         List fresh posts arranged chronologiaclly for the current user."""
 
         # Check for time and date filtered query params
-        create_time = request.GET.get('created')
-        update_time = request.GET.get('updated')
-        
-        if update_time is None:
-            update_time = create_time
 
         Queryset = CommunityPost.objects.all()
         
