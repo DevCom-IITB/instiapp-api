@@ -78,8 +78,8 @@ class PostViewSet(viewsets.ModelViewSet):
         if all([user_has_privilege(request.user.profile, id, 'AddE')
                 for id in request.data['community_id']]):
 
-            """# Fill in the
-            request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])"""
+            """# Fill in the"""
+            request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])
             try:
                 request.data['']
                 request.data['interests_id']

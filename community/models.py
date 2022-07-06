@@ -40,7 +40,7 @@ class CommunityPost(models.Model):
         related_name='communitypost_reaction', blank=True)
     view_count = models.IntegerField(default=0)
 
-    community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='posts')
+    community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='posts', null=True, blank=True)
 
     thread_rank = models.IntegerField(default=1)
     parent = models.ForeignKey("self", blank=True, null=True,
