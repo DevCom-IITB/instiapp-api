@@ -12,7 +12,7 @@ urlpatterns = [
     })),
 
     path('communityposts', PostViewSet.as_view({
-        'get': 'list',
+        'get': 'list','post': 'create'
     })),
 
     path('communitiesposts/<pk>', PostViewSet.as_view({
