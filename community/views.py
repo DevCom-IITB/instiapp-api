@@ -100,29 +100,35 @@ class PostViewSet(viewsets.ModelViewSet):
         
     @login_required_ajax
     def update(self, request, pk):
-        """Update Event.
+        """Update Posts.
         Needs BodyRole with `UpdE` for at least one associated body.
         Disassociating bodies from the event requires the `DelE`
         permission and associating needs `AddE`"""
 
         # Prevent events without any body
-        if 'bodies_id' not in request.data or not request.data['bodies_id']:
+        if 'community_id' not in request.data or not request.data['community_id']:
             return forbidden_no_privileges()
 
         # Get the event currently in database
-        event = self.get_community_post(pk)
+        post = self.get_community_post(pk)
 
         # Check if difference in bodies is valid
-        if not can_update_bodies(request.data['bodies_id'], event, request.user.profile):
+        if not can_update_bodies(request.data['community_id'], post, request.user.profile):
             return forbidden_no_privileges()
 
         try:
-            request.data['event_interest']
-            request.data['interests_id']
+            request.data["content"]
+            if request.data["tag_user_call"]:
+                 request.data["tag_user_call"]=UserProfile.objects.get(name)                
+            if request.data["tag_body_call"]:
+                 print(Body.objects.get(name))
+            if request.data["tag_location_call"]:
+                 print(Location.objects.get(name))
         except KeyError:
-            request.data['event_interest'] = []
-            request.data['interests_id'] = []
-
+            request.data['content'] = []
+            request.data['tag_user_call'] = []
+            request.data["tag_body_call"]=[]
+            request.data["tag_location_call"]=[]
         return super().update(request, pk)
 
     @login_required_ajax
@@ -185,11 +191,6 @@ def get_update_venue_ids(venue_names, event):
 class CommunityViewSet(viewsets.ModelViewSet):
     queryset = Community.objects
     serializer_class = CommunitySerializers
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> 5880015eba93eaff1a5dda636028ec8f78281b4a
     def get_serializer_context(self):
         return super().get_serializer_context()
 
