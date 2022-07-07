@@ -14,7 +14,7 @@ class Community(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE, related_name='community_body', null=True)
-
+    followers = models.IntegerField(default=0)
     def __str__(self):
         return self.name
 
