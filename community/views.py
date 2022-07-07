@@ -227,3 +227,19 @@ class CommunityViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
+
+    def get_community(self, pk):
+        """Get a community from pk uuid or strid."""
+        try:
+            UUID(pk, version=4)
+            return get_object_or_404(self.queryset, id=pk)
+        except ValueError:
+            return get_object_or_404(self.queryset, str_id=pk)
+
+    @login_required_ajax
+    def join_community(self, request, pk):
+        '''Function to let user join a community'''
+        if self.get_community(pk):
+            community = self.get_community(pk)
+            community.followers +=1
+            self.user.followers_Community += self.get_community(pk)
