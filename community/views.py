@@ -24,13 +24,17 @@ from locations.helpers import create_unreusable_locations
 from helpers.misc import query_from_num
 from helpers.misc import query_search
 
+class ModeratorViewSet(viewsets.ModelViewSet):
+    queryset = CommunityPost.objects
+    serializer_class = CommunityPostSerializers
+    serializer_class_min = CommunityPostSerializerMin
+    
 class PostViewSet(viewsets.ModelViewSet):
     """Post"""
 
     queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
     serializer_class_min = CommunityPostSerializerMin
-
     def get_serializer_context(self):
         return {'request': self.request}
 
@@ -62,7 +66,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         Queryset = CommunityPost.objects.all()
         
-        queryset = sorted(Queryset, key=lambda post: post.updated_at , reverse=True)
+        queryset = sorted(Queryset, key=lambda post: post.time_of_modification , reverse=True)
         queryset = query_from_num(request, 20, queryset)
 
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
