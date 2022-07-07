@@ -116,9 +116,6 @@ class PostViewSet(viewsets.ModelViewSet):
         if not can_update_bodies(request.data['community_id'],post, request.user.profile):
             return forbidden_no_privileges()
 
-        # Create added unreusable venues, unlink deleted ones
-        request.data['venue_ids'] = get_update_venue_ids(request.data['venue_names'], event)
-
         try:
             request.data["content"]
             if request.data["tag_user_call"]:
@@ -196,9 +193,6 @@ def get_update_venue_ids(venue_names, event):
 class CommunityViewSet(viewsets.ModelViewSet):
     queryset = Community.objects
     serializer_class = CommunitySerializers
-    
-    @login_required_ajax
-    def join_community():
         
     def get_serializer_context(self):
         return super().get_serializer_context()
@@ -227,19 +221,3 @@ class CommunityViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
-
-    def get_community(self, pk):
-        """Get a community from pk uuid or strid."""
-        try:
-            UUID(pk, version=4)
-            return get_object_or_404(self.queryset, id=pk)
-        except ValueError:
-            return get_object_or_404(self.queryset, str_id=pk)
-
-    @login_required_ajax
-    def join_community(self, request, pk):
-        '''Function to let user join a community'''
-        if self.get_community(pk):
-            community = self.get_community(pk)
-            community.followers +=1
-            self.user.followers_Community += self.get_community(pk)
