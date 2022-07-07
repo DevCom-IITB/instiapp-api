@@ -81,29 +81,23 @@ class PostViewSet(viewsets.ModelViewSet):
         # Prevent posts without any community
         if 'community_id' not in request.data or not request.data['community_id']:
             return forbidden_no_privileges()
+        try:
+            request.data["content"]
+            if request.data["tag_user_call"]:
+                 request.data["tag_user_call"]=UserProfile.objects.get(name)                
+            if request.data["tag_body_call"]:
+                 print(Body.objects.get(name))
+            if request.data["tag_location_call"]:
+                 print(Location.objects.get(name))            
+        except KeyError:
+            request.data['content'] = []
+            request.data['tag_user_call'] = []
+            request.data["tag_body_call"]=[]
+            request.data["tag_location_call"]=[]
 
-        # Check privileges for all communities
-        if all(user_has_privilege(request.user.profile, id, 'AddE')):
-            """# Fill in the
-            request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])"""
-            try:
-                request.data["content"]
-                if request.data["tag_user_call"]:
-                     request.data["tag_user_call"]=UserProfile.objects.get(name)
-                if request.data["tag_body_call"]:
-                     print(Body.objects.get(name))
-                if request.data["tag_location_call"]:
-                     print(Location.objects.get(name))
-            except KeyError:
-                request.data['content'] = []
-                request.data['tag_user_call'] = []
-                request.data["tag_body_call"]=[]
-                request.data["tag_location_call"]=[]
+        return super().create(request)
 
-            return super().create(request)
-
-        return forbidden_no_privileges()
-
+        
     @login_required_ajax
     def update(self, request, pk):
         """Update Event.
