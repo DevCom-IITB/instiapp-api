@@ -60,9 +60,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # Check for time and date filtered query params
 
-        Queryset = CommunityPost.objects.all()
+        Queryset = CommunityPost.objects.all().order_by("-time_of_modification")
         
-        queryset = sorted(Queryset, key=lambda post: post.updated_at , reverse=True)
+        queryset = sorted(Queryset, key=lambda post: post.time_of_modification , reverse=True)
         queryset = query_from_num(request, 20, queryset)
 
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})

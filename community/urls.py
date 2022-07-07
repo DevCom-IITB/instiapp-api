@@ -11,7 +11,7 @@ urlpatterns = [
         'get': 'retrieve',
     })),
 
-    path('communitieposts', PostViewSet.as_view({
+    path('communityposts', PostViewSet.as_view({
         'get': 'list',
     })),
 
