@@ -25,7 +25,6 @@ from helpers.misc import query_from_num
 from helpers.misc import query_search
 
 class ModeratorViewSet(viewsets.ModelViewSet):
-    queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
     serializer_class_min = CommunityPostSerializerMin
     @login_required_ajax
@@ -33,6 +32,26 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
         for post in CommunityPost.objects.all():
             return super().destroy(request, pk)
+    def update_post(self,request,pk):
+        post = self.get_community_post(pk)
+        for post in CommunityPost.objects.all():
+            if 'community_id' not in request.data or not request.data['community_id']:
+                return forbidden_no_privileges()
+            try:
+                request.data["content"]
+                if request.data["tag_user_call"]:
+                     request.data["tag_user_call"]=UserProfile.objects.get(name)                
+                if request.data["tag_body_call"]:
+                     request.data["tag_body_call"]=Body.objects.get(name) 
+                if request.data["tag_location_call"]:
+                     request.data["tag_location_call"]=Location.objects.get(name) 
+            except KeyError:
+                request.data['content'] = []
+                request.data['tag_user_call'] = []
+                request.data["tag_body_call"]=[]
+                request.data["tag_location_call"]=[]
+            return super().update(request, pk)
+
 
     
 class PostViewSet(viewsets.ModelViewSet):
