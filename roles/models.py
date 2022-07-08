@@ -12,6 +12,8 @@ PERMISSION_CHOICES = (
     ('VerA', 'Verify Achievements'),
     ('ModP', 'Moderate Post'),
     ('ModC', 'Moderate Comment'),
+    ('DelP', 'Delete Post'),
+    ('DelC', 'Delete Comment')
 )
 
 class BodyRole(models.Model):
