@@ -101,7 +101,7 @@ class PostViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def update(self, request, pk):
         """Update Posts.
-        Needs BodyRole with `ModC` for at least one associated community.
+        Needs BodyRole with `AddP` for at least one associated community.
         Disassociating bodies from the event requires the `DelP`
         permission and associating needs `ModP`"""
 
@@ -133,18 +133,26 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @login_required_ajax
     def destroy(self, request, pk):
-        """Delete Event.
-        Needs `DelE` permission for all associated bodies."""
+        """Delete Posts.
+        Needs `DelP` permission for all associated bodies."""
 
-        event = self.get_community_post(pk)
-        if all([user_has_privilege(request.user.profile, str(body.id), 'DelE')
-                for body in event.bodies.all()]):
+        post = self.get_community_post(pk)
+        if all([user_has_privilege(request.user.profile, str(community.id), 'DelP')
+                for community in post.community.all()]):
             return super().destroy(request, pk)
 
         return forbidden_no_privileges()
 
     def get_community_post(self, pk):
         """Get a community post from pk uuid or strid."""
+        try:
+            UUID(pk, version=4)
+            return get_object_or_404(self.queryset, id=pk)
+        except ValueError:
+            return get_object_or_404(self.queryset, str_id=pk)
+
+    def get_community_post_comment(self, pk):
+        """Get a community post comment from pk uuid or strid."""
         try:
             UUID(pk, version=4)
             return get_object_or_404(self.queryset, id=pk)
@@ -206,13 +214,13 @@ class CommunityViewSet(viewsets.ModelViewSet):
         self.queryset = CommunitySerializers.setup_eager_loading(self.queryset, request)
 
         # Try UUID or fall back to str_id
-        body = self.get_body(pk)
+        body = self.get_community(pk)
 
         # Serialize the body
         serialized = CommunitySerializers(body, context={'request': request}).data
         return Response(serialized)
 
-    def get_body(self, pk):
+    def get_community(self, pk):
         try:
             UUID(pk, version=4)
             return get_object_or_404(self.queryset, id=pk)
