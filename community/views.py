@@ -28,6 +28,12 @@ class ModeratorViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
     serializer_class_min = CommunityPostSerializerMin
+    @login_required_ajax
+    def Delete_post(self,request,pk):
+        post = self.get_community_post(pk)
+        for post in CommunityPost.objects.all():
+            return super().destroy(request, pk)
+
     
 class PostViewSet(viewsets.ModelViewSet):
     """Post"""
