@@ -101,7 +101,7 @@ class PostViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def update(self, request, pk):
         """Update Posts.
-        Needs BodyRole with `UpdE` for at least one associated body.
+        Needs BodyRole with `ModC` for at least one associated community.
         Disassociating bodies from the event requires the `DelE`
         permission and associating needs `AddE`"""
 
