@@ -86,9 +86,9 @@ class PostViewSet(viewsets.ModelViewSet):
             if request.data["tag_user_call"]:
                  request.data["tag_user_call"]=UserProfile.objects.get(name)                
             if request.data["tag_body_call"]:
-                 print(Body.objects.get(name))
+                 request.data["tag_body_call"]=Body.objects.get(name) 
             if request.data["tag_location_call"]:
-                 print(Location.objects.get(name))            
+                 request.data["tag_location_call"]=Location.objects.get(name)             
         except KeyError:
             request.data['content'] = []
             request.data['tag_user_call'] = []
@@ -102,8 +102,8 @@ class PostViewSet(viewsets.ModelViewSet):
     def update(self, request, pk):
         """Update Posts.
         Needs BodyRole with `ModC` for at least one associated community.
-        Disassociating bodies from the event requires the `DelE`
-        permission and associating needs `AddE`"""
+        Disassociating bodies from the event requires the `DelP`
+        permission and associating needs `ModP`"""
 
         # Prevent events without any body
         if 'community_id' not in request.data or not request.data['community_id']:
@@ -121,9 +121,9 @@ class PostViewSet(viewsets.ModelViewSet):
             if request.data["tag_user_call"]:
                  request.data["tag_user_call"]=UserProfile.objects.get(name)                
             if request.data["tag_body_call"]:
-                 print(Body.objects.get(name))
+                 request.data["tag_body_call"]=Body.objects.get(name) 
             if request.data["tag_location_call"]:
-                 print(Location.objects.get(name))
+                 request.data["tag_location_call"]=Location.objects.get(name) 
         except KeyError:
             request.data['content'] = []
             request.data['tag_user_call'] = []
