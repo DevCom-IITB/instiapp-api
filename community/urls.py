@@ -12,10 +12,18 @@ urlpatterns = [
     })),#viewing a particular community
 
     path('communityposts', PostViewSet.as_view({
-        'get': 'list','post': 'create','put': 'update'
+        'get': 'list','post': 'create','put': 'update','delete': 'destroy'
     })),#viewing the list of posts in their minimum view
 
-    path('communitiesposts/<pk>', PostViewSet.as_view({
-        'get': 'retrieve_full',
+    path('communityposts/<pk>', PostViewSet.as_view({
+        'get': 'retrieve_full','delete': 'destroy'
+    })),#to get the full view of a post
+
+    path('communitypostcomments', PostViewSet.as_view({
+        'post': 'create_comment','put': 'update_comment', 'delete': 'destroy'
+    })),#updating a comment and creating one
+
+    path('communitiespostcomments/<pk>', PostViewSet.as_view({
+        'delete': 'destroy'
     })),#to get the full view of a post
 ]

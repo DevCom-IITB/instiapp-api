@@ -102,6 +102,9 @@ class PostViewSet(viewsets.ModelViewSet):
         if 'community_id' not in request.data or not request.data['community_id']:
             return forbidden_no_privileges()
         try:
+            request.data["status"]=0
+            request.data["thread_rank"]=1
+            request.data["parent"]=None
             request.data["content"]
             if request.data["tag_user_call"]:
                  request.data["tag_user_call"]=UserProfile.objects.get(name)                
@@ -118,16 +121,19 @@ class PostViewSet(viewsets.ModelViewSet):
         return super().create(request)
 
     @login_required_ajax
-    def create_comment(self, request,pk1,pk2):
+    def create_comment(self, request,pk):
         """Create Post comment.
         Needs `AddC` permission for each body to be associated."""
 
         # Prevent posts without any community
         if 'community_id' not in request.data or not request.data['community_id']:
             return forbidden_no_privileges()
-        post = self.get_community_post(pk1)
-        comment = self.get_community_post_comment(pk2)
+        parent = self.get_community_post(pk)
         try:
+            request.data["status"]=0
+            
+            request.data["parent"]=parent
+            request.data["thread_rank"]=parent.thread_rank +1
             request.data["content"]
             if request.data["tag_user_call"]:
                  request.data["tag_user_call"]=UserProfile.objects.get(name)                
@@ -158,7 +164,7 @@ class PostViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
 
         # Check if difference in bodies is valid
-        if not can_update_bodies(request.data['community_id'], post, request.user.profile):
+        if not can_update_communities(request.data['community_id'], post, request.user.profile):
             return forbidden_no_privileges()
 
         try:
@@ -176,6 +182,40 @@ class PostViewSet(viewsets.ModelViewSet):
             request.data["tag_location_call"]=[]
         return super().update(request, pk)
 
+    @login_required_ajax
+    def update_comment(self, request,pk1,pk2):
+        """Create Post comment.
+        Needs `AddC` permission for each body to be associated."""
+
+        # Prevent posts without any community
+        if 'community_id' not in request.data or not request.data['community_id']:
+            return forbidden_no_privileges()
+        parent = self.get_community_post(pk1)
+        comment = self.get_community_post_comment(pk2)
+
+        if not can_update_communities(request.data['community_id'], comment, request.user.profile):
+            return forbidden_no_privileges()
+        
+        try:
+            request.data["status"]=0
+            
+            request.data["parent"]=parent
+            request.data["thread_rank"]=parent.thread_rank +1
+            request.data["content"]
+            if request.data["tag_user_call"]:
+                 request.data["tag_user_call"]=UserProfile.objects.get(name)                
+            if request.data["tag_body_call"]:
+                 request.data["tag_body_call"]=Body.objects.get(name) 
+            if request.data["tag_location_call"]:
+                 request.data["tag_location_call"]=Location.objects.get(name)             
+        except KeyError:
+            request.data['content'] = []
+            request.data['tag_user_call'] = []
+            request.data["tag_body_call"]=[]
+            request.data["tag_location_call"]=[]
+
+        return super().create(request,pk1,pk2)
+    
     @login_required_ajax
     def destroy(self, request, pk):
         """Delete Posts.
