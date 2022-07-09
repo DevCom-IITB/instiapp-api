@@ -76,7 +76,7 @@ class PostViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def create(self, request):
         """Create Post.
-        Needs `AddE` permission for each body to be associated."""
+        Needs `AddP` permission for each body to be associated."""
 
         # Prevent posts without any community
         if 'community_id' not in request.data or not request.data['community_id']:
@@ -97,6 +97,31 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return super().create(request)
 
+    @login_required_ajax
+    def create_comment(self, request,pk1,pk2):
+        """Create Post comment.
+        Needs `AddC` permission for each body to be associated."""
+
+        # Prevent posts without any community
+        if 'community_id' not in request.data or not request.data['community_id']:
+            return forbidden_no_privileges()
+        post = self.get_community_post(pk1)
+        comment = self.get_community_post_comment(pk2)
+        try:
+            request.data["content"]
+            if request.data["tag_user_call"]:
+                 request.data["tag_user_call"]=UserProfile.objects.get(name)                
+            if request.data["tag_body_call"]:
+                 request.data["tag_body_call"]=Body.objects.get(name) 
+            if request.data["tag_location_call"]:
+                 request.data["tag_location_call"]=Location.objects.get(name)             
+        except KeyError:
+            request.data['content'] = []
+            request.data['tag_user_call'] = []
+            request.data["tag_body_call"]=[]
+            request.data["tag_location_call"]=[]
+
+        return super().create(request)
         
     @login_required_ajax
     def update(self, request, pk):
@@ -160,7 +185,7 @@ class PostViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, str_id=pk)
 
 
-def can_update_bodies(new_bodies_id, event, profile):
+def can_update_communities(new_bodies_id, event, profile):
     """Check if the user is permitted to change the event bodies to ones given."""
 
     # Get current and difference in body ids
