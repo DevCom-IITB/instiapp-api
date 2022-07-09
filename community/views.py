@@ -18,6 +18,7 @@ from events.serializers import EventSerializer
 from events.serializers import EventFullSerializer
 from events.models import Event
 from roles.helpers import user_has_privilege
+from roles.helpers import user_has_community_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
@@ -37,31 +38,17 @@ class ModeratorViewSet(viewsets.ModelViewSet):
 
     @login_required_ajax
     def Delete_post(self,request,pk):
-        post = self.get_community_post(pk)
-        if post in CommunityPost.objects.all():
-            return super().destroy(request, pk)
+        if all([user_has_privilege(request.user.profile, id, 'ModP')]):
+            post = self.get_community_post(pk)
+            if post in CommunityPost.objects.all():
+                return super().destroy(request, pk)
     @login_required_ajax
     def update_post(self,request,pk):
         post = self.get_community_post(pk)
         if 'community_id' not in request.data or not request.data['community_id']:
             return forbidden_no_privileges()
-        try:
-            request.data["content"]
-            if request.data["tag_user_call"]:
-                 request.data["tag_user_call"]=UserProfile.objects.get(name)                
-            if request.data["tag_body_call"]:
-                 request.data["tag_body_call"]=Body.objects.get(name) 
-            if request.data["tag_location_call"]:
-                 request.data["tag_location_call"]=Location.objects.get(name) 
-        except KeyError:
-            request.data['content'] = []
-            request.data['tag_user_call'] = []
-            request.data["tag_body_call"]=[]
-            request.data["tag_location_call"]=[]
-        return super().update(request, pk)
+        CommunityPost.status=0
 
-
-    
 class PostViewSet(viewsets.ModelViewSet):
     """Post"""
 
