@@ -27,30 +27,38 @@ from helpers.misc import query_search
 class ModeratorViewSet(viewsets.ModelViewSet):
     serializer_class = CommunityPostSerializers
     serializer_class_min = CommunityPostSerializerMin
+    def get_community_post(self, pk):
+        """Get a community post from pk uuid or strid."""
+        try:
+            UUID(pk, version=4)
+            return get_object_or_404(self.queryset, id=pk)
+        except ValueError:
+            return get_object_or_404(self.queryset, str_id=pk)
+
     @login_required_ajax
     def Delete_post(self,request,pk):
         post = self.get_community_post(pk)
-        for post in CommunityPost.objects.all():
+        if post in CommunityPost.objects.all():
             return super().destroy(request, pk)
+    @login_required_ajax
     def update_post(self,request,pk):
         post = self.get_community_post(pk)
-        for post in CommunityPost.objects.all():
-            if 'community_id' not in request.data or not request.data['community_id']:
-                return forbidden_no_privileges()
-            try:
-                request.data["content"]
-                if request.data["tag_user_call"]:
-                     request.data["tag_user_call"]=UserProfile.objects.get(name)                
-                if request.data["tag_body_call"]:
-                     request.data["tag_body_call"]=Body.objects.get(name) 
-                if request.data["tag_location_call"]:
-                     request.data["tag_location_call"]=Location.objects.get(name) 
-            except KeyError:
-                request.data['content'] = []
-                request.data['tag_user_call'] = []
-                request.data["tag_body_call"]=[]
-                request.data["tag_location_call"]=[]
-            return super().update(request, pk)
+        if 'community_id' not in request.data or not request.data['community_id']:
+            return forbidden_no_privileges()
+        try:
+            request.data["content"]
+            if request.data["tag_user_call"]:
+                 request.data["tag_user_call"]=UserProfile.objects.get(name)                
+            if request.data["tag_body_call"]:
+                 request.data["tag_body_call"]=Body.objects.get(name) 
+            if request.data["tag_location_call"]:
+                 request.data["tag_location_call"]=Location.objects.get(name) 
+        except KeyError:
+            request.data['content'] = []
+            request.data['tag_user_call'] = []
+            request.data["tag_body_call"]=[]
+            request.data["tag_location_call"]=[]
+        return super().update(request, pk)
 
 
     
