@@ -311,3 +311,10 @@ class CommunityViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
+
+    @login_required_ajax
+    def join(self,request,pk):
+        if request.data["join_community"] and self.get_community(pk):
+            user =request.user.profile
+            user.followed_communities.append(self.get_community(pk).name)
+            self.get_community(pk).followers+=1
