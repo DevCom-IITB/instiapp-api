@@ -94,7 +94,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return Response({'count': len(data), 'data': data})
     @login_required_ajax
-    def create(self, request):
+    def create_post(self, request):
         """Create Post.
         Needs `AddP` permission for each body to be associated."""
 
@@ -150,7 +150,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return super().create(request)
         
     @login_required_ajax
-    def update(self, request, pk):
+    def update_post(self, request, pk):
         """Update Posts.
         Needs BodyRole with `AddP` for at least one associated community.
         Disassociating bodies from the event requires the `DelP`
