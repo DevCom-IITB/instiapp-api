@@ -20,7 +20,7 @@ urlpatterns = [
     })),#to get the full view of a post
 
     path('communitypostcomments', PostViewSet.as_view({
-        'post': 'create_comment','put': 'update_comment', 'delete': 'destroy'
+        'get':'list','post': 'create_comment','put': 'update_comment', 'delete': 'destroy_comment'
     })),#updating a comment and creating one
 
     path('communitiespostcomments/<pk>', PostViewSet.as_view({
