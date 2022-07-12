@@ -93,7 +93,7 @@ class PostViewSet(viewsets.ModelViewSet):
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
-    #@login_required_ajax
+    @login_required_ajax
     def create_post(self, request):
         """Create Post.
         Needs `AddP` permission for each body to be associated."""
