@@ -84,7 +84,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # Check for time and date filtered query params
 
-        Queryset = CommunityPost.objects.all().order_by("-time_of_modification")
+        Queryset = CommunityPost.objects.filter(status=1).order_by("-time_of_modification")
         
         queryset = sorted(Queryset, key=lambda post: post.time_of_modification , reverse=True)
         queryset = query_from_num(request, 20, queryset)
@@ -93,7 +93,7 @@ class PostViewSet(viewsets.ModelViewSet):
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
-    @login_required_ajax
+    #@login_required_ajax
     def create_post(self, request):
         """Create Post.
         Needs `AddP` permission for each body to be associated."""
