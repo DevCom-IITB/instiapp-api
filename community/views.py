@@ -37,13 +37,13 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, str_id=pk)
 
     @login_required_ajax
-    def Delete_post(self,request,pk):
+    def delete(self,request,pk):
         if all([user_has_privilege(request.user.profile, id, 'ModP')]):
             post = self.get_community_post(pk)
             if post in CommunityPost.objects.all():
                 return super().destroy(request, pk)
     @login_required_ajax
-    def update_post(self,request,pk):
+    def update(self,request,pk):
         post = self.get_community_post(pk)
         if 'community_id' not in request.data or not request.data['community_id']:
             return forbidden_no_privileges()
@@ -134,20 +134,18 @@ class PostViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
 
         # Check if difference in bodies is valid
-        if not can_update_communities(request.data['community_id'], post, request.user.profile):
-            return forbidden_no_privileges()
 
         try:
-            request.data["content"]
-            request.data["tag_user_call"]                
-            request.data["tag_body_call"]
-            request.data["tag_location_call"]
+            post.content=request.data["content"]
+            post.tag_user=request.data["tag_user_call"]                
+            post.tag_body=request.data["tag_body_call"]
+            post.tag_location=request.data["tag_location_call"]
         except KeyError:
-            request.data['content'] = []
+            request.data['content']= []
             request.data['tag_user_call'] = []
             request.data["tag_body_call"]=[]
             request.data["tag_location_call"]=[]
-        return super().update(request, pk)
+        return super().update(post, pk)
 
    
     @login_required_ajax
@@ -183,7 +181,7 @@ def can_update_communities(new_communities_id,post, profile):
     """Check if the user is permitted to change the event bodies to ones given."""
 
     # Get current and difference in body ids
-    old_communities_id = [str(x.id) for x in post..all()]
+    old_communities_id = [str(x.id) for x in post.all()]
     added_bodies = diff_set(new_bodies_id, old_bodies_id)
     removed_bodies = diff_set(old_bodies_id, new_bodies_id)
 

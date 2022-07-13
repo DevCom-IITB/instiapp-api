@@ -1,11 +1,15 @@
-"""URLs for placments."""
+"""URLs for communities."""
 from django.urls import path
-from community.views import CommunityViewSet,PostViewSet
+from community.views import CommunityViewSet,PostViewSet,ModeratorViewSet
 
 urlpatterns = [
     path('communities', CommunityViewSet.as_view({
         'get': 'list',
     })),#viewing the list of communities
+    path('communitymoderators',ModeratorViewSet.as_view({
+        'put':'update','delete':'delete'
+    })),#verification by moderators
+
 
     path('communities/<pk>', CommunityViewSet.as_view({
         'get': 'retrieve',
