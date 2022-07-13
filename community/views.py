@@ -47,7 +47,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
         if 'community_id' not in request.data or not request.data['community_id']:
             return forbidden_no_privileges()
-        CommunityPost.status=0
+        post.status=0
 
 class PostViewSet(viewsets.ModelViewSet):
     """Post"""
@@ -97,10 +97,11 @@ class PostViewSet(viewsets.ModelViewSet):
     def create_post(self, request):
         """Create Post.
         Needs `AddP` permission for each body to be associated."""
-
         # Prevent posts without any community
         if 'community_id' not in request.data or not request.data['community_id']:
             return forbidden_no_privileges()
+        user=request.user.profile
+        print(user)
         try:
             request.data["status"]=0
             request.data["thread_rank"]=1
@@ -133,7 +134,7 @@ class PostViewSet(viewsets.ModelViewSet):
             request.data["status"]=0
             
             request.data["parent"]=parent
-            request.data["thread_rank"]=parent.thread_rank +1
+            request.data["thread_rank"]=parent.thread_rank+1
             request.data["content"]
             if request.data["tag_user_call"]:
                  request.data["tag_user_call"]=UserProfile.objects.get(name)                
@@ -255,11 +256,11 @@ class PostViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, str_id=pk)
 
 
-def can_update_communities(new_bodies_id, event, profile):
+def can_update_communities(new_communities_id,post, profile):
     """Check if the user is permitted to change the event bodies to ones given."""
 
     # Get current and difference in body ids
-    old_bodies_id = [str(x.id) for x in event.bodies.all()]
+    old_communities_id = [str(x.id) for x in post..all()]
     added_bodies = diff_set(new_bodies_id, old_bodies_id)
     removed_bodies = diff_set(old_bodies_id, new_bodies_id)
 

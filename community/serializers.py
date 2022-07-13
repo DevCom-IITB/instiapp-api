@@ -4,13 +4,13 @@ from community.models import Community, CommunityPost
 from community.serializer_min import CommunityPostSerializerMin
 from roles.serializers import RoleSerializerMin
 
-
 class CommunitySerializers(serializers.ModelSerializer):
 
     followers_count = serializers.SerializerMethodField()
     is_user_following = serializers.SerializerMethodField()
     roles = RoleSerializerMin(many=True, read_only=True, source='body.roles')
     posts = serializers.SerializerMethodField()
+
 
     def get_posts(self, obj):
         """Get the posts of the community """
@@ -49,7 +49,7 @@ class CommunitySerializers(serializers.ModelSerializer):
 
 class CommunityPostSerializers(CommunityPostSerializerMin):
     comments = CommunityPostSerializerMin(many=True)
-
+   
     class Meta:
         model = CommunityPost
         fields = ('id', 'str_id', 'content', 'posted_by',
