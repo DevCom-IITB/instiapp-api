@@ -12,11 +12,6 @@ from community.models import Community
 from community.models import CommunityPost
 from community.serializer_min import CommunitySerializerMin,CommunityPostSerializerMin
 from community.serializers import CommunitySerializers,CommunityPostSerializers
-from events.prioritizer import get_fresh_prioritized_events
-from events.prioritizer import get_prioritized
-from events.serializers import EventSerializer
-from events.serializers import EventFullSerializer
-from events.models import Event
 from roles.helpers import user_has_privilege
 from roles.helpers import user_has_community_privilege
 from roles.helpers import login_required_ajax
@@ -85,9 +80,8 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # Check for time and date filtered query params
 
-        Queryset = CommunityPost.objects.filter(status=1).order_by("-time_of_modification")
-        
-        queryset = sorted(Queryset, key=lambda post: post.time_of_modification , reverse=True)
+        queryset = CommunityPost.objects.filter(status=1).order_by("-time_of_modification")
+        queryset = query_search(request, 3, queryset, ['content'], 'post')
         queryset = query_from_num(request, 20, queryset)
 
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
