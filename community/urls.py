@@ -6,10 +6,10 @@ urlpatterns = [
     path('communities', CommunityViewSet.as_view({
         'get': 'list',
     })),#viewing the list of communities
+    
     path('communitymoderators',ModeratorViewSet.as_view({
         'put':'update','delete':'delete'
     })),#verification by moderators
-
 
     path('communities/<pk>', CommunityViewSet.as_view({
         'get': 'retrieve',
