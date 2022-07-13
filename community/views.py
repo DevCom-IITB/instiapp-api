@@ -81,7 +81,7 @@ class PostViewSet(viewsets.ModelViewSet):
         # Check for time and date filtered query params
 
         queryset = CommunityPost.objects.filter(status=1).order_by("-time_of_modification")
-        queryset = query_search(request, 3, queryset, ['content'], 'post')
+        queryset = query_search(request, 3, queryset, ['content'], 'posts')
         queryset = query_from_num(request, 20, queryset)
 
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
@@ -216,6 +216,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = Community.objects.all()
+        queryset = query_search(request, 3, queryset, ['name'], 'communities')
         serializer = CommunitySerializerMin(queryset, many=True)
         data = serializer.data
         return Response(data)
