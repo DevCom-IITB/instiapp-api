@@ -84,7 +84,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # Check for time and date filtered query params
 
-        Queryset = CommunityPost.objects.all().order_by("-time_of_modification")
+        Queryset = CommunityPost.objects.filter(status=1).order_by("-time_of_modification")
         
         queryset = sorted(Queryset, key=lambda post: post.time_of_modification , reverse=True)
         queryset = query_from_num(request, 20, queryset)
@@ -94,7 +94,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return Response({'count': len(data), 'data': data})
     @login_required_ajax
-    def create_post(self, request):
+    def create(self, request):
         """Create Post.
         Needs `AddP` permission for each body to be associated."""
         # Prevent posts without any community
@@ -103,54 +103,23 @@ class PostViewSet(viewsets.ModelViewSet):
         user=request.user.profile
         print(user)
         try:
-            request.data["status"]=0
-            request.data["thread_rank"]=1
-            request.data["parent"]=None
+            request.data["parent"]
             request.data["content"]
-            if request.data["tag_user_call"]:
-                 request.data["tag_user_call"]=UserProfile.objects.get(name)                
-            if request.data["tag_body_call"]:
-                 request.data["tag_body_call"]=Body.objects.get(name) 
-            if request.data["tag_location_call"]:
-                 request.data["tag_location_call"]=Location.objects.get(name)             
+            request.data["tag_user_call"]             
+            request.data["tag_body_call"]
+            request.data["tag_location_call"]            
         except KeyError:
             request.data['content'] = []
+            request.data['parent'] = []
             request.data['tag_user_call'] = []
             request.data["tag_body_call"]=[]
             request.data["tag_location_call"]=[]
 
         return super().create(request)
 
+    
     @login_required_ajax
-    def create_comment(self, request,*args,**kwargs):
-        """Create Post comment.
-        Needs `AddC` permission for each body to be associated."""
-        pk=self.kwargs.get('pk')
-        # Prevent posts without any community
-        if 'community_id' not in request.data or not request.data['community_id']:
-            return forbidden_no_privileges()
-        parent = self.get_community_post(pk)
-        try:
-            request.data["status"]=0
-            
-            request.data["parent"]=parent
-            request.data["thread_rank"]=parent.thread_rank+1
-            request.data["content"]
-            if request.data["tag_user_call"]:
-                 request.data["tag_user_call"]=UserProfile.objects.get(name)                
-            if request.data["tag_body_call"]:
-                 request.data["tag_body_call"]=Body.objects.get(name) 
-            if request.data["tag_location_call"]:
-                 request.data["tag_location_call"]=Location.objects.get(name)             
-        except KeyError:
-            request.data['content'] = []
-            request.data['tag_user_call'] = []
-            request.data["tag_body_call"]=[]
-            request.data["tag_location_call"]=[]
-
-        return super().create(request)
-    @login_required_ajax
-    def update_post(self, request, *args,**kwargs):
+    def update(self, request, *args,**kwargs):
         """Update Posts.
         Needs BodyRole with `AddP` for at least one associated community.
         Disassociating bodies from the event requires the `DelP`
@@ -170,12 +139,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
         try:
             request.data["content"]
-            if request.data["tag_user_call"]:
-                 request.data["tag_user_call"]=UserProfile.objects.get(name)                
-            if request.data["tag_body_call"]:
-                 request.data["tag_body_call"]=Body.objects.get(name) 
-            if request.data["tag_location_call"]:
-                 request.data["tag_location_call"]=Location.objects.get(name) 
+            request.data["tag_user_call"]                
+            request.data["tag_body_call"]
+            request.data["tag_location_call"]
         except KeyError:
             request.data['content'] = []
             request.data['tag_user_call'] = []
@@ -183,52 +149,9 @@ class PostViewSet(viewsets.ModelViewSet):
             request.data["tag_location_call"]=[]
         return super().update(request, pk)
 
+   
     @login_required_ajax
-    def update_comment(self, request,pk1,pk2):
-        """Create Post comment.
-        Needs `AddC` permission for each body to be associated."""
-
-        # Prevent posts without any community
-        if 'community_id' not in request.data or not request.data['community_id']:
-            return forbidden_no_privileges()
-        parent = self.get_community_post(pk1)
-        comment = self.get_community_post_comment(pk2)
-
-        if not can_update_communities(request.data['community_id'], comment, request.user.profile):
-            return forbidden_no_privileges()
-        
-        try:
-            request.data["status"]=0
-            
-            request.data["parent"]=parent
-            request.data["thread_rank"]=parent.thread_rank +1
-            request.data["content"]
-            if request.data["tag_user_call"]:
-                 request.data["tag_user_call"]=UserProfile.objects.get(name)                
-            if request.data["tag_body_call"]:
-                 request.data["tag_body_call"]=Body.objects.get(name) 
-            if request.data["tag_location_call"]:
-                 request.data["tag_location_call"]=Location.objects.get(name)             
-        except KeyError:
-            request.data['content'] = []
-            request.data['tag_user_call'] = []
-            request.data["tag_body_call"]=[]
-            request.data["tag_location_call"]=[]
-
-        return super().create(request,pk1,pk2)
-    @login_required_ajax
-    def destroy_comment(self,request,pk):
-        """Delete Comments.
-        Needs `DelC` permission for all associated bodies."""
-
-        post = self.get_community_post_comment(pk)
-        if all([user_has_privilege(request.user.profile, str(community.id), 'DelP')
-                for community in post.community.all()]):
-            return super().destroy(request, pk)
-
-        return forbidden_no_privileges()
-    @login_required_ajax
-    def destroy_post(self, request, pk):
+    def destroy(self, request, pk):
         """Delete Posts.
         Needs `DelP` permission for all associated bodies."""
 
