@@ -12,10 +12,6 @@ from community.models import Community
 from community.models import CommunityPost
 from community.serializer_min import CommunitySerializerMin,CommunityPostSerializerMin
 from community.serializers import CommunitySerializers,CommunityPostSerializers
-from events.prioritizer import get_fresh_prioritized_events
-from events.prioritizer import get_prioritized
-from events.serializers import EventSerializer
-from events.serializers import EventFullSerializer
 from events.models import Event
 from roles.helpers import user_has_privilege
 from roles.helpers import user_has_community_privilege
@@ -150,9 +146,10 @@ class PostViewSet(viewsets.ModelViewSet):
 
    
     @login_required_ajax
-    def destroy(self, request, pk):
+    def destroy(self, request, *args,**kwargs):
         """Delete Posts.
         Needs `DelP` permission for all associated bodies."""
+        pk=self.kwargs.get('pk')
 
         post = self.get_community_post(pk)
         if all([user_has_privilege(request.user.profile, str(community.id), 'DelP')
@@ -168,51 +165,6 @@ class PostViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
-
-    def get_community_post_comment(self, pk):
-        """Get a community post comment from pk uuid or strid."""
-        try:
-            UUID(pk, version=4)
-            return get_object_or_404(self.queryset, id=pk)
-        except ValueError:
-            return get_object_or_404(self.queryset, str_id=pk)
-
-
-def can_update_communities(new_communities_id,post, profile):
-    """Check if the user is permitted to change the event bodies to ones given."""
-
-    # Get current and difference in body ids
-    old_communities_id = [str(x.id) for x in post.all()]
-    added_bodies = diff_set(new_bodies_id, old_bodies_id)
-    removed_bodies = diff_set(old_bodies_id, new_bodies_id)
-
-    # Check if user can add events for new bodies
-    can_add_events = all(
-        [user_has_privilege(profile, bid, 'AddE') for bid in added_bodies])
-
-    # Check if user can remove events for removed
-    can_del_events = all(
-        [user_has_privilege(profile, bid, 'DelE') for bid in removed_bodies])
-
-    # Check if the user can update event for any of the old bodies
-    can_update = any(
-        [user_has_privilege(profile, bid, 'UpdE') for bid in old_bodies_id])
-
-    return can_add_events and can_del_events and can_update
-
-def get_update_venue_ids(venue_names, event):
-    """Get venue ids with minimal object creation for updating event."""
-
-    old_venue_names = [x.name for x in event.venues.all()]
-    new_venue_names = venue_names
-    added_venues = diff_set(new_venue_names, old_venue_names)
-    common_venues = list(set(old_venue_names).intersection(new_venue_names))
-
-    common_venue_ids = [str(x.id) for x in event.venues.filter(name__in=common_venues)]
-    added_venue_ids = create_unreusable_locations(added_venues)
-
-    return added_venue_ids + common_venue_ids
-
 
 class CommunityViewSet(viewsets.ModelViewSet):
     queryset = Community.objects
