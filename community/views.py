@@ -47,7 +47,8 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
         if 'community_id' not in request.data or not request.data['community_id']:
             return forbidden_no_privileges()
-        post.status=0
+        post.status=1
+        return super().update(post , pk)
 
 class PostViewSet(viewsets.ModelViewSet):
     """Post"""
