@@ -45,6 +45,14 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         post.status=1
         return super().update(post , pk)
 
+    @login_required_ajax
+    def disapprove(self,request,pk):
+        post = self.get_community_post(pk)
+        if 'community_id' not in request.data or not request.data['community_id']:
+            return forbidden_no_privileges()
+        post.status=2
+        return super().update(post , pk)
+
 class PostViewSet(viewsets.ModelViewSet):
     """Post"""
 
