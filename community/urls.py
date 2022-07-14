@@ -18,13 +18,10 @@ urlpatterns = [
     })),#viewing reported content
     path('communityhidden_posts',ModeratorViewSet.as_view({
         'get':'hidden_posts',
-    })),
+    })),#viewing hidden posts
     path('communities/<pk>', CommunityViewSet.as_view({
         'get': 'retrieve',
     })),#viewing a particular community
-    path('communityfeatured_posts',PostViewSet.as_view({
-        'get':'featured_posts',
-    })),#for viewing featured posts
     path('communityposts', PostViewSet.as_view({
         'get': 'list','post': 'create','put': 'update','delete': 'destroy',
     })),#viewing the list of posts in their minimum view
