@@ -53,8 +53,6 @@ class ModeratorViewSet(viewsets.ModelViewSet):
                 post.status=2
             elif value == "1":
                 post.status=1
-            else:
-                return Response({"message": "Invalid Action"}, status=400)
             return super().update(post , pk)
 
 
@@ -86,6 +84,12 @@ class PostViewSet(viewsets.ModelViewSet):
         serialized = CommunityPostSerializerMin(post, context={'request': request}).data
 
         return Response(serialized)
+    def featured_posts(self,request):
+        queryset = CommunityPost.objects.filter(featured=True)
+
+        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        data = serializer.data
+        return Response({'data':data})
 
     def list(self, request):
         """List Of Posts.

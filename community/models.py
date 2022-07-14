@@ -9,7 +9,6 @@ class Community(models.Model):
     name = models.CharField(max_length=100)
     about = models.TextField()
     description = models.TextField()
-    featured=models.BooleanField(default=False)
     logo_image = models.URLField(blank=True, null=True)
     cover_image = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -40,7 +39,7 @@ class CommunityPost(models.Model):
         'users.UserProfile', through='CommunityPostUserReaction',
         related_name='communitypost_reaction', blank=True)
     view_count = models.IntegerField(default=0)
-
+    featured=models.BooleanField(default=False)
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='posts', null=True, blank=True)
 
     thread_rank = models.IntegerField(default=1)
