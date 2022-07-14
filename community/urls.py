@@ -10,12 +10,15 @@ urlpatterns = [
     path('communitymoderators',ModeratorViewSet.as_view({
         'put':'update','delete':'delete',
     })),#verification by moderators
-    path('pending_posts',ModeratorViewSet.as_view({
+    path('communitypending_posts',ModeratorViewSet.as_view({
         'get':'pending_posts',
     })),#viewing pending posts
-    path('reported_content',ModeratorViewSet.as_view({
+    path('communityreported_content',ModeratorViewSet.as_view({
         'get':'reported_content',
     })),#viewing reported content
+    path('communityhidden_posts',ModeratorViewSet.as_view({
+        'get':'hidden_posts',
+    })),
     path('communities/<pk>', CommunityViewSet.as_view({
         'get': 'retrieve',
     })),#viewing a particular community

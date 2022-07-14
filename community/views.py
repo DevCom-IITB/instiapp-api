@@ -30,6 +30,11 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
+    def hidden_posts(self,request):
+        queryset = CommunityPost.objects.filter(hidden=True)
+        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        data = serializer.data
+        return Response({'data':data})
     def pending_posts(self,request):
         queryset = CommunityPost.objects.filter(status=0)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
