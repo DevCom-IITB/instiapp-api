@@ -1,9 +1,13 @@
 from collections import Counter
+import re
 from rest_framework import serializers
 from community.models import Community, CommunityPost
 from community.serializer_min import CommunityPostSerializerMin
 from roles.serializers import RoleSerializerMin
-
+from users.models import UserProfile
+from bodies.models import Body
+from locations.models import Location
+from unicodedata import name
 
 class CommunitySerializers(serializers.ModelSerializer):
 
@@ -11,6 +15,7 @@ class CommunitySerializers(serializers.ModelSerializer):
     is_user_following = serializers.SerializerMethodField()
     roles = RoleSerializerMin(many=True, read_only=True, source='body.roles')
     posts = serializers.SerializerMethodField()
+
 
     def get_posts(self, obj):
         """Get the posts of the community """
@@ -49,9 +54,32 @@ class CommunitySerializers(serializers.ModelSerializer):
 
 class CommunityPostSerializers(CommunityPostSerializerMin):
     comments = CommunityPostSerializerMin(many=True)
-
+   
     class Meta:
         model = CommunityPost
         fields = ('id', 'str_id', 'content', 'posted_by',
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
                   'image_url', 'comments')
+
+    def create(self,validated_data):
+        validated_data["status"]=0
+        if validated_data["parent"]:
+            validated_data["thread_rank"]=self.context["parent"].thread_rank +1
+        else :
+            validated_data["thread_rank"]=1
+        if validated_data["tag_user_call"]:
+                 validated_data["tag_user_call"]=UserProfile.objects.get(name)                
+        if validated_data["tag_body_call"]:
+                 validated_data["tag_body_call"]=Body.objects.get(name) 
+        if validated_data["tag_location_call"]:
+                 validated_data["tag_location_call"]=Location.objects.get(name)
+        return super().create(validated_data)
+    
+    def update(self,validated_data,pk):
+        if validated_data["tag_user_call"]:
+                 validated_data["tag_user_call"]=UserProfile.objects.get(name)                
+        if validated_data["tag_body_call"]:
+                 validated_data["tag_body_call"]=Body.objects.get(name) 
+        if validated_data["tag_location_call"]:
+                 validated_data["tag_location_call"]=Location.objects.get(name)
+        return super().update(validated_data,pk)
