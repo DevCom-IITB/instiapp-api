@@ -53,8 +53,6 @@ class ModeratorViewSet(viewsets.ModelViewSet):
                 post.status=2
             elif value == "1":
                 post.status=1
-            else:
-                return Response({"message": "Invalid Action"}, status=400)
             return super().update(post , pk)
 
 
