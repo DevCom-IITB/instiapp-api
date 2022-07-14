@@ -9,6 +9,7 @@ class Community(models.Model):
     name = models.CharField(max_length=100)
     about = models.TextField()
     description = models.TextField()
+    featured=models.BooleanField(default=False)
     logo_image = models.URLField(blank=True, null=True)
     cover_image = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -33,7 +34,6 @@ class CommunityPost(models.Model):
     str_id = models.CharField(max_length=58, editable=False, null=True)
     time_of_creation = models.DateTimeField(auto_now_add=True)
     time_of_modification = models.DateTimeField(auto_now=True)
-
     content = models.TextField(blank=True)
     image_url = models.TextField(blank=True, null=True)
     reacted_by = models.ManyToManyField(
