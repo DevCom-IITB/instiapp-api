@@ -15,6 +15,7 @@ class Community(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE, related_name='community_body', null=True)
     followers = models.IntegerField(default=0)
+
     def __str__(self):
         return self.name
 
@@ -23,7 +24,7 @@ class Community(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = "Community" 
+        verbose_name = "Community"
         verbose_name_plural = "Communities"
         ordering = ("-created_at",)
 
@@ -64,7 +65,7 @@ class CommunityPost(models.Model):
     status = models.IntegerField()
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
-        self.str_id = get_url_friendly(self.time_of_creation) + "-" + str(self.id)[:8]
+        self.str_id = get_url_friendly(self.time_of_creation.__str__()) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
 
     class Meta:
