@@ -10,8 +10,8 @@ from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from community.models import Community
 from community.models import CommunityPost
-from community.serializer_min import CommunitySerializerMin,CommunityPostSerializerMin
-from community.serializers import CommunitySerializers,CommunityPostSerializers
+from community.serializer_min import CommunitySerializerMin, CommunityPostSerializerMin
+from community.serializers import CommunitySerializers, CommunityPostSerializers
 from roles.helpers import user_has_privilege
 from roles.helpers import user_has_community_privilege
 from roles.helpers import login_required_ajax
@@ -23,6 +23,7 @@ from helpers.misc import query_search
 class ModeratorViewSet(viewsets.ModelViewSet):
     serializer_class = CommunityPostSerializers
     serializer_class_min = CommunityPostSerializerMin
+
     def get_community_post(self, pk):
         """Get a community post from pk uuid or strid."""
         try:
@@ -30,27 +31,32 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
-    def hidden_posts(self,request):
+
+    def hidden_posts(self, request):
         queryset = CommunityPost.objects.filter(hidden=True)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
-        return Response({'data':data})
-    def pending_posts(self,request):
+        return Response({'data': data})
+
+    def pending_posts(self, request):
         queryset = CommunityPost.objects.filter(status=0)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
-        return Response({'data':data})
-    def reported_content(self,request):
+        return Response({'data': data})
+
+    def reported_content(self, request):
         queryset = CommunityPost.objects.filter(reported=True)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
-        return Response({'data':data})
-    def delete(self,request,pk):
+        return Response({'data': data})
+
+    def delete(self, request, pk):
         if all([user_has_privilege(request.user.profile, id, 'DelP')]):
             post = self.get_community_post(pk)
             if post in CommunityPost.objects.all():
                 return super().destroy(request, pk)
-    def approval(self,request,pk):
+
+    def approval(self, request, pk):
         if all([user_has_privilege(request.user.profile, id, 'AppP')]):
             post = self.get_community_post(pk)
             if 'community_id' not in request.data or not request.data['community_id']:
@@ -62,10 +68,10 @@ class ModeratorViewSet(viewsets.ModelViewSet):
 
             # Check possible actions
             if value == "0":
-                post.status=2
+                post.status = 2
             elif value == "1":
-                post.status=1
-            return super().update(post , pk)
+                post.status = 1
+            return super().update(post, pk)
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -74,6 +80,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
     serializer_class_min = CommunityPostSerializerMin
+
     def get_serializer_context(self):
         return {'request': self.request}
 
@@ -86,7 +93,7 @@ class PostViewSet(viewsets.ModelViewSet):
         serialized = CommunityPostSerializers(post, context={'request': request}).data
 
         return Response(serialized)
-    
+
     def retrieve_min(self, request, pk):
         """Get min Post.
         Get by `uuid` or `str_id`"""
@@ -96,7 +103,6 @@ class PostViewSet(viewsets.ModelViewSet):
         serialized = CommunityPostSerializerMin(post, context={'request': request}).data
 
         return Response(serialized)
-    
 
     def list(self, request):
         """List Of Posts.
@@ -112,6 +118,7 @@ class PostViewSet(viewsets.ModelViewSet):
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
+
     @login_required_ajax
     def create(self, request):
         """Create Post and Comments.
@@ -119,31 +126,29 @@ class PostViewSet(viewsets.ModelViewSet):
         # Prevent posts without any community
         if 'community' not in request.data or not request.data['community']:
             return forbidden_no_privileges()
-        user=request.user.profile
-        print(user)
-        # try:
-        #     request.data["parent"]
-        #     request.data["content"]
-        #     request.data["tag_user_call"]             
-        #     request.data["tag_body_call"]
-        #     request.data["tag_location_call"]            
-        # except KeyError:
-        #     request.data['content'] = []
-        #     request.data['parent'] = []
-        #     request.data['tag_user_call'] = []
-        #     request.data["tag_body_call"]=[]
-        #     request.data["tag_location_call"]=[]
+        user = request.user.profile
+        try:
+            request.data["parent"]
+            request.data["content"]
+            # request.data["tag_user_call"]
+            # request.data["tag_body_call"]
+            # request.data["tag_location_call"]
+        except KeyError:
+            request.data['content'] = []
+            request.data['parent'] = []
+            # request.data['tag_user_call'] = []
+            # request.data["tag_body_call"] = []
+            # request.data["tag_location_call"] = []
 
         return super().create(request)
 
-    
     @login_required_ajax
-    def update(self, request, *args,**kwargs):
+    def update(self, request, *args, **kwargs):
         """Update Posts and comments.
         Needs BodyRole with `AddP` for at least one associated community.
         Disassociating bodies from the event requires the `DelP`
         permission and associating needs `ModP`"""
-        pk=self.kwargs.get('pk')
+        pk = self.kwargs.get('pk')
 
         # Prevent events without any body
         if 'community_id' not in request.data or not request.data['community_id']:
@@ -155,23 +160,22 @@ class PostViewSet(viewsets.ModelViewSet):
         # Check if difference in bodies is valid
 
         try:
-            post.content=request.data["content"]
-            post.tag_user=request.data["tag_user_call"]                
-            post.tag_body=request.data["tag_body_call"]
-            post.tag_location=request.data["tag_location_call"]
+            post.content = request.data["content"]
+            post.tag_user = request.data["tag_user_call"]
+            post.tag_body = request.data["tag_body_call"]
+            post.tag_location = request.data["tag_location_call"]
         except KeyError:
-            request.data['content']= []
+            request.data['content'] = []
             request.data['tag_user_call'] = []
-            request.data["tag_body_call"]=[]
-            request.data["tag_location_call"]=[]
+            request.data["tag_body_call"] = []
+            request.data["tag_location_call"] = []
         return super().update(post, pk)
 
-   
     @login_required_ajax
-    def destroy(self, request, *args,**kwargs):
+    def destroy(self, request, *args, **kwargs):
         """Delete Posts and comments.
         Needs `DelP` permission for all associated bodies."""
-        pk=self.kwargs.get('pk')
+        pk = self.kwargs.get('pk')
 
         post = self.get_community_post(pk)
         if all([user_has_privilege(request.user.profile, str(community.id), 'DelP')
@@ -191,6 +195,7 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommunityViewSet(viewsets.ModelViewSet):
     queryset = Community.objects
     serializer_class = CommunitySerializers
+
     def get_serializer_context(self):
         return super().get_serializer_context()
 
@@ -221,7 +226,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, str_id=pk)
 
     @login_required_ajax
-    def join(self,request,pk):
+    def join(self, request, pk):
         """Join or Unjoin a community {?action}=0,1"""
 
         body = self.get_community(pk).body
