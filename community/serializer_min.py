@@ -45,7 +45,8 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
         """Get the image url of the community post """
-        return obj.image_url.split(',')
+        print(len(obj.image_url))
+        return obj.image_url.split(',') if obj.image_url else None
 
     @staticmethod
     def setup_eager_loading(queryset, request):
@@ -96,4 +97,4 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
         model = CommunityPost
         fields = ('id', 'str_id', 'content', 'posted_by',
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
-                  'image_url', 'most_liked_comment')
+                  'image_url', 'most_liked_comment', 'thread_rank')

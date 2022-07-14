@@ -98,7 +98,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response({'count': len(data), 'data': data})
     @login_required_ajax
     def create(self, request):
-        """Create Post.
+        """Create Post and Comments.
         Needs `AddP` permission for each body to be associated."""
         # Prevent posts without any community
         if 'community_id' not in request.data or not request.data['community_id']:
@@ -123,7 +123,7 @@ class PostViewSet(viewsets.ModelViewSet):
     
     @login_required_ajax
     def update(self, request, *args,**kwargs):
-        """Update Posts.
+        """Update Posts and comments.
         Needs BodyRole with `AddP` for at least one associated community.
         Disassociating bodies from the event requires the `DelP`
         permission and associating needs `ModP`"""
@@ -153,7 +153,7 @@ class PostViewSet(viewsets.ModelViewSet):
    
     @login_required_ajax
     def destroy(self, request, *args,**kwargs):
-        """Delete Posts.
+        """Delete Posts and comments.
         Needs `DelP` permission for all associated bodies."""
         pk=self.kwargs.get('pk')
 
