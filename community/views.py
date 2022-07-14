@@ -110,7 +110,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # Check for time and date filtered query params
 
-        queryset = CommunityPost.objects.filter(status=1).order_by("-time_of_modification")
+        queryset = CommunityPost.objects.filter(status=1, thread_rank=1).order_by("-time_of_modification")
         queryset = query_search(request, 3, queryset, ['content'], 'posts')
         queryset = query_from_num(request, 20, queryset)
 
