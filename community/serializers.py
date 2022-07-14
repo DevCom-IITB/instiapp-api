@@ -56,29 +56,55 @@ class CommunitySerializers(serializers.ModelSerializer):
 
 
 class CommunityPostSerializers(CommunityPostSerializerMin):
-    comments = CommunityPostSerializerMin(many=True)
-   
+    comments = CommunityPostSerializerMin(many=True, read_only=True)
+    reactions_count = serializers.SerializerMethodField()
+    user_reaction = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_reactions_count(obj):
+        """Get number of user reactions on news item."""
+        # Get all UNR for news item
+        unrs = obj.unr.all()
+
+        # Count for each type
+        reaction_counts = {t: 0 for t in range(0, 6)}
+        for unr in unrs:
+            if unr.reaction >= 0 and unr.reaction < 6:
+                reaction_counts[unr.reaction] += 1
+
+        return reaction_counts
+
+    def get_user_reaction(self, obj):
+        """Get the current user's reaction on the news item"""
+        request = self.context['request'] if 'request' in self.context else None
+        if request and request.user.is_authenticated:
+            profile = request.user.profile
+            return next((u.reaction for u in obj.unr.all() if u.user_id == profile.id), -1)
+        return -1
+
     class Meta:
         model = CommunityPost
         fields = ('id', 'str_id', 'content', 'posted_by',
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
-                  'image_url', 'comments')
+                  'image_url', 'comments', 'user_reaction', 'reactions_count')
 
     def create(self,validated_data):
-        
-        if validated_data["parent"]:
+        if 'parent' in validated_data and validated_data["parent"] != None:
             validated_data["thread_rank"]=self.context["parent"].thread_rank +1
             validated_data["status"]=1
-        else :
+        else:
+            validated_data['parent']=None
             validated_data["thread_rank"]=1
             validated_data["status"]=0
-        if validated_data["tag_user_call"]:
-                 validated_data["tag_user_call"]=UserProfile.objects.get(name)                
-        if validated_data["tag_body_call"]:
-                 validated_data["tag_body_call"]=Body.objects.get(name) 
-        if validated_data["tag_location_call"]:
-                 validated_data["tag_location_call"]=Location.objects.get(name)
+        validated_data['image_url'] = ",".join(validated_data["image_url"]) if 'image_url' in validated_data else ""
+        # if validated_data["tag_user_call"]:
+        #         validated_data["tag_user_call"]=UserProfile.objects.get(name)                
+        # if validated_data["tag_body_call"]:
+        #         validated_data["tag_body_call"]=Body.objects.get(name) 
+        # if validated_data["tag_location_call"]:
+        #         validated_data["tag_location_call"]=Location.objects.get(name)
         return super().create(validated_data)
+        
     
     def update(self,validated_data,pk):
         if validated_data["tag_user_call"]:
@@ -88,3 +114,6 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
         if validated_data["tag_location_call"]:
                  validated_data["tag_location_call"]=Location.objects.get(name)
         return super().update(validated_data,pk)
+
+    
+

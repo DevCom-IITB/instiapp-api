@@ -60,8 +60,6 @@ class ModeratorViewSet(viewsets.ModelViewSet):
                 post.status=2
             elif value == "1":
                 post.status=1
-            else:
-                return Response({"message": "Invalid Action"}, status=400)
             return super().update(post , pk)
 
 
@@ -114,22 +112,22 @@ class PostViewSet(viewsets.ModelViewSet):
         """Create Post and Comments.
         Needs `AddP` permission for each body to be associated."""
         # Prevent posts without any community
-        if 'community_id' not in request.data or not request.data['community_id']:
+        if 'community' not in request.data or not request.data['community']:
             return forbidden_no_privileges()
         user=request.user.profile
         print(user)
-        try:
-            request.data["parent"]
-            request.data["content"]
-            request.data["tag_user_call"]             
-            request.data["tag_body_call"]
-            request.data["tag_location_call"]            
-        except KeyError:
-            request.data['content'] = []
-            request.data['parent'] = []
-            request.data['tag_user_call'] = []
-            request.data["tag_body_call"]=[]
-            request.data["tag_location_call"]=[]
+        # try:
+        #     request.data["parent"]
+        #     request.data["content"]
+        #     request.data["tag_user_call"]             
+        #     request.data["tag_body_call"]
+        #     request.data["tag_location_call"]            
+        # except KeyError:
+        #     request.data['content'] = []
+        #     request.data['parent'] = []
+        #     request.data['tag_user_call'] = []
+        #     request.data["tag_body_call"]=[]
+        #     request.data["tag_location_call"]=[]
 
         return super().create(request)
 
