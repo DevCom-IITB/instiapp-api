@@ -14,7 +14,7 @@ urlpatterns = [
     path('communities/<pk>', CommunityViewSet.as_view({
         'get': 'retrieve',
     })),#viewing a particular community
-    path('featured_posts',PostViewSet.as_view({
+    path('communityfeatured_posts',PostViewSet.as_view({
         'get':'featured_posts',
     })),
 
