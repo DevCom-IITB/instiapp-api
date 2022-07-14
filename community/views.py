@@ -33,25 +33,30 @@ class ModeratorViewSet(viewsets.ModelViewSet):
 
     @login_required_ajax
     def delete(self,request,pk):
-        if all([user_has_privilege(request.user.profile, id, 'ModP')]):
+        if all([user_has_privilege(request.user.profile, id, 'DelP')]):
             post = self.get_community_post(pk)
             if post in CommunityPost.objects.all():
                 return super().destroy(request, pk)
     @login_required_ajax
-    def update(self,request,pk):
-        post = self.get_community_post(pk)
-        if 'community_id' not in request.data or not request.data['community_id']:
-            return forbidden_no_privileges()
-        post.status=1
-        return super().update(post , pk)
+    def approval(self,request,pk):
+        if all([user_has_privilege(request.user.profile, id, 'AppP')]):
+            post = self.get_community_post(pk)
+            if 'community_id' not in request.data or not request.data['community_id']:
+                return forbidden_no_privileges()
+            # Get query param
+            value = request.GET.get("action")
+            if value is None:
+                return Response({"message": "{?action} is required"}, status=400)
 
-    @login_required_ajax
-    def disapprove(self,request,pk):
-        post = self.get_community_post(pk)
-        if 'community_id' not in request.data or not request.data['community_id']:
-            return forbidden_no_privileges()
-        post.status=2
-        return super().update(post , pk)
+            # Check possible actions
+            if value == "0":
+                post.status=2
+            elif value == "1":
+                post.status=1
+            else:
+                return Response({"message": "Invalid Action"}, status=400)
+            return super().update(post , pk)
+
 
 class PostViewSet(viewsets.ModelViewSet):
     """Post"""
