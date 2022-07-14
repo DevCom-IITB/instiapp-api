@@ -16,7 +16,7 @@ urlpatterns = [
     })),#viewing a particular community
 
     path('communityposts', PostViewSet.as_view({
-        'get': 'list','post': 'create','put': 'update','delete': 'destroy'
+        'get': 'list','post': 'create','put': 'update','delete': 'destroy','get':'featured_posts'
     })),#viewing the list of posts in their minimum view
 
     path('communityposts/<pk>', PostViewSet.as_view({

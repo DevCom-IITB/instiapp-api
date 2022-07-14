@@ -101,6 +101,13 @@ class PostViewSet(viewsets.ModelViewSet):
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
+    def featured_posts(self,request):
+        queryset = CommunityPost.objects.filter(featured=True)
+
+        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        data = serializer.data
+        return Response({'data':data})
+
     @login_required_ajax
     def create(self, request):
         """Create Post and Comments.
