@@ -8,16 +8,20 @@ urlpatterns = [
     })),#viewing the list of communities
     
     path('communitymoderators',ModeratorViewSet.as_view({
-        'put':'update','delete':'delete'
+        'put':'update','delete':'delete',
     })),#verification by moderators
-
+    path('pending_posts',ModeratorViewSet.as_view({
+        'get':'pending_posts',
+    })),#viewing pending posts
+    path('reported_content',ModeratorViewSet.as_view({
+        'get':'reported_content',
+    })),#viewing reported content
     path('communities/<pk>', CommunityViewSet.as_view({
         'get': 'retrieve',
     })),#viewing a particular community
     path('featured_posts',PostViewSet.as_view({
         'get':'featured_posts',
-    })),
-
+    })),#for viewing featured posts
     path('communityposts', PostViewSet.as_view({
         'get': 'list','post': 'create','put': 'update','delete': 'destroy',
     })),#viewing the list of posts in their minimum view

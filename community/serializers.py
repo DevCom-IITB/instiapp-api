@@ -15,8 +15,11 @@ class CommunitySerializers(serializers.ModelSerializer):
     is_user_following = serializers.SerializerMethodField()
     roles = RoleSerializerMin(many=True, read_only=True, source='body.roles')
     posts = serializers.SerializerMethodField()
+    def featured_posts(self,obj):
+        """Get the featured posts of community"""
+        queryset = obj.posts.filter(featured=True)
 
-
+        return CommunityPostSerializerMin(queryset, many=True).data 
     def get_posts(self, obj):
         """Get the posts of the community """
         queryset = obj.posts.filter(thread_rank=1)

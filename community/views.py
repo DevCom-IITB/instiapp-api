@@ -30,14 +30,21 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
-
-    @login_required_ajax
+    def pending_posts(self,request):
+        queryset = CommunityPost.objects.filter(status=0)
+        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        data = serializer.data
+        return Response({'data':data})
+    def reported_content(self,request):
+        queryset = CommunityPost.objects.filter(reported=True)
+        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        data = serializer.data
+        return Response({'data':data})
     def delete(self,request,pk):
         if all([user_has_privilege(request.user.profile, id, 'DelP')]):
             post = self.get_community_post(pk)
             if post in CommunityPost.objects.all():
                 return super().destroy(request, pk)
-    @login_required_ajax
     def approval(self,request,pk):
         if all([user_has_privilege(request.user.profile, id, 'AppP')]):
             post = self.get_community_post(pk)
@@ -86,12 +93,7 @@ class PostViewSet(viewsets.ModelViewSet):
         serialized = CommunityPostSerializerMin(post, context={'request': request}).data
 
         return Response(serialized)
-    def featured_posts(self,request):
-        queryset = CommunityPost.objects.filter(featured=True)
-
-        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
-        data = serializer.data
-        return Response({'data':data})
+    
 
     def list(self, request):
         """List Of Posts.
