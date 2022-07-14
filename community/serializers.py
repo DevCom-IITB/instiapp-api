@@ -15,11 +15,13 @@ class CommunitySerializers(serializers.ModelSerializer):
     is_user_following = serializers.SerializerMethodField()
     roles = RoleSerializerMin(many=True, read_only=True, source='body.roles')
     posts = serializers.SerializerMethodField()
-    def featured_posts(self,obj):
+
+    def featured_posts(self, obj):
         """Get the featured posts of community"""
         queryset = obj.posts.filter(featured=True)
 
-        return CommunityPostSerializerMin(queryset, many=True).data 
+        return CommunityPostSerializerMin(queryset, many=True).data
+
     def get_posts(self, obj):
         """Get the posts of the community """
         queryset = obj.posts.filter(thread_rank=1)
@@ -63,14 +65,14 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
     @staticmethod
     def get_reactions_count(obj):
         """Get number of user reactions on news item."""
-        # Get all UNR for news item
-        unrs = obj.unr.all()
+        # Get all UCPR for news item
+        ucprs = obj.ucpr.all()
 
         # Count for each type
         reaction_counts = {t: 0 for t in range(0, 6)}
-        for unr in unrs:
-            if unr.reaction >= 0 and unr.reaction < 6:
-                reaction_counts[unr.reaction] += 1
+        for ucpr in ucprs:
+            if ucpr.reaction >= 0 and ucpr.reaction < 6:
+                reaction_counts[ucpr.reaction] += 1
 
         return reaction_counts
 
@@ -79,7 +81,7 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
         request = self.context['request'] if 'request' in self.context else None
         if request and request.user.is_authenticated:
             profile = request.user.profile
-            return next((u.reaction for u in obj.unr.all() if u.user_id == profile.id), -1)
+            return next((u.reaction for u in obj.ucpr.all() if u.user_id == profile.id), -1)
         return -1
 
     class Meta:
@@ -88,32 +90,28 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
                   'image_url', 'comments', 'user_reaction', 'reactions_count')
 
-    def create(self,validated_data):
+    def create(self, validated_data):
         if 'parent' in validated_data and validated_data["parent"] != None:
-            validated_data["thread_rank"]=self.context["parent"].thread_rank +1
-            validated_data["status"]=1
+            validated_data["thread_rank"] = self.context["parent"].thread_rank + 1
+            validated_data["status"] = 1
         else:
-            validated_data['parent']=None
-            validated_data["thread_rank"]=1
-            validated_data["status"]=0
+            validated_data['parent'] = None
+            validated_data["thread_rank"] = 1
+            validated_data["status"] = 0
         validated_data['image_url'] = ",".join(validated_data["image_url"]) if 'image_url' in validated_data else ""
         # if validated_data["tag_user_call"]:
-        #         validated_data["tag_user_call"]=UserProfile.objects.get(name)                
+        #         validated_data["tag_user_call"]=UserProfile.objects.get(name)
         # if validated_data["tag_body_call"]:
-        #         validated_data["tag_body_call"]=Body.objects.get(name) 
+        #         validated_data["tag_body_call"]=Body.objects.get(name)
         # if validated_data["tag_location_call"]:
         #         validated_data["tag_location_call"]=Location.objects.get(name)
         return super().create(validated_data)
-        
-    
-    def update(self,validated_data,pk):
+
+    def update(self, validated_data, pk):
         if validated_data["tag_user_call"]:
-                 validated_data["tag_user_call"]=UserProfile.objects.get(name)                
+            validated_data["tag_user_call"] = UserProfile.objects.get(name)
         if validated_data["tag_body_call"]:
-                 validated_data["tag_body_call"]=Body.objects.get(name) 
+            validated_data["tag_body_call"] = Body.objects.get(name)
         if validated_data["tag_location_call"]:
-                 validated_data["tag_location_call"]=Location.objects.get(name)
-        return super().update(validated_data,pk)
-
-    
-
+            validated_data["tag_location_call"] = Location.objects.get(name)
+        return super().update(validated_data, pk)

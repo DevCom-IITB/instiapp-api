@@ -61,7 +61,7 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
     @staticmethod
     def get_reactions_count(obj):
         """Get number of user reactions on community post item."""
-        # Get all UNR for news item
+        # Get all UCPR for news item
         ucprs = obj.ucpr.all()
 
         # Count for each type
