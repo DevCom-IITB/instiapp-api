@@ -53,7 +53,7 @@ class CommunitySerializers(serializers.ModelSerializer):
 
 
 class CommunityPostSerializers(CommunityPostSerializerMin):
-    comments = CommunityPostSerializerMin(many=True)
+    comments = CommunityPostSerializerMin(many=True, read_only=True)
    
     class Meta:
         model = CommunityPost
@@ -62,20 +62,22 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
                   'image_url', 'comments')
 
     def create(self,validated_data):
-        
-        if validated_data["parent"]:
+        if 'parent' in validated_data and validated_data["parent"] != None:
             validated_data["thread_rank"]=self.context["parent"].thread_rank +1
             validated_data["status"]=1
-        else :
+        else:
+            validated_data['parent']=None
             validated_data["thread_rank"]=1
             validated_data["status"]=0
-        if validated_data["tag_user_call"]:
-                 validated_data["tag_user_call"]=UserProfile.objects.get(name)                
-        if validated_data["tag_body_call"]:
-                 validated_data["tag_body_call"]=Body.objects.get(name) 
-        if validated_data["tag_location_call"]:
-                 validated_data["tag_location_call"]=Location.objects.get(name)
+        validated_data['image_url'] = ",".join(validated_data["image_url"]) if 'image_url' in validated_data else ""
+        # if validated_data["tag_user_call"]:
+        #         validated_data["tag_user_call"]=UserProfile.objects.get(name)                
+        # if validated_data["tag_body_call"]:
+        #         validated_data["tag_body_call"]=Body.objects.get(name) 
+        # if validated_data["tag_location_call"]:
+        #         validated_data["tag_location_call"]=Location.objects.get(name)
         return super().create(validated_data)
+        
     
     def update(self,validated_data,pk):
         if validated_data["tag_user_call"]:
