@@ -14,9 +14,12 @@ urlpatterns = [
     path('communities/<pk>', CommunityViewSet.as_view({
         'get': 'retrieve',
     })),#viewing a particular community
+    path('featured_posts',PostViewSet.as_view({
+        'get':'featured_posts',
+    })),
 
     path('communityposts', PostViewSet.as_view({
-        'get': 'list','post': 'create','put': 'update','delete': 'destroy','get':'featured_posts'
+        'get': 'list','post': 'create','put': 'update','delete': 'destroy',
     })),#viewing the list of posts in their minimum view
 
     path('communityposts/<pk>', PostViewSet.as_view({
