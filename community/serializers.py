@@ -62,11 +62,13 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
                   'image_url', 'comments')
 
     def create(self,validated_data):
-        validated_data["status"]=0
+        
         if validated_data["parent"]:
             validated_data["thread_rank"]=self.context["parent"].thread_rank +1
+            validated_data["status"]=1
         else :
             validated_data["thread_rank"]=1
+            validated_data["status"]=0
         if validated_data["tag_user_call"]:
                  validated_data["tag_user_call"]=UserProfile.objects.get(name)                
         if validated_data["tag_body_call"]:

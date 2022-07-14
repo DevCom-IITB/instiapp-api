@@ -206,7 +206,21 @@ class CommunityViewSet(viewsets.ModelViewSet):
 
     @login_required_ajax
     def join(self,request,pk):
-        if request.data["join_community"] and self.get_community(pk):
-            user =request.user.profile
-            user.followed_communities.append(self.get_community(pk).name)
-            self.get_community(pk).followers+=1
+        """Join or Unjoin a community {?action}=0,1"""
+
+        body = self.get_community(pk).body
+
+        # Get query param
+        value = request.GET.get("action")
+        if value is None:
+            return Response({"message": "{?action} is required"}, status=400)
+
+        # Check possible actions
+        if value == "0":
+            request.user.profile.followed_bodies.remove(body)
+        elif value == "1":
+            request.user.profile.followed_bodies.add(body)
+        else:
+            return Response({"message": "Invalid Action"}, status=400)
+
+        return Response(status=204)
