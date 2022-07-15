@@ -11,7 +11,7 @@ urlpatterns = [
         'put':'update','delete':'delete',
     })),#verification by moderators
     path('communitypending_posts',ModeratorViewSet.as_view({
-        'get':'pending_posts',
+        'get':['pending_posts','approval']
     })),#viewing pending posts
     path('communityreported_content',ModeratorViewSet.as_view({
         'get':'reported_content',
@@ -20,8 +20,11 @@ urlpatterns = [
         'get':'hidden_posts',
     })),#viewing hidden posts
     path('communityfeatured_posts',ModeratorViewSet.as_view({
-        'get':'featured_posts',
+        'put':'feature_posts','get':'featured_posts'
     })),#viewing featured posts
+    path('communitymoderate_comments' ,ModeratorViewSet.as_view({
+        'put':'moderate_comments'
+    })),#moderate comments
     path('communities/<pk>', CommunityViewSet.as_view({
         'get': 'retrieve',
     })),#viewing a particular community

@@ -42,6 +42,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         queryset = CommunityPost.objects.filter(status=0)
         print(queryset)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        print(serializer)
         data = serializer.data
         return Response({'data': data})
 
@@ -51,7 +52,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         data = serializer.data
         return Response({'data': data})
 
-    def featured_posts(self,request,pk):
+    def feature_posts(self,request,pk):
         '''action==1 for featuring a post'''
         if all([user_has_privilege(request.user.profile, id, 'FeaP')]):
             post = self.get_community_post(pk)
@@ -67,11 +68,20 @@ class ModeratorViewSet(viewsets.ModelViewSet):
                 post.featured = True
             return super().update(post, pk)
 
-    def delete(self, request, pk):
-        if all([user_has_privilege(request.user.profile, id, 'DelP')]):
+    def moderate_comment(self, request, pk):
+        if all([user_has_privilege(request.user.profile, id, 'AppP')]):
             post = self.get_community_post(pk)
-            if post in CommunityPost.objects.all():
-                return super().destroy(request, pk)
+            if 'community_id' not in request.data or not request.data['community_id']:
+                return forbidden_no_privileges()
+            # Get query param
+            value = request.GET.get("action")
+            if value is None:
+                return Response({"message": "{?action} is required"}, status=400)
+
+            # Check possible actions
+            if value == "0" and post.thread_rank > 1:
+                post.status = 2
+            return super().update(post, pk)
 
     def approval(self, request, pk):
         if all([user_has_privilege(request.user.profile, id, 'AppP')]):
@@ -84,9 +94,9 @@ class ModeratorViewSet(viewsets.ModelViewSet):
                 return Response({"message": "{?action} is required"}, status=400)
 
             # Check possible actions
-            if value == "0":
+            if value == "0" and post.thread_rank == 1:
                 post.status = 2
-            elif value == "1":
+            elif value == "1" and post.thread_rank == 1:
                 post.status = 1
             return super().update(post, pk)
 
