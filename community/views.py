@@ -50,6 +50,21 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         data = serializer.data
         return Response({'data': data})
 
+    def feature(self,request,pk):
+        if all([user_has_privilege(request.user.profile, id, 'FeaP')]):
+            post = self.get_community_post(pk)
+            if 'community_id' not in request.data or not request.data['community_id']:
+                return forbidden_no_privileges()
+            # Get query param
+            value = request.GET.get("action")
+            if value is None:
+                return Response({"message": "{?action} is required"}, status=400)
+
+            # Check possible actions
+            if value == "1":
+                post.featured = True
+            return super().update(post, pk)
+
     def delete(self, request, pk):
         if all([user_has_privilege(request.user.profile, id, 'DelP')]):
             post = self.get_community_post(pk)
