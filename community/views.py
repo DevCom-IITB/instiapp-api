@@ -99,6 +99,12 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             elif value == "1" and post.thread_rank == 1:
                 post.status = 1
             return super().update(post, pk)
+    def pending_posts(self, request):
+        queryset = CommunityPost.objects.filter(status=0)
+        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        data = serializer.data
+        return Response({'data': data})
+
 
 
 class PostViewSet(viewsets.ModelViewSet):
