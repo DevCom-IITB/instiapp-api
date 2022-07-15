@@ -38,23 +38,11 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         data = serializer.data
         return Response({'data': data})
 
-    def pending_posts(self, request):
-        queryset = CommunityPost.objects.filter(status=0)
-        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
-        data = serializer.data
-        return Response({'data': data})
-
     def reported_content(self, request):
         queryset = CommunityPost.objects.filter(reported=True)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
         return Response({'data': data})
-
-    def delete(self, request, pk):
-        if all([user_has_privilege(request.user.profile, id, 'DelP')]):
-            post = self.get_community_post(pk)
-            if post in CommunityPost.objects.all():
-                return super().destroy(request, pk)
 
     def approval(self, request, pk):
         if all([user_has_privilege(request.user.profile, id, 'AppP')]):
@@ -72,6 +60,12 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             elif value == "1":
                 post.status = 1
             return super().update(post, pk)
+    def pending_posts(self, request):
+        queryset = CommunityPost.objects.filter(status=0)
+        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        data = serializer.data
+        return Response({'data': data})
+
 
 
 class PostViewSet(viewsets.ModelViewSet):
