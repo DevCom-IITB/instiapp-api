@@ -40,6 +40,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
 
     def pending_posts(self, request):
         queryset = CommunityPost.objects.filter(status=0)
+        print(queryset)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
         return Response({'data': data})
@@ -51,6 +52,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         return Response({'data': data})
 
     def featured_posts(self,request,pk):
+        '''action==1 for featuring a post'''
         if all([user_has_privilege(request.user.profile, id, 'FeaP')]):
             post = self.get_community_post(pk)
             if 'community_id' not in request.data or not request.data['community_id']:
