@@ -17,14 +17,11 @@ urlpatterns = [
         'get':'reported_content',
     })),#viewing reported content
     path('communityhidden_posts',ModeratorViewSet.as_view({
-        'get':'hidden_posts',
-    })),#viewing hidden posts
+        'get':'hidden_posts', 'put':'moderate_comments'
+    })),#viewing and hiding hidden posts
     path('communityfeatured_posts',ModeratorViewSet.as_view({
         'put':'feature_posts','get':'featured_posts'
     })),#viewing featured posts
-    path('communitymoderate_comments' ,ModeratorViewSet.as_view({
-        'put':'moderate_comments'
-    })),#moderate comments
     path('communities/<pk>', CommunityViewSet.as_view({
         'get': 'retrieve',
     })),#viewing a particular community

@@ -69,7 +69,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             return super().update(post, pk)
 
     def moderate_comment(self, request, pk):
-        if all([user_has_privilege(request.user.profile, id, 'AppP')]):
+        if all([user_has_privilege(request.user.profile, id, 'ModC')]):
             post = self.get_community_post(pk)
             if 'community_id' not in request.data or not request.data['community_id']:
                 return forbidden_no_privileges()
@@ -80,7 +80,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
 
             # Check possible actions
             if value == "0" and post.thread_rank > 1:
-                post.status = 2
+                post.hidden = True
             return super().update(post, pk)
 
     def approval(self, request, pk):
