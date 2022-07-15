@@ -19,6 +19,9 @@ urlpatterns = [
     path('communityhidden_posts',ModeratorViewSet.as_view({
         'get':'hidden_posts',
     })),#viewing hidden posts
+    path('communityfeatured_posts',ModeratorViewSet.as_view({
+        'get':'featured_posts',
+    })),#viewing featured posts
     path('communities/<pk>', CommunityViewSet.as_view({
         'get': 'retrieve',
     })),#viewing a particular community

@@ -1,5 +1,6 @@
 from collections import Counter
 import re
+from wsgiref import validate
 from rest_framework import serializers
 from community.models import Community, CommunityPost
 from community.serializer_min import CommunityPostSerializerMin
@@ -104,10 +105,10 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
         validated_data['image_url'] = ",".join(validated_data["image_url"]) if 'image_url' in validated_data else ""
         if 'tag_user' in data and data["tag_user"]:
             validated_data["tag_user"] = [UserProfile.objects.get(id=i['id']) for i in data['tag_user']]
-        # if validated_data["tag_body_call"]:
-        #         validated_data["tag_body_call"]=Body.objects.get(name)
-        # if validated_data["tag_location_call"]:
-        #         validated_data["tag_location_call"]=Location.objects.get(name)
+        if 'tag_body' in data and data['tag_body']:
+            validated_data['tag_body'] = [Body.objects.get(id=i['id']) for i in data['tag_body']]
+        if 'tag_location' in data and data['tag_location']:
+            validated_data['tag_location'] = [Location.objects.get(id=i['id']) for i in data['tag_location']]
         return super().create(validated_data)
 
     def update(self, validated_data, pk):
