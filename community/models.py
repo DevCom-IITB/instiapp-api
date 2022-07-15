@@ -1,3 +1,4 @@
+from datetime import datetime
 from pyexpat import model
 from uuid import uuid4
 from django.db import models
@@ -17,7 +18,7 @@ class Community(models.Model):
     followers = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.name
+        return str(self.id)
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
@@ -66,7 +67,7 @@ class CommunityPost(models.Model):
     status = models.IntegerField()
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
-        self.str_id = get_url_friendly(self.time_of_creation.__str__()) + "-" + str(self.id)[:8]
+        self.str_id = get_url_friendly(str(datetime.now())) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
 
     class Meta:
