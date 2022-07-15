@@ -40,9 +40,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
 
     def pending_posts(self, request):
         queryset = CommunityPost.objects.filter(status=0)
-        print(queryset)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
-        print(serializer)
         data = serializer.data
         return Response({'data': data})
 

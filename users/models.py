@@ -75,7 +75,7 @@ class UserProfile(models.Model):
         user_editable = ('show_contact_no', 'fcm_id', 'about', 'android_version', 'website_url')
 
     def __str__(self):
-        return self.name
+        return str(self.id)
 
 class UserFormerRole(models.Model):
     """Through field for former_role from UserProfile to BodyRole."""
