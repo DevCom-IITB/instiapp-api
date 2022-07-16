@@ -45,7 +45,7 @@ class CommunitySerializers(serializers.ModelSerializer):
     class Meta:
         model = Community
         fields = ('id', 'str_id', 'name', 'about', 'description', 'created_at', 'updated_at',
-                  'cover_image', 'logo_image', 'followers_count', 'is_user_following', 'roles', 'posts')
+                  'cover_image', 'logo_image', 'followers_count', 'is_user_following', 'roles', 'posts', 'body')
 
     @staticmethod
     def setup_eager_loading(queryset, request):
