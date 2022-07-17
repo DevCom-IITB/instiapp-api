@@ -60,41 +60,17 @@ class CommunitySerializers(serializers.ModelSerializer):
 
 class CommunityPostSerializers(CommunityPostSerializerMin):
     comments = CommunityPostSerializerMin(many=True, read_only=True)
-    reactions_count = serializers.SerializerMethodField()
-    user_reaction = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_reactions_count(obj):
-        """Get number of user reactions on news item."""
-        # Get all UCPR for news item
-        ucprs = obj.ucpr.all()
-
-        # Count for each type
-        reaction_counts = {t: 0 for t in range(0, 6)}
-        for ucpr in ucprs:
-            if ucpr.reaction >= 0 and ucpr.reaction < 6:
-                reaction_counts[ucpr.reaction] += 1
-
-        return reaction_counts
-
-    def get_user_reaction(self, obj):
-        """Get the current user's reaction on the news item"""
-        request = self.context['request'] if 'request' in self.context else None
-        if request and request.user.is_authenticated:
-            profile = request.user.profile
-            return next((u.reaction for u in obj.ucpr.all() if u.user_id == profile.id), -1)
-        return -1
 
     class Meta:
         model = CommunityPost
         fields = ('id', 'str_id', 'content', 'posted_by',
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
-                  'image_url', 'comments', 'user_reaction', 'reactions_count')
+                  'image_url', 'comments', 'thread_rank', 'community')
 
     def create(self, validated_data):
         data = self.context["request"].data
         if 'parent' in data and data['parent']:
-            parent = CommunityPost.objects.get(id=data['parent']["id"])
+            parent = CommunityPost.objects.get(id=data['parent'])
             validated_data['parent'] = parent
             validated_data["thread_rank"] = parent.thread_rank + 1
             validated_data["status"] = 1
@@ -109,6 +85,8 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
             validated_data['tag_body'] = [Body.objects.get(id=i['id']) for i in data['tag_body']]
         if 'tag_location' in data and data['tag_location']:
             validated_data['tag_location'] = [Location.objects.get(id=i['id']) for i in data['tag_location']]
+
+        validated_data['posted_by'] = self.context['request'].user.profile
         return super().create(validated_data)
 
     def update(self, validated_data, pk):

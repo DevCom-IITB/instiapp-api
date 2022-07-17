@@ -40,12 +40,12 @@ class CommunityPost(models.Model):
         'users.UserProfile', through='CommunityPostUserReaction',
         related_name='communitypost_reaction', blank=True)
     view_count = models.IntegerField(default=0)
-    featured=models.BooleanField(default=False)
-    hidden=models.BooleanField(default=False)
-    reported=models.BooleanField(default=False)
+    featured = models.BooleanField(default=False)
+    hidden = models.BooleanField(default=False)
+    reported = models.BooleanField(default=False)
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='posts', null=True, blank=True)
 
-    thread_rank = models.IntegerField(default=1)
+    thread_rank = models.IntegerField(default=1, null=True)
     parent = models.ForeignKey("self", blank=True, null=True,
                                related_name="comments", on_delete=models.CASCADE)
     # comments = models.ManyToManyField(

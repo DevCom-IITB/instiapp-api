@@ -50,7 +50,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         data = serializer.data
         return Response({'data': data})
 
-    def feature_posts(self,request,pk):
+    def feature_posts(self, request, pk):
         '''action==1 for featuring a post'''
         if all([user_has_privilege(request.user.profile, id, 'FeaP')]):
             post = self.get_community_post(pk)
@@ -97,12 +97,12 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             elif value == "1" and post.thread_rank == 1:
                 post.status = 1
             return super().update(post, pk)
+
     def pending_posts(self, request):
         queryset = CommunityPost.objects.filter(status=0)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
         return Response({'data': data})
-
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -155,9 +155,10 @@ class PostViewSet(viewsets.ModelViewSet):
         """Create Post and Comments.
         Needs `AddP` permission for each body to be associated."""
         # Prevent posts without any community
+        print(request.data)
         if 'community' not in request.data or not request.data['community']:
             return forbidden_no_privileges()
-        user = request.user.profile
+
         try:
             request.data["parent"]
             request.data["content"]
