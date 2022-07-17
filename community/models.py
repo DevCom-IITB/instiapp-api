@@ -85,7 +85,6 @@ class CommunityPostUserReaction(models.Model):
             4 - Sad
             5 - Angry
     """
-
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
 
