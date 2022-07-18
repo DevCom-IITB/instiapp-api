@@ -21,6 +21,7 @@ from helpers.misc import query_from_num
 from helpers.misc import query_search
 
 class ModeratorViewSet(viewsets.ModelViewSet):
+    queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
     serializer_class_min = CommunityPostSerializerMin
 
@@ -42,7 +43,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         queryset = CommunityPost.objects.filter(status=0)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
-        return Response({'data': data})
+        return Response(data)
 
     def reported_content(self, request):
         queryset = CommunityPost.objects.filter(reported=True)
@@ -82,10 +83,11 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             return super().update(post, pk)
 
     def approval(self, request, pk):
-        if all([user_has_privilege(request.user.profile, id, 'AppP')]):
+        community = Community.objects.get(id=pk)
+
+        if all([user_has_privilege(request.user.profile, community.body.id, 'AppP')]):
             post = self.get_community_post(pk)
-            if 'community_id' not in request.data or not request.data['community_id']:
-                return forbidden_no_privileges()
+
             # Get query param
             value = request.GET.get("action")
             if value is None:
@@ -97,12 +99,6 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             elif value == "1" and post.thread_rank == 1:
                 post.status = 1
             return super().update(post, pk)
-
-    def pending_posts(self, request):
-        queryset = CommunityPost.objects.filter(status=0)
-        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
-        data = serializer.data
-        return Response({'data': data})
 
 
 class PostViewSet(viewsets.ModelViewSet):
