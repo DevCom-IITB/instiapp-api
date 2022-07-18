@@ -28,7 +28,8 @@ class CommunitySerializerMin(serializers.ModelSerializer):
 
     class Meta:
         model = Community
-        fields = ('id', 'str_id', 'name', 'about', 'cover_image', 'logo_image', 'followers_count', 'is_user_following')
+        fields = ('id', 'str_id', 'name', 'about', 'cover_image',
+                  'logo_image', 'followers_count', 'body', 'is_user_following')
 
 class CommunityPostSerializerMin(serializers.ModelSerializer):
     """Minimal serializer for Body."""
