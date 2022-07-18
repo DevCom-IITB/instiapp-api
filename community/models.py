@@ -71,6 +71,9 @@ class CommunityPost(models.Model):
         self.str_id = get_url_friendly(str(datetime.now())) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
 
+    def __str__(self) -> str:
+        return self.content[:100]
+
     class Meta:
         verbose_name = "Community Post"
         verbose_name_plural = "Community Posts"

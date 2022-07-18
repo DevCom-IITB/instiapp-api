@@ -10,6 +10,7 @@ class CommunitySerializerMin(serializers.ModelSerializer):
     """Minimal serializer for Community."""
 
     followers_count = serializers.SerializerMethodField()
+    is_user_following = serializers.SerializerMethodField()
 
     def get_followers_count(self, obj):
         """Get followers of community."""
@@ -17,9 +18,17 @@ class CommunitySerializerMin(serializers.ModelSerializer):
             return 0
         return obj.body.followers.count()
 
+    def get_is_user_following(self, obj):
+        """Get the current user's reaction on the community post """
+        request = self.context['request'] if 'request' in self.context else None
+        if request and request.user.is_authenticated:
+            profile = request.user.profile
+            return profile.followed_bodies.filter(id=obj.body.id).exists()
+        return False
+
     class Meta:
         model = Community
-        fields = ('id', 'str_id', 'name', 'about', 'cover_image', 'logo_image', 'followers_count')
+        fields = ('id', 'str_id', 'name', 'about', 'cover_image', 'logo_image', 'followers_count', 'is_user_following')
 
 class CommunityPostSerializerMin(serializers.ModelSerializer):
     """Minimal serializer for Body."""
