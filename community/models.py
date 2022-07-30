@@ -41,7 +41,7 @@ class CommunityPost(models.Model):
         related_name='communitypost_reaction', blank=True)
     view_count = models.IntegerField(default=0)
     featured = models.BooleanField(default=False)
-    hidden = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
     reported = models.BooleanField(default=False)
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='posts', null=True, blank=True)
 
@@ -65,7 +65,7 @@ class CommunityPost(models.Model):
         1 - Approved
         2 - Rejected
     """
-    status = models.IntegerField()
+    status = models.IntegerField(null=True, blank=True, default=0)
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(str(datetime.now())) + "-" + str(self.id)[:8]

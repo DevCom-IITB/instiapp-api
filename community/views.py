@@ -1,4 +1,5 @@
 from collections import UserList
+from http.client import BAD_REQUEST
 from pickle import GET
 from unicodedata import name
 from uuid import UUID
@@ -40,7 +41,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         return Response({'data': data})
 
     def pending_posts(self, request):
-        queryset = CommunityPost.objects.filter(status=0)
+        queryset = CommunityPost.objects.filter(status=0, thread_rank=1)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
         return Response(data)
@@ -50,22 +51,6 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
         return Response({'data': data})
-
-    def feature_posts(self, request, pk):
-        '''action==1 for featuring a post'''
-        if all([user_has_privilege(request.user.profile, id, 'FeaP')]):
-            post = self.get_community_post(pk)
-            if 'community_id' not in request.data or not request.data['community_id']:
-                return forbidden_no_privileges()
-            # Get query param
-            value = request.GET.get("action")
-            if value is None:
-                return Response({"message": "{?action} is required"}, status=400)
-
-            # Check possible actions
-            if value == "1":
-                post.featured = True
-            return super().update(post, pk)
 
     def moderate_comment(self, request, pk):
         if all([user_has_privilege(request.user.profile, id, 'ModC')]):
@@ -82,23 +67,21 @@ class ModeratorViewSet(viewsets.ModelViewSet):
                 post.hidden = True
             return super().update(post, pk)
 
-    def approval(self, request, pk):
-        community = Community.objects.get(id=pk)
+    def change_status(self, request, pk):
+        post = self.get_community_post(pk)
 
-        if all([user_has_privilege(request.user.profile, community.body.id, 'AppP')]):
-            post = self.get_community_post(pk)
-
+        if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
             # Get query param
-            value = request.GET.get("action")
-            if value is None:
+            status = request.data["status"]
+            if status is None:
                 return Response({"message": "{?action} is required"}, status=400)
 
             # Check possible actions
-            if value == "0" and post.thread_rank == 1:
-                post.status = 2
-            elif value == "1" and post.thread_rank == 1:
-                post.status = 1
-            return super().update(post, pk)
+            post.status = status
+            post.save()
+            return Response({"message": "Status changed"})
+
+        return forbidden_no_privileges()
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -136,8 +119,14 @@ class PostViewSet(viewsets.ModelViewSet):
         List fresh posts arranged chronologiaclly for the current user."""
 
         # Check for time and date filtered query params
+        status = request.GET.get("status")
+        if status is None:
+            queryset = CommunityPost.objects.filter(thread_rank=1, posted_by=request.user
+                                                    .profile).order_by("-time_of_modification")
+        else:
+            queryset = CommunityPost.objects.filter(
+                status=status, deleted=False, thread_rank=1).order_by("-time_of_modification")
 
-        queryset = CommunityPost.objects.filter(status=1, thread_rank=1).order_by("-time_of_modification")
         queryset = query_search(request, 3, queryset, ['content'], 'posts')
         queryset = query_from_num(request, 20, queryset)
 
@@ -171,46 +160,53 @@ class PostViewSet(viewsets.ModelViewSet):
         return super().create(request)
 
     @login_required_ajax
-    def update(self, request, *args, **kwargs):
-        """Update Posts and comments.
-        Needs BodyRole with `AddP` for at least one associated community.
-        Disassociating bodies from the event requires the `DelP`
-        permission and associating needs `ModP`"""
-        pk = self.kwargs.get('pk')
+    def update(self, request, pk):
+        """Update Event.
+        Needs BodyRole with `UpdE` for at least one associated body.
+        Disassociating bodies from the event requires the `DelE`
+        permission and associating needs `AddE`"""
 
-        # Prevent events without any body
-        if 'community_id' not in request.data or not request.data['community_id']:
+        if 'community' not in request.data or not request.data['community']:
             return forbidden_no_privileges()
 
-        # Get the event currently in database
+        return super().update(request, pk)
+
+    def perform_action(self, request, action, pk):
+        '''action==feature for featuring a post'''
         post = self.get_community_post(pk)
 
-        # Check if difference in bodies is valid
+        if(action == "feature"):
+            if all([user_has_privilege(request.user.profile, post.community.body.id, 'FeaP')]):
 
-        try:
-            post.content = request.data["content"]
-            post.tag_user = request.data["tag_user_call"]
-            post.tag_body = request.data["tag_body_call"]
-            post.tag_location = request.data["tag_location_call"]
-        except KeyError:
-            request.data['content'] = []
-            request.data['tag_user_call'] = []
-            request.data["tag_body_call"] = []
-            request.data["tag_location_call"] = []
-        return super().update(post, pk)
+                # Get query param
+                is_featured = request.data["is_featured"]
+                if is_featured is None:
+                    return Response({"message": "{?is_featured} is required"}, status=400)
 
-    @login_required_ajax
-    def destroy(self, request, *args, **kwargs):
-        """Delete Posts and comments.
-        Needs `DelP` permission for all associated bodies."""
-        pk = self.kwargs.get('pk')
+                # Check possible actions
 
-        post = self.get_community_post(pk)
-        if all([user_has_privilege(request.user.profile, str(community.id), 'DelP')
-                for community in post.community.all()]):
-            return super().destroy(request, pk)
+                post.featured = is_featured
+                post.save()
+                return Response({"message": "is_featured changed", 'is_featured': is_featured})
 
-        return forbidden_no_privileges()
+            return forbidden_no_privileges()
+
+        if(action == "delete"):
+            if(request.user.profile == post.posted_by):
+                post.deleted = True
+                post.featured = False
+                post.save()
+                return Response({"message": "Post deleted"})
+
+            if all([user_has_privilege(request.user.profile, post.community.body.id, 'DelP')]):
+                post.status = 2
+                post.featured = False
+                post.save()
+                return Response({"message": "Post deleted"})
+
+            return forbidden_no_privileges()
+
+        return Response({"message": "action not supported"}, status=400)
 
     def get_community_post(self, pk):
         """Get a community post from pk uuid or strid."""

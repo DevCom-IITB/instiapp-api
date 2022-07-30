@@ -14,6 +14,7 @@ class UploadViewSet(viewsets.ModelViewSet):
 
     @login_required_ajax
     def create(self, request):
+        print(request.data)
         """Upload file."""
         return super().create(request)
 
