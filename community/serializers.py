@@ -1,7 +1,9 @@
+from cmath import log
 from collections import Counter
 import re
 from wsgiref import validate
 from rest_framework import serializers
+from achievements.models import Interest
 from community.models import Community, CommunityPost
 from community.serializer_min import CommunityPostSerializerMin
 from roles.serializers import RoleSerializerMin
@@ -16,11 +18,11 @@ class CommunitySerializers(serializers.ModelSerializer):
     is_user_following = serializers.SerializerMethodField()
     roles = RoleSerializerMin(many=True, read_only=True, source='body.roles')
     posts = serializers.SerializerMethodField()
+    featured_posts = serializers.SerializerMethodField()
 
-    def featured_posts(self, obj):
+    def get_featured_posts(self, obj):
         """Get the featured posts of community"""
-        queryset = obj.posts.filter(featured=True)
-
+        queryset = obj.posts.filter(featured=True, deleted=False, status=1)
         return CommunityPostSerializerMin(queryset, many=True).data
 
     def get_posts(self, obj):
@@ -45,7 +47,7 @@ class CommunitySerializers(serializers.ModelSerializer):
     class Meta:
         model = Community
         fields = ('id', 'str_id', 'name', 'about', 'description', 'created_at', 'updated_at',
-                  'cover_image', 'logo_image', 'followers_count', 'is_user_following', 'roles', 'posts', 'body')
+                  'cover_image', 'logo_image', 'followers_count', 'is_user_following', 'roles', 'posts', 'body', 'featured_posts')
 
     @staticmethod
     def setup_eager_loading(queryset, request):
@@ -60,41 +62,20 @@ class CommunitySerializers(serializers.ModelSerializer):
 
 class CommunityPostSerializers(CommunityPostSerializerMin):
     comments = CommunityPostSerializerMin(many=True, read_only=True)
-    reactions_count = serializers.SerializerMethodField()
-    user_reaction = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_reactions_count(obj):
-        """Get number of user reactions on news item."""
-        # Get all UCPR for news item
-        ucprs = obj.ucpr.all()
-
-        # Count for each type
-        reaction_counts = {t: 0 for t in range(0, 6)}
-        for ucpr in ucprs:
-            if ucpr.reaction >= 0 and ucpr.reaction < 6:
-                reaction_counts[ucpr.reaction] += 1
-
-        return reaction_counts
-
-    def get_user_reaction(self, obj):
-        """Get the current user's reaction on the news item"""
-        request = self.context['request'] if 'request' in self.context else None
-        if request and request.user.is_authenticated:
-            profile = request.user.profile
-            return next((u.reaction for u in obj.ucpr.all() if u.user_id == profile.id), -1)
-        return -1
 
     class Meta:
         model = CommunityPost
         fields = ('id', 'str_id', 'content', 'posted_by',
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
-                  'image_url', 'comments', 'user_reaction', 'reactions_count')
+                  'image_url', 'comments', 'thread_rank', 'community', 'status', 'tag_body', 'tag_user', 'interests',
+                  'featured', 'deleted')
 
     def create(self, validated_data):
         data = self.context["request"].data
+        print("validated data:")
+        print(validated_data)
         if 'parent' in data and data['parent']:
-            parent = CommunityPost.objects.get(id=data['parent']["id"])
+            parent = CommunityPost.objects.get(id=data['parent'])
             validated_data['parent'] = parent
             validated_data["thread_rank"] = parent.thread_rank + 1
             validated_data["status"] = 1
@@ -102,20 +83,34 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
             validated_data['parent'] = None
             validated_data["thread_rank"] = 1
             validated_data["status"] = 0
-        validated_data['image_url'] = ",".join(validated_data["image_url"]) if 'image_url' in validated_data else ""
+        validated_data['image_url'] = ",".join(data["image_url"]) if 'image_url' in data else ""
         if 'tag_user' in data and data["tag_user"]:
             validated_data["tag_user"] = [UserProfile.objects.get(id=i['id']) for i in data['tag_user']]
         if 'tag_body' in data and data['tag_body']:
             validated_data['tag_body'] = [Body.objects.get(id=i['id']) for i in data['tag_body']]
-        if 'tag_location' in data and data['tag_location']:
-            validated_data['tag_location'] = [Location.objects.get(id=i['id']) for i in data['tag_location']]
+        if 'interests' in data and data['interests']:
+            validated_data['interests'] = [Interest.objects.get(id=i['id']) for i in data['interests']]
+        validated_data['posted_by'] = self.context['request'].user.profile
+        validated_data['community'] = Community.objects.get(id=data['community']['id'])
         return super().create(validated_data)
 
-    def update(self, validated_data, pk):
-        if validated_data["tag_user_call"]:
-            validated_data["tag_user_call"] = UserProfile.objects.get(name)
-        if validated_data["tag_body_call"]:
-            validated_data["tag_body_call"] = Body.objects.get(name)
-        if validated_data["tag_location_call"]:
-            validated_data["tag_location_call"] = Location.objects.get(name)
-        return super().update(validated_data, pk)
+    def update(self, instance, validated_data):
+        data = self.context["request"].data
+        if 'tag_user' in data and data["tag_user"]:
+            validated_data["tag_user"] = [UserProfile.objects.get(id=i['id']) for i in data['tag_user']]
+        if 'tag_body' in data and data['tag_body']:
+            validated_data['tag_body'] = [Body.objects.get(id=i['id']) for i in data['tag_body']]
+        if 'interests' in data and data['interests']:
+            validated_data['interests'] = [Interest.objects.get(id=i['id']) for i in data['interests']]
+        validated_data["status"] = 0
+        validated_data["deleted"] = False
+        validated_data["featured"] = False
+        validated_data['image_url'] = ",".join(data["image_url"]) if 'image_url' in data else ""
+        return super().update(instance, validated_data)
+
+    def destroy(self, instance, validated_data):
+        data = self.context["request"].data
+        validated_data["status"] = 0
+        validated_data["deleted"] = False
+        validated_data['image_url'] = ",".join(data["image_url"]) if 'image_url' in data else ""
+        return super().update(instance, validated_data)

@@ -1,5 +1,7 @@
 """Serializers for non-specific models."""
 from rest_framework import serializers
+from community.models import CommunityPost
+from community.serializers import CommunityPostSerializers
 from events.models import Event
 from events.serializers import EventSerializer
 from external.models import ExternalBlogEntry
@@ -16,6 +18,7 @@ from querybot.serializers import UnresolvedQuerySerializer
 
 class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disable=W0223
     """Serializer for actor/target of notifications."""
+
     def to_representation(self, value):
         if isinstance(value, Event):
             serializer = EventSerializer(value)
@@ -29,6 +32,8 @@ class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disa
             serializer = UnresolvedQuerySerializer(value)
         elif isinstance(value, ExternalBlogEntry):
             serializer = ExternalBlogEntry(value)
+        elif isinstance(value, CommunityPost):
+            serializer = CommunityPostSerializers(value)
 
         return serializer.data
 

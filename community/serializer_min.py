@@ -1,6 +1,7 @@
 """Minimal serializer for Body."""
 from itertools import count
 from rest_framework import serializers
+from achievements.serializers import InterestSerializer
 from bodies.serializer_min import BodySerializerMin
 from community.models import Community, CommunityPost
 from bodies.serializers_followers import BodyFollowersSerializer
@@ -10,6 +11,7 @@ class CommunitySerializerMin(serializers.ModelSerializer):
     """Minimal serializer for Community."""
 
     followers_count = serializers.SerializerMethodField()
+    is_user_following = serializers.SerializerMethodField()
 
     def get_followers_count(self, obj):
         """Get followers of community."""
@@ -17,9 +19,18 @@ class CommunitySerializerMin(serializers.ModelSerializer):
             return 0
         return obj.body.followers.count()
 
+    def get_is_user_following(self, obj):
+        """Get the current user's reaction on the community post """
+        request = self.context['request'] if 'request' in self.context else None
+        if request and request.user.is_authenticated:
+            profile = request.user.profile
+            return profile.followed_bodies.filter(id=obj.body.id).exists()
+        return False
+
     class Meta:
         model = Community
-        fields = ('id', 'str_id', 'name', 'about', 'cover_image', 'logo_image', 'followers_count')
+        fields = ('id', 'str_id', 'name', 'about', 'cover_image',
+                  'logo_image', 'followers_count', 'body', 'is_user_following')
 
 class CommunityPostSerializerMin(serializers.ModelSerializer):
     """Minimal serializer for Body."""
@@ -30,10 +41,16 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
     posted_by = UserProfileSerializer(read_only=True)
     image_url = serializers.SerializerMethodField()
     most_liked_comment = serializers.SerializerMethodField()
+    community = CommunitySerializerMin(read_only=True)
+    tag_body = BodySerializerMin(read_only=True, many=True)
+    tag_user = UserProfileSerializer(read_only=True, many=True)
+    interests = InterestSerializer(read_only=True, many=True)
 
     def get_most_liked_comment(self, obj):
         """Get the most liked comment of the community post """
         queryset = obj.comments.all()
+        if len(queryset) == 0:
+            return None
         max = 0
         most_liked_comment = None
         for comment in queryset:
@@ -97,4 +114,5 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
         model = CommunityPost
         fields = ('id', 'str_id', 'content', 'posted_by',
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
-                  'image_url', 'most_liked_comment', 'thread_rank')
+                  'image_url', 'most_liked_comment', 'thread_rank', 'community', 'status', 'tag_body', 'tag_user', 'interests',
+                  'featured', 'deleted')

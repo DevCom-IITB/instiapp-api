@@ -13,7 +13,7 @@ from events.serializers import EventSerializer
 from news import models
 from news.models import UserNewsReaction
 from news.models import NewsEntry
-from community.models import CommunityPost,CommunityPostUserReaction
+from community.models import CommunityPost, CommunityPostUserReaction
 from users.serializer_full import UserProfileFullSerializer
 from users.models import UserProfile
 from users.models import WebPushSubscription
@@ -146,7 +146,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return Response({"message": "reaction is required"}, status=400)
 
         # Get existing record if it exists
-        upr = CommunityPostUserReaction.objects.filter(news__id=post_pk, user=request.user.profile).first()
+        upr = CommunityPostUserReaction.objects.filter(communitypost__id=post_pk, user=request.user.profile).first()
 
         # Create new UserNewsReaction if not existing
         if not upr:
