@@ -6,7 +6,7 @@ from notifications.models import Notification
 from notifications.signals import notify
 from pyfcm import FCMNotification
 from achievements.models import UserInterest
-from community.models import CommunityPost
+from community.models import Community, CommunityPost
 from events.models import Event
 from helpers.celery import shared_task_conditional
 from helpers.celery import FaultTolerantTask
@@ -85,6 +85,22 @@ def notify_new_commpost(pk):
             recipient=users,
             verb=f"New post with tag {interest.title} added in {community.name}"
         )
+@shared_task_conditional(base=FaultTolerantTask)
+def notify_new_comm(pk):
+    """Notify users about event creation."""
+    setUp()
+    instance = CommunityPost.objects.filter(id=pk).first()
+    if not instance:
+        return
+
+    users = []
+    while instance.thread_rank > 1:
+        instance = instance.parent
+        users.append(instance.posted_by)
+        notify.send(
+        instance,
+        recipient=users,
+        verb="New comment added in " + Community.name)
 
 @shared_task_conditional(base=FaultTolerantTask)
 def push_notify(pk):

@@ -11,7 +11,6 @@ from news.models import NewsEntry
 from venter.models import ComplaintComment
 
 # pylint: disable=W0223,W0613
-
 def notify_new_event(instance, action, **kwargs):
     """Notify users that a new event was added for a followed body."""
     if action == 'post_add' and isinstance(instance, Event):
@@ -34,9 +33,11 @@ def notify_upd_event(instance):
 def notify_new_commpost(instance, created, **kwargs):
     """Notify users that a new complaint was added for a followed body."""
     if isinstance(instance, CommunityPost):
-        if instance.thread_rank == 1 and instance.status == 1 and instance.deleted == False:
+        if (instance.thread_rank == 1 and instance.status == 1 and instance.deleted == False):
             # Notify all body followers
             tasks.notify_new_commpost.delay(instance.id)
+        elif (instance.thread_rank>1 and instance.status == 1 and instance.deleted == False):
+            tasks.notify_new_comm.delay(instance.id) 
 
 
 def event_saved(instance, created, **kwargs):
