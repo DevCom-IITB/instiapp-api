@@ -33,8 +33,8 @@ def notify_upd_event(instance):
 
 def notify_new_commpost(instance, created, **kwargs):
     """Notify users that a new complaint was added for a followed body."""
-    if created and isinstance(instance, CommunityPost):
-        if(instance.thread_rank == 1):
+    if isinstance(instance, CommunityPost):
+        if instance.thread_rank == 1 and instance.status == 1 and instance.deleted == False:
             # Notify all body followers
             tasks.notify_new_commpost.delay(instance.id)
 
