@@ -30,7 +30,7 @@ MEDIA_URL = 'http://localhost:8000/static/upload/'
 USER_AVATAR_URL = '/static/upload/useravatar.jpg'
 
 VAPID_PRIV_KEY = ""
-FCM_SERVER_KEY = ""
+FCM_SERVER_KEY = "AAAAPIB48cw:APA91bFGHGOXHT-ssB5GAg2aB2SXi8PxGmulX2jy0qOptbmKjG2kDdpsTfvZkaf-bYMPTAJIBmaDU6A6C_6SNy_Y-yOf5HpZ8IGRV7fl5Vkmm0qrH-xfXz7R0h5tHsQae7vERoEFaaFO1sk7hJSM7UoSf6jxZTq5pA"
 
 # Change this to LOGGING to enable SQLite logging
 NO_LOGGING = {
