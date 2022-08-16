@@ -6,6 +6,7 @@ from notifications.models import Notification
 from notifications.signals import notify
 from pyfcm import FCMNotification
 from achievements.models import UserInterest
+from community.models import CommunityPost
 from events.models import Event
 from helpers.celery import shared_task_conditional
 from helpers.celery import FaultTolerantTask
@@ -57,6 +58,33 @@ def notify_upd_event(pk):
 
     users = User.objects.filter(id__in=instance.followers.filter(active=True).values('user_id'))
     notify.send(instance, recipient=users, verb=instance.name + " was updated")
+
+@shared_task_conditional(base=FaultTolerantTask)
+def notify_new_commpost(pk):
+    """Notify users about event creation."""
+    setUp()
+    instance = CommunityPost.objects.filter(id=pk).first()
+    if not instance:
+        return
+
+    community = instance.community
+    body = community.body
+    users = User.objects.filter(id__in=body.followers.filter(active=True).values('user_id'))
+    notify.send(
+        instance,
+        recipient=users,
+        verb="New post added in " + community.name
+    )
+
+    for interest in instance.interests.all():
+        users = User.objects.filter(
+            id__in=UserInterest.filter(title=interest.title).user.filter(active=True).values('user_id')
+        )
+        notify.send(
+            instance,
+            recipient=users,
+            verb=f"New post with tag {interest.title} added in {community.name}"
+        )
 
 @shared_task_conditional(base=FaultTolerantTask)
 def push_notify(pk):
