@@ -4,7 +4,7 @@ from notifications.signals import notify
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.db.models.signals import m2m_changed
-from community.models import CommunityPost
+from community.models import CommunityPost, CommunityPostUserReaction
 import other.tasks as tasks
 from events.models import Event
 from news.models import NewsEntry
@@ -32,12 +32,16 @@ def notify_upd_event(instance):
     tasks.notify_upd_event.delay(instance.id)
 
 def notify_new_commpost(instance, created, **kwargs):
-    """Notify users that a new complaint was added for a followed body."""
+    """Notify users that a new post was created."""
     if isinstance(instance, CommunityPost):
         if instance.thread_rank == 1 and instance.status == 1 and instance.deleted == False:
             # Notify all body followers
             tasks.notify_new_commpost.delay(instance.id)
 
+def notify_new_reaction(instance, created, **kwargs):
+    """Notify users a new reaction on their post"""
+    if isinstance(instance, CommunityPostUserReaction):
+        tasks.notify_new_reaction.delay(instance.id)
 
 def event_saved(instance, created, **kwargs):
     """Notify users when an event changes."""
@@ -71,3 +75,5 @@ post_save.connect(new_comment, sender=ComplaintComment)
 
 post_save.connect(notification_saved, sender=Notification)
 post_save.connect(notify_new_commpost, sender=CommunityPost)
+
+post_save.connect(notify_new_reaction, sneder=CommunityPostUserReaction)

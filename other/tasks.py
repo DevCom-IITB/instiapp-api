@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals
+from email.mime import base
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
@@ -6,7 +7,7 @@ from notifications.models import Notification
 from notifications.signals import notify
 from pyfcm import FCMNotification
 from achievements.models import UserInterest
-from community.models import CommunityPost
+from community.models import CommunityPost,CommunityPostUserReaction
 from events.models import Event
 from helpers.celery import shared_task_conditional
 from helpers.celery import FaultTolerantTask
@@ -61,7 +62,7 @@ def notify_upd_event(pk):
 
 @shared_task_conditional(base=FaultTolerantTask)
 def notify_new_commpost(pk):
-    """Notify users about event creation."""
+    """Notify users about post creation."""
     setUp()
     instance = CommunityPost.objects.filter(id=pk).first()
     if not instance:
@@ -85,6 +86,23 @@ def notify_new_commpost(pk):
             recipient=users,
             verb=f"New post with tag {interest.title} added in {community.name}"
         )
+
+@shared_task_conditional(base=FaultTolerantTask)
+def notify_new_reaction(pk):
+    """Notify user about new reaction to his post/comment"""
+    setUp()
+    instance = CommunityPostUserReaction.objects.filter(id=pk).first()
+    if not instance:
+        return
+    
+    user = [instance.user]
+    notify.send(
+        instance,
+        recipient=user,
+        verb="New reaction on your post in " + instance.communitypost.community.name
+    )
+
+
 
 @shared_task_conditional(base=FaultTolerantTask)
 def push_notify(pk):
