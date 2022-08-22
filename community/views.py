@@ -204,8 +204,8 @@ class PostViewSet(viewsets.ModelViewSet):
             return forbidden_no_privileges()
         
         if(action == "report"):
-            if(request.user.profile not in post.reported_by):
-                post.reported_by.append(request.user.profile)
+            if(request.user.profile not in post.reported_by.all()):
+                post.reported_by.add(request.user.profile)
                 post.save()
                 return Response({"message": "Post reported"})
             else:

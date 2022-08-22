@@ -36,15 +36,13 @@ class CommunityPost(models.Model):
     time_of_modification = models.DateTimeField(auto_now=True)
     content = models.TextField(blank=True)
     image_url = models.TextField(blank=True, null=True)
-    reported_by=models.ManyToManyField('users.UserProfile', through='CommunityPost',
-        related_name='communitypost_report', blank=True)
+    reported_by=models.ManyToManyField('users.UserProfile', related_name='posts_reported', blank=True)
     reacted_by = models.ManyToManyField(
         'users.UserProfile', through='CommunityPostUserReaction',
         related_name='communitypost_reaction', blank=True)
     view_count = models.IntegerField(default=0)
     featured = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
-    reported = models.BooleanField(default=False)
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='posts', null=True, blank=True)
 
     thread_rank = models.IntegerField(default=1, null=True)

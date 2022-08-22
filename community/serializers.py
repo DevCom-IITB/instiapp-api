@@ -68,7 +68,7 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
         fields = ('id', 'str_id', 'content', 'posted_by',
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
                   'image_url', 'comments', 'thread_rank', 'community', 'status', 'tag_body', 'tag_user', 'interests',
-                  'featured', 'deleted')
+                  'featured', 'deleted', 'anonymous', 'reported_by')
 
     def create(self, validated_data):
         data = self.context["request"].data
