@@ -25,7 +25,6 @@ class ModeratorViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
     serializer_class_min = CommunityPostSerializerMin
-
     def get_community_post(self, pk):
         """Get a community post from pk uuid or strid."""
         try:
@@ -33,7 +32,6 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
-
     def hidden_posts(self, request):
         queryset = CommunityPost.objects.filter(hidden=True)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
@@ -51,7 +49,6 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
         return Response({'data': data})
-
     def moderate_comment(self, request, pk):
         if all([user_has_privilege(request.user.profile, id, 'ModC')]):
             post = self.get_community_post(pk)
@@ -120,13 +117,13 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # Check for time and date filtered query params
         status = request.GET.get("status")
+        cmm=request.GET.get("community")
         if status is None:
             queryset = CommunityPost.objects.filter(thread_rank=1, posted_by=request.user
                                                     .profile).order_by("-time_of_modification")
         else:
             queryset = CommunityPost.objects.filter(
-                status=status, deleted=False, thread_rank=1).order_by("-time_of_modification")
-
+                status=status, deleted=False, thread_rank=1,community=cmm).order_by("-time_of_modification")
         queryset = query_search(request, 3, queryset, ['content'], 'posts')
         queryset = query_from_num(request, 20, queryset)
 

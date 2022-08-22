@@ -65,7 +65,7 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
 
     class Meta:
         model = CommunityPost
-        fields = ('id', 'str_id', 'content', 'posted_by',
+        fields = ('id', 'str_id', 'content', 'posted_by','report'
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
                   'image_url', 'comments', 'thread_rank', 'community', 'status', 'tag_body', 'tag_user', 'interests',
                   'featured', 'deleted')
@@ -111,6 +111,6 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
     def destroy(self, instance, validated_data):
         data = self.context["request"].data
         validated_data["status"] = 0
-        validated_data["deleted"] = False
+        validated_data["deleted"] = True
         validated_data['image_url'] = ",".join(data["image_url"]) if 'image_url' in data else ""
         return super().update(instance, validated_data)
