@@ -36,8 +36,8 @@ def notify_new_commpost(instance, created, **kwargs):
         if (instance.thread_rank == 1 and instance.status == 1 and instance.deleted == False):
             # Notify all body followers
             tasks.notify_new_commpost.delay(instance.id)
-        elif (instance.thread_rank>1 and instance.status == 1 and instance.deleted == False):
-            tasks.notify_new_comm.delay(instance.id) 
+        elif (instance.thread_rank > 1 and instance.status == 1 and instance.deleted == False):
+            tasks.notify_new_comm.delay(instance.id)
 
 def notify_new_reaction(instance, created, **kwargs):
     """Notify users a new reaction on their post"""
@@ -77,4 +77,4 @@ post_save.connect(new_comment, sender=ComplaintComment)
 post_save.connect(notification_saved, sender=Notification)
 post_save.connect(notify_new_commpost, sender=CommunityPost)
 
-post_save.connect(notify_new_reaction, sneder=CommunityPostUserReaction)
+post_save.connect(notify_new_reaction, sender=CommunityPostUserReaction)

@@ -36,6 +36,8 @@ class CommunityPost(models.Model):
     time_of_modification = models.DateTimeField(auto_now=True)
     content = models.TextField(blank=True)
     image_url = models.TextField(blank=True, null=True)
+    report=models.ManyToManyField('users.UserProfile', through='CommunityPost',
+        related_name='communitypost_report', blank=True)
     reacted_by = models.ManyToManyField(
         'users.UserProfile', through='CommunityPostUserReaction',
         related_name='communitypost_reaction', blank=True)
@@ -95,7 +97,6 @@ class CommunityPostUserReaction(models.Model):
                              default=uuid4, related_name='ucpr')
     communitypost = models.ForeignKey(CommunityPost, on_delete=models.CASCADE,
                                       default=uuid4, related_name='ucpr')
-
     reaction = models.IntegerField(default=0)
 
     class Meta:
