@@ -169,6 +169,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_action(self, request, action, pk):
         '''action==feature for featuring a post'''
+        print(pk)
         post = self.get_community_post(pk)
 
         if(action == "feature"):
@@ -218,8 +219,10 @@ class PostViewSet(viewsets.ModelViewSet):
         """Get a community post from pk uuid or strid."""
         try:
             UUID(pk, version=4)
+            print("Checking id")
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
+            print("Checking strid")
             return get_object_or_404(self.queryset, str_id=pk)
 
 class CommunityViewSet(viewsets.ModelViewSet):

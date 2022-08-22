@@ -74,7 +74,8 @@ class CommunityPost(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return self.content[:100]
+        return str(self.id)
+        # return self.content[:100]
 
     class Meta:
         verbose_name = "Community Post"
