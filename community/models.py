@@ -36,7 +36,7 @@ class CommunityPost(models.Model):
     time_of_modification = models.DateTimeField(auto_now=True)
     content = models.TextField(blank=True)
     image_url = models.TextField(blank=True, null=True)
-    report=models.ManyToManyField('users.UserProfile', through='CommunityPost',
+    reported_by=models.ManyToManyField('users.UserProfile', through='CommunityPost',
         related_name='communitypost_report', blank=True)
     reacted_by = models.ManyToManyField(
         'users.UserProfile', through='CommunityPostUserReaction',

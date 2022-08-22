@@ -13,7 +13,8 @@ PERMISSION_CHOICES = (
     ('AppP', 'Approve Post'),
     ('DelP', 'Delete Post'),
     ('FeaP', 'Feature Post'),
-    ('ModC', 'Moderate Comment')
+    ('ModC', 'Moderate Comment'),
+    ('RepC', 'Report Comment')
 )
 
 class BodyRole(models.Model):
