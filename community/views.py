@@ -117,13 +117,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # Check for time and date filtered query params
         status = request.GET.get("status")
-        cmm=request.GET.get("community")
         if status is None:
             queryset = CommunityPost.objects.filter(thread_rank=1, posted_by=request.user
                                                     .profile).order_by("-time_of_modification")
         else:
             queryset = CommunityPost.objects.filter(
-                status=status, deleted=False, thread_rank=1,community=cmm).order_by("-time_of_modification")
+                status=status, deleted=False, thread_rank=1).order_by("-time_of_modification")
         queryset = query_search(request, 3, queryset, ['content'], 'posts')
         queryset = query_from_num(request, 20, queryset)
 
