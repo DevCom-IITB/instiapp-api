@@ -61,7 +61,11 @@ class CommunitySerializers(serializers.ModelSerializer):
 
 
 class CommunityPostSerializers(CommunityPostSerializerMin):
-    comments = CommunityPostSerializerMin(many=True, read_only=True)
+    comments = serializers.SerializerMethodField()
+
+    def get_comments(self, obj):
+        c = obj.comments.filter(deleted=False, status=1)
+        return CommunityPostSerializerMin(c, many=True).data
 
     class Meta:
         model = CommunityPost

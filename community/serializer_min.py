@@ -48,7 +48,7 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
 
     def get_most_liked_comment(self, obj):
         """Get the most liked comment of the community post """
-        queryset = obj.comments.all()
+        queryset = obj.comments.filter(deleted=False, status=1)
         if len(queryset) == 0:
             return None
         max = 0
@@ -92,11 +92,11 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
     @staticmethod
     def get_comments_count(obj):
         """Get number of comments on community post item."""
-        if not obj.comments.exists() or obj.comments.count() == 0:
+        if not obj.comments.exists() or len(obj.comments.filter(deleted=False, status=1)) == 0:
             return 0
         count = 0
 
-        for comment in obj.comments.all():
+        for comment in obj.comments.filter(deleted=False, status=1):
             count += 1
             count += CommunityPostSerializerMin.get_comments_count(comment)
 
