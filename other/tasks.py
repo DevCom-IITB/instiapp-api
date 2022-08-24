@@ -98,7 +98,7 @@ def notify_new_comm(pk):
     users = []
     while instance.thread_rank > 1:
         instance = instance.parent
-        users.append(instance.posted_by)
+        users.append(instance.posted_by.user)
         notify.send(
             instance,
             recipient=users,
@@ -112,7 +112,7 @@ def notify_new_reaction(pk):
     if not instance:
         return
 
-    user = [instance.user]
+    user = [instance.user.user]
     notify.send(
         instance,
         recipient=user,
