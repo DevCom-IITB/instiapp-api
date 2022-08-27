@@ -64,13 +64,17 @@ class CommunityPost(models.Model):
         0 - Pending
         1 - Approved
         2 - Rejected
+        3 - Reported
+        
     """
     status = models.IntegerField(null=True, blank=True, default=0)
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(str(datetime.now())) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
-
+        # communitypost = CommunityPost.objects.get(id=self.id)
+        # communitypost.reports = communitypost.reported_by.count
+        
     def __str__(self) -> str:
         return self.content[:100]
 

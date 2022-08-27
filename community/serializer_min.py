@@ -45,6 +45,7 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
     tag_body = BodySerializerMin(read_only=True, many=True)
     tag_user = UserProfileSerializer(read_only=True, many=True)
     interests = InterestSerializer(read_only=True, many=True)
+    has_user_reported = serializers.SerializerMethodField()
 
     def get_most_liked_comment(self, obj):
         """Get the most liked comment of the community post """
@@ -110,9 +111,18 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
             return next((u.reaction for u in obj.ucpr.all() if u.user_id == profile.id), -1)
         return -1
 
+    def get_has_user_reported(self, obj):
+        """Get the current user's report on the community post """
+        request = self.context['request'] if 'request' in self.context else None
+        if request and request.user.is_authenticated:
+            profile = request.user.profile
+            
+            return obj.reported_by.filter(id=profile.id).exists()
+        return False
+
     class Meta:
         model = CommunityPost
         fields = ('id', 'str_id', 'content', 'posted_by',
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
                   'image_url', 'most_liked_comment', 'thread_rank', 'community', 'status', 'tag_body', 'tag_user', 'interests',
-                  'featured', 'deleted', 'anonymous', 'reported_by')
+                  'featured', 'deleted', 'anonymous', 'reported_by', 'has_user_reported')

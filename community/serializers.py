@@ -44,6 +44,8 @@ class CommunitySerializers(serializers.ModelSerializer):
             return profile.followed_bodies.filter(id=obj.body.id).exists()
         return False
 
+    
+
     class Meta:
         model = Community
         fields = ('id', 'str_id', 'name', 'about', 'description', 'created_at', 'updated_at',

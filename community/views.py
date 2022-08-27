@@ -1,5 +1,6 @@
 from collections import UserList
 from http.client import BAD_REQUEST
+from os import stat
 from pickle import GET
 from unicodedata import name
 from uuid import UUID
@@ -20,6 +21,7 @@ from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
 from helpers.misc import query_from_num
 from helpers.misc import query_search
+from django.db.models import Count
 
 class ModeratorViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects
@@ -117,12 +119,21 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # Check for time and date filtered query params
         status = request.GET.get("status")
+
+        # If your posts
         if status is None:
             queryset = CommunityPost.objects.filter(thread_rank=1, posted_by=request.user
                                                     .profile).order_by("-time_of_modification")
         else:
-            queryset = CommunityPost.objects.filter(
-                status=status, deleted=False, thread_rank=1).order_by("-time_of_modification")
+            # If reported posts
+            if status == "3":
+                queryset =CommunityPost.objects
+                queryset = queryset.annotate(reports=Count('reported_by')).filter(reports__gt=1)
+                # queryset = CommunityPost.objects.all()
+
+            else:
+                queryset = CommunityPost.objects.filter(
+                    status=status, deleted=False, thread_rank=1).order_by("-time_of_modification")
         queryset = query_search(request, 3, queryset, ['content'], 'posts')
         queryset = query_from_num(request, 20, queryset)
 
@@ -130,6 +141,16 @@ class PostViewSet(viewsets.ModelViewSet):
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
+
+    def list_reported(self,request):
+        queryset =CommunityPost.objects.all()
+        queryset = queryset.annotate(reports=Count('reported_by')).filter(reports__gt=5)
+        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        data = serializer.data
+
+        return Response({'count': len(data), 'data': data})
+
+
 
     @login_required_ajax
     def create(self, request):
@@ -206,10 +227,12 @@ class PostViewSet(viewsets.ModelViewSet):
         if(action == "report"):
             if(request.user.profile not in post.reported_by.all()):
                 post.reported_by.add(request.user.profile)
+                # post.reports +=1
                 post.save()
                 return Response({"message": "Post reported"})
             else:
                 post.reported_by.remove(request.user.profile)
+                # post.reports -=1
                 post.save()
                 return Response({"message": "Post unreported"})
 
