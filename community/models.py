@@ -55,7 +55,7 @@ class CommunityPost(models.Model):
     tag_body = models.ManyToManyField('bodies.Body', related_name="Tagged_Body", blank=True)
     tag_location = models.ManyToManyField('locations.Location', related_name='communitypost_tagloc', blank=True)
     followed_by = models.ManyToManyField("users.UserProfile", related_name="communitypost_followers", blank=True)
-    anonymous = models.BooleanField(default=False)
+    anonymous = models.BooleanField(default=False,blank=True)
     posted_by = models.ForeignKey('users.UserProfile', null=True, blank=True,
                                   on_delete=models.SET_NULL, related_name='communitypost_postedby')
     interests = models.ManyToManyField('achievements.Interest', related_name='communitypost_interest', blank=True)
