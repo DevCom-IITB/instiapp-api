@@ -141,7 +141,7 @@ class PostViewSet(viewsets.ModelViewSet):
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
-
+    
     def list_reported(self,request):
         queryset =CommunityPost.objects.all()
         queryset = queryset.annotate(reports=Count('reported_by')).filter(reports__gt=5)
@@ -223,7 +223,15 @@ class PostViewSet(viewsets.ModelViewSet):
                 return Response({"message": "Post deleted"})
 
             return forbidden_no_privileges()
-        
+        if (action=="ignore"):
+            if all([user_has_privilege(request.user.profile, post.community.body.id, 'IgP')]):
+                post.reported_by.delete()
+                # post.reports +=1
+                post.save()
+                post.status=1
+                return Response({"message": "reported post ignored"})
+            
+
         if(action == "report"):
             if(request.user.profile not in post.reported_by.all()):
                 post.reported_by.add(request.user.profile)
