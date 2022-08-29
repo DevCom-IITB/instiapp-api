@@ -44,7 +44,7 @@ class CommunityPost(models.Model):
     featured = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='posts', null=True, blank=True)
-
+    ignored = models.BooleanField(default= False)
     thread_rank = models.IntegerField(default=1, null=True)
     parent = models.ForeignKey("self", blank=True, null=True,
                                related_name="comments", on_delete=models.CASCADE)
@@ -65,7 +65,7 @@ class CommunityPost(models.Model):
         1 - Approved
         2 - Rejected
         3 - Reported
-        
+
     """
     status = models.IntegerField(null=True, blank=True, default=0)
 

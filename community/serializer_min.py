@@ -126,3 +126,5 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
                   'image_url', 'most_liked_comment', 'thread_rank', 'community', 'status', 'tag_body', 'tag_user', 'interests',
                   'featured', 'deleted', 'anonymous', 'reported_by', 'has_user_reported')
+
+#model me field ignored, save pe check kar kaise karna he , change satus is current status 3 to 1 ignore kar dena , if ignored save pe check nahi karna

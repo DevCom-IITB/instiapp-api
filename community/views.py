@@ -74,6 +74,8 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             status = request.data["status"]
             if status is None:
                 return Response({"message": "{?action} is required"}, status=400)
+            elif post.status==3 and status=="1":
+                post.ignored=True
 
             # Check possible actions
             post.status = status
@@ -194,7 +196,7 @@ class PostViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
 
         if(action == "feature"):
-            if all([user_has_privilege(request.user.profile, post.community.body.id, 'FeaP')]):
+            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
 
                 # Get query param
                 is_featured = request.data["is_featured"]
@@ -216,7 +218,7 @@ class PostViewSet(viewsets.ModelViewSet):
                 post.save()
                 return Response({"message": "Post deleted"})
 
-            if all([user_has_privilege(request.user.profile, post.community.body.id, 'DelP')]):
+            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
                 post.status = 2
                 post.featured = False
                 post.save()
@@ -301,3 +303,4 @@ class CommunityViewSet(viewsets.ModelViewSet):
             return Response({"message": "Invalid Action"}, status=400)
 
         return Response(status=204)
+
