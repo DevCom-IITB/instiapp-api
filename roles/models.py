@@ -14,7 +14,8 @@ PERMISSION_CHOICES = (
     ('DelP', 'Delete Post'),
     ('FeaP', 'Feature Post'),
     ('ModC', 'Moderate Comment'),
-    ('RepC', 'Report Comment')
+    ('RepC', 'Report Comment'),
+    ('IgP','Ignore Reported Post')
 )
 
 class BodyRole(models.Model):
