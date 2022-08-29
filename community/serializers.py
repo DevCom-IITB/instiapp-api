@@ -19,7 +19,6 @@ class CommunitySerializers(serializers.ModelSerializer):
     roles = RoleSerializerMin(many=True, read_only=True, source='body.roles')
     posts = serializers.SerializerMethodField()
     featured_posts = serializers.SerializerMethodField()
-
     def get_featured_posts(self, obj):
         """Get the featured posts of community"""
         queryset = obj.posts.filter(featured=True, deleted=False, status=1)
