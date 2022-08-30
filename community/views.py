@@ -27,6 +27,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
     serializer_class_min = CommunityPostSerializerMin
+
     def get_community_post(self, pk):
         """Get a community post from pk uuid or strid."""
         try:
@@ -34,6 +35,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
+
     def hidden_posts(self, request):
         queryset = CommunityPost.objects.filter(hidden=True)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
@@ -51,6 +53,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
         return Response({'data': data})
+
     def moderate_comment(self, request, pk):
         if all([user_has_privilege(request.user.profile, id, 'ModC')]):
             post = self.get_community_post(pk)
@@ -69,13 +72,14 @@ class ModeratorViewSet(viewsets.ModelViewSet):
     def change_status(self, request, pk):
         post = self.get_community_post(pk)
 
-        if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
+        if ((user_has_privilege(request.user.profile, post.community.body.id, 'AppP') and post.thread_rank == 1) or
+                (user_has_privilege(request.user.profile, post.community.body.id, 'ModC') and post.thread_rank > 1)):
             # Get query param
             status = request.data["status"]
             if status is None:
                 return Response({"message": "{?action} is required"}, status=400)
-            if post.status==3:    
-                post.ignored=True
+            if post.status == 3:
+                post.ignored = True
 
             # Check possible actions
             post.status = status
@@ -129,7 +133,7 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             # If reported posts
             if status == "3":
-                queryset =CommunityPost.objects.filter(status=status, deleted=False).order_by("-time_of_modification")
+                queryset = CommunityPost.objects.filter(status=status, deleted=False).order_by("-time_of_modification")
                 # queryset = CommunityPost.objects.all()
 
             else:
@@ -142,16 +146,14 @@ class PostViewSet(viewsets.ModelViewSet):
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
-    
-    def list_reported(self,request):
-        queryset =CommunityPost.objects.all()
+
+    def list_reported(self, request):
+        queryset = CommunityPost.objects.all()
         queryset = queryset.annotate(reports=Count('reported_by')).filter(reports__gt=5)
         serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
-
-
 
     @login_required_ajax
     def create(self, request):
@@ -224,14 +226,6 @@ class PostViewSet(viewsets.ModelViewSet):
                 return Response({"message": "Post deleted"})
 
             return forbidden_no_privileges()
-        if (action=="ignore"):
-            if all([user_has_privilege(request.user.profile, post.community.body.id, 'IgP')]):
-                post.reported_by.delete()
-                # post.reports +=1
-                post.save()
-                post.status=1
-                return Response({"message": "reported post ignored"})
-            
 
         if(action == "report"):
             if(request.user.profile not in post.reported_by.all()):
@@ -310,4 +304,3 @@ class CommunityViewSet(viewsets.ModelViewSet):
             return Response({"message": "Invalid Action"}, status=400)
 
         return Response(status=204)
-
