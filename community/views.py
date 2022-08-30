@@ -74,7 +74,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
             status = request.data["status"]
             if status is None:
                 return Response({"message": "{?action} is required"}, status=400)
-            elif post.status==3 and status=="1":
+            if post.status==3:    
                 post.ignored=True
 
             # Check possible actions
@@ -129,8 +129,7 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             # If reported posts
             if status == "3":
-                queryset =CommunityPost.objects
-                queryset = queryset.annotate(reports=Count('reported_by')).filter(reports__gt=1)
+                queryset =CommunityPost.objects.filter(status=status, deleted=False).order_by("-time_of_modification")
                 # queryset = CommunityPost.objects.all()
 
             else:

@@ -71,9 +71,10 @@ class CommunityPost(models.Model):
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(str(datetime.now())) + "-" + str(self.id)[:8]
+        if not self.ignored:
+            if self.reported_by.count() > 1:
+                self.status = 3
         super().save(*args, **kwargs)
-        # communitypost = CommunityPost.objects.get(id=self.id)
-        # communitypost.reports = communitypost.reported_by.count
         
     def __str__(self) -> str:
         return self.content[:100]

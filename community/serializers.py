@@ -19,6 +19,7 @@ class CommunitySerializers(serializers.ModelSerializer):
     roles = RoleSerializerMin(many=True, read_only=True, source='body.roles')
     posts = serializers.SerializerMethodField()
     featured_posts = serializers.SerializerMethodField()
+
     def get_featured_posts(self, obj):
         """Get the featured posts of community"""
         queryset = obj.posts.filter(featured=True, deleted=False, status=1)
@@ -43,8 +44,6 @@ class CommunitySerializers(serializers.ModelSerializer):
             return profile.followed_bodies.filter(id=obj.body.id).exists()
         return False
 
-    
-
     class Meta:
         model = Community
         fields = ('id', 'str_id', 'name', 'about', 'description', 'created_at', 'updated_at',
@@ -62,7 +61,11 @@ class CommunitySerializers(serializers.ModelSerializer):
 
 
 class CommunityPostSerializers(CommunityPostSerializerMin):
-    comments = CommunityPostSerializerMin(many=True, read_only=True)
+    comments = serializers.SerializerMethodField()
+
+    def get_comments(self, obj):
+        comments = obj.comments.filter(deleted=False, status=1)
+        return CommunityPostSerializerMin(comments, many=True).data
 
     class Meta:
         model = CommunityPost
