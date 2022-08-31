@@ -186,6 +186,8 @@ class PostViewSet(viewsets.ModelViewSet):
         Disassociating bodies from the event requires the `DelE`
         permission and associating needs `AddE`"""
 
+        print(request.data)
+
         if 'community' not in request.data or not request.data['community']:
             return forbidden_no_privileges()
 

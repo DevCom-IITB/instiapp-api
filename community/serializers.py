@@ -109,7 +109,7 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
         validated_data["status"] = 0
         validated_data["deleted"] = False
         validated_data["featured"] = False
-        validated_data['image_url'] = ",".join(data["image_url"]) if 'image_url' in data else ""
+        validated_data['image_url'] = ",".join(data["image_url"]) if 'image_url' in data and data['image_url'] else ""
         return super().update(instance, validated_data)
 
     def destroy(self, instance, validated_data):
