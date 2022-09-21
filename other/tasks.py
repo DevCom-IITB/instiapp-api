@@ -95,6 +95,7 @@ def notify_new_comm(pk):
     if not instance:
         return
 
+    commented_user = instance.posted_by
     users = []
     while instance.thread_rank > 1:
         instance = instance.parent
@@ -102,7 +103,7 @@ def notify_new_comm(pk):
         notify.send(
             instance,
             recipient=users,
-            verb="New comment added to you post in " + instance.community.name)
+            verb=commented_user.name + " commented to you post " + instance.content)
 
 @shared_task_conditional(base=FaultTolerantTask)
 def notify_new_reaction(pk):
@@ -116,7 +117,7 @@ def notify_new_reaction(pk):
     notify.send(
         instance,
         recipient=user,
-        verb="New reaction on your post in " + instance.communitypost.community.name
+        verb=instance.user.name + " reacted to you post " + instance.communitypost.content
     )
 
 

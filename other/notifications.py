@@ -41,7 +41,7 @@ def notify_new_commpost(instance, created, **kwargs):
 
 def notify_new_reaction(instance, created, **kwargs):
     """Notify users a new reaction on their post"""
-    if isinstance(instance, CommunityPostUserReaction):
+    if isinstance(instance, CommunityPostUserReaction) and created:
         tasks.notify_new_reaction.delay(instance.id)
 
 def event_saved(instance, created, **kwargs):
