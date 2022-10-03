@@ -65,6 +65,7 @@ urlpatterns = [
     path(api_base(), include('other.urls')),
     path(api_base(), include('querybot.urls')),
     path(api_base(), include('external.urls')),
+    path(api_base(), include('community.urls')),
     path(api_base('venter'), include("venter.urls")),
 
     # Non-API
