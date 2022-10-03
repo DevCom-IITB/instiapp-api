@@ -5,6 +5,7 @@ from bodies.models import Body
 from events.models import Event
 from users.models import UserTag
 from users.models import UserTagCategory
+from community.models import Community
 
 def create_event(start_time_delta=0, end_time_delta=0, **kwargs):
     """Create an event with optional start and end times."""
@@ -28,6 +29,15 @@ def create_body(**kwargs):
         kwargs['name'] = 'TestBody%d' % create_body.i
     return Body.objects.create(**kwargs)
 
+def create_community(**kwargs):
+    """Create a test body."""
+    create_community.i += 1
+    if 'name' not in kwargs:
+        kwargs['name'] = 'TestCommunity%d' % create_community.i
+    if 'body' not in kwargs:
+        kwargs['body'] = create_body()
+    return Community.objects.create(**kwargs)
+
 def create_usertagcategory(name=None):
     """Create a test tag category."""
     create_usertagcategory.i += 1
@@ -44,5 +54,6 @@ def create_usertag(category, regex, target='hostel', name='tag', **kwargs):
 
 create_event.i = 0
 create_body.i = 0
+create_community.i = 0
 create_usertagcategory.i = 0
 create_usertag.i = 0
