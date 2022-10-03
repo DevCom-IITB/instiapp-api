@@ -40,23 +40,23 @@ class CommunityPost(models.Model):
     reacted_by = models.ManyToManyField(
         'users.UserProfile', through='CommunityPostUserReaction',
         related_name='communitypost_reaction', blank=True)
-    view_count = models.IntegerField(default=0)
-    featured = models.BooleanField(default=False)
-    deleted = models.BooleanField(default=False)
+    featured = models.BooleanField(default=False, null=True, blank=True)
+    deleted = models.BooleanField(default=False, null=True, blank=True)
     community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='posts')
-    ignored = models.BooleanField(default=False)
+    ignored = models.BooleanField(default=False, null=True, blank=True)
     thread_rank = models.IntegerField(default=1, null=True, blank=True)
     parent = models.ForeignKey("self", blank=True, null=True,
                                related_name="comments", on_delete=models.CASCADE)
     # comments = models.ManyToManyField(
     #     "self", blank=True, related_name="community_post_comments")
 
-    tag_user = models.ManyToManyField("users.UserProfile", related_name="communitypost_taguser", blank=True)
-    tag_body = models.ManyToManyField('bodies.Body', related_name="Tagged_Body", blank=True)
-    tag_location = models.ManyToManyField('locations.Location', related_name='communitypost_tagloc', blank=True)
-    followed_by = models.ManyToManyField("users.UserProfile", related_name="communitypost_followers", blank=True)
+    tag_user = models.ManyToManyField("users.UserProfile", related_name="taggedcommunitypost", blank=True)
+    tag_body = models.ManyToManyField('bodies.Body', related_name="taggedcommunityposts", blank=True)
+    tag_location = models.ManyToManyField('locations.Location', related_name='taggedcommunityposts', blank=True)
+    followed_by = models.ManyToManyField("users.UserProfile", related_name="followedposts", blank=True)
     anonymous = models.BooleanField(default=False, blank=True)
-    posted_by = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE, related_name='communitypost_postedby')
+    posted_by = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE,
+                                  related_name='communityposts')
     interests = models.ManyToManyField('achievements.Interest', related_name='communitypost_interest', blank=True)
 
     """ Status

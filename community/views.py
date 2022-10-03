@@ -36,39 +36,6 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
 
-    def hidden_posts(self, request):
-        queryset = CommunityPost.objects.filter(hidden=True)
-        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
-        data = serializer.data
-        return Response({'data': data})
-
-    def pending_posts(self, request):
-        queryset = CommunityPost.objects.filter(status=0, thread_rank=1)
-        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
-        data = serializer.data
-        return Response(data)
-
-    def reported_content(self, request):
-        queryset = CommunityPost.objects.filter(reported=True)
-        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
-        data = serializer.data
-        return Response({'data': data})
-
-    def moderate_comment(self, request, pk):
-        if all([user_has_privilege(request.user.profile, id, 'ModC')]):
-            post = self.get_community_post(pk)
-            if 'community_id' not in request.data or not request.data['community_id']:
-                return forbidden_no_privileges()
-            # Get query param
-            value = request.GET.get("action")
-            if value is None:
-                return Response({"message": "{?action} is required"}, status=400)
-
-            # Check possible actions
-            if value == "0" and post.thread_rank > 1:
-                post.hidden = True
-            return super().update(post, pk)
-
     def change_status(self, request, pk):
         post = self.get_community_post(pk)
 
@@ -99,6 +66,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         return {'request': self.request}
 
+    @login_required_ajax
     def retrieve_full(self, request, pk):
         """Get full Post.
         Get by `uuid` or `str_id`"""
@@ -109,16 +77,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return Response(serialized)
 
-    def retrieve_min(self, request, pk):
-        """Get min Post.
-        Get by `uuid` or `str_id`"""
-
-        self.queryset = CommunityPostSerializerMin.setup_eager_loading(self.queryset, request)
-        post = self.get_community_post(pk)
-        serialized = CommunityPostSerializerMin(post, context={'request': request}).data
-
-        return Response(serialized)
-
+    @login_required_ajax
     def list(self, request):
         """List Of Posts.
         List fresh posts arranged chronologiaclly for the current user."""
@@ -147,35 +106,13 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return Response({'count': len(data), 'data': data})
 
-    def list_reported(self, request):
-        queryset = CommunityPost.objects.all()
-        queryset = queryset.annotate(reports=Count('reported_by')).filter(reports__gt=5)
-        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
-        data = serializer.data
-
-        return Response({'count': len(data), 'data': data})
-
     @login_required_ajax
     def create(self, request):
         """Create Post and Comments.
         Needs `AddP` permission for each body to be associated."""
         # Prevent posts without any community
-        print(request.data)
         if 'community' not in request.data or not request.data['community']:
             return forbidden_no_privileges()
-
-        try:
-            request.data["parent"]
-            request.data["content"]
-            # request.data["tag_user_call"]
-            # request.data["tag_body_call"]
-            # request.data["tag_location_call"]
-        except KeyError:
-            request.data['content'] = []
-            request.data['parent'] = []
-            # request.data['tag_user_call'] = []
-            # request.data["tag_body_call"] = []
-            # request.data["tag_location_call"] = []
 
         return super().create(request)
 
@@ -185,17 +122,14 @@ class PostViewSet(viewsets.ModelViewSet):
         Needs BodyRole with `UpdE` for at least one associated body.
         Disassociating bodies from the event requires the `DelE`
         permission and associating needs `AddE`"""
-
-        print(request.data)
-
-        if 'community' not in request.data or not request.data['community']:
+        post = self.get_community_post(pk)
+        if post.posted_by != request.user.profile:
             return forbidden_no_privileges()
 
         return super().update(request, pk)
 
     def perform_action(self, request, action, pk):
         '''action==feature for featuring a post'''
-        print(pk)
         post = self.get_community_post(pk)
 
         if(action == "feature"):

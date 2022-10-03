@@ -76,8 +76,6 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
 
     def create(self, validated_data):
         data = self.context["request"].data
-        print("validated data:")
-        print(validated_data)
         if 'parent' in data and data['parent']:
             parent = CommunityPost.objects.get(id=data['parent'])
             validated_data['parent'] = parent

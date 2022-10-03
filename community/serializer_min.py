@@ -63,7 +63,6 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
         """Get the image url of the community post """
-        print(len(obj.image_url))
         return obj.image_url.split(',') if obj.image_url else None
 
     @staticmethod
@@ -116,7 +115,7 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
         request = self.context['request'] if 'request' in self.context else None
         if request and request.user.is_authenticated:
             profile = request.user.profile
-            
+
             return obj.reported_by.filter(id=profile.id).exists()
         return False
 
@@ -127,4 +126,4 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
                   'image_url', 'most_liked_comment', 'thread_rank', 'community', 'status', 'tag_body', 'tag_user', 'interests',
                   'featured', 'deleted', 'anonymous', 'reported_by', 'has_user_reported')
 
-#model me field ignored, save pe check kar kaise karna he , change satus is current status 3 to 1 ignore kar dena , if ignored save pe check nahi karna
+# model me field ignored, save pe check kar kaise karna he , change satus is current status 3 to 1 ignore kar dena , if ignored save pe check nahi karna

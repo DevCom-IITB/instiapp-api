@@ -16,7 +16,7 @@ urlpatterns = [
     })),  # viewing, creating, updating and deleting the list of posts in their minimum view
 
     path('communityposts/<pk>', PostViewSet.as_view({
-        'get': 'retrieve_full', 'put': 'update', 'delete': 'destroy'
+        'get': 'retrieve_full', 'put': 'update'
     })),  # to get the full view of a post
 
     path('communityposts/moderator/<pk>', ModeratorViewSet.as_view({
