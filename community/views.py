@@ -260,6 +260,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         return super().get_serializer_context()
 
+    @login_required_ajax
     def list(self, request):
         queryset = Community.objects.all()
         queryset = query_search(request, 3, queryset, ['name', 'about', 'description'], 'communities')
@@ -267,8 +268,8 @@ class CommunityViewSet(viewsets.ModelViewSet):
         data = serializer.data
         return Response(data)
 
+    @login_required_ajax
     def retrieve(self, request, pk):
-
         # Prefetch and annotate data
         self.queryset = CommunitySerializers.setup_eager_loading(self.queryset, request)
 
@@ -285,24 +286,3 @@ class CommunityViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
-
-    @login_required_ajax
-    def join(self, request, pk):
-        """Join or Unjoin a community {?action}=0,1"""
-
-        body = self.get_community(pk).body
-
-        # Get query param
-        value = request.GET.get("action")
-        if value is None:
-            return Response({"message": "{?action} is required"}, status=400)
-
-        # Check possible actions
-        if value == "0":
-            request.user.profile.followed_bodies.remove(body)
-        elif value == "1":
-            request.user.profile.followed_bodies.add(body)
-        else:
-            return Response({"message": "Invalid Action"}, status=400)
-
-        return Response(status=204)

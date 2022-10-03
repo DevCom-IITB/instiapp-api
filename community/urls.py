@@ -15,6 +15,10 @@ urlpatterns = [
         'get': 'list', 'post': 'create'
     })),  # viewing, creating, updating and deleting the list of posts in their minimum view
 
+    path('communityposts/<pk>', PostViewSet.as_view({
+        'get': 'retrieve_full', 'put': 'update', 'delete': 'destroy'
+    })),  # to get the full view of a post
+
     path('communityposts/moderator/<pk>', ModeratorViewSet.as_view({
         'put': 'change_status'
     })),  # manages all the privileges of a moderator.. changes status
@@ -22,8 +26,4 @@ urlpatterns = [
     path('communityposts/<action>/<pk>', PostViewSet.as_view({
         'put': 'perform_action'
     })),  # setting featured posts
-
-    path('communityposts/<pk>', PostViewSet.as_view({
-        'get': 'retrieve_full', 'put': 'update', 'delete': 'destroy'
-    })),  # to get the full view of a post
 ]
