@@ -262,7 +262,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = Community.objects.all()
-        queryset = query_search(request, 3, queryset, ['name'], 'communities')
+        queryset = query_search(request, 3, queryset, ['name', 'about', 'description'], 'communities')
         serializer = CommunitySerializerMin(queryset, many=True)
         data = serializer.data
         return Response(data)
