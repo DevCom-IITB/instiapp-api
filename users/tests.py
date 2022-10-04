@@ -163,7 +163,7 @@ class UserTestCase(APITestCase):
         dev.application = 'app.insti.flutter'
         self.assertEqual(dev.supports_rich(), False)
         self.assertNotEqual(dev.process_rich(data)['click_action'], None)
-        dev.application = 'app.insti.ios'
+        dev.application = 'app.instiapp.flutter'
         self.assertEqual(dev.supports_rich(), False)
 
     def test_get_noauth(self):

@@ -20,7 +20,7 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventFullSerializer
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {'request': self.request}    
 
     def retrieve(self, request, pk):
         """Get Event.

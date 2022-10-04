@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals
+from email.mime import base
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
@@ -6,6 +7,7 @@ from notifications.models import Notification
 from notifications.signals import notify
 from pyfcm import FCMNotification
 from achievements.models import UserInterest
+from community.models import Community, CommunityPost, CommunityPostUserReaction
 from events.models import Event
 from helpers.celery import shared_task_conditional
 from helpers.celery import FaultTolerantTask
@@ -57,6 +59,67 @@ def notify_upd_event(pk):
 
     users = User.objects.filter(id__in=instance.followers.filter(active=True).values('user_id'))
     notify.send(instance, recipient=users, verb=instance.name + " was updated")
+
+@shared_task_conditional(base=FaultTolerantTask)
+def notify_new_commpost(pk):
+    """Notify users about post creation."""
+    setUp()
+    instance = CommunityPost.objects.filter(id=pk).first()
+    if not instance:
+        return
+
+    community = instance.community
+    body = community.body
+    users = User.objects.filter(id__in=body.followers.filter(active=True).values('user_id'))
+    notify.send(
+        instance,
+        recipient=users,
+        verb="New post added in " + community.name
+    )
+
+    for interest in instance.interests.all():
+        users = User.objects.filter(
+            id__in=UserInterest.filter(title=interest.title).user.filter(active=True).values('user_id')
+        )
+        notify.send(
+            instance,
+            recipient=users,
+            verb=f"New post with tag {interest.title} added in {community.name}"
+        )
+
+@shared_task_conditional(base=FaultTolerantTask)
+def notify_new_comm(pk):
+    """Notify users about event creation."""
+    setUp()
+    instance = CommunityPost.objects.filter(id=pk).first()
+    if not instance:
+        return
+
+    commented_user = instance.posted_by
+    users = []
+    while instance.thread_rank > 1:
+        instance = instance.parent
+        users.append(instance.posted_by.user)
+        notify.send(
+            instance,
+            recipient=users,
+            verb=commented_user.name + " commented to you post " + instance.content)
+
+@shared_task_conditional(base=FaultTolerantTask)
+def notify_new_reaction(pk):
+    """Notify user about new reaction to his post/comment"""
+    setUp()
+    instance = CommunityPostUserReaction.objects.filter(id=pk).first()
+    if not instance:
+        return
+
+    user = [instance.user.user]
+    notify.send(
+        instance,
+        recipient=user,
+        verb=instance.user.name + " reacted to you post " + instance.communitypost.content
+    )
+
 
 @shared_task_conditional(base=FaultTolerantTask)
 def push_notify(pk):

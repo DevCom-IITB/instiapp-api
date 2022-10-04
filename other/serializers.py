@@ -1,5 +1,7 @@
 """Serializers for non-specific models."""
 from rest_framework import serializers
+from community.models import CommunityPost, Community, CommunityPostUserReaction
+from community.serializers import CommunityPostSerializers, CommunitySerializers
 from events.models import Event
 from events.serializers import EventSerializer
 from external.models import ExternalBlogEntry
@@ -9,14 +11,16 @@ from news.models import NewsEntry
 from news.serializers import NewsEntrySerializer
 from venter.models import ComplaintComment
 from venter.serializers import CommentSerializer
-from users.models import UserTag
-from users.models import UserTagCategory
+from users.models import UserTag, UserTagCategory, UserProfile
+from users.serializers import UserProfileSerializer
 from querybot.models import UnresolvedQuery
 from querybot.serializers import UnresolvedQuerySerializer
 
 class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disable=W0223
     """Serializer for actor/target of notifications."""
+
     def to_representation(self, value):
+        serializer = None
         if isinstance(value, Event):
             serializer = EventSerializer(value)
         elif isinstance(value, NewsEntry):
@@ -29,8 +33,17 @@ class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disa
             serializer = UnresolvedQuerySerializer(value)
         elif isinstance(value, ExternalBlogEntry):
             serializer = ExternalBlogEntry(value)
-
-        return serializer.data
+        elif isinstance(value, CommunityPost):
+            serializer = CommunityPostSerializers(value)
+        elif isinstance(value, Community):
+            serializer = CommunitySerializer(value)
+        elif isinstance(value, CommunityPostUserReaction):
+            serializer = CommunityPostSerializers(value.communitypost)
+        elif isinstance(value, UserProfile):
+            serializer = UserProfileSerializer(value)
+        if serializer:
+            return serializer.data
+        return None
 
 class NotificationSerializer(serializers.Serializer):  # pylint: disable=W0223
     """Notification Serializer, with unread and actor"""

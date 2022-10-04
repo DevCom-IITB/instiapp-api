@@ -10,8 +10,10 @@ from login.helpers import update_fcm_device
 from events.models import UserEventStatus
 from events.models import Event
 from events.serializers import EventSerializer
+from news import models
 from news.models import UserNewsReaction
 from news.models import NewsEntry
+from community.models import CommunityPost, CommunityPostUserReaction
 from users.serializer_full import UserProfileFullSerializer
 from users.models import UserProfile
 from users.models import WebPushSubscription
@@ -130,6 +132,32 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         # Update existing UserNewsReaction
         unr.reaction = reaction
         unr.save()
+        return Response(status=204)
+
+    @classmethod
+    @login_required_ajax
+    def set_upr_me(cls, request, post_pk):
+        """Set UPR(User Post Reaction) for current user.
+        This will create or update if record exists."""
+
+        # Get reaction from query parameter
+        reaction = request.GET.get('reaction')
+        if reaction is None:
+            return Response({"message": "reaction is required"}, status=400)
+
+        # Get existing record if it exists
+        upr = CommunityPostUserReaction.objects.filter(communitypost__id=post_pk, user=request.user.profile).first()
+
+        # Create new UserNewsReaction if not existing
+        if not upr:
+            get_post = get_object_or_404(CommunityPost.objects.all(), pk=post_pk)
+            CommunityPostUserReaction.objects.create(
+                communitypost=get_post, user=request.user.profile, reaction=reaction)
+            return Response(status=204)
+
+        # Update existing UserNewsReaction
+        upr.reaction = reaction
+        upr.save()
         return Response(status=204)
 
     @classmethod
