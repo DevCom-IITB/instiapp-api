@@ -149,7 +149,10 @@ def push_notify(pk):
     if not hasattr(settings, 'FCM_SERVER_KEY'):
         return
 
-    push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
+    try:
+        push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
+    except:
+        return
 
     # Send FCM push notification
     for device in profile.devices.all():
