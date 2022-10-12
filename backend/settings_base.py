@@ -167,7 +167,7 @@ TRAINING_BLOG_URL_VAL = 'https://campus.placements.iitb.ac.in/blog/internship/?f
 
 EXTERNAL_BLOG_URL = 'https://gymkhana.iitb.ac.in/externalblog'
 
-MESSI_BASE_URL = ""
+MESSI_BASE_URL = "https://instamess.gymkhana.iitb.ac.in"
 
 # Names of bodies to notify when there are new posts on placement/training blog
 PLACEMENTS_BLOG_BODY = 'Placement Blog'

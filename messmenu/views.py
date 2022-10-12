@@ -8,6 +8,7 @@ from django.conf import settings
 from cryptography.fernet import Fernet
 from messmenu.models import Hostel, MessCalEvent
 from messmenu.serializers import HostelSerializer, MessCalEventSerializer
+from django.utils.timezone import make_aware
 
 
 @api_view(['GET', ])
@@ -43,9 +44,13 @@ def getUserMess(request):
     items = []
 
     while curr <= end:
-        res = requests.get(
-            f"{settings.MESSI_BASE_URL}/api/get_details?roll={rollno}&year={curr.year}&month={curr.month}"
-        )
+        url = f'{settings.MESSI_BASE_URL}/api/get_details?roll={rollno}&year={curr.year}&month={curr.month}'
+        payload = {}
+        headers = {
+            'x-access-token': settings.MESSI_ACCESS_TOKEN
+        }
+
+        res = requests.request("GET", url, headers=headers, data=payload)
 
         if res.status_code != 200:
             curr = curr + relativedelta(months=1)
@@ -69,10 +74,15 @@ def getUserMess(request):
                     title = "Snacks"
                 elif mealnum == "011":
                     title = "Dinner"
+                elif mealnum == "100":
+                    title = "Milk"
+                elif mealnum == "101":
+                    title = "Egg"
                 else:
-                    title = "Error"
+                    title = "Other"
 
                 date = datetime(curr.year, curr.month, k["day"], k["time"] // 60, k["time"] % 60)
+                date = make_aware(date)
                 hostel = k["hostel"]
 
                 item, c = MessCalEvent.objects.get_or_create(user=user, datetime=date, hostel=hostel)
