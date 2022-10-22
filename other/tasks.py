@@ -106,6 +106,27 @@ def notify_new_comm(pk):
         verb=commented_user.name + " commented to your post " + instance.content)
 
 @shared_task_conditional(base=FaultTolerantTask)
+def notify_new_commpostadmin(pk):
+    """Notify users about event creation."""
+    setUp()
+    instance = CommunityPost.objects.filter(id=pk).first()
+    if not instance:
+        return
+
+    community = instance.community
+    roles = instance.community.body.roles.all()
+    users = []
+    for role in roles:
+        if "AppP" in role.permissions:
+            users.extend(map(lambda user: user.user, role.users.all()))
+    print(users)
+    notify.send(
+        instance,
+        recipient=users,
+        verb="New post added for verification in " + community.name)
+
+
+@ shared_task_conditional(base=FaultTolerantTask)
 def notify_new_reaction(pk):
     """Notify user about new reaction to his post/comment"""
     setUp()
@@ -121,7 +142,7 @@ def notify_new_reaction(pk):
     )
 
 
-@shared_task_conditional(base=FaultTolerantTask)
+@ shared_task_conditional(base=FaultTolerantTask)
 def push_notify(pk):
     """Push notify a notification."""
     setUp()
