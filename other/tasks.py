@@ -100,10 +100,10 @@ def notify_new_comm(pk):
     while instance.thread_rank > 1:
         instance = instance.parent
         users.append(instance.posted_by.user)
-        notify.send(
-            instance,
-            recipient=users,
-            verb=commented_user.name + " commented to you post " + instance.content)
+    notify.send(
+        instance,
+        recipient=users,
+        verb=commented_user.name + " commented to your post " + instance.content)
 
 @shared_task_conditional(base=FaultTolerantTask)
 def notify_new_reaction(pk):
@@ -113,7 +113,7 @@ def notify_new_reaction(pk):
     if not instance:
         return
 
-    user = [instance.user.user]
+    user = [instance.communitypost.posted_by.user]
     notify.send(
         instance,
         recipient=user,
@@ -149,7 +149,10 @@ def push_notify(pk):
     if not hasattr(settings, 'FCM_SERVER_KEY'):
         return
 
-    push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
+    try:
+        push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
+    except:
+        return
 
     # Send FCM push notification
     for device in profile.devices.all():
