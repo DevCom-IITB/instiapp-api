@@ -100,10 +100,10 @@ def notify_new_comm(pk):
     while instance.thread_rank > 1:
         instance = instance.parent
         users.append(instance.posted_by.user)
-        notify.send(
-            instance,
-            recipient=users,
-            verb=commented_user.name + " commented to you post " + instance.content)
+    notify.send(
+        instance,
+        recipient=users,
+        verb=commented_user.name + " commented to your post " + instance.content)
 
 @shared_task_conditional(base=FaultTolerantTask)
 def notify_new_reaction(pk):
