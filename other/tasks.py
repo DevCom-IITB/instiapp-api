@@ -113,7 +113,7 @@ def notify_new_reaction(pk):
     if not instance:
         return
 
-    user = [instance.user.user]
+    user = [instance.communitypost.posted_by.user]
     notify.send(
         instance,
         recipient=user,
