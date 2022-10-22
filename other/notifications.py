@@ -38,6 +38,9 @@ def notify_new_commpost(instance, created, **kwargs):
             tasks.notify_new_commpost.delay(instance.id)
         elif (instance.thread_rank > 1 and instance.status == 1 and instance.deleted == False):
             tasks.notify_new_comm.delay(instance.id)
+        elif (instance.thread_rank == 1 and instance.status == 0 and instance.deleted == False):
+            # Notify all body followers
+            tasks.notify_new_commpostadmin.delay(instance.id)
 
 def notify_new_reaction(instance, created, **kwargs):
     """Notify users a new reaction on their post"""
