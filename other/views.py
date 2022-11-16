@@ -49,7 +49,7 @@ class OtherViewset(viewsets.ViewSet):
         # Search bodies by name and description
         if 'bodies' in types:
             bodies = query_search(
-                request, MIN_LENGTH, Body.objects, ['name', 'description'],
+                request, MIN_LENGTH, Body.objects, ['name', 'canonical_name', 'description'],
                 'bodies', order_relevance=True)
 
         # Search events by name and description
