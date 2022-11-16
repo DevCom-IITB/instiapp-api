@@ -19,6 +19,7 @@ from users.models import UserProfile
 from users.models import WebPushSubscription
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
+from querybot.models import ChatBotLog
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """UserProfile"""
@@ -141,30 +142,13 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         This will create or update if record exists."""
 
         # Get reaction from query parameter
-        reaction = request.GET.get('reaction')
-        answer = request.GET.get('answer')
-        question = request.GET.get('question')
+        reaction = request.data['reaction']
+        answer = request.data['answer']
+        question = request.data['question']
         if reaction is None or answer is None or question is None:
             return Response({"message": "reaction is required"}, status=400)
 
-        content = {
-            question: {
-                "answer": answer,
-                "reaction": reaction,
-            }
-        }
-        print(answer, question, reaction)
-        import json
-        with open(settings.CHATBOT_LOG, 'r+') as file:
-
-            file_data = json.load(file)
-            if "logs" in file_data:
-                file_data["logs"].append(content)
-            else:
-                file_data = {"logs": []}
-            file.seek(0)
-
-            json.dump(file_data, file, indent=4)
+        logentry = ChatBotLog.objects.create(question=question, answer=answer, reaction=reaction)
 
         return Response(status=204)
 
