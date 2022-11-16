@@ -1,10 +1,11 @@
 """Views for users app."""
+from tkinter.tix import STATUS
 from uuid import UUID
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-
+from django.conf import settings
 from login.helpers import update_fcm_device
 
 from events.models import UserEventStatus
@@ -132,6 +133,40 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         # Update existing UserNewsReaction
         unr.reaction = reaction
         unr.save()
+        return Response(status=204)
+
+    @classmethod
+    @login_required_ajax
+    def set_ucr_me(cls, request):
+        """Set UNR(User News Reaction) for current user.
+        This will create or update if record exists."""
+
+        # Get reaction from query parameter
+        reaction = request.GET.get('reaction')
+        answer = request.GET.get('answer')
+        question = request.GET.get('question')
+        if reaction is None or answer is None or question is None:
+            return Response({"message": "reaction is required"}, status=400)
+
+        content = {
+            question : {
+                "answer" : answer,
+                "reaction" : reaction,
+            }
+        }
+        print(answer, question, reaction)
+        import json
+        with open(settings.CHATBOT_LOG,'r+') as file:
+            
+            file_data = json.load(file)
+            if "logs" in file_data:
+                file_data["logs"].append(content)
+            else:
+                file_data = {"logs":[]}
+            file.seek(0)
+            
+            json.dump(file_data, file, indent = 4)
+
         return Response(status=204)
 
     @classmethod

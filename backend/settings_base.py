@@ -177,6 +177,7 @@ TRAINING_BLOG_BODY = 'Internship Blog'
 LDAP_USERNAME = None
 LDAP_PASSWORD = None
 SSO_TOTP_TOKEN = None
+CHATBOT_LOG = "chatbot_logs.json"
 
 if 'LDAP_USERNAME' in os.environ and 'LDAP_PASSWORD' in os.environ and 'SSO_TOTP_TOKEN' in os.environ:
     LDAP_USERNAME = os.environ['LDAP_USERNAME']
