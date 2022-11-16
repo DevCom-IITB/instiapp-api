@@ -1,5 +1,4 @@
 """Views for users app."""
-from tkinter.tix import STATUS
 from uuid import UUID
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -149,23 +148,23 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return Response({"message": "reaction is required"}, status=400)
 
         content = {
-            question : {
-                "answer" : answer,
-                "reaction" : reaction,
+            question: {
+                "answer": answer,
+                "reaction": reaction,
             }
         }
         print(answer, question, reaction)
         import json
-        with open(settings.CHATBOT_LOG,'r+') as file:
-            
+        with open(settings.CHATBOT_LOG, 'r+') as file:
+
             file_data = json.load(file)
             if "logs" in file_data:
                 file_data["logs"].append(content)
             else:
-                file_data = {"logs":[]}
+                file_data = {"logs": []}
             file.seek(0)
-            
-            json.dump(file_data, file, indent = 4)
+
+            json.dump(file_data, file, indent=4)
 
         return Response(status=204)
 
