@@ -9,5 +9,5 @@ class CommunityPostAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Community)
-admin.site.register(CommunityPost)
+admin.site.register(CommunityPost, CommunityPostAdmin)
 admin.site.register(CommunityPostUserReaction)
