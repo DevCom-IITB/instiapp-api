@@ -30,7 +30,7 @@ class Location(models.Model):
 
     adjacent_locs = models.ManyToManyField(
         'locations.Location', through='LocationLocationDistance',
-        related_name='adjacent_locs', blank=True)
+        related_name='adjacent_loc', blank=True)
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(self.short_name)
@@ -52,9 +52,9 @@ class LocationLocationDistance(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 
     location1 = models.ForeignKey(Location, on_delete=models.CASCADE,
-                             default=uuid4, related_name='lld')
+                                  default=uuid4, related_name='lld1')
     location2 = models.ForeignKey(Location, on_delete=models.CASCADE,
-                             default=uuid4, related_name='lld')
+                                  default=uuid4, related_name='lld2')
     distance = models.FloatField(default=100000000)
 
     class Meta:
