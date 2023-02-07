@@ -36,7 +36,7 @@ class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disa
         elif isinstance(value, CommunityPost):
             serializer = CommunityPostSerializers(value)
         elif isinstance(value, Community):
-            serializer = CommunitySerializer(value)
+            serializer = CommunitySerializers(value)
         elif isinstance(value, CommunityPostUserReaction):
             serializer = CommunityPostSerializers(value.communitypost)
         elif isinstance(value, UserProfile):

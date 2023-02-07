@@ -1,5 +1,4 @@
 """Unit tests for Events."""
-from django.utils import timezone
 from django.test import TransactionTestCase
 from rest_framework.test import APIClient
 from community.models import Community, CommunityPost
@@ -8,11 +7,6 @@ from login.tests import get_new_user
 from helpers.test_helpers import create_body
 from helpers.test_helpers import create_community
 from helpers.test_helpers import create_communitypost
-from helpers.test_helpers import create_event
-from helpers.test_helpers import create_usertag
-from helpers.test_helpers import create_usertagcategory
-from community.serializer_min import CommunityPostSerializerMin, CommunitySerializerMin
-from community.serializers import CommunityPostSerializers, CommunitySerializers
 # pylint: disable=R0902
 
 class CommunityTestCase(TransactionTestCase):
@@ -88,9 +82,6 @@ class CommunityTestCase(TransactionTestCase):
                              [self.user1.profile.name] * response.data['count'])
 
     def test_communitypost_pendinglist(self):
-        post1 = create_communitypost(community=self.test_community_1, posted_by=self.user1.profile)
-        post2 = create_communitypost(community=self.test_community_1, posted_by=self.user2.profile)
-
         url = '/api/communityposts?status=0'
         response = self.client1.get(url, format='json')
         data = response.data['data']
@@ -160,7 +151,6 @@ class CommunityTestCase(TransactionTestCase):
 
     def test_communitypost_moderation(self):
         post1 = create_communitypost(community=self.test_community_1, posted_by=self.user1.profile)
-        post2 = create_communitypost(community=self.test_community_1, posted_by=self.user1.profile)
 
         # Reject
         url = '/api/communityposts/moderator/' + str(post1.id)

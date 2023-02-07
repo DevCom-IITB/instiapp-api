@@ -8,14 +8,14 @@ import csv
 from django.http import HttpResponse
 
 def export_as_csv(self, request, queryset):
-	response = HttpResponse(content_type='text/csv')
-	response['Content-Disposition'] = 'attachment; filename=a.csv'
-	writer = csv.writer(response)
-	
-	writer.writerow(['name', 'roll_no', 'contact'])
-	for obj in queryset:
-		row = writer.writerow([obj.name, obj.roll_no, obj.contact_no])
-	return response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=a.csv'
+    writer = csv.writer(response)
+
+    writer.writerow(['name', 'roll_no', 'contact'])
+    for obj in queryset:
+        writer.writerow([obj.name, obj.roll_no, obj.contact_no])
+    return response
 
 class ProfileAdmin(admin.ModelAdmin):
     search_fields = ['name', 'roll_no', 'ldap_id']

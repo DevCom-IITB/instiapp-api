@@ -1,5 +1,4 @@
 from __future__ import absolute_import, unicode_literals
-from email.mime import base
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
@@ -7,7 +6,7 @@ from notifications.models import Notification
 from notifications.signals import notify
 from pyfcm import FCMNotification
 from achievements.models import UserInterest
-from community.models import Community, CommunityPost, CommunityPostUserReaction
+from community.models import CommunityPost, CommunityPostUserReaction
 from events.models import Event
 from helpers.celery import shared_task_conditional
 from helpers.celery import FaultTolerantTask
@@ -172,7 +171,7 @@ def push_notify(pk):
 
     try:
         push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
-    except:
+    except Exception:
         return
 
     # Send FCM push notification

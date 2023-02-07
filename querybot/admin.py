@@ -47,7 +47,7 @@ def export_as_csv(self, request, queryset):
 
     writer.writerow(['question', 'answer', 'reaction'])
     for obj in queryset:
-        row = writer.writerow([obj.question, obj.answer, obj.reaction])
+        writer.writerow([obj.question, obj.answer, obj.reaction])
     return response
 
 class ChatBotLogAdmin(admin.ModelAdmin):

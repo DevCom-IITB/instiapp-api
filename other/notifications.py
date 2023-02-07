@@ -33,12 +33,12 @@ def notify_upd_event(instance):
 def notify_new_commpost(instance, created, **kwargs):
     """Notify users that a new post was created."""
     if isinstance(instance, CommunityPost):
-        if (instance.thread_rank == 1 and instance.status == 1 and instance.deleted == False):
+        if (instance.thread_rank == 1 and instance.status == 1 and not instance.deleted):
             # Notify all body followers
             tasks.notify_new_commpost.delay(instance.id)
-        elif (instance.thread_rank > 1 and instance.status == 1 and instance.deleted == False):
+        elif (instance.thread_rank > 1 and instance.status == 1 and not instance.deleted):
             tasks.notify_new_comm.delay(instance.id)
-        elif (instance.thread_rank == 1 and instance.status == 0 and instance.deleted == False):
+        elif (instance.thread_rank == 1 and instance.status == 0 and not instance.deleted):
             # Notify all body followers
             tasks.notify_new_commpostadmin.delay(instance.id)
 

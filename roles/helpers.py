@@ -18,7 +18,7 @@ def user_has_privilege(profile, bodyid, privilege):
         if (role.body == body or role.inheritable) and privilege in role.permissions:
             return True
     return False
-def user_has_community_privilege(profile,communityid,privilege):
+def user_has_community_privilege(profile, communityid, privilege):
     """Returns true if UserProfile has or has inherited the privilege."""
     community = Community.objects.get(pk=communityid)
     parents = get_parents_recursive(community, [])

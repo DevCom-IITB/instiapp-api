@@ -10,8 +10,6 @@ from messmenu.models import Hostel, MessCalEvent
 from messmenu.serializers import HostelSerializer, MessCalEventSerializer
 from django.utils.timezone import make_aware
 
-from users.models import UserProfile
-
 @api_view(['GET', ])
 def get_mess(request):
     """Get mess menus of all hostels."""
@@ -67,20 +65,19 @@ def getUserMess(request):
             for d in details:
                 k = binaryDecode(d)
                 mealnum = k["meal"]
-                if mealnum == "000":
-                    title = "Breakfast"
-                elif mealnum == "001":
-                    title = "Lunch"
-                elif mealnum == "010":
-                    title = "Snacks"
-                elif mealnum == "011":
-                    title = "Dinner"
-                elif mealnum == "100":
-                    title = "Milk"
-                elif mealnum == "101":
-                    title = "Egg"
-                elif mealnum == "110":
-                    title = "Fruit"
+
+                mealnumtotitle = {
+                    "000": "Breakfast",
+                    "001": "Lunch",
+                    "010": "Snacks",
+                    "011": "Dinner",
+                    "100": "Milk",
+                    "101": "Egg",
+                    "110": "Fruit"
+                }
+
+                if mealnum in mealnumtotitle:
+                    title = mealnumtotitle[mealnum]
                 else:
                     title = "Other"
 

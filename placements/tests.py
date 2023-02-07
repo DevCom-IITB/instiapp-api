@@ -54,7 +54,8 @@ class PlacementsTestCase(APITestCase):
     # def test_blog_order(self):
     #     """Test ordering of the pinned blogs"""
     #     BlogEntry.objects.create(title="UnpinnedEntry2", blog_url=settings.PLACEMENTS_URL_VAL,)
-    #     pinnedEntry1 = BlogEntry.objects.create(title="PinnedEntry1", blog_url=settings.PLACEMENTS_URL_VAL, pinned=True)
+        # pinnedEntry1 = BlogEntry.objects.create(title="PinnedEntry1",
+        #                                         blog_url=settings.PLACEMENTS_URL_VAL, pinned=True)
 
     #     BlogEntry.objects.create(title="UnpinnedEntry3", blog_url=settings.PLACEMENTS_URL_VAL,)
     #     BlogEntry.objects.create(title="UnpinnedEntry4", blog_url=settings.PLACEMENTS_URL_VAL,)

@@ -18,6 +18,7 @@ class NewsEntry(models.Model):
     reacted_by = models.ManyToManyField(
         'users.UserProfile', through='UserNewsReaction',
         related_name='news_reactions', blank=True)
+
     def __str__(self):
         return self.title
 

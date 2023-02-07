@@ -4,13 +4,11 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.conf import settings
 from login.helpers import update_fcm_device
 
 from events.models import UserEventStatus
 from events.models import Event
 from events.serializers import EventSerializer
-from news import models
 from news.models import UserNewsReaction
 from news.models import NewsEntry
 from community.models import CommunityPost, CommunityPostUserReaction
@@ -148,7 +146,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         if reaction is None or answer is None or question is None:
             return Response({"message": "reaction is required"}, status=400)
 
-        logentry = ChatBotLog.objects.create(question=question, answer=answer, reaction=reaction)
+        ChatBotLog.objects.create(question=question, answer=answer, reaction=reaction)
 
         return Response(status=204)
 

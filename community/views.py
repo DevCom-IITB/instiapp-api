@@ -1,12 +1,4 @@
-from collections import UserList
-from http.client import BAD_REQUEST
-from os import stat
-from pickle import GET
-from unicodedata import name
 from uuid import UUID
-from bodies.models import Body
-from users.models import UserProfile
-from locations.models import Location
 from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
@@ -15,13 +7,10 @@ from community.models import CommunityPost
 from community.serializer_min import CommunitySerializerMin, CommunityPostSerializerMin
 from community.serializers import CommunitySerializers, CommunityPostSerializers
 from roles.helpers import user_has_privilege
-from roles.helpers import user_has_community_privilege
 from roles.helpers import login_required_ajax
-from roles.helpers import forbidden_no_privileges, diff_set
-from locations.helpers import create_unreusable_locations
+from roles.helpers import forbidden_no_privileges
 from helpers.misc import query_from_num
 from helpers.misc import query_search
-from django.db.models import Count
 
 class ModeratorViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects
@@ -39,8 +28,8 @@ class ModeratorViewSet(viewsets.ModelViewSet):
     def change_status(self, request, pk):
         post = self.get_community_post(pk)
 
-        if ((user_has_privilege(request.user.profile, post.community.body.id, 'AppP') and post.thread_rank == 1) or
-                (user_has_privilege(request.user.profile, post.community.body.id, 'ModC') and post.thread_rank > 1)):
+        if ((user_has_privilege(request.user.profile, post.community.body.id, 'AppP') and post.thread_rank == 1)
+                or (user_has_privilege(request.user.profile, post.community.body.id, 'ModC') and post.thread_rank > 1)):
             # Get query param
             status = request.data["status"]
             if status is None:
@@ -132,7 +121,7 @@ class PostViewSet(viewsets.ModelViewSet):
         '''action==feature for featuring a post'''
         post = self.get_community_post(pk)
 
-        if(action == "feature"):
+        if (action == "feature"):
             if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
 
                 # Get query param
@@ -148,8 +137,8 @@ class PostViewSet(viewsets.ModelViewSet):
 
             return forbidden_no_privileges()
 
-        if(action == "delete"):
-            if(request.user.profile == post.posted_by):
+        if (action == "delete"):
+            if (request.user.profile == post.posted_by):
                 post.deleted = True
                 post.featured = False
                 post.save()
@@ -163,8 +152,8 @@ class PostViewSet(viewsets.ModelViewSet):
 
             return forbidden_no_privileges()
 
-        if(action == "report"):
-            if(request.user.profile not in post.reported_by.all()):
+        if (action == "report"):
+            if (request.user.profile not in post.reported_by.all()):
                 post.reported_by.add(request.user.profile)
                 # post.reports +=1
                 post.save()

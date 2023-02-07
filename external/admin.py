@@ -6,4 +6,5 @@ class ExternalBlogAdmin(admin.ModelAdmin):
     list_display = ('title', 'body', 'published')
     search_fields = ['title']
 
+
 admin.site.register(ExternalBlogEntry, ExternalBlogAdmin)

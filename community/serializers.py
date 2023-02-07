@@ -1,7 +1,3 @@
-from cmath import log
-from collections import Counter
-import re
-from wsgiref import validate
 from rest_framework import serializers
 from achievements.models import Interest
 from community.models import Community, CommunityPost
@@ -9,8 +5,6 @@ from community.serializer_min import CommunityPostSerializerMin
 from roles.serializers import RoleSerializerMin
 from users.models import UserProfile
 from bodies.models import Body
-from locations.models import Location
-from unicodedata import name
 
 class CommunitySerializers(serializers.ModelSerializer):
 
@@ -32,7 +26,7 @@ class CommunitySerializers(serializers.ModelSerializer):
 
     def get_followers_count(self, obj):
         """Get followers of body."""
-        if obj.body == None:
+        if obj.body is None:
             return 0
         return obj.body.followers.count()
 
@@ -47,7 +41,8 @@ class CommunitySerializers(serializers.ModelSerializer):
     class Meta:
         model = Community
         fields = ('id', 'str_id', 'name', 'about', 'description', 'created_at', 'updated_at',
-                  'cover_image', 'logo_image', 'followers_count', 'is_user_following', 'roles', 'posts', 'body', 'featured_posts')
+                  'cover_image', 'logo_image', 'followers_count', 'is_user_following', 'roles',
+                  'posts', 'body', 'featured_posts')
 
     @staticmethod
     def setup_eager_loading(queryset, request):

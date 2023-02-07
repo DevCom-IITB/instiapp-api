@@ -1,10 +1,8 @@
 """Minimal serializer for Body."""
-from itertools import count
 from rest_framework import serializers
 from achievements.serializers import InterestSerializer
 from bodies.serializer_min import BodySerializerMin
 from community.models import Community, CommunityPost
-from bodies.serializers_followers import BodyFollowersSerializer
 from users.serializers import UserProfileSerializer
 
 class CommunitySerializerMin(serializers.ModelSerializer):
@@ -15,7 +13,7 @@ class CommunitySerializerMin(serializers.ModelSerializer):
 
     def get_followers_count(self, obj):
         """Get followers of community."""
-        if obj.body == None:
+        if obj.body is None:
             return 0
         return obj.body.followers.count()
 
@@ -123,7 +121,5 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
         model = CommunityPost
         fields = ('id', 'str_id', 'content', 'posted_by',
                   'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
-                  'image_url', 'most_liked_comment', 'thread_rank', 'community', 'status', 'tag_body', 'tag_user', 'interests',
-                  'featured', 'deleted', 'anonymous', 'reported_by', 'has_user_reported')
-
-# model me field ignored, save pe check kar kaise karna he , change satus is current status 3 to 1 ignore kar dena , if ignored save pe check nahi karna
+                  'image_url', 'most_liked_comment', 'thread_rank', 'community', 'status', 'tag_body', 'tag_user',
+                  'interests', 'featured', 'deleted', 'anonymous', 'reported_by', 'has_user_reported')
