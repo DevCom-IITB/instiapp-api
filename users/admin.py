@@ -1,11 +1,11 @@
+import csv
 from django.contrib import admin
+from django.http import HttpResponse
 from users.models import UserProfile
 from users.models import UserFormerRole
 from users.models import WebPushSubscription
 from users.models import UserTagCategory
 from users.models import UserTag
-import csv
-from django.http import HttpResponse
 
 def export_as_csv(self, request, queryset):
     response = HttpResponse(content_type='text/csv')

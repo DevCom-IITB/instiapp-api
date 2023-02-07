@@ -1,10 +1,9 @@
-from notifications.signals import notify
-
+import csv
 from django.contrib import admin
 from django.contrib.auth.models import User
-from querybot.models import Query, UnresolvedQuery, ChatBotLog
-import csv
 from django.http import HttpResponse
+from notifications.signals import notify
+from querybot.models import Query, UnresolvedQuery, ChatBotLog
 
 def handle_entry(entry, notify_user=True):
     """Handle a single entry from a feed."""

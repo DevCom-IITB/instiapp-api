@@ -121,7 +121,7 @@ class PostViewSet(viewsets.ModelViewSet):
         '''action==feature for featuring a post'''
         post = self.get_community_post(pk)
 
-        if (action == "feature"):
+        if action == "feature":
             if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
 
                 # Get query param
@@ -137,8 +137,8 @@ class PostViewSet(viewsets.ModelViewSet):
 
             return forbidden_no_privileges()
 
-        if (action == "delete"):
-            if (request.user.profile == post.posted_by):
+        if action == "delete":
+            if request.user.profile == post.posted_by:
                 post.deleted = True
                 post.featured = False
                 post.save()
@@ -152,17 +152,16 @@ class PostViewSet(viewsets.ModelViewSet):
 
             return forbidden_no_privileges()
 
-        if (action == "report"):
-            if (request.user.profile not in post.reported_by.all()):
+        if action == "report":
+            if request.user.profile not in post.reported_by.all():
                 post.reported_by.add(request.user.profile)
                 # post.reports +=1
                 post.save()
                 return Response({"message": "Post reported"})
-            else:
-                post.reported_by.remove(request.user.profile)
-                # post.reports -=1
-                post.save()
-                return Response({"message": "Post unreported"})
+            post.reported_by.remove(request.user.profile)
+            # post.reports -=1
+            post.save()
+            return Response({"message": "Post unreported"})
 
         return Response({"message": "action not supported"}, status=400)
 
@@ -177,9 +176,6 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommunityViewSet(viewsets.ModelViewSet):
     queryset = Community.objects
     serializer_class = CommunitySerializers
-
-    def get_serializer_context(self):
-        return super().get_serializer_context()
 
     @login_required_ajax
     def list(self, request):

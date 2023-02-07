@@ -124,8 +124,11 @@ class PlacementsTestCase(APITestCase):
         call_command('placement_blog_chore')
 
         # Check if posts were collected
-        placements = lambda: BlogEntry.objects.all().filter(blog_url=settings.PLACEMENTS_URL_VAL)
-        trainings = lambda: BlogEntry.objects.all().filter(blog_url=settings.TRAINING_BLOG_URL_VAL)
+        def placements():
+            return BlogEntry.objects.all().filter(blog_url=settings.PLACEMENTS_URL_VAL)
+
+        def trainings():
+            return BlogEntry.objects.all().filter(blog_url=settings.TRAINING_BLOG_URL_VAL)
         self.assertEqual(placements().count(), 3)
         self.assertEqual(trainings().count(), 5)
         self.assertEqual(set(x.guid for x in placements()), set('sample:p:%i' % i for i in range(1, 4)))

@@ -13,7 +13,7 @@ from bodies.models import Body
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def fill_blog(url, body):
-    response = requests.get(url, verify=False)
+    response = requests.get(url, verify=False, timeout=10)
     feeds = feedparser.parse(response.content)
 
     if not feeds['feed']:

@@ -18,6 +18,7 @@ from helpers.misc import table_to_markdown
 
 class ProfileFetcher():
     """Helper to get dictionary of profiles efficiently."""
+
     def __init__(self):
         self.roll_nos = None
 
@@ -97,7 +98,7 @@ def fill_blog(url, body_name, url_val):
 
         # Get the feed
         response = requests.get(url, auth=HTTPBasicAuth(
-            settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
+            settings.LDAP_USERNAME, settings.LDAP_PASSWORD), timeout=10)
         feeds = feedparser.parse(response.content)
 
         if not feeds['feed']:

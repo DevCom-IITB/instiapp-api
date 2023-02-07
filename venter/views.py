@@ -190,21 +190,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = ComplaintComment.objects
     serializer_class = CommentPostSerializer
 
-    @classmethod
-    @login_required_ajax
-    def create(cls, request, pk):
-        get_complaint = get_object_or_404(Complaint.objects.all(), id=pk)
-        get_text = request.data['text']
-        comment = ComplaintComment.objects.create(
-            text=get_text, commented_by=request.user.profile, complaint=get_complaint)
-        # Auto subscribes the commenter to the complaint
-        if settings.COMPLAINT_AUTO_SUBSCRIBE:
-            get_complaint.subscriptions.add(request.user.profile)
-            get_complaint.save()
-
-        serialized = CommentSerializer(comment)
-        return Response(serialized.data, status=201)
-
     @login_required_ajax
     def update(self, request, pk):
         """Update a comment if created by current user."""

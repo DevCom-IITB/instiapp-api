@@ -68,7 +68,7 @@ def handle_entry(entry):
 def fill_blog(url):
 
     # Get the feed
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
     feeds = feedparser.parse(response.content)
 
     if not feeds['feed']:

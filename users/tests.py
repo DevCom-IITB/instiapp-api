@@ -56,7 +56,8 @@ class UserTestCase(APITestCase):
         """Check the /api/user-me API."""
 
         # Function to get latest user from database
-        usr = lambda: UserProfile.objects.get(id=self.user.profile.id)
+        def usr():
+            return UserProfile.objects.get(id=self.user.profile.id)
 
         # Initialize
         self.user.profile.fcm_id = 'TESTINIT'
