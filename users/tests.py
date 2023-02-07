@@ -27,10 +27,10 @@ class UserTestCase(APITestCase):
 
         contact = '9876543210'
         profile = UserProfile.objects.create(
-            name="TestUser", ldap_id="tu", contact_no=contact)
+            name="TestUser", roll_no="tu", ldap_id="tu", contact_no=contact)
 
         # Check __str__
-        self.assertEqual(str(profile), profile.name)
+        self.assertEqual(str(profile), profile.name + ' - ' + profile.roll_no)
 
         # Test GET with UUID
         url = '/api/users/' + str(profile.id)
