@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.timezone import now
 
 class ExternalBlogEntry(models.Model):
-    """A single entry on the placements blog."""
+    """A single entry on the external blog."""
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     guid = models.CharField(max_length=200, blank=True)
