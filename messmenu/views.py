@@ -10,6 +10,7 @@ from messmenu.models import Hostel, MessCalEvent
 from messmenu.serializers import HostelSerializer, MessCalEventSerializer
 from django.utils.timezone import make_aware
 
+from users.models import UserProfile
 
 @api_view(['GET', ])
 def get_mess(request):
@@ -78,6 +79,8 @@ def getUserMess(request):
                     title = "Milk"
                 elif mealnum == "101":
                     title = "Egg"
+                elif mealnum == "110":
+                    title = "Fruit"
                 else:
                     title = "Other"
 
@@ -86,7 +89,7 @@ def getUserMess(request):
                 hostel = k["hostel"]
 
                 item, c = MessCalEvent.objects.get_or_create(user=user, datetime=date, hostel=hostel)
-                if c:
+                if c or item.title != title:
                     item.title = title
                     item.save()
 
