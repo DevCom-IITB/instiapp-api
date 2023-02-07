@@ -55,8 +55,6 @@ jobs:
         run: |
           pipenv run flake8
           pipenv run pylint_runner
-        env:
-          DJANGO_SETTINGS_MODULE: backend.settings_test
 
   test-mysql:
     services:
