@@ -17,7 +17,7 @@ class Command(BaseCommand):
         cleaned = 0
         for image in UploadedImage.objects.filter(is_claimed=False):
             # Check if the image was uploaded in the last hour
-            if (timezone.now() - image.time_of_creation).total_seconds() < 10:
+            if (timezone.now() - image.time_of_creation).total_seconds() < 3600:
                 continue
 
             # Initialize
@@ -53,10 +53,10 @@ class Command(BaseCommand):
         # Validate claims on claimed images
         verified = 0
         for image in UploadedImage.objects.prefetch_related('claimant').filter(is_claimed=True):
-            if (not image.claimant
-                or (type(image.claimant) != Community
+            if (not image.claimant  # pylint: disable=R0916
+                or (not isinstance(image.claimant, Community)
                     and image.picture.url not in image.claimant.image_url)
-                or (type(image.claimant) == Community
+                or (isinstance(image.claimant, Community)
                     and image.picture.url not in image.claimant.logo_image
                     and image.picture.url not in image.claimant.cover_image)):
                 print('Invalid claimant for', image.picture.url, '(%s)' % str(image.uploaded_by))
