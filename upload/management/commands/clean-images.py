@@ -1,9 +1,11 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from django.db.models import Q
 from upload.models import UploadedImage
 from events.models import Event
 from bodies.models import Body
 from venter.models import ComplaintImage
+from community.models import Community, CommunityPost
 
 class Command(BaseCommand):
     help = 'Check claims and clean unclaimed images.'
@@ -15,7 +17,7 @@ class Command(BaseCommand):
         cleaned = 0
         for image in UploadedImage.objects.filter(is_claimed=False):
             # Check if the image was uploaded in the last hour
-            if (timezone.now() - image.time_of_creation).total_seconds() < 3600:
+            if (timezone.now() - image.time_of_creation).total_seconds() < 10:
                 continue
 
             # Initialize
@@ -26,7 +28,9 @@ class Command(BaseCommand):
             queries = [
                 Event.objects.filter(image_url__contains=url),
                 Body.objects.filter(image_url__contains=url),
-                ComplaintImage.objects.filter(image_url__contains=url)
+                ComplaintImage.objects.filter(image_url__contains=url),
+                Community.objects.filter(Q(logo_image__contains=url) | Q(cover_image__contains=url)),
+                CommunityPost.objects.filter(image_url__contains=url)
             ]
 
             # Look for claimants
@@ -49,7 +53,12 @@ class Command(BaseCommand):
         # Validate claims on claimed images
         verified = 0
         for image in UploadedImage.objects.prefetch_related('claimant').filter(is_claimed=True):
-            if not image.claimant or image.picture.url not in image.claimant.image_url:
+            if (not image.claimant
+                or (type(image.claimant) != Community
+                    and image.picture.url not in image.claimant.image_url)
+                or (type(image.claimant) == Community
+                    and image.picture.url not in image.claimant.logo_image
+                    and image.picture.url not in image.claimant.cover_image)):
                 print('Invalid claimant for', image.picture.url, '(%s)' % str(image.uploaded_by))
                 image.delete()
                 cleaned += 1
