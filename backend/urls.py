@@ -39,7 +39,7 @@ schema_view = get_schema_view(
         default_version='v1',
         description="InstiApp IIT Bombay API",
         terms_of_service="https://insti.app/tos.html",
-        contact=openapi.Contact(email="support@insti.app"),
+        contact=openapi.Contact(email="devcom@iitb.ac.in"),
         license=openapi.License(name="AGPLv3"),
     ),
     public=True,
