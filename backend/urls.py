@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
 from django.contrib.sitemaps.views import sitemap
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -46,7 +47,7 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
-urlpatterns = [
+base_urlpatterns = [
     # Admin site
     path('admin/', admin.site.urls),
 
@@ -74,4 +75,8 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {
         'sitemaps': sitemaps()
     }, name='django.contrib.sitemaps.views.sitemap')
+]
+
+urlpatterns = [
+    path(settings.BASE_URL_PATH, include(base_urlpatterns)),
 ]
