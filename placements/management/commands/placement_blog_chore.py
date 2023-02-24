@@ -81,7 +81,7 @@ def fill_blog(url, body_name, url_val):
         # response = requests.get(url, auth=HTTPBasicAuth(
         #     settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
 
-        response = s.get(url)
+        response = s.get(url, verify=False, timeout=10)
 
         feeds = feedparser.parse(response.content)
 
