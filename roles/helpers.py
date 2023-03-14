@@ -1,6 +1,7 @@
 """Helper functions for implementing roles."""
 from rest_framework.response import Response
 from bodies.models import Body
+from community.models import Community
 
 def forbidden_no_privileges():
     """Forbidden due to insufficient privileges."""
@@ -15,6 +16,14 @@ def user_has_privilege(profile, bodyid, privilege):
     parents = get_parents_recursive(body, [])
     for role in profile.roles.all().filter(body__in=parents):
         if (role.body == body or role.inheritable) and privilege in role.permissions:
+            return True
+    return False
+def user_has_community_privilege(profile, communityid, privilege):
+    """Returns true if UserProfile has or has inherited the privilege."""
+    community = Community.objects.get(pk=communityid)
+    parents = get_parents_recursive(community, [])
+    for role in profile.roles.all().filter(community__in=parents):
+        if (role.body == community or role.inheritable) and privilege in role.permissions:
             return True
     return False
 

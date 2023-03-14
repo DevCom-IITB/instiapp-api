@@ -35,12 +35,21 @@ class Event(models.Model):
 
     starting_notified = models.BooleanField(default=False)
 
+    event_interest = models.ManyToManyField('achievements.Interest', related_name='events',
+                                            blank=True)
+
     promotion_boost = models.IntegerField(default=0)
 
     weight = 0
 
     def __str__(self):
-        return self.name
+        all_bodies = self.all_bodies()
+        if all_bodies == []:
+            return self.name
+        bodies_str = all_bodies[0]
+        for body in all_bodies[1:]:
+            bodies_str += ", " + body
+        return f"{self.name} - {bodies_str}"
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
@@ -48,6 +57,9 @@ class Event(models.Model):
 
     def get_absolute_url(self):
         return '/event/' + self.str_id
+
+    def all_bodies(self):
+        return [str(body) for body in self.bodies.all()]
 
     class Meta:
         verbose_name = "Event"

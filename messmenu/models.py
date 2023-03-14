@@ -31,3 +31,18 @@ class MenuEntry(models.Model):
 
     def __str__(self):
         return self.hostel.name + ' - ' + str(self.day)
+
+class MessCalEvent(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    hostel = models.IntegerField()
+    datetime = models.DateTimeField()
+    title = models.CharField(max_length=100)  # Breakfast, Lunch, Snacks, Dinner
+    user = models.ForeignKey(
+        'users.UserProfile',
+        on_delete=models.CASCADE,
+        default=uuid4,
+        related_name='ums'
+    )
+
+    def __str__(self):
+        return f"{str(self.user)}, {self.title}"

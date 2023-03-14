@@ -192,7 +192,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     @classmethod
     @login_required_ajax
-    def create(cls, request, pk):
+    def create(cls, request, pk):  # pylint: disable=W0237
         get_complaint = get_object_or_404(Complaint.objects.all(), id=pk)
         get_text = request.data['text']
         comment = ComplaintComment.objects.create(

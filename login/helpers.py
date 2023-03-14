@@ -28,7 +28,7 @@ def perform_login(auth_code, redir, request):
         headers={
             "Authorization": "Basic " + settings.SSO_CLIENT_ID_SECRET_BASE64,
             "Content-Type": "application/x-www-form-urlencoded"
-        }, verify=not settings.SSO_BAD_CERT)
+        }, verify=not settings.SSO_BAD_CERT, timeout=10)
     response_json = response.json()
 
     # Check that we have the access token
@@ -40,7 +40,7 @@ def perform_login(auth_code, redir, request):
         settings.SSO_PROFILE_URL,
         headers={
             "Authorization": "Bearer " + response_json['access_token'],
-        }, verify=not settings.SSO_BAD_CERT)
+        }, verify=not settings.SSO_BAD_CERT, timeout=10)
     profile_json = profile_response.json()
 
     # Check if we got at least the user's SSO id
@@ -221,3 +221,10 @@ def perform_alumni_login(request, ldap_entered):
     user = UserProfile.objects.filter(query).first().user
     login(request, user)
     request.session.save()
+    queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
+    user_profile = queryset.get(user=user)
+    return request.session.session_key, user.username, user_profile.id, UserProfileFullSerializer(
+        user_profile, context={
+            'request': request
+        }
+    ).data
