@@ -9,7 +9,8 @@ class HostelAdmin(admin.ModelAdmin):
 
 class MessCalEventAdmin(admin.ModelAdmin):
     list_filter = ('datetime', 'hostel',)
-    list_display = ('user', 'hostel', 'title',)    
+    list_display = ('user', 'hostel', 'title', 'datetime',)
+
 
 # Register your models here.
 admin.site.register(Hostel, HostelAdmin)

@@ -17,7 +17,7 @@ class Command(BaseCommand):
         queryset = Notification.objects.filter(timestamp__lte=now() - timedelta(days=90))
         print('Dumping and Cleaning up %s old notifications' % queryset.count())
         if queryset.count() > 0:
-            notif_list = list(queryset.values())
+            notif_list = queryset.values()
             with open(file_path, 'a') as f:
                 for notif in notif_list:
                     json.dump(notif, f, ensure_ascii=False, default=str)

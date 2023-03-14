@@ -1,4 +1,5 @@
 google_client_secret.json
+chatbot_logs.json
 .vscode
 upload/static
 htmlcov
@@ -109,3 +110,4 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+

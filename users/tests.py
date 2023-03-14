@@ -27,10 +27,10 @@ class UserTestCase(APITestCase):
 
         contact = '9876543210'
         profile = UserProfile.objects.create(
-            name="TestUser", ldap_id="tu", contact_no=contact)
+            name="TestUser", roll_no="tu", ldap_id="tu", contact_no=contact)
 
         # Check __str__
-        self.assertEqual(str(profile), profile.name)
+        self.assertEqual(str(profile), profile.name + ' - ' + profile.roll_no)
 
         # Test GET with UUID
         url = '/api/users/' + str(profile.id)
@@ -56,7 +56,8 @@ class UserTestCase(APITestCase):
         """Check the /api/user-me API."""
 
         # Function to get latest user from database
-        usr = lambda: UserProfile.objects.get(id=self.user.profile.id)
+        def usr():
+            return UserProfile.objects.get(id=self.user.profile.id)
 
         # Initialize
         self.user.profile.fcm_id = 'TESTINIT'
@@ -163,7 +164,7 @@ class UserTestCase(APITestCase):
         dev.application = 'app.insti.flutter'
         self.assertEqual(dev.supports_rich(), False)
         self.assertNotEqual(dev.process_rich(data)['click_action'], None)
-        dev.application = 'app.insti.ios'
+        dev.application = 'app.instiapp.flutter'
         self.assertEqual(dev.supports_rich(), False)
 
     def test_get_noauth(self):

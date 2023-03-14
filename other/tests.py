@@ -190,8 +190,9 @@ class OtherTestCase(TransactionTestCase):
         self.assertIn(EventSerializer(event3).data, actors)
 
         # Mark event2 as read
+        def e2notif():
+            return Notification.objects.get(pk=e2n['id'])
         e2n = [n for n in response.data if n['actor'] == EventSerializer(event2).data][0]
-        e2notif = lambda: Notification.objects.get(pk=e2n['id'])
         self.assertEqual(e2notif().unread, True)
         self.assertEqual(e2notif().deleted, False)
         response = self.client.get(url + '/read/' + str(e2n['id']))

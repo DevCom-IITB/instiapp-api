@@ -33,12 +33,12 @@ class ExternalTestCase(APITestCase):
         ExternalBlogEntry.objects.create(title="TEntry2")
         ExternalBlogEntry.objects.create(title="TEntry3")
 
-    def test_placement_other(self):
-        """Check misc parameters of Placement."""
-        self.assertEqual(str(self.entry1), self.entry1.title)
+    def test_external_other(self):
+        """Check misc parameters of External."""
+        self.assertEqual(str(self.entry1), self.entry1.title + ' - ' + self.entry1.body)
 
-    def test_placement_get(self):
-        """Check auth before getting placements."""
+    def test_external_get(self):
+        """Check auth before getting external blogs."""
         test_blog(self, '/api/external-blog', 5)
 
     def test_blog_order(self):
@@ -65,8 +65,8 @@ class ExternalTestCase(APITestCase):
         self.assertEqual(response.data[4]['id'], str(first_entry.id))
 
     @freeze_time('2019-01-02')
-    def test_placements_chore(self):
-        """Test the placement blog chore."""
+    def test_external_chore(self):
+        """Test the external blog chore."""
 
         # Clear table
         ExternalBlogEntry.objects.all().delete()
@@ -75,10 +75,10 @@ class ExternalTestCase(APITestCase):
         call_command('external_blog_chore')
 
         # Check if posts were collected
-        placements = ExternalBlogEntry.objects.all()
-        self.assertEqual(placements.count(), 5)
-        self.assertEqual(set(x.guid for x in placements), set('sample:t:%i' % i for i in range(1, 6)))
-        self.assertEqual(set(x.title for x in placements), set('Training Item %i' % i for i in range(1, 6)))
+        externals = ExternalBlogEntry.objects.all()
+        self.assertEqual(externals.count(), 5)
+        self.assertEqual(set(x.guid for x in externals), set('sample:t:%i' % i for i in range(1, 6)))
+        self.assertEqual(set(x.title for x in externals), set('Training Item %i' % i for i in range(1, 6)))
 
     def tearDown(self):
         # Stop server

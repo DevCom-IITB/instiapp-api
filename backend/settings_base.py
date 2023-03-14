@@ -11,9 +11,10 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_URL_PATH = ''
 
 # Elasticsearch configuration
-ELASTICSEARCH_DSL={
+ELASTICSEARCH_DSL = {
     'default': {
         'hosts': 'localhost:9200'
     },
@@ -33,6 +34,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'django_elasticsearch_dsl',
+    'corsheaders',
 
     'achievements.apps.AchievementsConfig',
     'events.apps.EventsConfig',
@@ -49,6 +51,8 @@ INSTALLED_APPS = [
     'querybot.apps.QuerybotConfig',
     'external.apps.ExternalConfig',
     'alumni.apps.AlumniConfig',
+    'community.apps.CommunityConfig',
+
     'notifications',
     'markdownify',
 ]
@@ -57,7 +61,8 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'backend.middle.DisableCSRFMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -165,7 +170,7 @@ TRAINING_BLOG_URL_VAL = 'https://campus.placements.iitb.ac.in/blog/internship/?f
 
 EXTERNAL_BLOG_URL = 'https://gymkhana.iitb.ac.in/externalblog'
 
-MESSI_BASE_URL = ""
+MESSI_BASE_URL = "https://instamess.gymkhana.iitb.ac.in"
 
 # Names of bodies to notify when there are new posts on placement/training blog
 PLACEMENTS_BLOG_BODY = 'Placement Blog'
@@ -175,6 +180,7 @@ TRAINING_BLOG_BODY = 'Internship Blog'
 LDAP_USERNAME = None
 LDAP_PASSWORD = None
 SSO_TOTP_TOKEN = None
+CHATBOT_LOG = "chatbot_logs.json"
 
 if 'LDAP_USERNAME' in os.environ and 'LDAP_PASSWORD' in os.environ and 'SSO_TOTP_TOKEN' in os.environ:
     LDAP_USERNAME = os.environ['LDAP_USERNAME']
@@ -205,7 +211,7 @@ DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 COMPLAINT_AUTO_SUBSCRIBE = True
 
-DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # true when elasticsearch is configured
 USE_ELASTIC = True

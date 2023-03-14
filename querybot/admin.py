@@ -1,8 +1,9 @@
-from notifications.signals import notify
-
+import csv
 from django.contrib import admin
 from django.contrib.auth.models import User
-from querybot.models import Query, UnresolvedQuery
+from django.http import HttpResponse
+from notifications.signals import notify
+from querybot.models import Query, UnresolvedQuery, ChatBotLog
 
 def handle_entry(entry, notify_user=True):
     """Handle a single entry from a feed."""
@@ -38,5 +39,21 @@ class UnresolvedQueryAdmin(admin.ModelAdmin):
     list_filter = ['category', 'resolved']
     actions = [make_resolved]
 
+def export_as_csv(self, request, queryset):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=a.csv'
+    writer = csv.writer(response)
+
+    writer.writerow(['question', 'answer', 'reaction'])
+    for obj in queryset:
+        writer.writerow([obj.question, obj.answer, obj.reaction])
+    return response
+
+class ChatBotLogAdmin(admin.ModelAdmin):
+    search_fields = ['question', 'answer']
+    list_display = ('question', 'answer', 'reaction')
+    actions = [export_as_csv]
+
 
 admin.site.register(UnresolvedQuery, UnresolvedQueryAdmin)
+admin.site.register(ChatBotLog, ChatBotLogAdmin)

@@ -6,5 +6,6 @@ class BodyAdmin(admin.ModelAdmin):
     search_fields = ['name']
     ordering = ('-time_of_creation',)
 
+
 admin.site.register(Body, BodyAdmin)
 admin.site.register(BodyChildRelation)

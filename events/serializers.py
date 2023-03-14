@@ -100,11 +100,13 @@ class EventFullSerializer(serializers.ModelSerializer):
     interested_count = serializers.IntegerField(read_only=True)
     going_count = serializers.IntegerField(read_only=True)
 
+    def get_interested(self, obj):
+        return get_followers(obj, 1)
     interested = serializers.SerializerMethodField()
-    get_interested = lambda self, obj: get_followers(obj, 1)
 
+    def get_going(self, obj):
+        return get_followers(obj, 2)
     going = serializers.SerializerMethodField()
-    get_going = lambda self, obj: get_followers(obj, 2)
 
     user_ues = serializers.SerializerMethodField()
     get_user_ues = get_user_ues  # pylint: disable=self-assigning-variable

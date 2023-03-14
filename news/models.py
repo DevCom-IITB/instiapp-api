@@ -6,7 +6,6 @@ from bodies.models import Body
 
 class NewsEntry(models.Model):
     """A single entry on a news blog."""
-
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     body = models.ForeignKey(Body, on_delete=models.CASCADE)
     guid = models.CharField(max_length=200, blank=True)

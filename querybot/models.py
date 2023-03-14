@@ -34,3 +34,18 @@ class UnresolvedQuery(models.Model):
     class Meta:
         verbose_name = "UnresolvedQuery"
         verbose_name_plural = "UnresolvedQueries"
+
+class ChatBotLog(models.Model):
+    """Reaction to an answer by chatbot"""
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    question = models.TextField(blank=False)
+    answer = models.TextField(blank=True)
+    reaction = models.IntegerField()
+
+    def __str__(self):
+        return self.question
+
+    class Meta:
+        verbose_name = "ChatBotLog"
+        verbose_name_plural = "ChatBotLogs"

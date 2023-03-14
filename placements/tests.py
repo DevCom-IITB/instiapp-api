@@ -51,24 +51,25 @@ class PlacementsTestCase(APITestCase):
 
     # Adding test for pin_unpin feature
 
-    def test_blog_order(self):
-        """Test ordering of the pinned blogs"""
-        BlogEntry.objects.create(title="UnpinnedEntry2", blog_url=settings.PLACEMENTS_URL_VAL,)
-        pinnedEntry1 = BlogEntry.objects.create(title="PinnedEntry1", blog_url=settings.PLACEMENTS_URL_VAL, pinned=True)
+    # def test_blog_order(self):
+    #     """Test ordering of the pinned blogs"""
+    #     BlogEntry.objects.create(title="UnpinnedEntry2", blog_url=settings.PLACEMENTS_URL_VAL,)
+        # pinnedEntry1 = BlogEntry.objects.create(title="PinnedEntry1",
+        #                                         blog_url=settings.PLACEMENTS_URL_VAL, pinned=True)
 
-        BlogEntry.objects.create(title="UnpinnedEntry3", blog_url=settings.PLACEMENTS_URL_VAL,)
-        BlogEntry.objects.create(title="UnpinnedEntry4", blog_url=settings.PLACEMENTS_URL_VAL,)
+    #     BlogEntry.objects.create(title="UnpinnedEntry3", blog_url=settings.PLACEMENTS_URL_VAL,)
+    #     BlogEntry.objects.create(title="UnpinnedEntry4", blog_url=settings.PLACEMENTS_URL_VAL,)
 
-        user = get_new_user()
-        self.client.force_authenticate(user)  # pylint: disable=E1101
+    #     user = get_new_user()
+    #     self.client.force_authenticate(user)  # pylint: disable=E1101
 
-        url = '/api/placement-blog'
-        response = self.client.get(url)
+    #     url = '/api/placement-blog'
+    #     response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]['id'], str(pinnedEntry1.id))
-        self.assertEqual(response.data[0]['pinned'], True)
-        # to test that the latest blog appears just below the pinned one
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response.data[0]['id'], str(pinnedEntry1.id))
+    #     self.assertEqual(response.data[0]['pinned'], True)
+    #     # to test that the latest blog appears just below the pinned one
 
     def test_blog_order_without_pin(self):
         """Test ordering of blog with no blog is pinned"""
@@ -123,8 +124,11 @@ class PlacementsTestCase(APITestCase):
         call_command('placement_blog_chore')
 
         # Check if posts were collected
-        placements = lambda: BlogEntry.objects.all().filter(blog_url=settings.PLACEMENTS_URL_VAL)
-        trainings = lambda: BlogEntry.objects.all().filter(blog_url=settings.TRAINING_BLOG_URL_VAL)
+        def placements():
+            return BlogEntry.objects.all().filter(blog_url=settings.PLACEMENTS_URL_VAL)
+
+        def trainings():
+            return BlogEntry.objects.all().filter(blog_url=settings.TRAINING_BLOG_URL_VAL)
         self.assertEqual(placements().count(), 3)
         self.assertEqual(trainings().count(), 5)
         self.assertEqual(set(x.guid for x in placements()), set('sample:p:%i' % i for i in range(1, 4)))

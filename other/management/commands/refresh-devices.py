@@ -11,12 +11,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Initiate connection
         push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
-
+        print("Refreshing Devices")
         # Refresh all
         for device in Device.objects.all():
-            print(device.user.name + ' - ', end='', flush=True)
             if fill_device_firebase(push_service, device):
-                print('OK')
+                pass
             else:
                 device.delete()
+                print(device.user.name + ' - ', end='', flush=True)
                 print('FAIL')

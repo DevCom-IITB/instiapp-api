@@ -17,8 +17,9 @@ ALLOWED_HOSTS = ['*']
 # SSO Config
 SSO_TOKEN_URL = 'https://gymkhana.iitb.ac.in/sso/oauth/token/'
 SSO_PROFILE_URL = 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number'
-SSO_CLIENT_ID = 'Ji3kYtUkmDY2TSQx2AbFY7M5rqFrMuu5kiSUEFXm'
-SSO_CLIENT_ID_SECRET_BASE64 = 'Smkza1l0VWttRFkyVFNReDJBYkZZN001cnFGck11dTVraVNVRUZYbTp4UFVmV0ZSTThabTQwaXp4NkRMZWUyMUZQaWhJYUtaSGVEZUtvN3lNU1RhYklGSDlhbmJUR2N3enlZOUxPb0ZQMGd6NkFmNlBMNGxEMjJzTEU1TmZnZ3pIT0R0Z2IyVHNnS2pGR2FicjRzRDdJRzJRZ1hBM2xJN0xlejZ5NEFSSg=='
+SSO_CLIENT_ID = '5jyMJufq0Vk0aDlj9Hnudsj84UfbFZlYRUnn02Xd'
+SSO_CLIENT_ID_SECRET_BASE64 = 'NWp5TUp1ZnEwVmswYURsajlIbnVkc2o4NFVmYkZabFlSVW5uMDJYZDo2RTN5S3g4OU5XWVFxcWFJaUdwcE9RdFF4TmZxSkxFYXhkcDVXb2s2VzZsdGxDQWpPWmM3SWJrVXVpUXdnaTZNaGVoUU1LWnVTelFUMU1EOHBockhhVThvVUk5S1hYZ2NHMG51UE03Wkk3V0xoWjYydG5OZFU4Uk02TTJXaXdJZw=='
+
 # Password Login
 SSO_DEFAULT_REDIR = 'https://insti.app/login'
 SSO_LOGIN_URL = 'https://gymkhana.iitb.ac.in/sso/account/login/?next=/sso/oauth/authorize/%3Fclient_id%3DvR1pU7wXWyve1rUkg0fMS6StL1Kr6paoSmRIiLXJ%26response_type%3Dcode%26scope%3Dbasic%2520profile%2520picture%2520sex%2520ldap%2520phone%2520insti_address%2520program%2520secondary_emails%26redirect_uri%3D' + SSO_DEFAULT_REDIR
@@ -30,6 +31,7 @@ USER_AVATAR_URL = '/static/upload/useravatar.jpg'
 
 VAPID_PRIV_KEY = ""
 FCM_SERVER_KEY = ""
+MESSI_ACCESS_TOKEN = ""
 
 # Change this to LOGGING to enable SQLite logging
 NO_LOGGING = {
