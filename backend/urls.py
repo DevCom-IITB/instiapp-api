@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
 from django.contrib.sitemaps.views import sitemap
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -39,14 +40,14 @@ schema_view = get_schema_view(
         default_version='v1',
         description="InstiApp IIT Bombay API",
         terms_of_service="https://insti.app/tos.html",
-        contact=openapi.Contact(email="support@insti.app"),
+        contact=openapi.Contact(email="devcom@iitb.ac.in"),
         license=openapi.License(name="AGPLv3"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
 
-urlpatterns = [
+base_urlpatterns = [
     # Admin site
     path('admin/', admin.site.urls),
 
@@ -65,6 +66,7 @@ urlpatterns = [
     path(api_base(), include('other.urls')),
     path(api_base(), include('querybot.urls')),
     path(api_base(), include('external.urls')),
+    path(api_base(), include('community.urls')),
     path(api_base('venter'), include("venter.urls")),
 
     # Non-API
@@ -73,4 +75,8 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {
         'sitemaps': sitemaps()
     }, name='django.contrib.sitemaps.views.sitemap')
+]
+
+urlpatterns = [
+    path(settings.BASE_URL_PATH, include(base_urlpatterns)),
 ]

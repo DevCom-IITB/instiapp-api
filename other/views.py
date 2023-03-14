@@ -49,7 +49,7 @@ class OtherViewset(viewsets.ViewSet):
         # Search bodies by name and description
         if 'bodies' in types:
             bodies = query_search(
-                request, MIN_LENGTH, Body.objects, ['name', 'description'],
+                request, MIN_LENGTH, Body.objects, ['name', 'canonical_name', 'description'],
                 'bodies', order_relevance=True)
 
         # Search events by name and description
@@ -73,7 +73,7 @@ class OtherViewset(viewsets.ViewSet):
         if 'interests' in types:
             interests = query_search(
                 request, 0, Interest.objects.all(),
-                ["title"], 'interests', order_relevance=True)[:20]
+                ["title"], 'interests', order_relevance=True)
 
         return Response({
             "bodies": BodySerializerMin(bodies, many=True).data,

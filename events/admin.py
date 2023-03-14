@@ -2,8 +2,8 @@ from django.contrib import admin
 from events.models import Event, UserEventStatus
 
 class EventAdmin(admin.ModelAdmin):
-    list_filter = ('start_time',)
-    list_display = ('name', 'start_time', 'end_time')
+    list_filter = ('start_time', 'bodies',)
+    list_display = ('name', 'all_bodies', 'start_time', 'end_time',)
     search_fields = ['name']
     ordering = ('-start_time',)
     raw_id_fields = ('created_by',)

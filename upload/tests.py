@@ -14,10 +14,12 @@ from helpers.test_helpers import create_body
 
 from upload.models import UploadedImage
 
-get_image = lambda: SimpleUploadedFile(
-    "img.jpg", open("./upload/img.jpg", "rb").read(), content_type="image/jpeg")
+def get_image():
+    return SimpleUploadedFile("img.jpg", open("./upload/img.jpg", "rb").read(), content_type="image/jpeg")
 
-new_upload = lambda slf: slf.client.post('/api/upload', {'picture': get_image()})
+
+def new_upload(slf):
+    return slf.client.post('/api/upload', {'picture': get_image()})
 
 class UploadTestCase(APITestCase):
     """Check if logged in users can upload files."""
@@ -67,8 +69,11 @@ class UploadTestCase(APITestCase):
             body1 = create_body(image_url=res[3].data['picture'])
 
         # Get path for checking deletion
-        obj = lambda res: UploadedImage.objects.get(pk=res.data['id'])
-        obj_exists = lambda res: UploadedImage.objects.filter(pk=res.data['id']).exists()
+        def obj(res):
+            return UploadedImage.objects.get(pk=res.data['id'])
+
+        def obj_exists(res):
+            return UploadedImage.objects.filter(pk=res.data['id']).exists()
         paths = [obj(r).picture.path for r in res]
 
         # Check if deleting a non existent file is fine
@@ -79,7 +84,8 @@ class UploadTestCase(APITestCase):
         self.assertFalse(obj_exists(res[4]))
 
         # Call the chore
-        clean = lambda: call_command('clean-images')
+        def clean():
+            return call_command('clean-images')
         clean()
 
         # Check if unclaimed images were removed

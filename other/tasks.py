@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from notifications.models import Notification
 from notifications.signals import notify
 from pyfcm import FCMNotification
+from achievements.models import UserInterest
+from community.models import CommunityPost, CommunityPostUserReaction
 from events.models import Event
 from helpers.celery import shared_task_conditional
 from helpers.celery import FaultTolerantTask
@@ -36,6 +38,16 @@ def notify_new_event(pk):
             verb=body.name + " has added a new event"
         )
 
+    for interest in instance.event_interest.all():
+        users = User.objects.filter(
+            id__in=UserInterest.filter(title=interest.title).user.filter(active=True).values('user_id')
+        )
+        notify.send(
+            instance,
+            recipient=users,
+            verb=f"A new event with tag {interest.title} has been added"
+        )
+
 @shared_task_conditional(base=FaultTolerantTask)
 def notify_upd_event(pk):
     """Notify users about event updation."""
@@ -48,6 +60,88 @@ def notify_upd_event(pk):
     notify.send(instance, recipient=users, verb=instance.name + " was updated")
 
 @shared_task_conditional(base=FaultTolerantTask)
+def notify_new_commpost(pk):
+    """Notify users about post creation."""
+    setUp()
+    instance = CommunityPost.objects.filter(id=pk).first()
+    if not instance:
+        return
+
+    community = instance.community
+    body = community.body
+    users = User.objects.filter(id__in=body.followers.filter(active=True).values('user_id'))
+    notify.send(
+        instance,
+        recipient=users,
+        verb="New post added in " + community.name
+    )
+
+    for interest in instance.interests.all():
+        users = User.objects.filter(
+            id__in=UserInterest.filter(title=interest.title).user.filter(active=True).values('user_id')
+        )
+        notify.send(
+            instance,
+            recipient=users,
+            verb=f"New post with tag {interest.title} added in {community.name}"
+        )
+
+@shared_task_conditional(base=FaultTolerantTask)
+def notify_new_comm(pk):
+    """Notify users about event creation."""
+    setUp()
+    instance = CommunityPost.objects.filter(id=pk).first()
+    if not instance:
+        return
+
+    commented_user = instance.posted_by
+    users = []
+    while instance.thread_rank > 1:
+        instance = instance.parent
+        users.append(instance.posted_by.user)
+    notify.send(
+        instance,
+        recipient=users,
+        verb=commented_user.name + " commented to your post " + instance.content)
+
+@shared_task_conditional(base=FaultTolerantTask)
+def notify_new_commpostadmin(pk):
+    """Notify users about event creation."""
+    setUp()
+    instance = CommunityPost.objects.filter(id=pk).first()
+    if not instance:
+        return
+
+    community = instance.community
+    roles = instance.community.body.roles.all()
+    users = []
+    for role in roles:
+        if "AppP" in role.permissions:
+            users.extend(map(lambda user: user.user, role.users.all()))
+    print(users)
+    notify.send(
+        instance,
+        recipient=users,
+        verb="New post added for verification in " + community.name)
+
+
+@ shared_task_conditional(base=FaultTolerantTask)
+def notify_new_reaction(pk):
+    """Notify user about new reaction to his post/comment"""
+    setUp()
+    instance = CommunityPostUserReaction.objects.filter(id=pk).first()
+    if not instance:
+        return
+
+    user = [instance.communitypost.posted_by.user]
+    notify.send(
+        instance,
+        recipient=user,
+        verb=instance.user.name + " reacted to you post " + instance.communitypost.content
+    )
+
+
+@ shared_task_conditional(base=FaultTolerantTask)
 def push_notify(pk):
     """Push notify a notification."""
     setUp()
@@ -75,7 +169,10 @@ def push_notify(pk):
     if not hasattr(settings, 'FCM_SERVER_KEY'):
         return
 
-    push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
+    try:
+        push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
+    except Exception:
+        return
 
     # Send FCM push notification
     for device in profile.devices.all():

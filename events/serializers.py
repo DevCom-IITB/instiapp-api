@@ -3,6 +3,8 @@ from rest_framework import serializers
 from django.db.models import Count
 from django.db.models import Prefetch
 from django.db.models import Q
+from achievements.serializers import InterestSerializer
+from achievements.models import Interest
 from events.models import Event
 from events.models import UserEventStatus
 from users.models import UserTag
@@ -47,13 +49,14 @@ class EventSerializer(serializers.ModelSerializer):
     bodies = BodySerializerMin(many=True, read_only=True)
 
     offered_achievements = OfferedAchievementSerializer(many=True, read_only=True)
+    event_interest = InterestSerializer(many=True, read_only=True)
 
     class Meta:
         model = Event
         fields = ('id', 'str_id', 'name', 'description', 'image_url',
                   'start_time', 'end_time', 'all_day', 'venues', 'bodies',
                   'interested_count', 'going_count', 'website_url', 'weight',
-                  'user_ues', 'offered_achievements')
+                  'user_ues', 'offered_achievements', 'event_interest')
 
     @staticmethod
     def setup_eager_loading(queryset, request, extra_prefetch=None):
@@ -97,11 +100,13 @@ class EventFullSerializer(serializers.ModelSerializer):
     interested_count = serializers.IntegerField(read_only=True)
     going_count = serializers.IntegerField(read_only=True)
 
+    def get_interested(self, obj):
+        return get_followers(obj, 1)
     interested = serializers.SerializerMethodField()
-    get_interested = lambda self, obj: get_followers(obj, 1)
 
+    def get_going(self, obj):
+        return get_followers(obj, 2)
     going = serializers.SerializerMethodField()
-    get_going = lambda self, obj: get_followers(obj, 2)
 
     user_ues = serializers.SerializerMethodField()
     get_user_ues = get_user_ues  # pylint: disable=self-assigning-variable
@@ -121,13 +126,18 @@ class EventFullSerializer(serializers.ModelSerializer):
         many=True, read_only=False, queryset=UserTag.objects.all(), default=[])
 
     offered_achievements = OfferedAchievementSerializer(many=True, read_only=True)
+    event_interest = InterestSerializer(many=True, read_only=True)
+
+    interests_id = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=False, queryset=Interest.objects.all(), source='event_interest')
 
     class Meta:
         model = Event
         fields = ('id', 'str_id', 'name', 'description', 'image_url', 'start_time',
                   'end_time', 'all_day', 'venues', 'venue_names', 'bodies', 'bodies_id',
                   'interested_count', 'going_count', 'interested', 'going', 'venue_ids',
-                  'website_url', 'user_ues', 'notify', 'user_tags', 'offered_achievements')
+                  'website_url', 'user_ues', 'notify', 'user_tags', 'offered_achievements',
+                  'event_interest', 'interests_id')
 
     @staticmethod
     def setup_eager_loading(queryset, request):
