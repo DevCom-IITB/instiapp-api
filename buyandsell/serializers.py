@@ -12,4 +12,4 @@ class ProductSerializer(serializers.ModelSerializer):
         repre = super().to_representation(instance)
         repre['image_urls'] = [str(url) for url in ImageURL.objects.filter(product=instance)]
         repre['category'] = Category.objects.get(id=repre['category']).name
-        return repre
+        return repre 

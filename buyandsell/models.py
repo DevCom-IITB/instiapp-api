@@ -12,9 +12,6 @@ CONTACT_MAX_LENGTH = 300
 MOD_EMAIL = 'hardikraj08@gmail.com'
 # Create your models here.
 
-def image_path(instance, filename):
-    return '{0}'.format(filename)
-
 class Category(models.Model):
     id = models.IntegerField(primary_key=True,editable=False)
     name = models.CharField(max_length=100,blank=False, null=False)
@@ -50,7 +47,7 @@ class Product(models.Model):
     str_id = models.CharField(max_length=58, editable=False, null=True)
     name = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=False, null=False)
     description = models.TextField(blank=True, default='', null=False)
-    product_image = models.ImageField(upload_to=image_path,blank=True)
+    product_image = models.URLField(blank=True, null=True)
     ##TODO: Change the on_delete function to .
     category = models.ForeignKey(Category, on_delete=models.SET_DEFAULT, default=0)
     brand = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=True,null=False,default='')
