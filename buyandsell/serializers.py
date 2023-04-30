@@ -4,10 +4,14 @@ from django.db.models import Count
 from django.db.models import Prefetch
 from django.db.models import Q
 from buyandsell.models import Category, Product, ImageURL
+from users.serializers import UserProfileSerializer
 class ProductSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer(read_only=True)
+
     class Meta:
         model = Product
         fields = '__all__'
+        
     def to_representation(self, instance):
         repre = super().to_representation(instance)
         repre['image_urls'] = [str(url) for url in ImageURL.objects.filter(product=instance)]
