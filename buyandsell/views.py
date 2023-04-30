@@ -83,7 +83,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         queryset = query_search(request, 3, queryset, ['name', 'description'], 'buyandsell')
         queryset = self.category_filter(request, queryset)
         queryset = self.seller_filter(request, queryset)
-        queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
+        # queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
         data = ProductSerializer(queryset, many=True).data
         return Response(data)
     def get_contact_details(userpro:UserProfile):
