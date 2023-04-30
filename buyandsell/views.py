@@ -16,6 +16,7 @@ from users.models import UserProfile
 from django.db.models import Count,Q
 import json
 from django.utils import timezone
+import traceback
 REPORTS_THRES = 3
 
 class BuyAndSellViewSet(viewsets.ModelViewSet):
@@ -32,7 +33,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
 
     def update_limits(self):
         for limit in Limit.objects.all():
-            if(limit.endtime<timezone.localtime()):
+            if(limit.endtime != None and limit.endtime<timezone.localtime()):
                 limit.delete()
     
     def update_bans(self, product:Product=None):
@@ -114,24 +115,28 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         
         """Limit checking:"""
         limit,created = Limit.objects.get_or_create(user=userpro)
-        if(limit.strikes>=3):
-            return Response("Limit of Three Products per Day Reached.")
+        if(limit.strikes>=1000):
+            return Response("Limit of Three Products per Day Reached.", status=403)
         limit.strikes+=1
         if(limit.strikes==3):
             limit.endtime = timezone.localtime()+timezone.timedelta(days=1)
         limit.save()
 
         """Create the product, modifying some fields."""
-        request.data._mutable = True
-        request.data['status'] = True
-        image_urls = json.loads(request.data['image_urls'])
-        request.data['contact_details'] = BuyAndSellViewSet.get_contact_details(userpro)
-        request.data['user'] = userpro.id
+        # request.data._mutable = True
+        # request.data['status'] = True
+        # image_urls = json.loads(request.data['image_urls'])
+        # request.data['contact_details'] = BuyAndSellViewSet.get_contact_details(userpro)
+        # request.data['user'] = userpro.id
+        # print(request.data)
+        print(request.data)
         
-        new_product_data = super().create(request)
-        instance = Product.objects.get(new_product_data.data['id'])
-        self.update_image_urls(request, instance)
-        return Response(ProductSerializer(instance).data)
+        try:
+            return super().create(request)
+        except Exception as e:
+            print(e)
+            print(traceback.format_exc())
+            return Response({"error":str(e)}, status=400)
     @login_required_ajax
     def destroy(self, request, pk):
         product = self.get_product(pk)

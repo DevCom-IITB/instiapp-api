@@ -49,7 +49,7 @@ class Product(models.Model):
     description = models.TextField(blank=True, default='', null=False)
     product_image = models.URLField(blank=True, null=True)
     ##TODO: Change the on_delete function to .
-    category = models.ForeignKey(Category, on_delete=models.SET_DEFAULT, default=0)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     brand = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=True,null=False,default='')
     warranty = models.BooleanField(default=False)
     packaging = models.BooleanField(default=False)
@@ -60,8 +60,8 @@ class Product(models.Model):
 
 
     action = models.CharField(max_length=10,choices=ACTION_CHOICES, default='sell', blank=False)
-    status = models.BooleanField(default=True)
-    deleted = models.BooleanField(default=False)
+    status = models.BooleanField(default=True, blank=True, null=True)
+    deleted = models.BooleanField(default=False, blank=True, null=True)
     price = models.IntegerField(blank=False, default=100)
     negotiable = models.BooleanField(default=True)
     
@@ -72,7 +72,7 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     def save(self, *args, **kwargs):
-        self.category.numproducts+=1
+        # self.category.numproducts+=1
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
     def delete(self, *args, **kwargs):
@@ -99,7 +99,7 @@ class Ban(models.Model):
         return str(self.user)
 class Limit(models.Model):
     user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE)
-    endtime = models.DateTimeField()
+    endtime = models.DateTimeField(auto_created=True, null=True)
     strikes = models.IntegerField(default=0)
     def __str__(self):
         return str(self.user)
