@@ -7,6 +7,10 @@ from buyandsell.models import Category, Product, ImageURL
 from users.serializers import UserProfileSerializer
 class ProductSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer(read_only=True)
+    category = serializers.SerializerMethodField()
+
+    def get_category(self, obj):
+        return obj.name
 
     class Meta:
         model = Product

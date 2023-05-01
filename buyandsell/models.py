@@ -76,7 +76,7 @@ class Product(models.Model):
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
     def delete(self, *args, **kwargs):
-        self.category.numproducts-=1
+      #  self.category.numproducts-=1
         return super().delete(*args, **kwargs)
     class Meta:
         verbose_name = "Product"

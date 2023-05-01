@@ -134,8 +134,6 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         try:
             return super().create(request)
         except Exception as e:
-            print(e)
-            print(traceback.format_exc())
             return Response({"error":str(e)}, status=400)
     @login_required_ajax
     def destroy(self, request, pk):
