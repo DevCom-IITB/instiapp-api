@@ -55,7 +55,6 @@ class Product(models.Model):
     packaging = models.BooleanField(default=False)
     condition = models.CharField(max_length=2,choices=CONDITION_CHOICES, default='7',blank=False)
     
-    
     followers = models.ManyToManyField('users.UserProfile', related_name='followers+', blank=True)
 
 

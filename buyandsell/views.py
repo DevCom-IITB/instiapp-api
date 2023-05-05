@@ -148,11 +148,11 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     def update(self, request, pk):
         product = self.get_product(pk)
         ##TO TEST:
-        product.category.numproducts-=1
+        ## product.category.numproducts-=1
         if(product.user == UserProfile.objects.get(user=request.user)):
-            request.data._mutable = True
+        ##    request.data._mutable = True
             request = self.update_user_details(request)
-            self.update_image_urls(request, product)
+        ##    self.update_image_urls(request, product)
             return super().update(request, pk)
         return Response(ProductSerializer(product).data)
 
