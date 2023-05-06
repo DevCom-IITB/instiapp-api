@@ -81,10 +81,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
                 """Remove products from users whose bans are still running."""
                 queryset = queryset.filter(~Q(user=ban.user))
         #TODO: allow category to be passed here too.
-        queryset = query_search(request, 3, queryset, ['name', 'description'], 'buyandsell')
-        queryset = self.category_filter(request, queryset)
-        queryset = self.seller_filter(request, queryset)
-        # queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
+
         data = ProductSerializer(queryset, many=True).data
         return Response(data)
     def get_contact_details(userpro:UserProfile):
@@ -123,12 +120,6 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         limit.save()
 
         """Create the product, modifying some fields."""
-        # request.data._mutable = True
-        # request.data['status'] = True
-        # image_urls = json.loads(request.data['image_urls'])
-        # request.data['contact_details'] = BuyAndSellViewSet.get_contact_details(userpro)
-        # request.data['user'] = userpro.id
-        # print(request.data)
         print(request.data)
         
         try:
