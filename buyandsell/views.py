@@ -161,7 +161,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
             """If user is banned, their products don't show up in the list.
             This if-block is for calls made to the api manually."""
             return Response('User is Banned atm.')
-        
+
         # reporter = UserProfile.objects.get(user=request.user)
         # reporter = product.user
         # report_by_usercreated = Report.objects.get_or_create(product=product, reporter=reporter)
