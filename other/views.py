@@ -76,12 +76,12 @@ class OtherViewset(viewsets.ViewSet):
             interests = query_search(
                 request, 0, Interest.objects.all(),
                 ["title"], 'interests', order_relevance=True)
-            
+
         # Search products by name,brand
         if 'products' in types:
             products = query_search(
                 request, MIN_LENGTH, Product.objects.all(),
-                ['name', 'description', 'category','brand'], 'products', order_relevance=True)[:20]
+                ['name', 'description', 'category', 'brand'], 'products', order_relevance=True)[:20]
 
         return Response({
             "bodies": BodySerializerMin(bodies, many=True).data,
@@ -89,7 +89,7 @@ class OtherViewset(viewsets.ViewSet):
             "users": UserProfileSerializer(users, many=True).data,
             "skills": SkillSerializer(skills, many=True).data,
             "interests": InterestSerializer(interests, many=True).data,
-            "products" : ProductSerializer(products, many=True).data
+            "products": ProductSerializer(products, many=True).data
         })
 
     @classmethod
