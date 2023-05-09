@@ -1,9 +1,6 @@
 """Serializers for Event."""
 from rest_framework import serializers
-from django.db.models import Count
-from django.db.models import Prefetch
-from django.db.models import Q
-from buyandsell.models import Category, Product, ImageURL
+from buyandsell.models import Product
 from users.serializers import UserProfileSerializer
 class ProductSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer(read_only=True)
