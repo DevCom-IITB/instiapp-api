@@ -33,11 +33,8 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
 
     def update_bans(self, product: Product = None):
         if product is not None:
-            """Get the existing reports on this product that have been accepted by the moderator
-            but have not been addressed (by initiating a ban)."""
             reports = Report.objects.filter(product=product, addressed=False, accepted=True)
             if len(reports) >= REPORTS_THRES:
-                """Create a ban for the user lasting three days."""
                 endtime = timezone.localtime() + timezone.timedelta(days=3)
                 Ban.objects.create(user=product.user, endtime=endtime)
                 product.deleted = True
