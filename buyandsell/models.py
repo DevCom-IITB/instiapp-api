@@ -46,7 +46,6 @@ class Product(models.Model):
     name = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=False, null=False)
     description = models.TextField(blank=True, default='', null=False)
     product_image = models.URLField(blank=True, null=True)
-    # TODO: Change the on_delete function to .
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     brand = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=True, null=False, default='')
     warranty = models.BooleanField(default=False)

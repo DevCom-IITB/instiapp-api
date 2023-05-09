@@ -100,7 +100,6 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         """
 
         self.update_limits()
-        from users.models import UserProfile
         userpro = UserProfile.objects.get(user=request.user)
 
         limit, created = Limit.objects.get_or_create(user=userpro)
