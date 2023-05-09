@@ -51,8 +51,8 @@ class Product(models.Model):
     brand = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=True, null=False, default='')
     warranty = models.BooleanField(default=False)
     packaging = models.BooleanField(default=False)
-    condition = models.CharField(max_length=2,choices=CONDITION_CHOICES, default='7', blank=False)
-    
+    condition = models.CharField(max_length=2, choices=CONDITION_CHOICES, default='7', blank=False)
+
     followers = models.ManyToManyField('users.UserProfile', related_name='followers+', blank=True)
 
     action = models.CharField(max_length=10, choices=ACTION_CHOICES, default='sell', blank=False)
@@ -67,7 +67,7 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def save(self, *args, **kwargs):
         # self.category.numproducts+=1
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
@@ -76,7 +76,7 @@ class Product(models.Model):
     def delete(self, *args, **kwargs):
         #  self.category.numproducts-=1
         return super().delete(*args, **kwargs)
-    
+
     class Meta:
         verbose_name = "Product"
         verbose_name_plural = "Products"
@@ -88,21 +88,21 @@ class Product(models.Model):
 class ImageURL(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     url = models.URLField(blank=False, null=False)
-    
+
     def __str__(self):
         return self.url
 
 class Ban(models.Model):
     user = models.ManyToManyField('users.UserProfile')
     endtime = models.DateTimeField()
-    
+
     def __str__(self):
         return str(self.user)
 class Limit(models.Model):
     user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE)
     endtime = models.DateTimeField(auto_created=True, null=True)
     strikes = models.IntegerField(default=0)
-    
+
     def __str__(self):
         return str(self.user)
 class Report(models.Model):
@@ -112,7 +112,6 @@ class Report(models.Model):
     reason = models.TextField(blank=False, null=False)
     addressed = models.BooleanField(default=False)
     accepted = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return str(self.product) + ':' + str(self.reporter)
-    
