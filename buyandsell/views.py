@@ -43,14 +43,12 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
                 product.deleted = True
                 reports.update(addressed=True)
         else:
-            """Calls the above if-block on products that have accepted but unaddressed reports."""
             reports = Report.objects.filter(accepted=True, addressed=False)
             products = []
             for report in reports:
                 products.append(report.product)
             for prod in set(products):
                 if products.count(prod) >= REPORTS_THRES:
-                    """Products from a banned user cannot be reported. (acc. to report function.)"""
                     endtime = timezone.localtime() + timezone.timedelta(days=3)
                     Ban.objects.create(user=product.user, endtime=endtime)
                     reports.update(addressed=True)
@@ -71,11 +69,9 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         # introduce tags?
         self.update_bans()
         queryset = self.queryset.filter(status=True)
-        """remove products from banned users"""
         bans = Ban.objects.all()
         for ban in bans:
-            if (ban.endtime > timezone.localtime()):
-                """Remove products from users whose bans are still running."""
+            if ban.endtime > timezone.localtime():
                 queryset = queryset.filter(~Q(user=ban.user))
         # TODO: allow category to be passed here too.
 
@@ -110,7 +106,6 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         from users.models import UserProfile
         userpro = UserProfile.objects.get(user=request.user)
 
-        """Limit checking:"""
         limit, created = Limit.objects.get_or_create(user=userpro)
         if limit.strikes >= 1000:
             return Response("Limit of Three Products per Day Reached.", status=403)
@@ -119,7 +114,6 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
             limit.endtime = timezone.localtime() + timezone.timedelta(days=1)
         limit.save()
 
-        """Create the product, modifying some fields."""
         print(request.data)
 
         try:
@@ -158,8 +152,6 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         product = self.get_product(pk)
         self.update_bans(product)
         if len(Ban.objects.filter(user=product.user)) > 0:
-            """If user is banned, their products don't show up in the list.
-            This if-block is for calls made to the api manually."""
             return Response('User is Banned atm.')
 
         # reporter = UserProfile.objects.get(user=request.user)
