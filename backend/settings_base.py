@@ -208,6 +208,9 @@ NO_CELERY = os.environ.get('NO_CELERY') != 'false'
 # Number of seconds to count down
 CELERY_DELAY = 0
 
+#EMAIL
+COMPLAINT_AUTO_SUBSCRIBE = True
+
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # true when elasticsearch is configured
