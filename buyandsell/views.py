@@ -18,21 +18,21 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     RESULTS_PER_PAGE = 1  # testing purposes.
     queryset = Product.objects
-  
+
     def mail_moderator(self, report: Report):
         msg = f"""
-        {str(report.reporter)} lodged a report against the product {str(report.product)} posted by 
+        {str(report.reporter)} lodged a report against the product {str(report.product)} posted by
         {str(report.product.user)}.
         Alleged Reason: {report.reason}."""
         send_mail('New Report', msg, settings.DEFAULT_FROM_EMAIL, [report.moderator_email])
 
     def update_limits(self):
         for limit in Limit.objects.all():
-            if (limit.endtime != None and limit.endtime < timezone.localtime()):
+            if (limit.endtime is not None and limit.endtime < timezone.localtime()):
                 limit.delete()
-  
+
     def update_bans(self, product: Product = None):
-        if (product != None):
+        if (product is not None):
             """Get the existing reports on this product that have been accepted by the moderator
             but have not been addressed (by initiating a ban)."""
             reports = Report.objects.filter(product=product, addressed=False, accepted=True)
@@ -54,16 +54,16 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
                     endtime = timezone.localtime() + timezone.timedelta(days=3)
                     Ban.objects.create(user=product.user, endtime=endtime)
                     reports.update(addressed=True)
-  
+
     def category_filter(self, request, queryset):
         category = request.GET.get('category')
-        if (category != None and len(Category.objects.filter(name=category)) > 0):
+        if (category is not None and len(Category.objects.filter(name=category)) > 0):
             queryset = queryset.filter(category__name=category)
         return queryset
 
     def seller_filter(self, request, queryset):
         seller = request.GET.get('seller')
-        if (seller != None and len(UserProfile.objects.filter(ldap_id=seller)) > 0):
+        if (seller is not None and len(UserProfile.objects.filter(ldap_id=seller)) > 0):
             queryset = queryset.filter(user=UserProfile.objects.get(ldap_id=seller))
         return queryset
 
@@ -109,7 +109,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         self.update_limits()
         from users.models import UserProfile
         userpro = UserProfile.objects.get(user=request.user)
-      
+
         """Limit checking:"""
         limit, created = Limit.objects.get_or_create(user=userpro)
         if (limit.strikes >= 1000):
@@ -130,7 +130,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def destroy(self, request, pk):
         product = self.get_product(pk)
-        if (UserProfile.objects.get(user=request.user)==product.user):
+        if (UserProfile.objects.get(user=request.user) == product.user):
             return super().destroy(request, pk)  # maybe change return arg?
         return Response(ProductSerializer(product).data)
 
@@ -140,12 +140,12 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def update(self, request, pk):
         product = self.get_product(pk)
-        #TO TEST:
+        # TO TEST:
         # product.category.numproducts-=1
         if (product.user == UserProfile.objects.get(user=request.user)):
-        #    request.data._mutable = True
+        # request.data._mutable = True
             request = self.update_user_details(request)
-        #    self.update_image_urls(request, product)
+        # self.update_image_urls(request, product)
             return super().update(request, pk)
         return Response(ProductSerializer(product).data)
 
@@ -157,7 +157,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     def report(self, request, pk):
         product = self.get_product(pk)
         self.update_bans(product)
-        if (len(Ban.objects.filter(user = product.user)) > 0):
+        if (len(Ban.objects.filter(user=product.user)) > 0):
             """If user is banned, their products don't show up in the list.
             This if-block is for calls made to the api manually."""
             return Response('User is Banned atm.')
