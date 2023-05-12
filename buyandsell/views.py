@@ -70,7 +70,6 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         for ban in bans:
             if ban.endtime > timezone.localtime():
                 queryset = queryset.filter(~Q(user=ban.user))
-        # TODO: allow category to be passed here too.
 
         data = ProductSerializer(queryset, many=True).data
         return Response(data)
@@ -139,8 +138,8 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
             return super().update(request, pk)
         return Response(ProductSerializer(product).data)
 
-    def retrieve(self, pk):
-        product = self.get_product(pk)
+    def retrieve(self, request):
+        product = self.get_product(request)
         return Response(ProductSerializer(product).data)
 
     @login_required_ajax
