@@ -2,15 +2,16 @@
 import json
 from django.conf import settings
 from django.core.mail import send_mail
-from rest_framework.response import Response
-from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.utils import timezone
+from rest_framework.response import Response
+from rest_framework import viewsets
 from roles.helpers import login_required_ajax
 from buyandsell.models import Ban, Category, ImageURL, Limit, Product, Report
 from buyandsell.serializers import ProductSerializer
 from users.models import UserProfile
-from django.utils import timezone
+
 
 REPORTS_THRES = 3
 
@@ -74,7 +75,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         data = ProductSerializer(queryset, many=True).data
         return Response(data)
 
-    def get_contact_details(userpro: UserProfile):
+    def get_contact_details(self, userpro: UserProfile):
         return f"""
  Phone: {userpro.contact_no}
  Email: {userpro.email}"""
@@ -101,7 +102,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         self.update_limits()
         userpro = UserProfile.objects.get(user=request.user)
 
-        limit, created = Limit.objects.get_or_create(user=userpro)
+        limit = Limit.objects.get_or_create(user=userpro)
         if limit.strikes >= 1000:
             return Response("Limit of Three Products per Day Reached.", status=403)
         limit.strikes += 1
