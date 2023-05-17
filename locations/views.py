@@ -73,6 +73,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 This endpoint gives the shortest path between two points on the map in a sequence of locations.
 '''
 
+<<<<<<< HEAD
 @api_view(('POST',))
 def get_shortest_path(request):
     try:
@@ -87,6 +88,12 @@ def get_shortest_path(request):
             
         
     end = request.data['destination']
+=======
+@api_view(('GET',))
+def get_shortest_path(request):
+    start = request.GET.get('origin')
+    end = request.GET.get('destination')
+>>>>>>> d37a317f27876414b3a0614a67daac982c6e9ce3
     graph = handle_entry() # This is to update the adj_list along with the distances. And update the database
     if start is not None and end is not None:
         try:
@@ -101,7 +108,11 @@ def get_shortest_path(request):
             path = dijkstra(graph, start, end)
         except KeyError:
             return Response(data=[])
+<<<<<<< HEAD
         loc_path = []
+=======
+        loc_path = {}
+>>>>>>> d37a317f27876414b3a0614a67daac982c6e9ce3
         
         if path is not None:
             for a in range(len(path)):
@@ -111,20 +122,35 @@ def get_shortest_path(request):
                 else:
                     name = "Node"+str(i)
                     loc_i = Location.objects.get(name = name)
+<<<<<<< HEAD
                 loc_path.append([LocationSerializer(loc_i).data["pixel_x"],
                                 LocationSerializer(loc_i).data["pixel_y"]
                                              ])
             return Response(loc_path)
 
+=======
+                loc_path[a] = LocationSerializer(loc_i).data
+        
+        return Response(loc_path)
+            
+ 
+>>>>>>> d37a317f27876414b3a0614a67daac982c6e9ce3
     return Response()
 
 '''
 Finding the nearest two points for a given set of coordinates. 
 '''
+<<<<<<< HEAD
 @api_view(("POST",))
 def nearest_points(request):
     xcor = request.data["xcor"]
     ycor = request.data["ycor"]
+=======
+@api_view(("GET",))
+def nearest_points(request):
+    xcor = request.GET.get("xcor")
+    ycor = request.GET.get("ycor")
+>>>>>>> d37a317f27876414b3a0614a67daac982c6e9ce3
 
     locations ={}
     if xcor is not None and ycor is not None:
@@ -135,7 +161,11 @@ def nearest_points(request):
             data= {"detail" :"Invalid Coordinates "}
             return Response(data=data)
 
+<<<<<<< HEAD
         filtered_locations = Location.objects.filter(pixel_x__range =[xcor-400, xcor+400],pixel_y__range=[ycor-400, ycor+400] )
+=======
+        filtered_locations = Location.objects.filter(pixel_x__range =[xcor-100, xcor+100],pixel_y__range=[ycor-100, ycor+100] )
+>>>>>>> d37a317f27876414b3a0614a67daac982c6e9ce3
         if len(filtered_locations)>=2:
             nearest_point_dist = sys.maxsize
             second_nearest_point_dist =sys.maxsize
@@ -154,7 +184,11 @@ def nearest_points(request):
                     snpi = a
 
         elif len(filtered_locations)<2:
+<<<<<<< HEAD
             filtered_locations = Location.objects.filter(pixel_x__range =[xcor-1200, xcor+1200],pixel_y__range=[ycor-1200, ycor+1200] )
+=======
+            filtered_locations = Location.objects.filter(pixel_x__range =[xcor-400, xcor+400],pixel_y__range=[ycor-400, ycor+400] )
+>>>>>>> d37a317f27876414b3a0614a67daac982c6e9ce3
             nearest_point_dist = sys.maxsize
             second_nearest_point_dist =sys.maxsize
             npi =0
@@ -856,6 +890,7 @@ def checkerrors(request):
                     items["Failed : Location Does Not Exist"].append(y)
                 except Location.MultipleObjectsReturned:
                     items["Failed : MultipleObjectsReturned"].append(y)
+<<<<<<< HEAD
     return Response(data=items)
 
 @api_view(['GET','POST'])
@@ -868,3 +903,6 @@ def allnodes(request):
     
     return Response(data=all_nodes)
 
+=======
+    return Response(data=items)
+>>>>>>> d37a317f27876414b3a0614a67daac982c6e9ce3
