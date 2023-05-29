@@ -76,10 +76,6 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         queryset = self.category_filter(request, queryset)
         queryset = self.seller_filter(request, queryset)
         # queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
-        queryset = query_search(request, 3, queryset, ['name', 'description'], 'buyandsell')
-        queryset = self.category_filter(request, queryset)
-        queryset = self.seller_filter(request, queryset)
-        # queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
         data = ProductSerializer(queryset, many=True).data
         return Response(data)
 
@@ -110,7 +106,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         self.update_limits()
         userpro = UserProfile.objects.get(user=request.user)
 
-        limit = Limit.objects.get_or_create(user=userpro)
+        limit,created = Limit.objects.get_or_create(user=userpro)
         if limit.strikes >= 1000:
             return Response("Limit of Three Products per Day Reached.", status=403)
         limit.strikes += 1
@@ -118,6 +114,13 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
             limit.endtime = timezone.localtime() + timezone.timedelta(days=1)
         limit.save()
 
+        """Create the product, modifying some fields."""
+        # request.data._mutable = True
+        # request.data['status'] = True
+        # image_urls = json.loads(request.data['image_urls'])
+        # request.data['contact_details'] = BuyAndSellViewSet.get_contact_details(userpro)
+        # request.data['user'] = userpro.id
+        # print(request.data)
         print(request.data)
 
         try:
