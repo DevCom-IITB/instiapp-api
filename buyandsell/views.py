@@ -134,10 +134,10 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def update(self, request, pk):
         product = self.get_product(pk)
-        # TO TEST:
-        # product.category.numproducts-=1
-        if product.user == UserProfile.objects.get(user=request.user):
-            # request.data._mutable = True
+        ##TO TEST:
+        product.category.numproducts-=1
+        if(product.user == UserProfile.objects.get(user=request.user)):
+            request.data._mutable = True
             request = self.update_user_details(request)
             # self.update_image_urls(request, product)
             return super().update(request, pk)

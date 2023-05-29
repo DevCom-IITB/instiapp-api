@@ -50,8 +50,9 @@ class Product(models.Model):
     brand = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=True, null=False, default='')
     warranty = models.BooleanField(default=False)
     packaging = models.BooleanField(default=False)
-    condition = models.CharField(max_length=2, choices=CONDITION_CHOICES, default='7', blank=False)
-
+    condition = models.CharField(max_length=2,choices=CONDITION_CHOICES, default='7',blank=False)
+    
+    
     followers = models.ManyToManyField('users.UserProfile', related_name='followers+', blank=True)
 
     action = models.CharField(max_length=10, choices=ACTION_CHOICES, default='sell', blank=False)
