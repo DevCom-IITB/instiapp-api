@@ -10,7 +10,7 @@ from external.models import ExternalBlogEntry
 from bodies.models import Body
 from helpers.misc import table_to_markdown
 import sys
-
+from locations.serializers import LocationSerializerMin
 from locations.models import Location, LocationLocationDistance
 
 
@@ -102,6 +102,9 @@ class handle_entry:
     
     '''Gets the nearest Node near a location on the map.'''
     def get_nearest(self, loc):
+        if "Node" in loc:
+            l = int(loc.replace("Node", ""))
+            return l
         min_dist = sys.maxsize
         nearest_loc = ""
         try:
@@ -156,7 +159,7 @@ def dijkstra(graph, start, goal):
             track_path.insert(0, currentNode)
             currentNode = track_pred[currentNode]
         except KeyError:
-            print("Path is not reachable")
+            print(f"Path is not reachable start : {start}, end:{goal}")
             break
     track_path.insert(0, start)
     if shortest_dist[goal] != inf:
@@ -188,3 +191,67 @@ class Command(BaseCommand):
 
         handle_entry(settings.EXTERNAL_BLOG_URL)
         self.stdout.write(self.style.SUCCESS('External Blog Chore completed successfully'))
+
+
+''' This command gets the nearest points for some x, y coordinates. Although a simliar function is defined in views.py'''
+def fn_nearest_points(request):
+    xcor = request.data2["xcor"]
+    ycor = request.data2["ycor"]
+
+    locations = {}
+    if xcor is not None and ycor is not None:
+        try:
+            xcor = int(xcor)
+            ycor = int(ycor)
+        except TypeError:
+            data = {"detail": "Invalid Coordinates "}
+            return data
+        if 'only_nodes' in request.data2:
+            filtered_locations = Location.objects.filter(Q(name__contains="Node"), pixel_x__range=[xcor - 1200, xcor + 1200], pixel_y__range=[ycor - 1200, ycor + 1200])
+            #filtered_locations = location.filter(pixel_x__range=[xcor - 400, xcor + 400], pixel_y__range=[ycor - 400, ycor + 400])
+        else:
+            location = Location
+            filtered_locations = location.objects.filter(
+            pixel_x__range=[xcor - 400, xcor + 400], pixel_y__range=[ycor - 400, ycor + 400])
+        if len(filtered_locations) >= 2:
+            nearest_point_dist = sys.maxsize
+            second_nearest_point_dist = sys.maxsize
+            npi = 0
+            snpi = 1
+            for a in range(0, len(filtered_locations) - 1):
+                i = filtered_locations[a]
+                distance = 0.001 * ((i.pixel_x - xcor) ^ 2 + (i.pixel_y - ycor) ^ 2)
+                if distance <= nearest_point_dist:
+                    second_nearest_point_dist = nearest_point_dist
+                    snpi = npi
+                    npi = a
+                    nearest_point_dist = distance
+                elif distance <= second_nearest_point_dist:
+                    second_nearest_point_dist = distance
+                    snpi = a
+
+        elif len(filtered_locations) < 2:
+            filtered_locations = Location.objects.filter(
+                pixel_x__range=[xcor - 1200, xcor + 1200], pixel_y__range=[ycor - 1200, ycor + 1200])
+            nearest_point_dist = sys.maxsize
+            second_nearest_point_dist = sys.maxsize
+            npi = 0
+            snpi = 1
+            for a in range(0, len(filtered_locations) - 1):
+                i = filtered_locations[a]
+                distance = 0.001 * ((i.pixel_x - xcor) ^ 2 + (i.pixel_y - ycor) ^ 2)
+                if distance <= nearest_point_dist:
+                    second_nearest_point_dist = nearest_point_dist
+                    snpi = npi
+                    npi = a
+                    nearest_point_dist = distance
+                elif distance <= second_nearest_point_dist:
+                    second_nearest_point_dist = distance
+                    snpi = a
+        if len(filtered_locations) >= 2:
+            locations[0] = LocationSerializerMin(filtered_locations[npi]).data
+            locations[1] = LocationSerializerMin(filtered_locations[snpi]).data
+
+            return locations
+        else:
+            return {"detail": "No Locations"}

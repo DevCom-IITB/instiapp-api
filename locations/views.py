@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.http import HttpRequest
 import sys
 from rest_framework.decorators import api_view
-from locations.management.commands.krishna import handle_entry, dijkstra
+from locations.management.commands.krishna import handle_entry, dijkstra, fn_nearest_points
 
 class LocationViewSet(viewsets.ModelViewSet):
     """Location"""
@@ -70,7 +70,6 @@ class LocationViewSet(viewsets.ModelViewSet):
 
         return super().destroy(request, pk)
 
-
 ''' 
 This endpoint gives the shortest path between two points on the map in a sequence of locations.
 '''
@@ -79,18 +78,19 @@ This endpoint gives the shortest path between two points on the map in a sequenc
 def get_shortest_path(request):
     try:
         start = request.data['origin']
+        formatted_origin = True
     except KeyError:
         start_x = (request.data["start"])["x_coordinate"]
         start_y = (request.data)["start"]["y_coordinate"]
+        formatted_origin = False
         
-        data = {"xcor": str(start_x),
+        data2 = {"xcor": str(start_x),
                 "ycor": str(start_y)}
         request2 = HttpRequest()
-        request2.method = 'POST'
-        request2.META = request.META
-        request2.data = data
-        start = nearest_points(request2)[0]["name"]
+        request2.data2 = data2
+        start = fn_nearest_points(request2)[0]["name"]
     end = request.data['destination']
+    dest = end
     object = handle_entry()
     start = object.get_nearest(start)
     end = object.get_nearest(end)
@@ -111,6 +111,11 @@ def get_shortest_path(request):
         loc_path = []
 
         if path is not None:
+            if formatted_origin:
+                loc_path.append([LocationSerializer(Location.objects.get(name=start)).data["pixel_x"],
+                                LocationSerializer(Location.objects.get(name=start)).data["pixel_y"]
+                                 ])
+            
             for a in range(len(path)):
                 i = path[a]
                 if type(i) == str:
@@ -120,6 +125,9 @@ def get_shortest_path(request):
                     loc_i = Location.objects.get(name=name)
                 loc_path.append([LocationSerializer(loc_i).data["pixel_x"],
                                 LocationSerializer(loc_i).data["pixel_y"]
+                                 ])
+            loc_path.append([LocationSerializer(Location.objects.get(name=dest)).data["pixel_x"],
+                                LocationSerializer(Location.objects.get(name=dest)).data["pixel_y"]
                                  ])
             return Response(loc_path)
 
