@@ -45,7 +45,7 @@ class Product(models.Model):
     str_id = models.CharField(max_length=58, editable=False, null=True)
     name = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=False, null=False)
     description = models.TextField(blank=True, default='', null=False)
-    product_image = models.URLField(blank=True, null=True)
+    product_image = models.TextField(blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     brand = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=True, null=False, default='')
     warranty = models.BooleanField(default=False)

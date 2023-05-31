@@ -20,10 +20,11 @@ class ProductSerializer(serializers.ModelSerializer):
     #     return repre 
     
     def create(self, validated_data):
-        # data = self.context["request"].data
+        data = self.context["request"].data
         validated_data['status'] = True
         validated_data['deleted'] = False
         validated_data['user'] = self.context['request'].user.profile
+        validated_data['product_image'] = ",".join(data["product_image"]) if 'product_image' in data else ""
         if validated_data['action'] == 'giveaway':
             validated_data['price'] = 0
         return super().create(validated_data)
