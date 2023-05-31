@@ -72,7 +72,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
             if ban.endtime > timezone.localtime():
                 queryset = queryset.filter(~Q(user=ban.user))
         #TODO: allow category to be passed here too.
-        queryset = query_search(request, 3, queryset, ['name', 'description'], 'buyandsell')
+        #queryset = query_search(request, 3, queryset, ['name', 'description'], 'buyandsell')
         queryset = self.category_filter(request, queryset)
         queryset = self.seller_filter(request, queryset)
         # queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
