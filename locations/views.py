@@ -92,6 +92,8 @@ def get_shortest_path(request):
     end = request.data['destination']
     dest = end
     object = handle_entry()
+    object.update()
+    strt = start
     start = object.get_nearest(start)
     end = object.get_nearest(end)
     graph = object.graph() 
@@ -112,8 +114,8 @@ def get_shortest_path(request):
 
         if path is not None:
             if formatted_origin:
-                loc_path.append([LocationSerializer(Location.objects.get(name=start)).data["pixel_x"],
-                                LocationSerializer(Location.objects.get(name=start)).data["pixel_y"]
+                loc_path.append([LocationSerializer(Location.objects.get(name=strt)).data["pixel_x"],
+                                LocationSerializer(Location.objects.get(name=strt)).data["pixel_y"]
                                  ])
             
             for a in range(len(path)):
