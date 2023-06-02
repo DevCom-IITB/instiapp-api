@@ -9,6 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 from external.models import ExternalBlogEntry
 from bodies.models import Body
 from helpers.misc import table_to_markdown
+from django.db.models import Q
 import sys
 from locations.serializers import LocationSerializerMin
 from locations.models import Location, LocationLocationDistance
