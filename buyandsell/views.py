@@ -71,8 +71,8 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         for ban in bans:
             if ban.endtime > timezone.localtime():
                 queryset = queryset.filter(~Q(user=ban.user))
-        #TODO: allow category to be passed here too.
-        #queryset = query_search(request, 3, queryset, ['name', 'description'], 'buyandsell')
+        # TODO: allow category to be passed here too.
+        # queryset = query_search(request, 3, queryset, ['name', 'description'], 'buyandsell')
         queryset = self.category_filter(request, queryset)
         queryset = self.seller_filter(request, queryset)
         # queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
@@ -106,7 +106,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         self.update_limits()
         userpro = UserProfile.objects.get(user=request.user)
 
-        limit,created = Limit.objects.get_or_create(user=userpro)
+        limit, created = Limit.objects.get_or_create(user=userpro)
         if limit.strikes >= 1000:
             return Response("Limit of Three Products per Day Reached.", status=403)
         limit.strikes += 1
@@ -141,9 +141,9 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def update(self, request, pk):
         product = self.get_product(pk)
-        ##TO TEST:
-        product.category.numproducts-=1
-        if(product.user == UserProfile.objects.get(user=request.user)):
+        # TO TEST:
+        product.category.numproducts -= 1
+        if (product.user == UserProfile.objects.get(user=request.user)):
             request.data._mutable = True
             request = self.update_user_details(request)
             # self.update_image_urls(request, product)
