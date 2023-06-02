@@ -91,8 +91,7 @@ class handle_entry:
                             x_pix=0
                             y_pix=0
                         
-                        self.adj_list[x][y] = abs(0.001 * ((x_cor  - x_pix) )**2 +
-                                            (y_cor - y_pix)**2)
+                        self.adj_list[x][y] = abs(0.001 * ((x_cor  - x_pix) )**2 + (y_cor - y_pix)**2)
             # Need to run this once to update the database with given new or updated node points.
             i = 0
             loc_list = []
@@ -100,42 +99,42 @@ class handle_entry:
                 loc, c = Location.objects.get_or_create(pixel_x=p[0], pixel_y=p[1], name="Node" + str(i))
                 loc_list.append(loc)
                 i += 1
-    
+ 
     '''Gets the nearest Node near a location on the map.'''
     def get_nearest(self, loc):
         if "Node" in loc:
-            l = int(loc.replace("Node", ""))
-            return l
+            k = int(loc.replace("Node", ""))
+            return k
         min_dist = sys.maxsize
         nearest_loc = ""
         try:
             sts = self.adj_list
-            sets = sts[loc] 
+            sets = sts[loc]
             for i in sets:
                 if type(sets[i]) != str:
-                    if sets[i]<=min_dist :
+                    if sets[i] <= min_dist:
                         min_dist = sets[i]
                         nearest_loc = i
         except KeyError:
             raise Exception("Invalid Location")
         return nearest_loc
-    
+
     '''Returns the adj_list which contains only the node points and nothing else.'''
     def graph(self):
-        new_adjoint_list ={}
+        new_adjoint_list = {}
         for i in self.adj_list:
             if type(i) != str:
                 new_adjoint_list[i] = {}
                 for j in self.adj_list[i]:
-                    if type(j)!=str:
-                        new_adjoint_list[i][j] =self.adj_list[i][j]
+                    if type(j) != str:
+                        new_adjoint_list[i][j] = self.adj_list[i][j]
         return new_adjoint_list
-                
-                
+            
+            
 def dijkstra(graph, start, goal):
     shortest_dist = {}
     track_pred = {}
-    unseenNodes=graph
+    unseenNodes = graph
     inf = sys.maxsize
     track_path = []
     for node in unseenNodes:
@@ -169,7 +168,6 @@ def dijkstra(graph, start, goal):
 
         return track_path
 
-
     # for i in range(0, len(coordinates)):
     #     loc1 = loc_list[i]
     #     print(adj_list[i])
@@ -194,7 +192,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('External Blog Chore completed successfully'))
 
 
-''' This command gets the nearest points for some x, y coordinates. Although a simliar function is defined in views.py'''
+''' This command gets the nearest points for some x,y coordinates. Although a simliar function is defined in views.py'''
 def fn_nearest_points(request):
     xcor = request.data2["xcor"]
     ycor = request.data2["ycor"]
@@ -208,12 +206,15 @@ def fn_nearest_points(request):
             data = {"detail": "Invalid Coordinates "}
             return data
         if 'only_nodes' in request.data2:
-            filtered_locations = Location.objects.filter(Q(name__contains="Node"), pixel_x__range=[xcor - 1200, xcor + 1200], pixel_y__range=[ycor - 1200, ycor + 1200])
-            #filtered_locations = location.filter(pixel_x__range=[xcor - 400, xcor + 400], pixel_y__range=[ycor - 400, ycor + 400])
+            filtered_locations = Location.objects. filter(Q(name__contains="Node"),
+            pixel_x__range=[xcor - 1200, xcor + 
+                            1200], pixel_y__range=[ycor - 1200, ycor + 1200])
+            # filtered_locations = location.filter
+            # (pixel_x__range=[xcor - 400, xcor +   # 400], pixel_y__range=[ycor - 400, ycor # + 400])
         else:
             location = Location
             filtered_locations = location.objects.filter(
-            pixel_x__range=[xcor - 400, xcor + 400], pixel_y__range=[ycor - 400, ycor + 400])
+                pixel_x__range=[xcor - 400, xcor + 400], pixel_y__range=[ycor - 400, ycor + 400])
         if len(filtered_locations) >= 2:
             nearest_point_dist = sys.maxsize
             second_nearest_point_dist = sys.maxsize
