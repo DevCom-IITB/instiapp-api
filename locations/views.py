@@ -70,6 +70,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 
         return super().destroy(request, pk)
 
+
 ''' 
 This endpoint gives the shortest path between two points on the map in a sequence of locations.
 '''
@@ -83,9 +84,9 @@ def get_shortest_path(request):
         start_x = (request.data["start"])["x_coordinate"]
         start_y = (request.data)["start"]["y_coordinate"]
         formatted_origin = False
-        
+
         data2 = {"xcor": str(start_x),
-                "ycor": str(start_y)}
+                 "ycor": str(start_y)}
         request2 = HttpRequest()
         request2.data2 = data2
         start = fn_nearest_points(request2)[0]["name"]
@@ -96,7 +97,7 @@ def get_shortest_path(request):
     strt = start
     start = object.get_nearest(start)
     end = object.get_nearest(end)
-    graph = object.graph() 
+    graph = object.graph()
     if start is not None and end is not None:
         try:
             start = int(start)
@@ -117,7 +118,7 @@ def get_shortest_path(request):
                 loc_path.append([LocationSerializer(Location.objects.get(name=strt)).data["pixel_x"],
                                 LocationSerializer(Location.objects.get(name=strt)).data["pixel_y"]
                                  ])
-            
+
             for a in range(len(path)):
                 i = path[a]
                 if type(i) == str:
@@ -129,8 +130,8 @@ def get_shortest_path(request):
                                 LocationSerializer(loc_i).data["pixel_y"]
                                  ])
             loc_path.append([LocationSerializer(Location.objects.get(name=dest)).data["pixel_x"],
-                                LocationSerializer(Location.objects.get(name=dest)).data["pixel_y"]
-                                 ])
+                             LocationSerializer(Location.objects.get(name=dest)).data["pixel_y"]
+                             ])
             return Response(loc_path)
 
     return Response()
@@ -153,12 +154,13 @@ def nearest_points(request):
             data = {"detail": "Invalid Coordinates "}
             return Response(data=data)
         if 'only_nodes' in request.data:
-            filtered_locations = Location.objects.filter(Q(name__contains="Node"), pixel_x__range=[xcor - 1200, xcor + 1200], pixel_y__range=[ycor - 1200, ycor + 1200])
-            #filtered_locations = location.filter(pixel_x__range=[xcor - 400, xcor + 400], pixel_y__range=[ycor - 400, ycor + 400])
+            filtered_locations = Location.objects.filter(Q(name__contains="Node"), pixel_x__range=[
+                                                         xcor - 1200, xcor + 1200], pixel_y__range=[ycor - 1200, ycor + 1200])
+            # filtered_locations = location.filter(pixel_x__range=[xcor - 400, xcor + 400], pixel_y__range=[ycor - 400, ycor + 400])
         else:
             location = Location
             filtered_locations = location.objects.filter(
-            pixel_x__range=[xcor - 400, xcor + 400], pixel_y__range=[ycor - 400, ycor + 400])
+                pixel_x__range=[xcor - 400, xcor + 400], pixel_y__range=[ycor - 400, ycor + 400])
         if len(filtered_locations) >= 2:
             nearest_point_dist = sys.maxsize
             second_nearest_point_dist = sys.maxsize
@@ -209,12 +211,12 @@ These are the errors that may occur when running the Dijkstra code. It provides 
 '''
 @api_view(["GET"])
 def checkerrors(request):
-    adj_list = {} #change this list accordingly
+    adj_list = {}  # change this list accordingly
 
     items = {}
     items["Failed : Location Does Not Exist"] = []
     items["Failed : MultipleObjectsReturned"] = []
-    
+
     items["Passed : Coordinates null"] = []
     items["Passed : Coordinates are null"] = []
 
@@ -244,7 +246,7 @@ def checkerrors(request):
                     items["Failed : MultipleObjectsReturned"].append(y)
     return Response(data=items)
 
-
+# test
 @api_view(['GET', 'POST'])
 def allnodes(request):
     all_nodes = []
