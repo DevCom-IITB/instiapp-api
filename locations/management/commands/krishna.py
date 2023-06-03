@@ -108,8 +108,8 @@ class handle_entry:
             return l
         min_dist = sys.maxsize
         nearest_loc = ""
+        sts = self.adj_list
         try:
-            sts = self.adj_list
             sets = sts[loc] 
             for i in sets:
                 if type(sets[i]) != str:
@@ -117,7 +117,8 @@ class handle_entry:
                         min_dist = sets[i]
                         nearest_loc = i
         except KeyError:
-            raise Exception("Invalid Location")
+            print(f"This Location : {loc} does not exist in adj_list")
+            raise Exception(IndexError)
         return nearest_loc
     
     '''Returns the adj_list which contains only the node points and nothing else.'''
