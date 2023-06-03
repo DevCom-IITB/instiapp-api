@@ -12,6 +12,6 @@ urlpatterns = [
     })),
     path('nearest/', nearest_points),
     path('check/', checkerrors),
-    path('shortestpath/', get_shortest_path),
-    # path('shortestpath/',allnodes)
+    # path('shortestpath/', get_shortest_path),
+    path('shortestpath/',allnodes)
 ]
