@@ -77,6 +77,7 @@ This endpoint gives the shortest path between two points on the map in a sequenc
 
 @api_view(('POST',))
 def get_shortest_path(request):
+    
     try:
         start = request.data['origin']
         formatted_origin = True
@@ -93,7 +94,6 @@ def get_shortest_path(request):
     end = request.data['destination']
     dest = end
     object = handle_entry()
-    # object.update()
     strt = start
     start = object.get_nearest(start)
     end = object.get_nearest(end)
@@ -132,8 +132,9 @@ def get_shortest_path(request):
             loc_path.append([LocationSerializer(Location.objects.get(name=dest)).data["pixel_x"],
                              LocationSerializer(Location.objects.get(name=dest)).data["pixel_y"]
                              ])
+            
             return Response(loc_path)
-
+        return(Response(data={'detail' : 'No path found'}))
     return Response()
 
 
@@ -211,7 +212,7 @@ These are the errors that may occur when running the Dijkstra code. It provides 
 '''
 @api_view(["GET"])
 def checkerrors(request):
-    adj_list = {}  # change this list accordingly
+    adj_list = {} # change this list accordingly
 
     items = {}
     items["Failed : Location Does Not Exist"] = []
@@ -250,7 +251,7 @@ def checkerrors(request):
 @api_view(['GET', 'POST'])
 def allnodes(request):
     all_nodes = []
-    for a in range(0, 200):
+    for a in range(0, 246):
         node = "Node" + str(a)
         all_nodes.append([LocationSerializer(Location.objects.get(name=node)).data["pixel_x"],
                           LocationSerializer(Location.objects.get(name=node)).data["pixel_y"]])
