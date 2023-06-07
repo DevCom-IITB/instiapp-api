@@ -1,6 +1,6 @@
 """URLs for locations."""
 from django.urls import path
-from locations.views import LocationViewSet, get_shortest_path, nearest_points, checkerrors,allnodes
+from locations.views import LocationViewSet, get_shortest_path, nearest_points, checkerrors
 
 urlpatterns = [
     path('locations', LocationViewSet.as_view({
