@@ -17,7 +17,12 @@ class ProductSerializer(serializers.ModelSerializer):
         validated_data['status'] = True
         validated_data['deleted'] = False
         validated_data['user'] = self.context['request'].user.profile
-        # validated_data['product_image'] = ",".join(self.context['request'].get('product_image', []))
+        
+        str_urls = validated_data['product_image']
+        str_urls = str_urls.strip(" '")
+        list_urls = [url.strip(" '") for url in str_urls.split(", ")]
+        validated_data['product_image'] = list_urls
+
         if validated_data['action'] == 'giveaway':
             validated_data['price'] = 0
         return super().create(validated_data)
