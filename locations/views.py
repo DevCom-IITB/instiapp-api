@@ -94,7 +94,7 @@ def get_shortest_path(request):
     end = request.data['destination']
     dest = end
     object = handle_entry()
-    #object.update()
+    # object.update()
     strt = start
     start = object.get_nearest(start)
     end = object.get_nearest(end)
