@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.http import HttpRequest
 import sys
 from rest_framework.decorators import api_view
-from locations.management.commands.krishna import handle_entry, dijkstra, fn_nearest_points
+from locations.management.commands.mapnav import handle_entry, dijkstra, fn_nearest_points
 
 class LocationViewSet(viewsets.ModelViewSet):
     """Location"""
