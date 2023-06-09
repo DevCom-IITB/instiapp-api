@@ -28,6 +28,10 @@ class Location(models.Model):
     lng = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     reusable = models.BooleanField(default=False)
 
+    adjacent_locs = models.ManyToManyField(
+        'locations.Location', through='LocationLocationDistance',
+        related_name='adjacent_loc', blank=True)
+
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(self.short_name)
         super().save(*args, **kwargs)
@@ -43,3 +47,16 @@ class Location(models.Model):
             models.Index(fields=['reusable', ]),
             models.Index(fields=['reusable', 'group_id']),
         ]
+
+class LocationLocationDistance(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+
+    location1 = models.ForeignKey(Location, on_delete=models.CASCADE,
+                                  default=uuid4, related_name='lld1')
+    location2 = models.ForeignKey(Location, on_delete=models.CASCADE,
+                                  default=uuid4, related_name='lld2')
+    distance = models.FloatField(default=100000000)
+
+    class Meta:
+        verbose_name = "Location-Location Distance"
+        verbose_name_plural = "Location-Location Distances"
