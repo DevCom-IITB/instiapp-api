@@ -13,6 +13,8 @@ STATIC_BASE_URL = BASE_URL
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_WHITELIST = ['https://www.insti.app','https://api.insti.app', 'https://gymkhana.iitb.ac.in', 'http://10.105.177.175', 'http://localhost:4200', 'http://10.198.49.175']
+CORS_ALLOW_CREDENTIALS = True
 
 # SSO Config
 SSO_TOKEN_URL = 'https://gymkhana.iitb.ac.in/sso/oauth/token/'
