@@ -78,8 +78,9 @@ def notify_new_commpost(pk):
 
     for interest in instance.interests.all():
         users = User.objects.filter(
-            id__in=UserInterest.filter(title=interest.title).user.filter(active=True).values('user_id')
-        )
+           
+            id__in=UserInterest.objects.filter(title=interest.title)).filter(is_active=True).values('id')
+        
         notify.send(
             instance,
             recipient=users,

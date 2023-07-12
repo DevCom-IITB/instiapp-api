@@ -6,12 +6,12 @@ from community.models import Community
 from community.models import CommunityPost
 from community.serializer_min import CommunitySerializerMin, CommunityPostSerializerMin
 from community.serializers import CommunitySerializers, CommunityPostSerializers
-from roles.helpers import user_has_privilege
+from roles.helpers import user_has_privilege, user_has_community_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
 from helpers.misc import query_from_num
 from helpers.misc import query_search
-
+from users.models import UserProfile
 class ModeratorViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
@@ -29,7 +29,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
 
         if ((user_has_privilege(request.user.profile, post.community.body.id, 'AppP') and post.thread_rank == 1)
-                or (user_has_privilege(request.user.profile, post.community.body.id, 'ModC') and post.thread_rank > 1)):
+                or (user_has_privilege(request.user.profile, post.community.body.id, 'ModC') and post.thread_rank > 1)) or user_has_community_privilege(request.user.profile, post.community.id, 'ModC'):
             # Get query param
             status = request.data["status"]
             if status is None:
@@ -102,7 +102,8 @@ class PostViewSet(viewsets.ModelViewSet):
         # Prevent posts without any community
         if 'community' not in request.data or not request.data['community']:
             return forbidden_no_privileges()
-
+        
+        user, created = UserProfile.objects.get_or_create(user=request.user)
         return super().create(request)
 
     @login_required_ajax
@@ -122,7 +123,7 @@ class PostViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
 
         if action == "feature":
-            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
+            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]) or user_has_community_privilege(request.user.profile, post.community.id, 'ModC'):
 
                 # Get query param
                 is_featured = request.data["is_featured"]
@@ -144,7 +145,7 @@ class PostViewSet(viewsets.ModelViewSet):
                 post.save()
                 return Response({"message": "Post deleted"})
 
-            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
+            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]) or user_has_community_privilege(request.user.profile, post.community.id, 'ModC'):
                 post.status = 2
                 post.featured = False
                 post.save()
@@ -203,3 +204,13 @@ class CommunityViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
+        
+    @login_required_ajax
+    def create(self, request):
+        name = request.data['name']
+        user, created = UserProfile.objects.get_or_create(user=request.user)
+        if not Community.objects.all().filter(name=name).exists():
+            super().create(request)
+            return Response({"message": "Community created"})
+
+        return Response({"message": "Community already exists"}, status=400)

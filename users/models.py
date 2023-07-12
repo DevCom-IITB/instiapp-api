@@ -48,13 +48,14 @@ class UserProfile(models.Model):
     # InstiApp feature fields
     active = models.BooleanField(default=True)
     followed_bodies = models.ManyToManyField('bodies.Body', related_name='followers', blank=True)
+    followed_communities = models.ManyToManyField('community.Community', related_name='community_followers', blank=True)
     # InstiApp roles
     roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
     former_roles = models.ManyToManyField(
         'roles.BodyRole', related_name='former_users', blank=True, through='UserFormerRole')
     institute_roles = models.ManyToManyField(
         'roles.InstituteRole', related_name='users', blank=True)
-
+    community_roles = models.ManyToManyField('roles.CommunityRole', related_name='users', blank=True)
     # User exposed fields
     show_contact_no = models.BooleanField(default=False)
     fcm_id = models.CharField(max_length=200, null=True, blank=True)

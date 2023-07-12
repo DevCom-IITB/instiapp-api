@@ -5,6 +5,7 @@ from community.views import CommunityViewSet, PostViewSet, ModeratorViewSet
 urlpatterns = [
     path('communities', CommunityViewSet.as_view({
         'get': 'list',
+        'post': 'create'
     })),  # viewing the list of communities
 
     path('communities/<pk>', CommunityViewSet.as_view({
