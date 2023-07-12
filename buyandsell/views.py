@@ -124,7 +124,6 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         # request.data['contact_details'] = BuyAndSellViewSet.get_contact_details(userpro)
         # request.data['user'] = userpro.id
         # print(request.data)
-        print(request.data)
         
         try:
             return super().create(request)

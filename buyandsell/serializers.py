@@ -5,6 +5,11 @@ from users.serializers import UserProfileSerializer
 class ProductSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer(read_only=True)
     category = serializers.SerializerMethodField()
+    product_image = serializers.SerializerMethodField()
+
+    def get_product_image(self, obj):
+        return obj.product_image.split(',') if obj.product_image else None
+
 
     def get_category(self, obj):
         return obj.name
@@ -14,14 +19,12 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def create(self, validated_data):
+        data = self.context["request"].data
         validated_data['status'] = True
         validated_data['deleted'] = False
         validated_data['user'] = self.context['request'].user.profile
-        
-        str_urls = validated_data['product_image']
-        str_urls = str_urls.strip(" '")
-        list_urls = [url.strip(" '") for url in str_urls.split(", ")]
-        validated_data['product_image'] = list_urls
+
+        validated_data['product_image'] = ",".join(data["product_image"]) if 'product_image' in data else ""
 
         if validated_data['action'] == 'giveaway':
             validated_data['price'] = 0
