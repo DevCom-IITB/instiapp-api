@@ -55,7 +55,7 @@ class UserProfile(models.Model):
         'roles.BodyRole', related_name='former_users', blank=True, through='UserFormerRole')
     institute_roles = models.ManyToManyField(
         'roles.InstituteRole', related_name='users', blank=True)
-    community_roles = models.ManyToManyField('roles.CommunityRole', related_name='users', blank=True)
+    # community_roles = models.ManyToManyField('roles.CommunityRole', related_name='users', blank=True)
     # User exposed fields
     show_contact_no = models.BooleanField(default=False)
     fcm_id = models.CharField(max_length=200, null=True, blank=True)

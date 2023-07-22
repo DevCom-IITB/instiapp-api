@@ -2,7 +2,6 @@
 from rest_framework.response import Response
 from bodies.models import Body
 from community.models import Community
-from roles.models import CommunityRole
 
 def forbidden_no_privileges():
     """Forbidden due to insufficient privileges."""
@@ -20,11 +19,13 @@ def user_has_privilege(profile, bodyid, privilege):
             return True
     return False
 def user_has_community_privilege(profile, communityid, privilege):
-    """Returns true if UserProfile has particular previlege in a community."""
-    coms = Community.objects.filter(pk=communityid)
-    for role in profile.community_roles.all().filter(community__in=coms):
-        if  privilege in role.permissions:
+    """Returns true if UserProfile has or has inherited the privilege."""
+    community = Community.objects.get(pk=communityid)
+    parents = get_parents_recursive(community, [])
+    for role in profile.roles.all().filter(community__in=parents):
+        if (role.body == community or role.inheritable) and privilege in role.permissions:
             return True
+    return False
 
     
 

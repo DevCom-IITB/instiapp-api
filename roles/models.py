@@ -35,26 +35,30 @@ class BodyRole(models.Model):
     def __str__(self):
         return self.body.name + " " + self.name
     
-class CommunityRole(models.Model):
-    """A role for a bodywhich can be granted to multiple users."""
+''' 
+Added Community Role Model : To allow to have various communities in a single body and have different roles for each community.
+Ditched For Now
+'''
+# class CommunityRole(models.Model):
+#     """A role for a bodywhich can be granted to multiple users."""
 
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    time_of_creation = models.DateTimeField(auto_now_add=True)
-    name = models.CharField(max_length=50)
-    community = models.ForeignKey('community.Community', on_delete=models.CASCADE, related_name='roles')
-    inheritable = models.BooleanField(default=False)
-    permissions = MultiSelectField(choices=PERMISSION_CHOICES)
-    priority = models.IntegerField(default=0)
-    official_post = models.BooleanField(default=True)
-    permanent = models.BooleanField(default=False)
+#     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+#     time_of_creation = models.DateTimeField(auto_now_add=True)
+#     name = models.CharField(max_length=50)
+#     community = models.ForeignKey('community.Community', on_delete=models.CASCADE, related_name='roles')
+#     inheritable = models.BooleanField(default=False)
+#     permissions = MultiSelectField(choices=PERMISSION_CHOICES)
+#     priority = models.IntegerField(default=0)
+#     official_post = models.BooleanField(default=True)
+#     permanent = models.BooleanField(default=False)
 
-    class Meta:
-        verbose_name = "Community Role"
-        verbose_name_plural = "Community Roles"
-        ordering = ("community__name", "priority")
+#     class Meta:
+#         verbose_name = "Community Role"
+#         verbose_name_plural = "Community Roles"
+#         ordering = ("community__name", "priority")
 
-    def __str__(self):
-        return self.community.name + " " + self.name
+#     def __str__(self):
+#         return self.community.name + " " + self.name
 
 
 INSTITUTE_PERMISSION_CHOICES = (

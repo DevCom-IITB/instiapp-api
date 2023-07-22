@@ -6,7 +6,7 @@ from community.models import Community
 from community.models import CommunityPost
 from community.serializer_min import CommunitySerializerMin, CommunityPostSerializerMin
 from community.serializers import CommunitySerializers, CommunityPostSerializers
-from roles.helpers import user_has_privilege, user_has_community_privilege
+from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
 from helpers.misc import query_from_num
@@ -29,7 +29,7 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
 
         if ((user_has_privilege(request.user.profile, post.community.body.id, 'AppP') and post.thread_rank == 1)
-                or (user_has_privilege(request.user.profile, post.community.body.id, 'ModC') and post.thread_rank > 1)) or user_has_community_privilege(request.user.profile, post.community.id, 'ModC'):
+                or (user_has_privilege(request.user.profile, post.community.body.id, 'ModC') and post.thread_rank > 1)):
             # Get query param
             status = request.data["status"]
             if status is None:
@@ -123,7 +123,7 @@ class PostViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
 
         if action == "feature":
-            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]) or user_has_community_privilege(request.user.profile, post.community.id, 'ModC'):
+            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
 
                 # Get query param
                 is_featured = request.data["is_featured"]
@@ -145,7 +145,7 @@ class PostViewSet(viewsets.ModelViewSet):
                 post.save()
                 return Response({"message": "Post deleted"})
 
-            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]) or user_has_community_privilege(request.user.profile, post.community.id, 'ModC'):
+            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
                 post.status = 2
                 post.featured = False
                 post.save()
