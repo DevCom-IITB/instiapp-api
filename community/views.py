@@ -73,7 +73,11 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # Check for time and date filtered query params
         status = request.GET.get("status")
-        community = request.GET.get("community")
+        comm_id = request.GET.get("community")
+        if comm_id is None:
+            return Response({"message": "comm_id is required"}, status=400)
+        community = get_object_or_404(Community.objects, id=comm_id)
+
         # If your posts
         if status is None:
             queryset = CommunityPost.objects.filter(thread_rank=1, community=community, posted_by=request.user
@@ -81,7 +85,8 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             # If reported posts
             if status == "3":
-                queryset = CommunityPost.objects.filter(status=status, community=community, deleted=False).order_by("-time_of_modification")
+                queryset = CommunityPost.objects.filter(
+                    status=status, community=community, deleted=False).order_by("-time_of_modification")
                 # queryset = CommunityPost.objects.all()
 
             else:
@@ -102,7 +107,7 @@ class PostViewSet(viewsets.ModelViewSet):
         # Prevent posts without any community
         if 'community' not in request.data or not request.data['community']:
             return forbidden_no_privileges()
-        
+
         user, created = UserProfile.objects.get_or_create(user=request.user)
         return super().create(request)
 
@@ -204,7 +209,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
             return get_object_or_404(self.queryset, id=pk)
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
-        
+
     @login_required_ajax
     def create(self, request):
         name = request.data['name']
