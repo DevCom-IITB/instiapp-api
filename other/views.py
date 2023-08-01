@@ -23,6 +23,8 @@ from other.serializers import NotificationSerializer
 from other.serializers import UserTagCategorySerializer
 from helpers.misc import query_search
 from helpers.misc import users_from_tags
+from buyandsell.models import Product
+from buyandsell.serializers import ProductSerializer
 
 def get_notif_queryset(queryset):
     return queryset.unread().filter(timestamp__gte=timezone.now() - timedelta(days=7))
@@ -44,7 +46,7 @@ class OtherViewset(viewsets.ViewSet):
             return Response({"message": "No query or too short!"}, status=400)
 
         # Include only the types we want
-        bodies, events, users, skills, interests = ([] for i in range(5))
+        bodies, events, users, skills, interests, products = ([] for i in range(6))
 
         # Search bodies by name and description
         if 'bodies' in types:
@@ -74,13 +76,20 @@ class OtherViewset(viewsets.ViewSet):
             interests = query_search(
                 request, 0, Interest.objects.all(),
                 ["title"], 'interests', order_relevance=True)
+            
+        # Search products by name,brand
+        if 'products' in types:
+            products = query_search(
+                request, MIN_LENGTH, Product.objects.all(),
+                ['name', 'description', 'category','brand'], 'products', order_relevance=True)[:20]
 
         return Response({
             "bodies": BodySerializerMin(bodies, many=True).data,
             "events": EventSerializer(events, many=True).data,
             "users": UserProfileSerializer(users, many=True).data,
             "skills": SkillSerializer(skills, many=True).data,
-            "interests": InterestSerializer(interests, many=True).data
+            "interests": InterestSerializer(interests, many=True).data,
+            "products" : ProductSerializer(products, many=True).data
         })
 
     @classmethod
