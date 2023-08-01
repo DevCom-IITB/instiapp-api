@@ -90,15 +90,13 @@ def get_shortest_path(request):
                  "ycor": str(start_y)}
         request2 = HttpRequest()
         request2.data2 = data2
-        start = fn_nearest_points(request2)[0]["name"]
+        # start = fn_nearest_points(request2)[0]["name"]
     end = request.data['destination']
     dest = end
     object = handle_entry()
     # object.update()
     strt = start
-    start = object.get_nearest(start)
-    end = object.get_nearest(end)
-    graph = object.graph()
+    graph = object.graph(end, start)
     if start is not None and end is not None:
         try:
             start = int(start)
