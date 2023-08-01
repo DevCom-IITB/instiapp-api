@@ -215,9 +215,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # true when elasticsearch is configured
 USE_ELASTIC = True
-# CORS_ORIGIN_ALLOW_ALL = True
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:4200",
-# ]
-
-# CORS_ALLOW_CREDENTIALS = True
