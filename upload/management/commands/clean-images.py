@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.db.models import Q
+from buyandsell.models import Product
 from upload.models import UploadedImage
 from events.models import Event
 from bodies.models import Body
@@ -30,7 +31,8 @@ class Command(BaseCommand):
                 Body.objects.filter(image_url__contains=url),
                 ComplaintImage.objects.filter(image_url__contains=url),
                 Community.objects.filter(Q(logo_image__contains=url) | Q(cover_image__contains=url)),
-                CommunityPost.objects.filter(image_url__contains=url)
+                CommunityPost.objects.filter(image_url__contains=url) |
+                Product.objects.filter(product_image__contains=url)
             ]
 
             # Look for claimants
