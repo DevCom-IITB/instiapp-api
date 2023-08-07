@@ -31,7 +31,7 @@ class Command(BaseCommand):
                 Body.objects.filter(image_url__contains=url),
                 ComplaintImage.objects.filter(image_url__contains=url),
                 Community.objects.filter(Q(logo_image__contains=url) | Q(cover_image__contains=url)),
-                CommunityPost.objects.filter(image_url__contains=url) |
+                CommunityPost.objects.filter(image_url__contains=url),
                 Product.objects.filter(product_image__contains=url)
             ]
 
