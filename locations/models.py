@@ -2,7 +2,7 @@
 from uuid import uuid4
 from django.db import models
 from helpers.misc import get_url_friendly
-
+from locations.management.commands.Addloc import add_conns, delete_connections
 class Location(models.Model):
     """A unique location, chiefly venues for events.
 
@@ -27,14 +27,25 @@ class Location(models.Model):
     lat = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     lng = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     reusable = models.BooleanField(default=False)
-
+    connected_locs = models.TextField(blank=True, null=True)
     adjacent_locs = models.ManyToManyField(
         'locations.Location', through='LocationLocationDistance',
         related_name='adjacent_loc', blank=True)
 
     def save(self, *args, **kwargs):        # pylint: disable=W0222
         self.str_id = get_url_friendly(self.short_name)
+        adj_data = self.connected_locs
+        locs = adj_data.split(',')
+        for loc in locs:
+            if loc:
+                loc = Location.objects.filter(name=loc).first()
+                add_conns(self, loc)
         super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        delete_connections(self)
+        super().delete(*args, **kwargs)
+
 
     def __str__(self):
         return (self.short_name if self.short_name else '') + ' - ' + self.name
