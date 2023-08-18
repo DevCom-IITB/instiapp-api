@@ -32,14 +32,15 @@ class Location(models.Model):
         'locations.Location', through='LocationLocationDistance',
         related_name='adjacent_loc', blank=True)
 
-    def save(self, *args, **kwargs):        # pylint: disable=W0222
+    def save(self, *args, **kwargs):        # pylint: disable =W0222
         self.str_id = get_url_friendly(self.short_name)
         adj_data = self.connected_locs
-        locs = adj_data.split(',')
-        for loc in locs:
-            if loc:
-                loc = Location.objects.filter(name=loc).first()
-                add_conns(self, loc)
+        if adj_data:
+            locs = adj_data.split(',')
+            for loc in locs:
+                if loc:
+                    loc = Location.objects.filter(name=loc).first()
+                    add_conns(self, loc)
         super().save(*args, **kwargs)
     
     def delete(self, *args, **kwargs):
