@@ -4,7 +4,6 @@ from django.db.models import Q
 import sys
 from locations.serializers import LocationSerializerMin
 from locations.models import Location
-import json
 import os
 import math as m
 
@@ -277,26 +276,7 @@ class handle_entry:
                             [3525, 2741], [3436, 2777], [3329, 2750],
                             [2741, 445]]
 
-        '''
-            Adding New Locations to the database(Not A Node):
-            1. Save the location with all the connected Nodes or locations separated by a comma. 
-            adj_list is updated automatically.
-            **TO UPDATE THE ADJ_LIST AUTOMATICALLY WITH CORRECTED DISTANCES:**
-            1. open manage.py shell and run the following commands:
-                from locations.management.commands.mapnav import handle_entry 
-                h= handle_entry().update()
-            ** TO ADD NEW NODE POINTS TO THE ADJ_LIST:**
-            1. Add their coordinates(sequentially) here and delete all the node locations in the database.
-            2. And update the adj_list using above method.
-    
-        '''
-
-
-        working_directory = os.getcwd()
-        os.chdir(working_directory+ "/locations/management/commands/")
-        with open("adj_list.py", 'r') as f:
-            self.adj_list = dict(eval(f.read()))
-        os.chdir(working_directory)
+        self.adj_list = self.load_adj_list()
 
 
     '''Caution: Avoid executing the update function during active requests as it may cause significant delays (~20s).
@@ -364,13 +344,46 @@ class handle_entry:
                 loc_list.append(loc)
                 i += 1
             
-            working_directory = os.getcwd()
-            os.chdir(working_directory+ "/locations/management/commands/")
-            with open("adj_list.py", 'w') as f:
+
+            adj_list_path = f"{os.getcwd()}/locations/management/commands/adj_list.py"
+            
+            with open(adj_list_path, 'w') as f:
                 f.write(str(self.adj_list))
-            os.chdir(working_directory)
+
+
+    """
+    Updates the 'connected_locs' field of Location objects with conected locations
+    """
+    def update_locations_with_connected_loc(self):
+        # Need to run this to ensure the location objects contain the adjacent locations that they are connected to.
+            all_locations = Location.objects.all()
+            for location in all_locations:
+                try:
+                    adj_locs_dict = self.adj_list[location.name]
+                    connected_location_str = ""
+                    for i in adj_locs_dict:
+                        if isinstance(i, int):
+                            connected_location_str += f"Node{i},"
+                        else:
+                            connected_location_str+= f"{i},"
+                    connected_location_str.replace(connected_location_str[-1],"",1)
+                    location.connected_locs = connected_location_str
+                    location.save()
+                except KeyError:
+                    pass
 
     '''Gets the nearest Node near a location on the map.'''
+
+    def load_adj_list(self):
+        adj_list_path = f"{os.getcwd()}/locations/management/commands/adj_list.py"
+        adj_list = {}
+
+        
+        with open(adj_list_path, 'r') as f:
+            adj_list = dict(eval(f.read()))
+
+        return adj_list
+
 
     import sys
 
