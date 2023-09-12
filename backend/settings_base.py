@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'external.apps.ExternalConfig',
     'alumni.apps.AlumniConfig',
     'community.apps.CommunityConfig',
+    "gcleaderboard.apps.GcleaderboardConfig",
 
     'notifications',
     'markdownify',
