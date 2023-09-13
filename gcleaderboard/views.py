@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from .serializers import (
     GCSerializer,
     Hostel_PointsSerializer,
-    Hostel,
     Hostel_Serializer,
 )
 
@@ -34,8 +33,8 @@ class InstiViewSet(viewsets.ModelViewSet):
 
     """ 3> GET List Of Hostel Sorted w.r.t points for LeaderBoard of That GC """
 
-    def Sub_GC_LB(self, request, Id):
-        gc = GC_Hostel_Points.objects.filter(gc__id=Id).order_by("-points")
+    def Sub_GC_LB(self, request, gcuuid):
+        gc = GC_Hostel_Points.objects.filter(gc__id=gcuuid).order_by("-points")
         serializer = Hostel_PointsSerializer(gc, many=True)
         return Response(serializer.data)
 
