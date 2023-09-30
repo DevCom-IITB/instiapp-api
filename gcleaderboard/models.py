@@ -22,7 +22,8 @@ class GC_Hostel_Points(models.Model):
     gc = models.ForeignKey(GC, on_delete=models.CASCADE)
     hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE)
     points = models.IntegerField(default=0)
+    participants = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        
+        # Convert the UUID to a string representation before returning it
         return self.hostel.short_name

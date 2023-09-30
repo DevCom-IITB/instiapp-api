@@ -1,46 +1,50 @@
+from django.shortcuts import render
 from django.db.models import Sum, Value
 from django.db.models.functions import Coalesce
 from rest_framework import viewsets
 from .models import GC, GC_Hostel_Points, Hostel
+from roles.helpers import user_has_privilege
+from roles.helpers import login_required_ajax
 
 from rest_framework.response import Response
 from .serializers import (
     GCSerializer,
     Hostel_PointsSerializer,
     Hostel_Serializer,
+    
 )
+
+from gcleaderboard.serializers import Participants_Serializer 
 
 
 class InstiViewSet(viewsets.ModelViewSet):
     queryset = GC.objects
     serializer_class = GCSerializer
-    """ GET 1> List Of Types Of GCs """
+  
+   
 
-    def Types_Of_GCs(self, request):
-        data = {1: "Tech", 2: "Sports", 3: "Cult"}
-        return Response(data)
-
-    """ 2> GET  List Of GCs of A Type """
-
-    def X_GC(
+    def Type_GC(
         self,
         request,
         Type,
     ):
+        """  List of GCs of a particular Type """
         gcs = GC.objects.filter(type=Type)
         serializer = GCSerializer(gcs, many=True)
         return Response(serializer.data)
 
-    """ 3> GET List Of Hostel Sorted w.r.t points for LeaderBoard of That GC """
 
-    def Sub_GC_LB(self, request, gcuuid):
-        gc = GC_Hostel_Points.objects.filter(gc__id=gcuuid).order_by("-points")
+    def Individual_GC_LB(self, request, gc_id):
+        
+        """ List Of Hostels sorted w.r.t points for leaderboard of that gc """
+        gc = GC_Hostel_Points.objects.filter(gc__id=gc_id).order_by("-points")
         serializer = Hostel_PointsSerializer(gc, many=True)
         return Response(serializer.data)
 
-    """ GET 4> Leaderboard for list of hostels for types of GC """
+    
 
     def Type_GC_LB(self, request, Type):
+        """ Leaderboard for list of hostels for types of GC """
         data = {}
         all_rows = Hostel.objects.all()
         for row in all_rows:
@@ -57,9 +61,10 @@ class InstiViewSet(viewsets.ModelViewSet):
         print(sorted_dict)
         return Response(sorted_dict)
 
-    """GET  5 List of Hostels for overall Leaderboard """
 
     def GC_LB(self, request):
+        
+        """ List of Hostels for Overall Leaderboard """
         data = {}
         all_rows = Hostel.objects.all()
         for row in all_rows:
@@ -75,27 +80,41 @@ class InstiViewSet(viewsets.ModelViewSet):
 
         print(sorted_dict)
         return Response(sorted_dict)
+    
+    def Participants_in_GC(self ,  request , points_id ,hostel_short_name ):
+         participants = GC_Hostel_Points.objects.filter(
+                hostel__short_name=hostel_short_name, id = points_id
+            )
+         
+         serializer = Participants_Serializer(participants , many = True)
+         return Response(serializer.data)
+         
+
+
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = GC.objects.all()  
+    queryset = GC.objects.all()  #
     serializer_class = GCSerializer
-
-    """ POST 6> Add GC  """
+    
+    @login_required_ajax
     def add_GC(self, request):
+        """ Adding New GC """
         serializer = GCSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
         return Response(serializer.data)
 
 
+
 class UpdateViewSet(viewsets.ModelViewSet):
-    queryset = GC_Hostel_Points.objects.all()  
+    queryset = GC_Hostel_Points.objects.all()  # Replace with your queryset
     serializer_class = Hostel_Serializer
 
-    """ PUT 7> Modify Hostel Points for a GC  """
-
+    
+    @login_required_ajax
     def update_Points(self, request, pk):
+        """ Mpdify Hostel Points for a GC  """
         hostel = GC_Hostel_Points.objects.get(id=pk)
         change_point = int(request.data["points"])
         hostel.points += change_point
