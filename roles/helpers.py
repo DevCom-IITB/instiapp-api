@@ -2,6 +2,32 @@
 from rest_framework.response import Response
 from bodies.models import Body
 from community.models import Community
+from bans.models import SSOBan
+from users.models import UserProfile
+import datetime
+from dateutil.relativedelta import relativedelta
+
+def user_is_banned(profile):
+    try:
+        ban = SSOBan.objects.get(banned_user = profile.id)
+        current_time = datetime.datetime.now()
+        ban_created = ban.time_of_creation
+        ban_duration = ban.duration_of_ban
+
+        if ban_duration == 'Permanent':
+            return True
+        
+        else:
+            duration_month = int(ban_duration.split(" ")[0])
+            banned_till = ban_created + relativedelta(months=duration_month)
+
+            if banned_till > current_time:
+                return True
+        return False
+    except SSOBan.DoesNotExist:
+        return False
+    
+
 
 def forbidden_no_privileges():
     """Forbidden due to insufficient privileges."""
@@ -63,7 +89,16 @@ def login_required_ajax(func):
     @add_doc(func.__doc__)
     def wrapper(*args, **kw):
         if args[1].user.is_authenticated:
-            return func(*args, **kw)
+            user = args[1].user
+            profile = UserProfile.objects.get(user = user)
+            if not user_is_banned(profile):
+                return func(*args, **kw)
+            if user_is_banned:
+                return Response({
+                    'message':'banned', 
+                    'detail' : 'your SSO has been banned/disabled'
+
+                })
         return Response({
             'message': 'unauthenticated',
             'detail': 'Log in to continue!'

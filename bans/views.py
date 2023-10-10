@@ -8,15 +8,15 @@ from roles.helpers import login_required_ajax, user_has_insti_privilege, forbidd
 
 
 from users.models import UserProfile
-from .models import SSOBans
+from .models import SSOBan
 from .serializers import SSOBansSerializer
 
 
 # Create your views here.
 
 
-class SSOBansViewSet(viewsets.ModelViewSet):
-    queryset = SSOBans.objects.all()
+class SSOBanViewSet(viewsets.ModelViewSet):
+    queryset = SSOBan.objects.all()
     serializer_class = SSOBansSerializer 
 
     @login_required_ajax
@@ -27,7 +27,7 @@ class SSOBansViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
         else:
-            return forbidden_no_privileges
+            return forbidden_no_privileges()
 
     @login_required_ajax
     def retrieve(self, request, pk):
@@ -37,7 +37,7 @@ class SSOBansViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
         else:
-            return forbidden_no_privileges
+            return forbidden_no_privileges()
 
     @login_required_ajax
     def create(self, request):
@@ -62,7 +62,7 @@ class SSOBansViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return forbidden_no_privileges
+            return forbidden_no_privileges()
     
     @login_required_ajax
     def update(self, request, pk=None, *args, **kwargs):
@@ -77,7 +77,7 @@ class SSOBansViewSet(viewsets.ModelViewSet):
             
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return forbidden_no_privileges
+            return forbidden_no_privileges()
 
     @login_required_ajax
     def destroy(self, request, pk=None, *args, **kwargs):
@@ -86,6 +86,6 @@ class SSOBansViewSet(viewsets.ModelViewSet):
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
-            return forbidden_no_privileges
+            return forbidden_no_privileges()
 
             
