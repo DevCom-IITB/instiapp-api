@@ -68,6 +68,7 @@ base_urlpatterns = [
     path(api_base(), include('external.urls')),
     path(api_base(), include('community.urls')),
     path(api_base(), include('buyandsell.urls')),
+    path(api_base(), include('bans.urls')),
     path(api_base('venter'), include("venter.urls")),
 
 

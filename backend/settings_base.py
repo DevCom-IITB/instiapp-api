@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'external.apps.ExternalConfig',
     'alumni.apps.AlumniConfig',
     'community.apps.CommunityConfig',
+    'bans.apps.BansConfig',
 
     'notifications',
     'markdownify',
