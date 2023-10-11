@@ -5,21 +5,22 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bodies', '0020_auto_20180815_2032'),
+        ("bodies", "0020_auto_20180815_2032"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='body',
-            name='time_of_creation',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="body",
+            name="time_of_creation",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='body',
-            name='time_of_modification',
+            model_name="body",
+            name="time_of_modification",
             field=models.DateTimeField(auto_now=True),
         ),
     ]

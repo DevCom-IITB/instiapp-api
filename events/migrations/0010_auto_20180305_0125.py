@@ -5,21 +5,27 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0002_userprofile_followed_bodies'),
-        ('events', '0009_auto_20180304_0135'),
+        ("users", "0002_userprofile_followed_bodies"),
+        ("events", "0009_auto_20180304_0135"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='created_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='users.UserProfile'),
+            model_name="event",
+            name="created_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="users.UserProfile",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='venues',
-            field=models.ManyToManyField(blank=True, null=True, related_name='events', to='locations.Location'),
+            model_name="event",
+            name="venues",
+            field=models.ManyToManyField(
+                blank=True, null=True, related_name="events", to="locations.Location"
+            ),
         ),
     ]

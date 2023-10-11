@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('community', '0018_communitypost_reported_by'),
+        ("community", "0018_communitypost_reported_by"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='communitypost',
-            name='reported',
+            model_name="communitypost",
+            name="reported",
         ),
     ]

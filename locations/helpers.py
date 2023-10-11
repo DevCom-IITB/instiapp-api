@@ -2,6 +2,7 @@
 from django.db.models import Q
 from locations.models import Location
 
+
 def create_unreusable_locations(loc_list):
     """Takes a list of venues and creates venues which do not match
     any existing venues. Returns a list of venue ids to be

@@ -5,21 +5,27 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='PlacementBlogEntry',
+            name="PlacementBlogEntry",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('guid', models.TextField(blank=True)),
-                ('title', models.TextField(blank=True)),
-                ('content', models.TextField(blank=True)),
-                ('link', models.TextField(blank=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("guid", models.TextField(blank=True)),
+                ("title", models.TextField(blank=True)),
+                ("content", models.TextField(blank=True)),
+                ("link", models.TextField(blank=True)),
             ],
         ),
     ]

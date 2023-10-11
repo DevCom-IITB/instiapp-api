@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('community', '0008_alter_communitypost_community'),
+        ("community", "0008_alter_communitypost_community"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='community',
-            name='followers',
+            model_name="community",
+            name="followers",
             field=models.IntegerField(default=0),
         ),
     ]

@@ -6,31 +6,37 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ExternalBlogEntry',
+            name="ExternalBlogEntry",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('guid', models.CharField(blank=True, max_length=200)),
-                ('title', models.CharField(blank=True, max_length=300)),
-                ('content', models.TextField(blank=True)),
-                ('link', models.CharField(blank=True, max_length=200)),
-                ('published', models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("guid", models.CharField(blank=True, max_length=200)),
+                ("title", models.CharField(blank=True, max_length=300)),
+                ("content", models.TextField(blank=True)),
+                ("link", models.CharField(blank=True, max_length=200)),
+                ("published", models.DateTimeField(default=django.utils.timezone.now)),
             ],
             options={
-                'verbose_name': 'External Blog Entry',
-                'verbose_name_plural': 'External Blog Entries',
-                'ordering': ('-published',),
+                "verbose_name": "External Blog Entry",
+                "verbose_name_plural": "External Blog Entries",
+                "ordering": ("-published",),
             },
         ),
         migrations.AddIndex(
-            model_name='externalblogentry',
-            index=models.Index(fields=['guid'], name='external_ex_guid_dceedf_idx'),
+            model_name="externalblogentry",
+            index=models.Index(fields=["guid"], name="external_ex_guid_dceedf_idx"),
         ),
     ]

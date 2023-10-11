@@ -5,31 +5,36 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('achievements', '0001_initial'),
+        ("achievements", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='achievement',
-            name='admin_note',
+            model_name="achievement",
+            name="admin_note",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='achievement',
-            name='title',
-            field=models.CharField(default='nothing', max_length=80),
+            model_name="achievement",
+            name="title",
+            field=models.CharField(default="nothing", max_length=80),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='achievement',
-            name='description',
+            model_name="achievement",
+            name="description",
             field=models.TextField(blank=True),
         ),
         migrations.AlterField(
-            model_name='achievement',
-            name='verified_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='achievements_verified_by', to='users.UserProfile'),
+            model_name="achievement",
+            name="verified_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="achievements_verified_by",
+                to="users.UserProfile",
+            ),
         ),
     ]

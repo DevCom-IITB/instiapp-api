@@ -5,21 +5,25 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('locations', '0002_location_time_of_creation'),
-        ('events', '0002_auto_20180217_2147'),
+        ("locations", "0002_location_time_of_creation"),
+        ("events", "0002_auto_20180217_2147"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='time_of_creation',
+            model_name="event",
+            name="time_of_creation",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='event',
-            name='venue',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='locations.Location'),
+            model_name="event",
+            name="venue",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="locations.Location",
+            ),
         ),
     ]

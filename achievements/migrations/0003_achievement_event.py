@@ -5,16 +5,20 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0028_event_promotion_boost'),
-        ('achievements', '0002_auto_20190719_2321'),
+        ("events", "0028_event_promotion_boost"),
+        ("achievements", "0002_auto_20190719_2321"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='achievement',
-            name='event',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='achievements', to='events.Event'),
+            model_name="achievement",
+            name="event",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="achievements",
+                to="events.Event",
+            ),
         ),
     ]

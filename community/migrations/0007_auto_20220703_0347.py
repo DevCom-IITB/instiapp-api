@@ -5,19 +5,24 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('community', '0006_rename_threadrank_communitypost_thread_rank'),
+        ("community", "0006_rename_threadrank_communitypost_thread_rank"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='communitypost',
-            name='comments',
+            model_name="communitypost",
+            name="comments",
         ),
         migrations.AlterField(
-            model_name='communitypost',
-            name='parent',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='community.communitypost'),
+            model_name="communitypost",
+            name="parent",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="comments",
+                to="community.communitypost",
+            ),
         ),
     ]

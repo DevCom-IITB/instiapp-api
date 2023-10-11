@@ -6,27 +6,57 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('users', '0032_auto_20190329_1914'),
-        ('bodies', '0023_body_canonical_name'),
+        ("users", "0032_auto_20190329_1914"),
+        ("bodies", "0023_body_canonical_name"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Achievement',
+            name="Achievement",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('time_of_creation', models.DateTimeField(auto_now_add=True)),
-                ('time_of_modification', models.DateTimeField(auto_now=True)),
-                ('dismissed', models.BooleanField(default=False)),
-                ('verified', models.BooleanField(default=False)),
-                ('description', models.CharField(max_length=100)),
-                ('body', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='achievements', to='bodies.Body')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='achievements', to='users.UserProfile')),
-                ('verified_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='achievements_verified_by', to='users.UserProfile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("time_of_creation", models.DateTimeField(auto_now_add=True)),
+                ("time_of_modification", models.DateTimeField(auto_now=True)),
+                ("dismissed", models.BooleanField(default=False)),
+                ("verified", models.BooleanField(default=False)),
+                ("description", models.CharField(max_length=100)),
+                (
+                    "body",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="achievements",
+                        to="bodies.Body",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="achievements",
+                        to="users.UserProfile",
+                    ),
+                ),
+                (
+                    "verified_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="achievements_verified_by",
+                        to="users.UserProfile",
+                    ),
+                ),
             ],
         ),
     ]

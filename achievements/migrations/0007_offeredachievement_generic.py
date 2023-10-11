@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('achievements', '0006_auto_20190720_0355'),
+        ("achievements", "0006_auto_20190720_0355"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='offeredachievement',
-            name='generic',
-            field=models.CharField(default='generic', max_length=20),
+            model_name="offeredachievement",
+            name="generic",
+            field=models.CharField(default="generic", max_length=20),
         ),
     ]

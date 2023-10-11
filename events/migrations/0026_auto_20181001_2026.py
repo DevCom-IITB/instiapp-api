@@ -4,18 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0025_event_starting_notified'),
+        ("events", "0025_event_starting_notified"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='event',
-            options={'ordering': ('-start_time',), 'verbose_name': 'Event', 'verbose_name_plural': 'Events'},
+            name="event",
+            options={
+                "ordering": ("-start_time",),
+                "verbose_name": "Event",
+                "verbose_name_plural": "Events",
+            },
         ),
         migrations.AddIndex(
-            model_name='event',
-            index=models.Index(fields=['start_time'], name='events_even_start_t_c2d277_idx'),
+            model_name="event",
+            index=models.Index(
+                fields=["start_time"], name="events_even_start_t_c2d277_idx"
+            ),
         ),
     ]

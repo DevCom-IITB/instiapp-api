@@ -6,26 +6,48 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0038_auto_20210606_2237'),
-        ('achievements', '0010_auto_20211125_2314'),
+        ("users", "0038_auto_20210606_2237"),
+        ("achievements", "0010_auto_20211125_2314"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Interest',
+            name="Interest",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=80)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("title", models.CharField(max_length=80)),
             ],
         ),
         migrations.CreateModel(
-            name='UserInterest',
+            name="UserInterest",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=80)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='interests', to='users.userprofile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("title", models.CharField(max_length=80)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="interests",
+                        to="users.userprofile",
+                    ),
+                ),
             ],
         ),
     ]

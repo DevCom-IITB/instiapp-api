@@ -3,6 +3,7 @@ from uuid import uuid4
 from django.db import models
 from helpers.misc import get_url_friendly
 
+
 class Event(models.Model):
     """An event to be associated with one or more Bodies.
 
@@ -17,26 +18,40 @@ class Event(models.Model):
 
     name = models.CharField(max_length=60)
     description = models.TextField(blank=True)
-    bodies = models.ManyToManyField('bodies.Body', related_name='events', blank=True)
+    bodies = models.ManyToManyField("bodies.Body", related_name="events", blank=True)
     image_url = models.URLField(blank=True, null=True)
     website_url = models.URLField(blank=True, null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    created_by = models.ForeignKey('users.UserProfile', null=True, blank=True,
-                                   on_delete=models.SET_NULL, related_name='created_events')
+    created_by = models.ForeignKey(
+        "users.UserProfile",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="created_events",
+    )
     all_day = models.BooleanField(default=False)
-    venues = models.ManyToManyField('locations.Location', related_name='events', blank=True)
-    followers = models.ManyToManyField('users.UserProfile', through='UserEventStatus',
-                                       related_name='followed_events', blank=True)
+    venues = models.ManyToManyField(
+        "locations.Location", related_name="events", blank=True
+    )
+    followers = models.ManyToManyField(
+        "users.UserProfile",
+        through="UserEventStatus",
+        related_name="followed_events",
+        blank=True,
+    )
 
     archived = models.BooleanField(default=False)
     notify = models.BooleanField(default=True)
-    user_tags = models.ManyToManyField('users.UserTag', related_name='events', blank=True)
+    user_tags = models.ManyToManyField(
+        "users.UserTag", related_name="events", blank=True
+    )
 
     starting_notified = models.BooleanField(default=False)
 
-    event_interest = models.ManyToManyField('achievements.Interest', related_name='events',
-                                            blank=True)
+    event_interest = models.ManyToManyField(
+        "achievements.Interest", related_name="events", blank=True
+    )
 
     promotion_boost = models.IntegerField(default=0)
 
@@ -51,12 +66,12 @@ class Event(models.Model):
             bodies_str += ", " + body
         return f"{self.name} - {bodies_str}"
 
-    def save(self, *args, **kwargs):        # pylint: disable=W0222
+    def save(self, *args, **kwargs):  # pylint: disable=W0222
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
-    
+
     def get_absolute_url(self):
-        return '/event/' + self.str_id
+        return "/event/" + self.str_id
 
     def all_bodies(self):
         return [str(body) for body in self.bodies.all()]
@@ -66,8 +81,13 @@ class Event(models.Model):
         verbose_name_plural = "Events"
         ordering = ("-start_time",)
         indexes = [
-            models.Index(fields=['start_time', ]),
+            models.Index(
+                fields=[
+                    "start_time",
+                ]
+            ),
         ]
+
 
 class UserEventStatus(models.Model):
     """Associates a User and an Event, describing probabilty of attending.
@@ -82,10 +102,12 @@ class UserEventStatus(models.Model):
 
     # Cascading on delete is delibrate here, since the entry
     # makes no sense if the user or event gets deleted
-    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE,
-                             default=uuid4, related_name='ues')
-    event = models.ForeignKey(Event, on_delete=models.CASCADE,
-                              default=uuid4, related_name='ues')
+    user = models.ForeignKey(
+        "users.UserProfile", on_delete=models.CASCADE, default=uuid4, related_name="ues"
+    )
+    event = models.ForeignKey(
+        Event, on_delete=models.CASCADE, default=uuid4, related_name="ues"
+    )
 
     status = models.IntegerField(default=0)
 

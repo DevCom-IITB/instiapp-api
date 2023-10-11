@@ -13,7 +13,17 @@ from news.models import NewsEntry
 from achievements.models import Interest, Skill
 from external.models import ExternalBlogEntry
 
-model_classes = (Body, Event, UserProfile, BlogEntry, NewsEntry, ExternalBlogEntry, Skill, Interest)
+model_classes = (
+    Body,
+    Event,
+    UserProfile,
+    BlogEntry,
+    NewsEntry,
+    ExternalBlogEntry,
+    Skill,
+    Interest,
+)
+
 
 @shared_task_conditional(base=FaultTolerantTask)
 def update_index(typ, pk):  # pragma: no cover
@@ -25,6 +35,7 @@ def update_index(typ, pk):  # pragma: no cover
         return
 
     push_obj_sync(instance)
+
 
 def model_saved(instance, created, **kwargs):  # pylint: disable=unused-argument
     """Update the FTS entry through celery."""

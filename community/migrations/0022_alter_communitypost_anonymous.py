@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('community', '0021_communitypost_reported_by'),
+        ("community", "0021_communitypost_reported_by"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='communitypost',
-            name='anonymous',
+            model_name="communitypost",
+            name="anonymous",
             field=models.BooleanField(blank=True, default=False),
         ),
     ]

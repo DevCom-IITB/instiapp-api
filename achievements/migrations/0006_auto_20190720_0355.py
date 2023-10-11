@@ -5,20 +5,24 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('achievements', '0005_offeredachievement'),
+        ("achievements", "0005_offeredachievement"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='achievement',
-            name='offer',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='achievements', to='achievements.OfferedAchievement'),
+            model_name="achievement",
+            name="offer",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="achievements",
+                to="achievements.OfferedAchievement",
+            ),
         ),
         migrations.AddField(
-            model_name='offeredachievement',
-            name='secret',
+            model_name="offeredachievement",
+            name="secret",
             field=models.CharField(blank=True, max_length=200, null=True),
         ),
     ]

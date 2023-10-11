@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('community', '0016_alter_communitypost_status'),
+        ("community", "0016_alter_communitypost_status"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='communitypost',
-            old_name='hidden',
-            new_name='deleted',
+            model_name="communitypost",
+            old_name="hidden",
+            new_name="deleted",
         ),
     ]

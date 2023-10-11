@@ -4,22 +4,22 @@ from datetime import timedelta
 from django.utils import timezone
 from events.serializers import EventSerializer
 
-BASE = 1000                              # Base points
-FINISHED_PENALTY = 600                   # Direct penalty if event is done
-WEIGHT_START_TIME = 800                  # Weight of time from event start
-WEIGHT_END_TIME = 800                    # Weight of time from event end
-TIME_SD = 2.5                            # Standard deviation of time distribution
-TIME_L_END = 1.2                         # Lambda for exponential of ended penalty
-BODY_FOLLOWING_BONUS = 100               # Bonus if the body is followed
-TIME_DEP_BODY_BONUS = 200                # Bonus if the body is followed dependent on time
-BODY_BONUS_MAX = 400                     # Maximum bonus for followed bodies
-TIME_PENALTY_FACTOR = 0.05               # Multiplying factor for event length penalty
-LINEAR_DECAY = 0.05                      # Slope of linear decay
-FAR_OFF_THRESHOLD = 15                   # Time in days after which events are considered far off
-NOT_TAG_TARGET_PENALTY = 2000            # Penalty if not targeted in a restricted event
+BASE = 1000  # Base points
+FINISHED_PENALTY = 600  # Direct penalty if event is done
+WEIGHT_START_TIME = 800  # Weight of time from event start
+WEIGHT_END_TIME = 800  # Weight of time from event end
+TIME_SD = 2.5  # Standard deviation of time distribution
+TIME_L_END = 1.2  # Lambda for exponential of ended penalty
+BODY_FOLLOWING_BONUS = 100  # Bonus if the body is followed
+TIME_DEP_BODY_BONUS = 200  # Bonus if the body is followed dependent on time
+BODY_BONUS_MAX = 400  # Maximum bonus for followed bodies
+TIME_PENALTY_FACTOR = 0.05  # Multiplying factor for event length penalty
+LINEAR_DECAY = 0.05  # Slope of linear decay
+FAR_OFF_THRESHOLD = 15  # Time in days after which events are considered far off
+NOT_TAG_TARGET_PENALTY = 2000  # Penalty if not targeted in a restricted event
 
 
-class EventPrioritizer():  # pylint: disable=R0902
+class EventPrioritizer:  # pylint: disable=R0902
     """Sets the weight for one event."""
 
     def __init__(self, event, profile):
@@ -55,7 +55,7 @@ class EventPrioritizer():  # pylint: disable=R0902
 
     def apply_time_bonus(self):
         """Apply bonus to events starting soon with normal."""
-        self.start_time_factor = math.exp((-(self.start_time_diff / TIME_SD)**2))
+        self.start_time_factor = math.exp((-((self.start_time_diff / TIME_SD) ** 2)))
         self.start_time_factor *= self.penalise_finished()
         self.weight += int(WEIGHT_START_TIME * self.start_time_factor)
 
@@ -78,7 +78,9 @@ class EventPrioritizer():  # pylint: disable=R0902
                 categories.append(tag.category)
             if tag.category not in categories_satisfy and tag.match(self.profile):
                 categories_satisfy.append(tag.category)
-        self.weight -= int((len(categories) - len(categories_satisfy)) * NOT_TAG_TARGET_PENALTY)
+        self.weight -= int(
+            (len(categories) - len(categories_satisfy)) * NOT_TAG_TARGET_PENALTY
+        )
 
     def bonus_followed(self):
         """Apply bonus if user is following a body conducting the event."""
@@ -88,13 +90,16 @@ class EventPrioritizer():  # pylint: disable=R0902
                 if body_bonus >= BODY_BONUS_MAX:
                     break
                 if body in self.followed_bodies:
-                    body_bonus += int(BODY_FOLLOWING_BONUS + (TIME_DEP_BODY_BONUS * self.start_time_factor))
+                    body_bonus += int(
+                        BODY_FOLLOWING_BONUS
+                        + (TIME_DEP_BODY_BONUS * self.start_time_factor)
+                    )
             self.weight += body_bonus
 
     def penalise_far_off(self):
         """Penalise events that have a long time to start linearly."""
         if self.days_till_event > FAR_OFF_THRESHOLD:
-            self.weight *= (1 - (self.days_till_event - FAR_OFF_THRESHOLD) * LINEAR_DECAY)
+            self.weight *= 1 - (self.days_till_event - FAR_OFF_THRESHOLD) * LINEAR_DECAY
 
     def penalise_length(self):
         """Penalise long running events."""
@@ -111,19 +116,22 @@ def get_prioritized(queryset, request):
 
     # Get profile if authenticated
     profile = None
-    if request.user.is_authenticated and hasattr(request.user, 'profile'):
+    if request.user.is_authenticated and hasattr(request.user, "profile"):
         profile = request.user.profile
 
     # Iterate all events
     for event in queryset:
         event.weight = EventPrioritizer(event, profile).compute().weight
 
-    return sorted(queryset, key=lambda event: (event.weight, event.start_time), reverse=True)
+    return sorted(
+        queryset, key=lambda event: (event.weight, event.start_time), reverse=True
+    )
+
 
 def get_fresh_events(queryset, delta=3):
     """Gets events after removing stale ones."""
-    return queryset.filter(
-        end_time__gte=timezone.now() - timedelta(days=delta))
+    return queryset.filter(end_time__gte=timezone.now() - timedelta(days=delta))
+
 
 def get_fresh_prioritized_events(queryset, request, delta=3):
     """Gets fresh events with prioritization."""

@@ -4,29 +4,30 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0003_auto_20180305_1228'),
+        ("users", "0003_auto_20180305_1228"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='userprofile',
-            old_name='gcm_id',
-            new_name='fcm_id',
+            model_name="userprofile",
+            old_name="gcm_id",
+            new_name="fcm_id",
         ),
         migrations.RemoveField(
-            model_name='userprofile',
-            name='mapped_user',
+            model_name="userprofile",
+            name="mapped_user",
         ),
         migrations.AddField(
-            model_name='userprofile',
-            name='contact_no',
+            model_name="userprofile",
+            name="contact_no",
             field=models.CharField(blank=True, max_length=10, null=True),
         ),
         migrations.AlterField(
-            model_name='userprofile',
-            name='followed_bodies',
-            field=models.ManyToManyField(blank=True, related_name='followers', to='bodies.Body'),
+            model_name="userprofile",
+            name="followed_bodies",
+            field=models.ManyToManyField(
+                blank=True, related_name="followers", to="bodies.Body"
+            ),
         ),
     ]

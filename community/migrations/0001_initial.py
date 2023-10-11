@@ -6,94 +6,189 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('bodies', '0023_body_canonical_name'),
-        ('users', '0038_auto_20210606_2237'),
-        ('achievements', '0012_auto_20211201_1642'),
-        ('locations', '0014_location_str_id'),
+        ("bodies", "0023_body_canonical_name"),
+        ("users", "0038_auto_20210606_2237"),
+        ("achievements", "0012_auto_20211201_1642"),
+        ("locations", "0014_location_str_id"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Community',
+            name="Community",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('str_id', models.CharField(editable=False, max_length=58, null=True)),
-                ('name', models.CharField(max_length=100)),
-                ('about', models.TextField()),
-                ('description', models.TextField()),
-                ('logo_image', models.URLField(blank=True, null=True)),
-                ('cover_image', models.URLField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('followers_count', models.IntegerField(default=0)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("str_id", models.CharField(editable=False, max_length=58, null=True)),
+                ("name", models.CharField(max_length=100)),
+                ("about", models.TextField()),
+                ("description", models.TextField()),
+                ("logo_image", models.URLField(blank=True, null=True)),
+                ("cover_image", models.URLField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("followers_count", models.IntegerField(default=0)),
             ],
             options={
-                'verbose_name': 'Community',
-                'verbose_name_plural': 'Communities',
-                'ordering': ('-created_at',),
+                "verbose_name": "Community",
+                "verbose_name_plural": "Communities",
+                "ordering": ("-created_at",),
             },
         ),
         migrations.CreateModel(
-            name='CommunityPost',
+            name="CommunityPost",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('str_id', models.CharField(editable=False, max_length=58, null=True)),
-                ('time_of_creation', models.DateTimeField(auto_now_add=True)),
-                ('time_of_modification', models.DateTimeField(auto_now=True)),
-                ('content', models.TextField(blank=True)),
-                ('image_url', models.TextField(blank=True, null=True)),
-                ('view_count', models.IntegerField(default=0)),
-                ('threadRank', models.IntegerField(default=1)),
-                ('status', models.IntegerField()),
-                ('comments', models.ManyToManyField(blank=True, related_name='_community_communitypost_comments_+', to='community.CommunityPost')),
-                ('community', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='community_posts', to='community.community')),
-                ('followed_by', models.ManyToManyField(blank=True, related_name='communitypost_followers', to='users.UserProfile')),
-                ('interests', models.ManyToManyField(blank=True, related_name='communitypost_interest', to='achievements.Interest')),
-                ('parent', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='communitypost_parent', to='community.communitypost')),
-                ('posted_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='communitypost_postedby', to='users.userprofile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("str_id", models.CharField(editable=False, max_length=58, null=True)),
+                ("time_of_creation", models.DateTimeField(auto_now_add=True)),
+                ("time_of_modification", models.DateTimeField(auto_now=True)),
+                ("content", models.TextField(blank=True)),
+                ("image_url", models.TextField(blank=True, null=True)),
+                ("view_count", models.IntegerField(default=0)),
+                ("threadRank", models.IntegerField(default=1)),
+                ("status", models.IntegerField()),
+                (
+                    "comments",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="_community_communitypost_comments_+",
+                        to="community.CommunityPost",
+                    ),
+                ),
+                (
+                    "community",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="community_posts",
+                        to="community.community",
+                    ),
+                ),
+                (
+                    "followed_by",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="communitypost_followers",
+                        to="users.UserProfile",
+                    ),
+                ),
+                (
+                    "interests",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="communitypost_interest",
+                        to="achievements.Interest",
+                    ),
+                ),
+                (
+                    "parent",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="communitypost_parent",
+                        to="community.communitypost",
+                    ),
+                ),
+                (
+                    "posted_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="communitypost_postedby",
+                        to="users.userprofile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Community Post',
-                'verbose_name_plural': 'Community Posts',
-                'ordering': ('-time_of_creation',),
+                "verbose_name": "Community Post",
+                "verbose_name_plural": "Community Posts",
+                "ordering": ("-time_of_creation",),
             },
         ),
         migrations.CreateModel(
-            name='CommunityPostUserReaction',
+            name="CommunityPostUserReaction",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('time_of_creation', models.DateTimeField(auto_now_add=True)),
-                ('reaction', models.IntegerField(default=0)),
-                ('communitypost', models.ForeignKey(default=uuid.uuid4, on_delete=django.db.models.deletion.CASCADE, related_name='communitypost_communitypostreaction', to='community.communitypost')),
-                ('user', models.ForeignKey(default=uuid.uuid4, on_delete=django.db.models.deletion.CASCADE, related_name='user_communitypostreaction', to='users.userprofile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("time_of_creation", models.DateTimeField(auto_now_add=True)),
+                ("reaction", models.IntegerField(default=0)),
+                (
+                    "communitypost",
+                    models.ForeignKey(
+                        default=uuid.uuid4,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="communitypost_communitypostreaction",
+                        to="community.communitypost",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        default=uuid.uuid4,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="user_communitypostreaction",
+                        to="users.userprofile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Community Post User Reaction',
-                'verbose_name_plural': 'Community Post User Reactions',
+                "verbose_name": "Community Post User Reaction",
+                "verbose_name_plural": "Community Post User Reactions",
             },
         ),
         migrations.AddField(
-            model_name='communitypost',
-            name='reacted_by',
-            field=models.ManyToManyField(blank=True, related_name='communitypost_reaction', through='community.CommunityPostUserReaction', to='users.UserProfile'),
+            model_name="communitypost",
+            name="reacted_by",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="communitypost_reaction",
+                through="community.CommunityPostUserReaction",
+                to="users.UserProfile",
+            ),
         ),
         migrations.AddField(
-            model_name='communitypost',
-            name='tag_body',
-            field=models.ManyToManyField(blank=True, related_name='Tagged_Body', to='bodies.Body'),
+            model_name="communitypost",
+            name="tag_body",
+            field=models.ManyToManyField(
+                blank=True, related_name="Tagged_Body", to="bodies.Body"
+            ),
         ),
         migrations.AddField(
-            model_name='communitypost',
-            name='tag_location',
-            field=models.ManyToManyField(blank=True, related_name='communitypost_tagloc', to='locations.Location'),
+            model_name="communitypost",
+            name="tag_location",
+            field=models.ManyToManyField(
+                blank=True, related_name="communitypost_tagloc", to="locations.Location"
+            ),
         ),
         migrations.AddField(
-            model_name='communitypost',
-            name='tag_user',
-            field=models.ManyToManyField(blank=True, related_name='communitypost_taguser', to='users.UserProfile'),
+            model_name="communitypost",
+            name="tag_user",
+            field=models.ManyToManyField(
+                blank=True, related_name="communitypost_taguser", to="users.UserProfile"
+            ),
         ),
     ]

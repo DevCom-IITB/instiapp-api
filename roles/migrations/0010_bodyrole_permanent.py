@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('roles', '0009_bodyrole_official_post'),
+        ("roles", "0009_bodyrole_official_post"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bodyrole',
-            name='permanent',
+            model_name="bodyrole",
+            name="permanent",
             field=models.BooleanField(default=False),
         ),
     ]

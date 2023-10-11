@@ -4,16 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('achievements', '0012_auto_20211201_1642'),
-        ('events', '0030_event_event_interest'),
+        ("achievements", "0012_auto_20211201_1642"),
+        ("events", "0030_event_event_interest"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='event_interest',
-            field=models.ManyToManyField(blank=True, related_name='events', to='achievements.Interest'),
+            model_name="event",
+            name="event_interest",
+            field=models.ManyToManyField(
+                blank=True, related_name="events", to="achievements.Interest"
+            ),
         ),
     ]

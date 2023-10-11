@@ -4,16 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bodies', '0012_remove_body_events'),
-        ('events', '0017_event_archived'),
+        ("bodies", "0012_remove_body_events"),
+        ("events", "0017_event_archived"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='bodies',
-            field=models.ManyToManyField(blank=True, related_name='events', to='bodies.Body'),
+            model_name="event",
+            name="bodies",
+            field=models.ManyToManyField(
+                blank=True, related_name="events", to="bodies.Body"
+            ),
         ),
     ]

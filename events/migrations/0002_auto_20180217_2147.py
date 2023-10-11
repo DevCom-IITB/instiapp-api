@@ -4,19 +4,15 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0001_initial'),
+        ("events", "0001_initial"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='event',
-            name='id'
-        ),
+        migrations.RemoveField(model_name="event", name="id"),
         migrations.AddField(
-            model_name='event',
-            name='id',
+            model_name="event",
+            name="id",
             field=models.UUIDField(primary_key=True, serialize=False),
         ),
     ]

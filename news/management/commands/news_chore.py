@@ -12,21 +12,22 @@ from bodies.models import Body
 # Disable log garbage due to Insecure warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+
 def fill_blog(url, body):
     response = requests.get(url, verify=False, timeout=10)
     feeds = feedparser.parse(response.content)
 
-    if not feeds['feed']:
-        raise CommandError('NEWS CHORE FAILED')
+    if not feeds["feed"]:
+        raise CommandError("NEWS CHORE FAILED")
 
     # Log number of new entries
     existing_entries = 0
     new_entries = 0
     min_pub = timezone.now() - timedelta(days=2)
 
-    for entry in feeds['entries']:
+    for entry in feeds["entries"]:
         # Try to get an entry existing
-        guid = entry['id']
+        guid = entry["id"]
         db_entry = NewsEntry.objects.filter(guid=guid).first()
         is_new_entry = False
 
@@ -39,31 +40,37 @@ def fill_blog(url, body):
             new_entries += 1
 
         # Fill the db entry
-        if 'title' in entry:
-            db_entry.title = entry['title']
-        if 'description' in entry:
-            db_entry.content = entry['description']
-        if 'link' in entry:
-            db_entry.link = entry['link']
-        if 'content' in entry and db_entry.content == "":
+        if "title" in entry:
+            db_entry.title = entry["title"]
+        if "description" in entry:
+            db_entry.content = entry["description"]
+        if "link" in entry:
+            db_entry.link = entry["link"]
+        if "content" in entry and db_entry.content == "":
             # Fill in content only if we don't have description
-            db_entry.content = entry['content'][0]['value']
+            db_entry.content = entry["content"][0]["value"]
 
         # Disable notifications if published long ago or unknown
-        has_published = 'published' in entry
+        has_published = "published" in entry
         if has_published:
-            db_entry.published = parse(entry['published'])
+            db_entry.published = parse(entry["published"])
 
         # Check if news article is old and for too many articles
-        if is_new_entry and not has_published or new_entries > 3 or min_pub > db_entry.published:
+        if (
+            is_new_entry
+            and not has_published
+            or new_entries > 3
+            or min_pub > db_entry.published
+        ):
             db_entry.notify = False
 
         db_entry.save()
 
     print("(+" + str(new_entries) + ", " + str(existing_entries) + ") ", end="")
 
+
 class Command(BaseCommand):
-    help = 'Updates the placement blog database'
+    help = "Updates the placement blog database"
 
     def handle(self, *args, **options):
         """Run the chore."""
@@ -79,4 +86,4 @@ class Command(BaseCommand):
             except Exception:  # pylint: disable=W0703
                 print("Failed!")
 
-        self.stdout.write(self.style.SUCCESS('News Chore completed successfully'))
+        self.stdout.write(self.style.SUCCESS("News Chore completed successfully"))

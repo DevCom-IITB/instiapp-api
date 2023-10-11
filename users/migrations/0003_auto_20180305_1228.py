@@ -4,35 +4,36 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0002_userprofile_followed_bodies'),
+        ("users", "0002_userprofile_followed_bodies"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userprofile',
-            name='email',
+            model_name="userprofile",
+            name="email",
             field=models.EmailField(blank=True, max_length=254, null=True),
         ),
         migrations.AlterField(
-            model_name='userprofile',
-            name='followed_bodies',
-            field=models.ManyToManyField(blank=True, null=True, related_name='followers', to='bodies.Body'),
+            model_name="userprofile",
+            name="followed_bodies",
+            field=models.ManyToManyField(
+                blank=True, null=True, related_name="followers", to="bodies.Body"
+            ),
         ),
         migrations.AlterField(
-            model_name='userprofile',
-            name='gcm_id',
+            model_name="userprofile",
+            name="gcm_id",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='userprofile',
-            name='profile_pic',
+            model_name="userprofile",
+            name="profile_pic",
             field=models.URLField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='userprofile',
-            name='year',
+            model_name="userprofile",
+            name="year",
             field=models.IntegerField(blank=True, default=1, null=True),
         ),
     ]
