@@ -34,11 +34,17 @@ class Location(models.Model):
 
     def save(self, *args, **kwargs):        # pylint: disable =W0222
         self.str_id = get_url_friendly(self.short_name)
-        adj_data = self.connected_locs.split(',') if self.connected_locs else []
+        if self.connected_locs:
+            adj_data = self.connected_locs.split(',')
+        else:
+            self.connected_locs = []
 
         if Location.objects.filter(name=self.name).exists():
             old_instance = Location.objects.get(name=self.name)
-            old_instance_adj = old_instance.connected_locs.split(',')
+            if old_instance.connected_locs:
+                old_instance_adj = old_instance.connected_locs.split(',') 
+            else:
+                old_instance_adj = []
   
             deletedConnections = list(set(old_instance_adj) - set(adj_data))
 
