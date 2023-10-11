@@ -278,7 +278,6 @@ class handle_entry:
 
         self.adj_list = self.load_adj_list()
 
-
     '''Caution: Avoid executing the update function during active requests as it may cause significant delays (~20s).
     If any modifications need to be made to the adj_list, it is essential to ensure that the
     adj_list is updated accordingly,
@@ -291,7 +290,8 @@ class handle_entry:
                 for y in self.adj_list[x]:
                     if type(y) != str:
                         self.adj_list[x][y] = m.sqrt(abs(0.001 * ((self.coordinates[x][0] - self.coordinates[y][0])**2
-                                                           + (self.coordinates[x][1] - self.coordinates[y][1])**2)))
+                                                                  + (self.coordinates[x][1]
+                                                                     - self.coordinates[y][1])**2)))
                     else:
                         try:
                             x_cor = Location.objects.filter(name=y)[0].pixel_x
@@ -304,7 +304,7 @@ class handle_entry:
                             y_cor = 0
 
                         self.adj_list[x][y] = m.sqrt(abs(0.001 * ((self.coordinates[x][0] - x_cor)**2
-                                                  + (self.coordinates[x][1] - y_cor)**2)))
+                                                                  + (self.coordinates[x][1] - y_cor)**2)))
 
             else:
                 try:
@@ -322,7 +322,7 @@ class handle_entry:
                 for y in self.adj_list[x]:
                     if type(y) != str:
                         self.adj_list[x][y] = m.sqrt(abs(0.001 * ((x_cor - (self.coordinates[y][0]))**2
-                                                           + (y_cor - (self.coordinates[y][1]))**2)))
+                                                                  + (y_cor - (self.coordinates[y][1]))**2)))
                     else:
                         try:
                             x_pix = Location.objects.filter(name=y)[0].pixel_x
@@ -343,34 +343,32 @@ class handle_entry:
                 loc, c = Location.objects.get_or_create(pixel_x=p[0], pixel_y=p[1], name="Node" + str(i))
                 loc_list.append(loc)
                 i += 1
-            
 
             adj_list_path = f"{os.getcwd()}/locations/management/commands/adj_list.py"
-            
+
             with open(adj_list_path, 'w') as f:
                 f.write(str(self.adj_list))
-
 
     """
     Updates the 'connected_locs' field of Location objects with conected locations
     """
     def update_locations_with_connected_loc(self):
         # Need to run this to ensure the location objects contain the adjacent locations that they are connected to.
-            all_locations = Location.objects.all()
-            for location in all_locations:
-                try:
-                    adj_locs_dict = self.adj_list[location.name]
-                    connected_location_str = ""
-                    for i in adj_locs_dict:
-                        if isinstance(i, int):
-                            connected_location_str += f"Node{i},"
-                        else:
-                            connected_location_str+= f"{i},"
-                    connected_location_str.replace(connected_location_str[-1],"",1)
-                    location.connected_locs = connected_location_str
-                    location.save()
-                except KeyError:
-                    pass
+        all_locations = Location.objects.all()
+        for location in all_locations:
+            try:
+                adj_locs_dict = self.adj_list[location.name]
+                connected_location_str = ""
+                for i in adj_locs_dict:
+                    if isinstance(i, int):
+                        connected_location_str += f"Node{i},"
+                    else:
+                        connected_location_str += f"{i},"
+                connected_location_str.replace(connected_location_str[-1], "", 1)
+                location.connected_locs = connected_location_str
+                location.save()
+            except KeyError:
+                pass
 
     '''Gets the nearest Node near a location on the map.'''
 
@@ -378,12 +376,10 @@ class handle_entry:
         adj_list_path = f"{os.getcwd()}/locations/management/commands/adj_list.py"
         adj_list = {}
 
-        
         with open(adj_list_path, 'r') as f:
             adj_list = dict(eval(f.read()))
 
         return adj_list
-
 
     import sys
 
@@ -407,7 +403,6 @@ class handle_entry:
 
         return nearest_loc
 
-
     '''Returns the adj_list which contains only the node points containing the endpoint and the start point'''
 
     def graph(self, end, start):
@@ -420,7 +415,7 @@ class handle_entry:
                         new_adjoint_list[i][j] = self.adj_list[i][j]
 
         return new_adjoint_list
-    
+
     @staticmethod
     def location_location_distance(location1, location2):
         loc1 = Location.objects.filter(name=location1)[0]
@@ -431,7 +426,7 @@ class handle_entry:
         x_loc2 = loc2.pixel_x
         y_loc2 = loc2.pixel_y
 
-        lld = abs(0.001 * ((x_loc1-x_loc2)**2 + (y_loc1- y_loc2)**2))
+        lld = abs(0.001 * ((x_loc1 - x_loc2)**2 + (y_loc1 - y_loc2)**2))
         return lld
 
 

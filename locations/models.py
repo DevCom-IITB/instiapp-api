@@ -42,10 +42,10 @@ class Location(models.Model):
         if Location.objects.filter(name=self.name).exists():
             old_instance = Location.objects.get(name=self.name)
             if old_instance.connected_locs:
-                old_instance_adj = old_instance.connected_locs.split(',') 
+                old_instance_adj = old_instance.connected_locs.split(',')
             else:
                 old_instance_adj = []
-  
+
             deletedConnections = list(set(old_instance_adj) - set(adj_data))
 
             UpdatedConnectionsLoc = []
@@ -53,9 +53,9 @@ class Location(models.Model):
                 if loc:
                     loc_object = Location.objects.get(name=loc)
                     UpdatedConnectionsLoc.append(loc_object)
-            UpdateAdjList().add_conns(self, UpdatedConnectionsLoc) #Accounts for coordinates change also.
-            
-            deleted_connections_locs =[]
+            UpdateAdjList().add_conns(self, UpdatedConnectionsLoc)  # Accounts for coordinates change also.
+
+            deleted_connections_locs = []
             if deletedConnections:
                 for loc in deletedConnections:
                     deleted_loc = Location.objects.get(name=loc)
@@ -67,9 +67,9 @@ class Location(models.Model):
             if adj_data:
                 locs = adj_data
                 connections = [Location.objects.filter(name=x).first() for x in locs if x]
-                
+
                 UpdateAdjList().add_conns(self, connections)
-                
+
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

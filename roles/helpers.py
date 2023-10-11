@@ -9,14 +9,14 @@ from dateutil.relativedelta import relativedelta
 
 def user_is_banned(profile):
     try:
-        ban = SSOBan.objects.get(banned_user = profile.id)
+        ban = SSOBan.objects.get(banned_user=profile.id)
         current_time = datetime.datetime.now()
         ban_created = ban.time_of_creation
         ban_duration = ban.duration_of_ban
 
         if ban_duration == 'Permanent':
             return True
-        
+
         else:
             duration_month = int(ban_duration.split(" ")[0])
             banned_till = ban_created + relativedelta(months=duration_month)
@@ -26,8 +26,6 @@ def user_is_banned(profile):
         return False
     except SSOBan.DoesNotExist:
         return False
-    
-
 
 def forbidden_no_privileges():
     """Forbidden due to insufficient privileges."""
@@ -90,13 +88,13 @@ def login_required_ajax(func):
     def wrapper(*args, **kw):
         if args[1].user.is_authenticated:
             user = args[1].user
-            profile = UserProfile.objects.get(user = user)
+            profile = UserProfile.objects.get(user=user)
             if not user_is_banned(profile):
                 return func(*args, **kw)
             if user_is_banned:
                 return Response({
-                    'message':'banned', 
-                    'detail' : 'your SSO has been banned/disabled'
+                    'message': 'banned',
+                    'detail': 'your SSO has been banned/disabled'
 
                 })
         return Response({

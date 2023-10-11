@@ -1,9 +1,6 @@
-from django.db.models import deletion
 from django.db.models.deletion import SET
 from django.db.models.fields.related import ForeignKey
-from django.utils import timezone
 from django.db import models
-from django.db.models.enums import IntegerChoices
 from uuid import uuid4
 from helpers.misc import get_url_friendly
 PDT_NAME_MAX_LENGTH = 60
@@ -18,7 +15,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 class Product(models.Model):
-    ##achievements, events, users
+    # achievements, events, users
     # placement
     CATEGORY_CHOICES = (
         ('electronics', 'Electronics'),
@@ -72,7 +69,7 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-      #  self.category.numproducts-=1
+        #  self.category.numproducts-=1
         return super().delete(*args, **kwargs)
 
     class Meta:
