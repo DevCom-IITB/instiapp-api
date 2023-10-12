@@ -2,6 +2,7 @@
 from uuid import uuid4
 from django.db import models
 
+
 class Query(models.Model):
     """A single entry on the FAQ Page."""
 
@@ -19,13 +20,16 @@ class Query(models.Model):
         verbose_name = "Query"
         verbose_name_plural = "Queries"
 
+
 class UnresolvedQuery(models.Model):
     """New question asked by someone."""
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     question = models.TextField(blank=False)
     category = models.CharField(max_length=30, blank=True)
-    user = models.ForeignKey('users.UserProfile', null=False, on_delete=models.CASCADE, related_name='Query')
+    user = models.ForeignKey(
+        "users.UserProfile", null=False, on_delete=models.CASCADE, related_name="Query"
+    )
     resolved = models.BooleanField(default=False)
 
     def __str__(self):
@@ -34,6 +38,7 @@ class UnresolvedQuery(models.Model):
     class Meta:
         verbose_name = "UnresolvedQuery"
         verbose_name_plural = "UnresolvedQueries"
+
 
 class ChatBotLog(models.Model):
     """Reaction to an answer by chatbot"""

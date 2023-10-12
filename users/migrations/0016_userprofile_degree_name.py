@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0015_auto_20180521_1046'),
+        ("users", "0015_auto_20180521_1046"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='degree_name',
+            model_name="userprofile",
+            name="degree_name",
             field=models.CharField(blank=True, max_length=200, null=True),
         ),
     ]

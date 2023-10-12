@@ -5,6 +5,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from messmenu.models import MenuEntry
 from messmenu.models import Hostel
 
+
 def update_day(sheet, day, hostel):
     """Update one day's menu."""
     # Check if object exists or create one
@@ -21,6 +22,7 @@ def update_day(sheet, day, hostel):
     # Commit
     menu.save()
 
+
 def fetch_hostel(client, hostel):
     """Update menu of one hostel."""
     # Open Google sheet
@@ -33,18 +35,23 @@ def fetch_hostel(client, hostel):
     for i in range(1, 8):
         update_day(vals, i, hostel)
 
+
 class Command(BaseCommand):
-    help = 'Fetches mess menus from Google'
+    help = "Fetches mess menus from Google"
 
     def handle(self, *args, **options):
         """Fetch Mess Menus."""
 
         # Use credentials to create a client to interact with the Google Drive API
         print("Authorizing - ", end="", flush=True)
-        scope = ['https://spreadsheets.google.com/feeds',
-                 'https://www.googleapis.com/auth/drive']
+        scope = [
+            "https://spreadsheets.google.com/feeds",
+            "https://www.googleapis.com/auth/drive",
+        ]
 
-        creds = ServiceAccountCredentials.from_json_keyfile_name('google_client_secret.json', scope)
+        creds = ServiceAccountCredentials.from_json_keyfile_name(
+            "google_client_secret.json", scope
+        )
         client = gspread.authorize(creds)
         print("OK")
 

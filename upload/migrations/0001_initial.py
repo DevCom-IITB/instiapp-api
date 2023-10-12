@@ -6,25 +6,41 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('users', '0005_auto_20180306_1631'),
+        ("users", "0005_auto_20180306_1631"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UploadedImage',
+            name="UploadedImage",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('time_of_creation', models.DateTimeField(auto_now_add=True)),
-                ('picture', models.ImageField(upload_to='pictures')),
-                ('uploaded_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='uploaded_images', to='users.UserProfile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("time_of_creation", models.DateTimeField(auto_now_add=True)),
+                ("picture", models.ImageField(upload_to="pictures")),
+                (
+                    "uploaded_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="uploaded_images",
+                        to="users.UserProfile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Uploaded Image',
-                'verbose_name_plural': 'Uploaded Images',
+                "verbose_name": "Uploaded Image",
+                "verbose_name_plural": "Uploaded Images",
             },
         ),
     ]

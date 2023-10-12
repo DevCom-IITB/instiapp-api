@@ -5,6 +5,7 @@ from bodies.serializer_min import BodySerializerMin
 from community.models import Community, CommunityPost
 from users.serializers import UserProfileSerializer
 
+
 class CommunitySerializerMin(serializers.ModelSerializer):
     """Minimal serializer for Community."""
 
@@ -18,8 +19,8 @@ class CommunitySerializerMin(serializers.ModelSerializer):
         return obj.body.followers.count()
 
     def get_is_user_following(self, obj):
-        """Get the current user's reaction on the community post """
-        request = self.context['request'] if 'request' in self.context else None
+        """Get the current user's reaction on the community post"""
+        request = self.context["request"] if "request" in self.context else None
         if request and request.user.is_authenticated:
             profile = request.user.profile
             return profile.followed_bodies.filter(id=obj.body.id).exists()
@@ -27,8 +28,18 @@ class CommunitySerializerMin(serializers.ModelSerializer):
 
     class Meta:
         model = Community
-        fields = ('id', 'str_id', 'name', 'about', 'cover_image',
-                  'logo_image', 'followers_count', 'body', 'is_user_following')
+        fields = (
+            "id",
+            "str_id",
+            "name",
+            "about",
+            "cover_image",
+            "logo_image",
+            "followers_count",
+            "body",
+            "is_user_following",
+        )
+
 
 class CommunityPostSerializerMin(serializers.ModelSerializer):
     """Minimal serializer for Body."""
@@ -46,7 +57,7 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
     has_user_reported = serializers.SerializerMethodField()
 
     def get_most_liked_comment(self, obj):
-        """Get the most liked comment of the community post """
+        """Get the most liked comment of the community post"""
         queryset = obj.comments.filter(deleted=False, status=1)
         if len(queryset) == 0:
             return None
@@ -60,8 +71,8 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
         return CommunityPostSerializerMin(most_liked_comment).data
 
     def get_image_url(self, obj):
-        """Get the image url of the community post """
-        return obj.image_url.split(',') if obj.image_url else None
+        """Get the image url of the community post"""
+        return obj.image_url.split(",") if obj.image_url else None
 
     @staticmethod
     def setup_eager_loading(queryset, request):
@@ -90,7 +101,10 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
     @staticmethod
     def get_comments_count(obj):
         """Get number of comments on community post item."""
-        if not obj.comments.exists() or len(obj.comments.filter(deleted=False, status=1)) == 0:
+        if (
+            not obj.comments.exists()
+            or len(obj.comments.filter(deleted=False, status=1)) == 0
+        ):
             return 0
         count = 0
 
@@ -101,16 +115,18 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
         return count
 
     def get_user_reaction(self, obj):
-        """Get the current user's reaction on the community post """
-        request = self.context['request'] if 'request' in self.context else None
+        """Get the current user's reaction on the community post"""
+        request = self.context["request"] if "request" in self.context else None
         if request and request.user.is_authenticated:
             profile = request.user.profile
-            return next((u.reaction for u in obj.ucpr.all() if u.user_id == profile.id), -1)
+            return next(
+                (u.reaction for u in obj.ucpr.all() if u.user_id == profile.id), -1
+            )
         return -1
 
     def get_has_user_reported(self, obj):
-        """Get the current user's report on the community post """
-        request = self.context['request'] if 'request' in self.context else None
+        """Get the current user's report on the community post"""
+        request = self.context["request"] if "request" in self.context else None
         if request and request.user.is_authenticated:
             profile = request.user.profile
 
@@ -119,7 +135,27 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
 
     class Meta:
         model = CommunityPost
-        fields = ('id', 'str_id', 'content', 'posted_by',
-                  'reactions_count', 'user_reaction', 'comments_count', 'time_of_creation', 'time_of_modification',
-                  'image_url', 'most_liked_comment', 'thread_rank', 'community', 'status', 'tag_body', 'tag_user',
-                  'interests', 'featured', 'deleted', 'anonymous', 'reported_by', 'has_user_reported')
+        fields = (
+            "id",
+            "str_id",
+            "content",
+            "posted_by",
+            "reactions_count",
+            "user_reaction",
+            "comments_count",
+            "time_of_creation",
+            "time_of_modification",
+            "image_url",
+            "most_liked_comment",
+            "thread_rank",
+            "community",
+            "status",
+            "tag_body",
+            "tag_user",
+            "interests",
+            "featured",
+            "deleted",
+            "anonymous",
+            "reported_by",
+            "has_user_reported",
+        )

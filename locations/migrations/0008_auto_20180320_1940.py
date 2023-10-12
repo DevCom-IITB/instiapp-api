@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('locations', '0007_location_resuable'),
+        ("locations", "0007_location_resuable"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='location',
-            old_name='resuable',
-            new_name='reusable',
+            model_name="location",
+            old_name="resuable",
+            new_name="reusable",
         ),
     ]

@@ -6,27 +6,45 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('venter', '0004_auto_20180923_1236'),
+        ("venter", "0004_auto_20180923_1236"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Authorities',
+            name="Authorities",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('name', models.CharField(blank=True, max_length=30, null=True)),
-                ('email', models.EmailField(blank=True, max_length=50, null=True, unique=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("name", models.CharField(blank=True, max_length=30, null=True)),
+                (
+                    "email",
+                    models.EmailField(
+                        blank=True, max_length=50, null=True, unique=True
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Authority Email',
-                'verbose_name_plural': 'Authority Emails',
+                "verbose_name": "Authority Email",
+                "verbose_name_plural": "Authority Emails",
             },
         ),
         migrations.AddField(
-            model_name='complaints',
-            name='authority_email',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='venter.Authorities', to_field='email'),
+            model_name="complaints",
+            name="authority_email",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="venter.Authorities",
+                to_field="email",
+            ),
         ),
     ]

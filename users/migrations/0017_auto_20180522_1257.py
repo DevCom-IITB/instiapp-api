@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0016_userprofile_degree_name'),
+        ("users", "0016_userprofile_degree_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='hostel',
+            model_name="userprofile",
+            name="hostel",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='userprofile',
-            name='room',
+            model_name="userprofile",
+            name="room",
             field=models.TextField(blank=True, null=True),
         ),
     ]

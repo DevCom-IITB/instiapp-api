@@ -3,6 +3,7 @@ from rest_framework.test import APITestCase
 from messmenu.models import MenuEntry
 from messmenu.models import Hostel
 
+
 class MessTestCase(APITestCase):
     """Check mess menu endpoints."""
 
@@ -17,13 +18,13 @@ class MessTestCase(APITestCase):
     def test_mess_other(self):
         """Check misc paramters of Mess."""
         self.assertEqual(str(self.h1), self.h1.name)
-        self.assertEqual(str(self.h1m1), self.h1.name + ' - ' + str(self.h1m1.day))
+        self.assertEqual(str(self.h1m1), self.h1.name + " - " + str(self.h1m1.day))
 
     def test_mess(self):
         """Test `/api/mess`"""
 
-        url = '/api/mess'
-        response = self.client.get(url, format='json')
+        url = "/api/mess"
+        response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
-        self.assertEqual(len(response.data[0]['mess']), 1)
+        self.assertEqual(len(response.data[0]["mess"]), 1)

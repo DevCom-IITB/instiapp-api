@@ -8,15 +8,15 @@ USE_SONIC = True
 
 # Use postgres for tests as celery is not disabled
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test_instiapp',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': 3306,
-        'TEST': {
-            'NAME': 'test_instiapp',
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "test_instiapp",
+        "USER": "root",
+        "PASSWORD": "root",
+        "HOST": "127.0.0.1",
+        "PORT": 3306,
+        "TEST": {
+            "NAME": "test_instiapp",
         },
     }
 }

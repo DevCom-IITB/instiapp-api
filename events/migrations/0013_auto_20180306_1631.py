@@ -5,29 +5,41 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0005_auto_20180306_1631'),
-        ('events', '0012_auto_20180305_1239'),
+        ("users", "0005_auto_20180306_1631"),
+        ("events", "0012_auto_20180305_1239"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='event',
-            options={'verbose_name': 'Event', 'verbose_name_plural': 'Events'},
+            name="event",
+            options={"verbose_name": "Event", "verbose_name_plural": "Events"},
         ),
         migrations.AlterModelOptions(
-            name='usereventstatus',
-            options={'verbose_name': 'User-Event Status', 'verbose_name_plural': 'User-Event Statuses'},
+            name="usereventstatus",
+            options={
+                "verbose_name": "User-Event Status",
+                "verbose_name_plural": "User-Event Statuses",
+            },
         ),
         migrations.AddField(
-            model_name='event',
-            name='followers',
-            field=models.ManyToManyField(related_name='following_events', through='events.UserEventStatus', to='users.UserProfile'),
+            model_name="event",
+            name="followers",
+            field=models.ManyToManyField(
+                related_name="following_events",
+                through="events.UserEventStatus",
+                to="users.UserProfile",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='created_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='created_events', to='users.UserProfile'),
+            model_name="event",
+            name="created_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="created_events",
+                to="users.UserProfile",
+            ),
         ),
     ]

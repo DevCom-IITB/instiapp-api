@@ -5,20 +5,21 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0003_auto_20180217_2215'),
+        ("events", "0003_auto_20180217_2215"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
+            model_name="event",
+            name="id",
+            field=models.UUIDField(
+                default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='time_of_creation',
+            model_name="event",
+            name="time_of_creation",
             field=models.DateTimeField(auto_now_add=True),
         ),
     ]

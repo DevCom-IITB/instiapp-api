@@ -4,24 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('messmenu', '0001_initial'),
+        ("messmenu", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='hostel',
-            options={'ordering': ('name',)},
+            name="hostel",
+            options={"ordering": ("name",)},
         ),
         migrations.AddField(
-            model_name='hostel',
-            name='mess_gsheet',
+            model_name="hostel",
+            name="mess_gsheet",
             field=models.URLField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='hostel',
-            name='short_name',
+            model_name="hostel",
+            name="short_name",
             field=models.CharField(blank=True, max_length=25),
         ),
     ]

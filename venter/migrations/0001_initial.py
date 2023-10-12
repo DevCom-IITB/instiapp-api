@@ -6,82 +6,151 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('users', '0022_userprofile_former_roles'),
+        ("users", "0022_userprofile_former_roles"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Comment',
+            name="Comment",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('time', models.DateTimeField(auto_now_add=True)),
-                ('text', models.TextField()),
-                ('commented_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='commented_by', to='users.UserProfile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("time", models.DateTimeField(auto_now_add=True)),
+                ("text", models.TextField()),
+                (
+                    "commented_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="commented_by",
+                        to="users.UserProfile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Comment',
-                'ordering': ('-time',),
-                'verbose_name_plural': 'Comments',
+                "verbose_name": "Comment",
+                "ordering": ("-time",),
+                "verbose_name_plural": "Comments",
             },
         ),
         migrations.CreateModel(
-            name='ComplaintMedia',
+            name="ComplaintMedia",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('image_url', models.URLField()),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("image_url", models.URLField()),
             ],
         ),
         migrations.CreateModel(
-            name='Complaints',
+            name="Complaints",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('description', models.TextField(blank=True)),
-                ('report_date', models.DateTimeField(auto_now_add=True)),
-                ('status', models.CharField(choices=[('Reported', 'Reported'), ('In Progress', 'In Progress'), ('Resolved', 'Resolved'), ('Deleted', 'Deleted')], default='reported', max_length=30)),
-                ('latitude', models.FloatField(blank=True, max_length=8, null=True)),
-                ('longitude', models.FloatField(blank=True, max_length=8, null=True)),
-                ('location_description', models.TextField(blank=True)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='created_by', to='users.UserProfile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("description", models.TextField(blank=True)),
+                ("report_date", models.DateTimeField(auto_now_add=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("Reported", "Reported"),
+                            ("In Progress", "In Progress"),
+                            ("Resolved", "Resolved"),
+                            ("Deleted", "Deleted"),
+                        ],
+                        default="reported",
+                        max_length=30,
+                    ),
+                ),
+                ("latitude", models.FloatField(blank=True, max_length=8, null=True)),
+                ("longitude", models.FloatField(blank=True, max_length=8, null=True)),
+                ("location_description", models.TextField(blank=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="created_by",
+                        to="users.UserProfile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Complaint',
-                'ordering': ('-report_date',),
-                'verbose_name_plural': 'Complaints',
+                "verbose_name": "Complaint",
+                "ordering": ("-report_date",),
+                "verbose_name_plural": "Complaints",
             },
         ),
         migrations.CreateModel(
-            name='TagUris',
+            name="TagUris",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('tag_uri', models.CharField(max_length=200)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("tag_uri", models.CharField(max_length=200)),
             ],
             options={
-                'verbose_name': 'Tag URI',
-                'verbose_name_plural': 'Tag URIs',
+                "verbose_name": "Tag URI",
+                "verbose_name_plural": "Tag URIs",
             },
         ),
         migrations.AddField(
-            model_name='complaints',
-            name='tags',
-            field=models.ManyToManyField(blank=True, related_name='tags', to='venter.TagUris'),
+            model_name="complaints",
+            name="tags",
+            field=models.ManyToManyField(
+                blank=True, related_name="tags", to="venter.TagUris"
+            ),
         ),
         migrations.AddField(
-            model_name='complaints',
-            name='users_up_voted',
-            field=models.ManyToManyField(blank=True, related_name='users_up_voted', to='users.UserProfile'),
+            model_name="complaints",
+            name="users_up_voted",
+            field=models.ManyToManyField(
+                blank=True, related_name="users_up_voted", to="users.UserProfile"
+            ),
         ),
         migrations.AddField(
-            model_name='complaintmedia',
-            name='complaint',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='media', to='venter.Complaints'),
+            model_name="complaintmedia",
+            name="complaint",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="media",
+                to="venter.Complaints",
+            ),
         ),
         migrations.AddField(
-            model_name='comment',
-            name='complaint',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='venter.Complaints'),
+            model_name="comment",
+            name="complaint",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="comments",
+                to="venter.Complaints",
+            ),
         ),
     ]

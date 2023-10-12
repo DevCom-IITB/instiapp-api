@@ -4,25 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('placements', '0002_auto_20180401_2308'),
+        ("placements", "0002_auto_20180401_2308"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='placementblogentry',
-            name='guid',
+            model_name="placementblogentry",
+            name="guid",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='placementblogentry',
-            name='link',
+            model_name="placementblogentry",
+            name="link",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='placementblogentry',
-            name='title',
+            model_name="placementblogentry",
+            name="title",
             field=models.CharField(blank=True, max_length=300),
         ),
     ]

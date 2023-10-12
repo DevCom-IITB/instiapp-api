@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0033_userprofile_last_ping'),
+        ("users", "0033_userprofile_last_ping"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='active',
+            model_name="userprofile",
+            name="active",
             field=models.BooleanField(default=True),
         ),
     ]

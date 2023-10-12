@@ -4,14 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('roles', '0005_instituterole_description'),
+        ("roles", "0005_instituterole_description"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='bodyrole',
-            options={'ordering': ('body__name',), 'verbose_name': 'Body Role', 'verbose_name_plural': 'Body Roles'},
+            name="bodyrole",
+            options={
+                "ordering": ("body__name",),
+                "verbose_name": "Body Role",
+                "verbose_name_plural": "Body Roles",
+            },
         ),
     ]

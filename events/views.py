@@ -13,6 +13,7 @@ from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
 
+
 class EventViewSet(viewsets.ModelViewSet):
     """Event"""
 
@@ -20,7 +21,7 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventFullSerializer
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
     def retrieve(self, request, pk):
         """Get Event.
@@ -28,7 +29,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
         self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
         event = self.get_event(pk)
-        serialized = EventFullSerializer(event, context={'request': request}).data
+        serialized = EventFullSerializer(event, context={"request": request}).data
 
         return Response(serialized)
 
@@ -37,21 +38,22 @@ class EventViewSet(viewsets.ModelViewSet):
         List fresh events prioritized for the current user."""
 
         # Check for date filtered query params
-        start = request.GET.get('start')
-        end = request.GET.get('end')
+        start = request.GET.get("start")
+        end = request.GET.get("end")
 
         if start is not None and end is not None:
             # Try date-filtered if we have the params
-            queryset = get_prioritized(self.queryset.filter(
-                start_time__range=(start, end)), request)
+            queryset = get_prioritized(
+                self.queryset.filter(start_time__range=(start, end)), request
+            )
         else:
             # Respond with recent events
             queryset = get_fresh_prioritized_events(self.queryset, request)
 
-        serializer = EventSerializer(queryset, many=True, context={'request': request})
+        serializer = EventSerializer(queryset, many=True, context={"request": request})
         data = serializer.data
 
-        return Response({'count': len(data), 'data': data})
+        return Response({"count": len(data), "data": data})
 
     @login_required_ajax
     def create(self, request):
@@ -59,21 +61,26 @@ class EventViewSet(viewsets.ModelViewSet):
         Needs `AddE` permission for each body to be associated."""
 
         # Prevent events without any body
-        if 'bodies_id' not in request.data or not request.data['bodies_id']:
+        if "bodies_id" not in request.data or not request.data["bodies_id"]:
             return forbidden_no_privileges()
 
         # Check privileges for all bodies
-        if all([user_has_privilege(request.user.profile, id, 'AddE')
-                for id in request.data['bodies_id']]):
-
+        if all(
+            [
+                user_has_privilege(request.user.profile, id, "AddE")
+                for id in request.data["bodies_id"]
+            ]
+        ):
             # Fill in ids of venues
-            request.data['venue_ids'] = create_unreusable_locations(request.data['venue_names'])
+            request.data["venue_ids"] = create_unreusable_locations(
+                request.data["venue_names"]
+            )
             try:
-                request.data['event_interest']
-                request.data['interests_id']
+                request.data["event_interest"]
+                request.data["interests_id"]
             except KeyError:
-                request.data['event_interest'] = []
-                request.data['interests_id'] = []
+                request.data["event_interest"] = []
+                request.data["interests_id"] = []
 
             return super().create(request)
 
@@ -87,25 +94,29 @@ class EventViewSet(viewsets.ModelViewSet):
         permission and associating needs `AddE`"""
 
         # Prevent events without any body
-        if 'bodies_id' not in request.data or not request.data['bodies_id']:
+        if "bodies_id" not in request.data or not request.data["bodies_id"]:
             return forbidden_no_privileges()
 
         # Get the event currently in database
         event = self.get_event(pk)
 
         # Check if difference in bodies is valid
-        if not can_update_bodies(request.data['bodies_id'], event, request.user.profile):
+        if not can_update_bodies(
+            request.data["bodies_id"], event, request.user.profile
+        ):
             return forbidden_no_privileges()
 
         # Create added unreusable venues, unlink deleted ones
-        request.data['venue_ids'] = get_update_venue_ids(request.data['venue_names'], event)
+        request.data["venue_ids"] = get_update_venue_ids(
+            request.data["venue_names"], event
+        )
 
         try:
-            request.data['event_interest']
-            request.data['interests_id']
+            request.data["event_interest"]
+            request.data["interests_id"]
         except KeyError:
-            request.data['event_interest'] = []
-            request.data['interests_id'] = []
+            request.data["event_interest"] = []
+            request.data["interests_id"] = []
 
         return super().update(request, pk)
 
@@ -115,8 +126,12 @@ class EventViewSet(viewsets.ModelViewSet):
         Needs `DelE` permission for all associated bodies."""
 
         event = self.get_event(pk)
-        if all([user_has_privilege(request.user.profile, str(body.id), 'DelE')
-                for body in event.bodies.all()]):
+        if all(
+            [
+                user_has_privilege(request.user.profile, str(body.id), "DelE")
+                for body in event.bodies.all()
+            ]
+        ):
             return super().destroy(request, pk)
 
         return forbidden_no_privileges()
@@ -140,17 +155,21 @@ def can_update_bodies(new_bodies_id, event, profile):
 
     # Check if user can add events for new bodies
     can_add_events = all(
-        [user_has_privilege(profile, bid, 'AddE') for bid in added_bodies])
+        [user_has_privilege(profile, bid, "AddE") for bid in added_bodies]
+    )
 
     # Check if user can remove events for removed
     can_del_events = all(
-        [user_has_privilege(profile, bid, 'DelE') for bid in removed_bodies])
+        [user_has_privilege(profile, bid, "DelE") for bid in removed_bodies]
+    )
 
     # Check if the user can update event for any of the old bodies
     can_update = any(
-        [user_has_privilege(profile, bid, 'UpdE') for bid in old_bodies_id])
+        [user_has_privilege(profile, bid, "UpdE") for bid in old_bodies_id]
+    )
 
     return can_add_events and can_del_events and can_update
+
 
 def get_update_venue_ids(venue_names, event):
     """Get venue ids with minimal object creation for updating event."""

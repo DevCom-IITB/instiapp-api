@@ -4,24 +4,25 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('venter', '0007_auto_20181123_1240'),
+        ("venter", "0007_auto_20181123_1240"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='complaints',
-            name='authority_email',
+            model_name="complaints",
+            name="authority_email",
         ),
         migrations.AddField(
-            model_name='complaints',
-            name='authorities',
-            field=models.ManyToManyField(related_name='complaints', to='venter.Authorities'),
+            model_name="complaints",
+            name="authorities",
+            field=models.ManyToManyField(
+                related_name="complaints", to="venter.Authorities"
+            ),
         ),
         migrations.AddField(
-            model_name='complaints',
-            name='email_status',
+            model_name="complaints",
+            name="email_status",
             field=models.BooleanField(default=False),
         ),
     ]

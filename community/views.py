@@ -12,6 +12,7 @@ from roles.helpers import forbidden_no_privileges
 from helpers.misc import query_from_num
 from helpers.misc import query_search
 
+
 class ModeratorViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
@@ -28,8 +29,13 @@ class ModeratorViewSet(viewsets.ModelViewSet):
     def change_status(self, request, pk):
         post = self.get_community_post(pk)
 
-        if ((user_has_privilege(request.user.profile, post.community.body.id, 'AppP') and post.thread_rank == 1)
-                or (user_has_privilege(request.user.profile, post.community.body.id, 'ModC') and post.thread_rank > 1)):
+        if (
+            user_has_privilege(request.user.profile, post.community.body.id, "AppP")
+            and post.thread_rank == 1
+        ) or (
+            user_has_privilege(request.user.profile, post.community.body.id, "ModC")
+            and post.thread_rank > 1
+        ):
             # Get query param
             status = request.data["status"]
             if status is None:
@@ -53,16 +59,18 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class_min = CommunityPostSerializerMin
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
     @login_required_ajax
     def retrieve_full(self, request, pk):
         """Get full Post.
         Get by `uuid` or `str_id`"""
 
-        self.queryset = CommunityPostSerializers.setup_eager_loading(self.queryset, request)
+        self.queryset = CommunityPostSerializers.setup_eager_loading(
+            self.queryset, request
+        )
         post = self.get_community_post(pk)
-        serialized = CommunityPostSerializers(post, context={'request': request}).data
+        serialized = CommunityPostSerializers(post, context={"request": request}).data
 
         return Response(serialized)
 
@@ -76,31 +84,37 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # If your posts
         if status is None:
-            queryset = CommunityPost.objects.filter(thread_rank=1, posted_by=request.user
-                                                    .profile).order_by("-time_of_modification")
+            queryset = CommunityPost.objects.filter(
+                thread_rank=1, posted_by=request.user.profile
+            ).order_by("-time_of_modification")
         else:
             # If reported posts
             if status == "3":
-                queryset = CommunityPost.objects.filter(status=status, deleted=False).order_by("-time_of_modification")
+                queryset = CommunityPost.objects.filter(
+                    status=status, deleted=False
+                ).order_by("-time_of_modification")
                 # queryset = CommunityPost.objects.all()
 
             else:
                 queryset = CommunityPost.objects.filter(
-                    status=status, deleted=False, thread_rank=1).order_by("-time_of_modification")
-        queryset = query_search(request, 3, queryset, ['content'], 'posts')
+                    status=status, deleted=False, thread_rank=1
+                ).order_by("-time_of_modification")
+        queryset = query_search(request, 3, queryset, ["content"], "posts")
         queryset = query_from_num(request, 20, queryset)
 
-        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        serializer = CommunityPostSerializerMin(
+            queryset, many=True, context={"request": request}
+        )
         data = serializer.data
 
-        return Response({'count': len(data), 'data': data})
+        return Response({"count": len(data), "data": data})
 
     @login_required_ajax
     def create(self, request):
         """Create Post and Comments.
         Needs `AddP` permission for each body to be associated."""
         # Prevent posts without any community
-        if 'community' not in request.data or not request.data['community']:
+        if "community" not in request.data or not request.data["community"]:
             return forbidden_no_privileges()
 
         return super().create(request)
@@ -118,22 +132,31 @@ class PostViewSet(viewsets.ModelViewSet):
         return super().update(request, pk)
 
     def perform_action(self, request, action, pk):
-        '''action==feature for featuring a post'''
+        """action==feature for featuring a post"""
         post = self.get_community_post(pk)
 
         if action == "feature":
-            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
-
+            if all(
+                [
+                    user_has_privilege(
+                        request.user.profile, post.community.body.id, "AppP"
+                    )
+                ]
+            ):
                 # Get query param
                 is_featured = request.data["is_featured"]
                 if is_featured is None:
-                    return Response({"message": "{?is_featured} is required"}, status=400)
+                    return Response(
+                        {"message": "{?is_featured} is required"}, status=400
+                    )
 
                 # Check possible actions
 
                 post.featured = is_featured
                 post.save()
-                return Response({"message": "is_featured changed", 'is_featured': is_featured})
+                return Response(
+                    {"message": "is_featured changed", "is_featured": is_featured}
+                )
 
             return forbidden_no_privileges()
 
@@ -144,7 +167,13 @@ class PostViewSet(viewsets.ModelViewSet):
                 post.save()
                 return Response({"message": "Post deleted"})
 
-            if all([user_has_privilege(request.user.profile, post.community.body.id, 'AppP')]):
+            if all(
+                [
+                    user_has_privilege(
+                        request.user.profile, post.community.body.id, "AppP"
+                    )
+                ]
+            ):
                 post.status = 2
                 post.featured = False
                 post.save()
@@ -173,6 +202,7 @@ class PostViewSet(viewsets.ModelViewSet):
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
 
+
 class CommunityViewSet(viewsets.ModelViewSet):
     queryset = Community.objects
     serializer_class = CommunitySerializers
@@ -180,7 +210,9 @@ class CommunityViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def list(self, request):
         queryset = Community.objects.all()
-        queryset = query_search(request, 3, queryset, ['name', 'about', 'description'], 'communities')
+        queryset = query_search(
+            request, 3, queryset, ["name", "about", "description"], "communities"
+        )
         serializer = CommunitySerializerMin(queryset, many=True)
         data = serializer.data
         return Response(data)
@@ -194,7 +226,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
         body = self.get_community(pk)
 
         # Serialize the body
-        serialized = CommunitySerializers(body, context={'request': request}).data
+        serialized = CommunitySerializers(body, context={"request": request}).data
         return Response(serialized)
 
     def get_community(self, pk):

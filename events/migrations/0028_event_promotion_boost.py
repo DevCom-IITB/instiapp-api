@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0027_event_user_tags'),
+        ("events", "0027_event_user_tags"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='promotion_boost',
+            model_name="event",
+            name="promotion_boost",
             field=models.IntegerField(default=0),
         ),
     ]

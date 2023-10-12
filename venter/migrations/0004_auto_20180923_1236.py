@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('venter', '0003_auto_20180920_1625'),
+        ("venter", "0003_auto_20180920_1625"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='comment',
-            options={'verbose_name': 'Comment', 'verbose_name_plural': 'Comments'},
+            name="comment",
+            options={"verbose_name": "Comment", "verbose_name_plural": "Comments"},
         ),
     ]

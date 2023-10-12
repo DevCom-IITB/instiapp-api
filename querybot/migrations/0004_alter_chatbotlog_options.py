@@ -4,14 +4,16 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('querybot', '0003_chatbotlog'),
+        ("querybot", "0003_chatbotlog"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='chatbotlog',
-            options={'verbose_name': 'ChatBotLog', 'verbose_name_plural': 'ChatBotLogs'},
+            name="chatbotlog",
+            options={
+                "verbose_name": "ChatBotLog",
+                "verbose_name_plural": "ChatBotLogs",
+            },
         ),
     ]

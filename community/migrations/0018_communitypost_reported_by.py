@@ -4,16 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0040_remove_userprofile_followed_communities'),
-        ('community', '0017_rename_hidden_communitypost_deleted'),
+        ("users", "0040_remove_userprofile_followed_communities"),
+        ("community", "0017_rename_hidden_communitypost_deleted"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='communitypost',
-            name='reported_by',
-            field=models.ManyToManyField(blank=True, related_name='communitypost_report', through='community.CommunityPost', to='users.UserProfile'),
+            model_name="communitypost",
+            name="reported_by",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="communitypost_report",
+                through="community.CommunityPost",
+                to="users.UserProfile",
+            ),
         ),
     ]
