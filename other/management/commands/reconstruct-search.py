@@ -17,6 +17,7 @@ from placements.models import BlogEntry
 from news.models import NewsEntry
 from external.models import ExternalBlogEntry
 
+
 async def refresh(queryset):
     # Get client
     client = SonicClient(**settings.SONIC_CONFIG)
@@ -33,8 +34,9 @@ async def refresh(queryset):
         # Push object
         await push(pair, client=client)
 
+
 class Command(BaseCommand):
-    help = 'Reconstruct all search indices'
+    help = "Reconstruct all search indices"
 
     def handle(self, *args, **options):
         if not settings.USE_SONIC:
@@ -51,8 +53,11 @@ class Command(BaseCommand):
         run_sync(refresh(fresh_events))
 
         # Refresh entries younger than two years
-        placement = list(BlogEntry.objects.filter(
-            published__gte=timezone.now() - timedelta(days=600)))
+        placement = list(
+            BlogEntry.objects.filter(
+                published__gte=timezone.now() - timedelta(days=600)
+            )
+        )
         run_sync(refresh(placement))
 
         # Refresh active users
@@ -60,9 +65,11 @@ class Command(BaseCommand):
         run_sync(refresh(active_user_profiles))
 
         # Refresh external blog entries younger than two years
-        external = list(ExternalBlogEntry.objects.filter(
-            published__gte=timezone.now() - timedelta(days=600)
-        ))
+        external = list(
+            ExternalBlogEntry.objects.filter(
+                published__gte=timezone.now() - timedelta(days=600)
+            )
+        )
         run_sync(refresh(external))
 
         # refresh all skills

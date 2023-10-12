@@ -4,20 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bodies', '0006_remove_body_followers'),
+        ("bodies", "0006_remove_body_followers"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='body',
-            name='description',
+            model_name="body",
+            name="description",
             field=models.CharField(blank=True, max_length=500),
         ),
         migrations.AlterField(
-            model_name='body',
-            name='events',
-            field=models.ManyToManyField(blank=True, null=True, related_name='bodies', to='events.Event'),
+            model_name="body",
+            name="events",
+            field=models.ManyToManyField(
+                blank=True, null=True, related_name="bodies", to="events.Event"
+            ),
         ),
     ]

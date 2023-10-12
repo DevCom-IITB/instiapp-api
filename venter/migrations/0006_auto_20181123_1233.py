@@ -5,15 +5,19 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('venter', '0005_auto_20181120_1429'),
+        ("venter", "0005_auto_20181120_1429"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='complaints',
-            name='authority_email',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='venter.Authorities'),
+            model_name="complaints",
+            name="authority_email",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="venter.Authorities",
+            ),
         ),
     ]

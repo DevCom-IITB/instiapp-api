@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0040_remove_userprofile_followed_communities'),
-        ('bans', '0001_initial'),
+        ("users", "0040_remove_userprofile_followed_communities"),
+        ("bans", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='SSOBans',
-            new_name='SSOBan',
+            old_name="SSOBans",
+            new_name="SSOBan",
         ),
     ]

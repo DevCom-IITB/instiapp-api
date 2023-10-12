@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bodies', '0012_remove_body_events'),
+        ("bodies", "0012_remove_body_events"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='body',
-            name='description',
+            model_name="body",
+            name="description",
             field=models.TextField(blank=True),
         ),
     ]

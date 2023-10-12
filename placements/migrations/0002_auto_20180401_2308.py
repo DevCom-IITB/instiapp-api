@@ -5,19 +5,22 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('placements', '0001_initial'),
+        ("placements", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='placementblogentry',
-            options={'ordering': ('-published',), 'verbose_name': 'Placement Blog Entry', 'verbose_name_plural': 'Placement Blog Entries'},
+            name="placementblogentry",
+            options={
+                "ordering": ("-published",),
+                "verbose_name": "Placement Blog Entry",
+                "verbose_name_plural": "Placement Blog Entries",
+            },
         ),
         migrations.AddField(
-            model_name='placementblogentry',
-            name='published',
+            model_name="placementblogentry",
+            name="published",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
     ]

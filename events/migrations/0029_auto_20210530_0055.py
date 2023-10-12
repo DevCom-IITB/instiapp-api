@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0028_event_promotion_boost'),
+        ("events", "0028_event_promotion_boost"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='name',
+            model_name="event",
+            name="name",
             field=models.CharField(max_length=60),
         ),
     ]

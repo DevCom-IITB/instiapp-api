@@ -34,7 +34,6 @@ class SSOBanViewSet(viewsets.ModelViewSet):
 
     @login_required_ajax
     def retrieve(self, request, pk):
-
         if user_has_insti_privilege(request.user.profile, "RoleB"):
             instance = get_object_or_404(self.queryset, pk=pk)
             serializer = self.get_serializer(instance)
@@ -47,7 +46,6 @@ class SSOBanViewSet(viewsets.ModelViewSet):
         if user_has_insti_privilege(request.user.profile, "RoleB"):
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
-
                 banned_user = serializer.validated_data.get("banned_user")
                 duration_of_ban = serializer.validated_data.get("duration_of_ban")
 

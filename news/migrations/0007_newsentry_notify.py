@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('news', '0006_auto_20181001_2026'),
+        ("news", "0006_auto_20181001_2026"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='newsentry',
-            name='notify',
+            model_name="newsentry",
+            name="notify",
             field=models.BooleanField(default=True),
         ),
     ]

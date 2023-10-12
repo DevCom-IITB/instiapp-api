@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 
+
 class Device(models.Model):
     """A device to which a user is logged in.
     To be used chiefly for sending notifications."""
@@ -12,10 +13,14 @@ class Device(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
     last_ping = models.DateTimeField()
-    last_refresh = models.DateTimeField(default=parse('1970-01-01T00:00:00Z'))
+    last_refresh = models.DateTimeField(default=parse("1970-01-01T00:00:00Z"))
 
-    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE, related_name='devices')
-    session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='devices')
+    user = models.ForeignKey(
+        "users.UserProfile", on_delete=models.CASCADE, related_name="devices"
+    )
+    session = models.ForeignKey(
+        Session, on_delete=models.CASCADE, related_name="devices"
+    )
 
     fcm_id = models.CharField(max_length=200, null=True, blank=True)
 
@@ -30,10 +35,10 @@ class Device(models.Model):
         """Check if this device supports data messages."""
 
         # Check for flutter and iOS
-        if self.application == 'app.insti.flutter':
+        if self.application == "app.insti.flutter":
             return int(self.app_version) >= 24
 
-        if self.application == 'app.instiapp.flutter':
+        if self.application == "app.instiapp.flutter":
             return False
 
         # Try parsing the app version
@@ -46,8 +51,8 @@ class Device(models.Model):
         """Add device specific fields to the data message."""
 
         # Add click_action for flutter
-        if self.application == 'app.insti.flutter':
-            data_message['click_action'] = 'FLUTTER_NOTIFICATION_CLICK'
+        if self.application == "app.insti.flutter":
+            data_message["click_action"] = "FLUTTER_NOTIFICATION_CLICK"
 
         return data_message
 

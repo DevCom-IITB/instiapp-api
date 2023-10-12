@@ -7,10 +7,11 @@ from bodies.models import Body
 from bodies.serializer_min import BodySerializerMin
 from helpers.misc import sort_by_field
 
+
 class BodySerializer(serializers.ModelSerializer):
     """Serializer for Body."""
 
-    from roles.serializers import RoleSerializerMin     # pylint: disable=C0415
+    from roles.serializers import RoleSerializerMin  # pylint: disable=C0415
 
     followers_count = serializers.IntegerField(read_only=True)
     user_follows = serializers.BooleanField(read_only=True)
@@ -23,48 +24,76 @@ class BodySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Body
-        fields = ('id', 'str_id', 'name', 'short_description', 'description',
-                  'image_url', 'children', 'parents', 'events', 'followers_count',
-                  'user_follows', 'roles', 'website_url', 'blog_url', 'cover_url')
+        fields = (
+            "id",
+            "str_id",
+            "name",
+            "short_description",
+            "description",
+            "image_url",
+            "children",
+            "parents",
+            "events",
+            "followers_count",
+            "user_follows",
+            "roles",
+            "website_url",
+            "blog_url",
+            "cover_url",
+        )
 
     @staticmethod
     def get_parents(obj):
         """Gets a min serialized parents of a Body."""
-        parents = obj.parents.prefetch_related('parent')
+        parents = obj.parents.prefetch_related("parent")
         parents = sort_by_field(
-            parents, 'parent__followers', reverse=True,
-            filt=Q(parent__followers__active=True))
+            parents,
+            "parent__followers",
+            reverse=True,
+            filt=Q(parent__followers__active=True),
+        )
         return [BodySerializerMin(x.parent).data for x in parents.all()]
 
     @staticmethod
     def get_children(obj):
         """Gets a min serialized children of a Body."""
-        children = obj.children.prefetch_related('child')
+        children = obj.children.prefetch_related("child")
         children = sort_by_field(
-            children, 'child__followers', reverse=True,
-            filt=Q(child__followers__active=True))
+            children,
+            "child__followers",
+            reverse=True,
+            filt=Q(child__followers__active=True),
+        )
         return [BodySerializerMin(x.child).data for x in children.all()]
 
     def get_events(self, obj):
         """Gets filtred events."""
-        from events.serializers import EventSerializer      # pylint: disable=C0415
-        return EventSerializer(get_fresh_prioritized_events(
-            obj.events, self.context['request'], delta=365), many=True, read_only=True).data
+        from events.serializers import EventSerializer  # pylint: disable=C0415
+
+        return EventSerializer(
+            get_fresh_prioritized_events(
+                obj.events, self.context["request"], delta=365
+            ),
+            many=True,
+            read_only=True,
+        ).data
 
     @staticmethod
     def setup_eager_loading(queryset, request):
         """Perform necessary eager loading of data."""
 
         # Prefetch body child relations
-        queryset = queryset.prefetch_related('parents', 'children')
+        queryset = queryset.prefetch_related("parents", "children")
 
         # Annotate followers count
-        followers_count = Count('followers', filter=Q(followers__active=True))
+        followers_count = Count("followers", filter=Q(followers__active=True))
 
         # Annotate user_follows
         userid = request.user.profile.id if request.user.is_authenticated else None
-        user_follows = Count('followers', filter=Q(followers__id=userid))
+        user_follows = Count("followers", filter=Q(followers__id=userid))
 
-        queryset = queryset.annotate(followers_count=followers_count, user_follows=user_follows)
+        queryset = queryset.annotate(
+            followers_count=followers_count, user_follows=user_follows
+        )
 
         return queryset

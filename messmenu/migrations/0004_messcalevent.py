@@ -6,21 +6,36 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0038_auto_20210606_2237'),
-        ('messmenu', '0003_hostel_long_name'),
+        ("users", "0038_auto_20210606_2237"),
+        ("messmenu", "0003_hostel_long_name"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MessCalEvent',
+            name="MessCalEvent",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('hostel', models.IntegerField()),
-                ('datetime', models.DateTimeField()),
-                ('title', models.CharField(max_length=100)),
-                ('user', models.ForeignKey(default=uuid.uuid4, on_delete=django.db.models.deletion.CASCADE, related_name='ums', to='users.userprofile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("hostel", models.IntegerField()),
+                ("datetime", models.DateTimeField()),
+                ("title", models.CharField(max_length=100)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        default=uuid.uuid4,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="ums",
+                        to="users.userprofile",
+                    ),
+                ),
             ],
         ),
     ]

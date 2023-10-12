@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('buyandsell', '0005_alter_limit_endtime'),
+        ("buyandsell", "0005_alter_limit_endtime"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='product',
-            name='deleted',
+            model_name="product",
+            name="deleted",
             field=models.BooleanField(blank=True, default=False),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='status',
+            model_name="product",
+            name="status",
             field=models.BooleanField(blank=True, default=True),
         ),
     ]

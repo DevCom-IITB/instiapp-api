@@ -7,22 +7,31 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from PIL import Image
 
+
 def get_image_path(instance, filename):
     userid = str(instance.uploaded_by.id)
-    return './' + userid[0:2] + '/' + userid[2:4] + '/' + userid + '-' + filename + '.jpg'
+    return (
+        "./" + userid[0:2] + "/" + userid[2:4] + "/" + userid + "-" + filename + ".jpg"
+    )
+
 
 class UploadedImage(models.Model):
     """An uploaded file."""
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
-    uploaded_by = models.ForeignKey('users.UserProfile', null=True, blank=True,
-                                    on_delete=models.SET_NULL, related_name='uploaded_images')
+    uploaded_by = models.ForeignKey(
+        "users.UserProfile",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="uploaded_images",
+    )
     picture = models.ImageField(upload_to=get_image_path)
 
     claimant_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     claimant_id = models.UUIDField(null=True)
-    claimant = GenericForeignKey('claimant_type', 'claimant_id')
+    claimant = GenericForeignKey("claimant_type", "claimant_id")
     is_claimed = models.BooleanField(default=False)
 
     class Meta:
@@ -30,10 +39,14 @@ class UploadedImage(models.Model):
         verbose_name_plural = "Uploaded Images"
         ordering = ("-time_of_creation",)
         indexes = [
-            models.Index(fields=['is_claimed', ]),
+            models.Index(
+                fields=[
+                    "is_claimed",
+                ]
+            ),
         ]
 
-    def save(self, *args, **kwargs):        # pylint: disable=W0222
+    def save(self, *args, **kwargs):  # pylint: disable=W0222
         # Super
         super().save(*args, **kwargs)
 
@@ -51,7 +64,7 @@ class UploadedImage(models.Model):
         MAX_DIM = 1200
 
         # Load image
-        image = Image.open(path).convert('RGB')
+        image = Image.open(path).convert("RGB")
         (width, height) = image.size
 
         # Resize
@@ -61,10 +74,11 @@ class UploadedImage(models.Model):
             image = image.resize(size, Image.ANTIALIAS)
 
         # Save
-        image.save(path, 'JPEG', quality=90, optimize=True, progressive=True)
+        image.save(path, "JPEG", quality=90, optimize=True, progressive=True)
+
 
 @receiver(post_delete, sender=UploadedImage)
 def image_post_delete_handler(**kwargs):
-    image = kwargs['instance']
+    image = kwargs["instance"]
     storage, path = image.picture.storage, image.picture.path
     storage.delete(path)

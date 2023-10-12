@@ -5,15 +5,24 @@ import multiselectfield.db.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('roles', '0002_auto_20180319_1258'),
+        ("roles", "0002_auto_20180319_1258"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='instituterole',
-            name='permissions',
-            field=multiselectfield.db.fields.MultiSelectField(choices=[('AddB', 'Add Body'), ('DelB', 'Delete Body'), ('BodyChild', 'Modify Body-Child Relations'), ('Location', 'Full control over locations'), ('Role', 'Modify Institute Roles'), ('RoleB', 'Modify roles for any body')], max_length=39),
+            model_name="instituterole",
+            name="permissions",
+            field=multiselectfield.db.fields.MultiSelectField(
+                choices=[
+                    ("AddB", "Add Body"),
+                    ("DelB", "Delete Body"),
+                    ("BodyChild", "Modify Body-Child Relations"),
+                    ("Location", "Full control over locations"),
+                    ("Role", "Modify Institute Roles"),
+                    ("RoleB", "Modify roles for any body"),
+                ],
+                max_length=39,
+            ),
         ),
     ]

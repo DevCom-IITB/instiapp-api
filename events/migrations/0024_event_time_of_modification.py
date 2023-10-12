@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0023_event_notify'),
+        ("events", "0023_event_notify"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='time_of_modification',
+            model_name="event",
+            name="time_of_modification",
             field=models.DateTimeField(auto_now=True),
         ),
     ]
