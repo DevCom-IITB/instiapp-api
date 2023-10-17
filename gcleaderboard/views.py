@@ -3,6 +3,7 @@ from django.db.models import Sum, Value
 from django.db.models.functions import Coalesce
 from rest_framework import viewsets
 from .models import GC, GC_Hostel_Points, Hostel
+from messmenu.serializers import HostelSerializer
 from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 
@@ -45,19 +46,23 @@ class InstiViewSet(viewsets.ModelViewSet):
 
     def Type_GC_LB(self, request, Type):
         """ Leaderboard for list of hostels for types of GC """
-        data = {}
+        data = []
         all_rows = Hostel.objects.all()
         for row in all_rows:
             # Access fields of the row
-            curr_hostel_name = row.short_name
+            curr_hostel_id = row.id
+            curr_hostel_name = row.name
 
             Total_Points_Curr_Hostel = GC_Hostel_Points.objects.filter(
-                hostel__short_name=curr_hostel_name, gc__type=Type
+                hostel__id=curr_hostel_id, gc__type=Type
             ).aggregate(Total_Points=Coalesce(Sum("points"), Value(0)))["Total_Points"]
 
-            data.update({curr_hostel_name: Total_Points_Curr_Hostel})
+            data.append({
+                "hostels": HostelSerializer(row).data,
+                "points": Total_Points_Curr_Hostel
+            })
 
-        sorted_dict = dict(sorted(data.items(), key=lambda item: item[1], reverse=True))
+        sorted_dict = sorted(data, key=lambda item: item["points"], reverse=True)
         print(sorted_dict)
         return Response(sorted_dict)
 
@@ -65,18 +70,21 @@ class InstiViewSet(viewsets.ModelViewSet):
     def GC_LB(self, request):
         
         """ List of Hostels for Overall Leaderboard """
-        data = {}
+        data = []
         all_rows = Hostel.objects.all()
         for row in all_rows:
-            curr_hostel_name = row.short_name
+            curr_hostel_id = row.id
 
             Total_Points_Curr_Hostel = GC_Hostel_Points.objects.filter(
-                hostel__short_name=curr_hostel_name
+                hostel__id=curr_hostel_id
             ).aggregate(Total_Points=Coalesce(Sum("points"), Value(0)))["Total_Points"]
 
-            data.update({curr_hostel_name: Total_Points_Curr_Hostel})
+            data.append({
+                "hostels": HostelSerializer(row).data,
+                "points": Total_Points_Curr_Hostel
+            })
 
-        sorted_dict = dict(sorted(data.items(), key=lambda item: item[1], reverse=True))
+        sorted_dict = sorted(data, key=lambda item: item["points"], reverse=True)
 
         print(sorted_dict)
         return Response(sorted_dict)
