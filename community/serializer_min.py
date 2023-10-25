@@ -3,6 +3,7 @@ from rest_framework import serializers
 from achievements.serializers import InterestSerializer
 from bodies.serializer_min import BodySerializerMin
 from community.models import Community, CommunityPost
+from users.models import UserProfile
 from users.serializers import UserProfileSerializer
 
 
@@ -55,6 +56,14 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
     tag_user = UserProfileSerializer(read_only=True, many=True)
     interests = InterestSerializer(read_only=True, many=True)
     has_user_reported = serializers.SerializerMethodField()
+    posted_by = serializers.SerializerMethodField()
+
+    def get_posted_by(self, obj):
+        pb =  UserProfile.objects.get(id=obj.posted_by.id)
+        if(obj.anonymous):
+            pb.name = "Anonymous"
+            pb.profile_pic = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM9q9XJKxlskry5gXTz1OXUyem5Ap59lcEGg&usqp=CAU"
+        return UserProfileSerializer(pb).data
 
     def get_most_liked_comment(self, obj):
         """Get the most liked comment of the community post"""
