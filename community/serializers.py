@@ -78,6 +78,8 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
         pb =  UserProfile.objects.get(id=obj.posted_by.id)
         if(obj.anonymous):
             pb.name = "Anonymous"
+            pb.id = "null"
+            pb.ldap_id = "null" 
             pb.profile_pic = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM9q9XJKxlskry5gXTz1OXUyem5Ap59lcEGg&usqp=CAU"
         return UserProfileSerializer(pb).data
 
