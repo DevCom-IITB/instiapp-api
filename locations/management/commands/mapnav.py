@@ -4,7 +4,6 @@ from django.db.models import Q
 import sys
 from locations.serializers import LocationSerializerMin
 from locations.models import Location
-import json
 
 # class ProfileFetcher():
 #     """Helper to get dictionary of profiles efficiently."""

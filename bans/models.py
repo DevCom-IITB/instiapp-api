@@ -1,8 +1,6 @@
-from collections.abc import Iterable
 from django.db import models
 from uuid import uuid4
 from users.models import UserProfile
-from django.db.models.signals import post_save, post_delete, pre_save
 
 # Create your models here.
 

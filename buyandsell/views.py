@@ -7,12 +7,11 @@ from django.shortcuts import get_object_or_404
 from roles.helpers import login_required_ajax
 from buyandsell.models import Ban, Category, ImageURL, Limit, Product, Report
 from buyandsell.serializers import ProductSerializer
-from helpers.misc import query_from_num, query_search
+from helpers.misc import query_search
 from users.models import UserProfile
 from django.db.models import Q
 import json
 from django.utils import timezone
-import traceback
 
 REPORTS_THRES = 3
 
@@ -24,7 +23,8 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
 
     def mail_moderator(self, report: Report):
         msg = f"""
-        {str(report.reporter)} lodged a report against the product {str(report.product)} posted by {str(report.product.user)}.
+        {str(report.reporter)} lodged a report against the product
+        {str(report.product)} posted by {str(report.product.user)}.
         Alleged Reason: {report.reason}."""
         send_mail(
             "New Report", msg, settings.DEFAULT_FROM_EMAIL, [report.moderator_email]
@@ -36,7 +36,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
                 limit.delete()
 
     def update_bans(self, product: Product = None):
-        if product != None:
+        if product is not None:
             """Get the existing reports on this product that have been accepted by the moderator
             but have not been addressed (by initiating a ban)."""
             reports = Report.objects.filter(
@@ -74,7 +74,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request):
-        ##introduce tags?
+        # introduce tags?
         self.update_bans()
         queryset = self.queryset.filter(status=True)
         """remove products from banned users"""
@@ -157,7 +157,7 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def update(self, request, pk):
         product = self.get_product(pk)
-        ##TO TEST:
+        # TO TEST:
         # product.category.numproducts-=1
         # product.category.numproducts-=1
         if product.user == UserProfile.objects.get(user=request.user):
