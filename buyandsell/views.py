@@ -23,8 +23,8 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
 
     def mail_moderator(self, report: Report):
         msg = f"""
-        {str(report.reporter)} lodged a report against the product {str(report.product)} posted by
-        {str(report.product.user)}.
+        {str(report.reporter)} lodged a report against the product
+        {str(report.product)} posted by {str(report.product.user)}.
         Alleged Reason: {report.reason}."""
         send_mail(
             "New Report", msg, settings.DEFAULT_FROM_EMAIL, [report.moderator_email]
@@ -161,10 +161,10 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         # product.category.numproducts-=1
         # product.category.numproducts-=1
         if product.user == UserProfile.objects.get(user=request.user):
-            # request.data._mutable = True
-            # request.data._mutable = True
+            #    request.data._mutable = True
+            #    request.data._mutable = True
             request = self.update_user_details(request)
-            # self.update_image_urls(request, product)
+            #    self.update_image_urls(request, product)
             return super().update(request, pk)
         return Response(ProductSerializer(product).data)
 

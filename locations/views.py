@@ -12,7 +12,10 @@ from django.db.models import Q
 from django.http import HttpRequest
 import sys
 from rest_framework.decorators import api_view
-from locations.management.commands.mapnav import handle_entry, dijkstra
+from locations.management.commands.mapnav import (
+    handle_entry,
+    dijkstra,
+)
 
 
 class LocationViewSet(viewsets.ModelViewSet):

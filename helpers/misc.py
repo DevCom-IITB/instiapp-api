@@ -41,6 +41,7 @@ def query_from_num(request, default_num, queryset):
     return queryset[from_i : from_i + num]
 
 
+
 def query_search(  # pylint: disable=too-many-arguments
     request, min_length, queryset, fields, collection, order_relevance=False
 ):

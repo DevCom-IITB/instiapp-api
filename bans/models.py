@@ -1,5 +1,6 @@
 from django.db import models
 from uuid import uuid4
+from users.models import UserProfile
 
 # Create your models here.
 
@@ -25,7 +26,11 @@ class SSOBan(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, blank=False)
     banned_user = models.ForeignKey(
-        to="users.UserProfile", related_name="banned_user", on_delete=models.CASCADE
+        to="users.UserProfile",
+        related_name="banned_user",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     time_of_creation = models.DateTimeField(auto_now_add=True)
     reason = models.CharField(max_length=30, choices=BAN_REASON_CHOICHES)
@@ -38,3 +43,9 @@ class SSOBan(models.Model):
         null=True,
         blank=True,
     )
+    banned_user_ldapid = models.CharField(max_length=20, blank=True, null=True)
+
+    def save(self, *args, **kwargs) -> None:
+        if self.banned_user_ldapid:
+            self.banned_user = UserProfile.objects.get(ldap_id=self.banned_user_ldapid)
+        return super().save(*args, **kwargs)
