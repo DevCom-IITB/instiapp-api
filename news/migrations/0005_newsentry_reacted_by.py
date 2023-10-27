@@ -4,16 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0019_auto_20180523_2158'),
-        ('news', '0004_usernewsreaction'),
+        ("users", "0019_auto_20180523_2158"),
+        ("news", "0004_usernewsreaction"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='newsentry',
-            name='reacted_by',
-            field=models.ManyToManyField(blank=True, related_name='news_reactions', through='news.UserNewsReaction', to='users.UserProfile'),
+            model_name="newsentry",
+            name="reacted_by",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="news_reactions",
+                through="news.UserNewsReaction",
+                to="users.UserProfile",
+            ),
         ),
     ]

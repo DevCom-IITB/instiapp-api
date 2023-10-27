@@ -27,10 +27,12 @@ from helpers.test_helpers import create_usertagcategory
 from helpers.test_helpers import create_event
 from helpers.test_helpers import create_body
 
+
 def celery_delay(delay=2):
     """Wait for Celery."""
     if not settings.NO_CELERY:
         time.sleep(delay)
+
 
 class OtherTestCase(TransactionTestCase):
     """Test other endpoints."""
@@ -38,7 +40,8 @@ class OtherTestCase(TransactionTestCase):
     def setUp(self):
         # Create bodies
         body1 = create_body(
-            name="Test WnCC", description="<script> var js = 'XSS'; </script>")
+            name="Test WnCC", description="<script> var js = 'XSS'; </script>"
+        )
         body2 = create_body(name="Test MoodI")
 
         # Create dummy events
@@ -72,47 +75,49 @@ class OtherTestCase(TransactionTestCase):
 
     def test_search(self):
         """Test the search endpoint."""
-        url = '/api/search?query='
+        url = "/api/search?query="
 
         # Consolidate
-        call_command('reconstruct-search')
+        call_command("reconstruct-search")
 
-        response = self.client.get(url + 'bo')
+        response = self.client.get(url + "bo")
         self.assertEqual(response.status_code, 400)
 
         def assert_len(response, bodies, events, users, s_i):
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(len(response.data['bodies']), bodies)
-            self.assertEqual(len(response.data['events']), events)
-            self.assertEqual(len(response.data['users']), users)
-            self.assertEqual(len(response.data['skills']), s_i[0])
-            self.assertEqual(len(response.data['interests']), s_i[1])
+            self.assertEqual(len(response.data["bodies"]), bodies)
+            self.assertEqual(len(response.data["events"]), events)
+            self.assertEqual(len(response.data["users"]), users)
+            self.assertEqual(len(response.data["skills"]), s_i[0])
+            self.assertEqual(len(response.data["interests"]), s_i[1])
 
-        response = self.client.get(url + 'wncc')
+        response = self.client.get(url + "wncc")
         assert_len(response, 1, 1, 0, [0, 0])
 
-        response = self.client.get(url + 'moodi')
+        response = self.client.get(url + "moodi")
         assert_len(response, 1, 0, 0, [0, 0])
 
-        response = self.client.get(url + 'moo')
+        response = self.client.get(url + "moo")
         assert_len(response, 1, 0, 0, [0, 0])
 
-        response = self.client.get(url + 'test user')
+        response = self.client.get(url + "test user")
         assert_len(response, 0, 0, 2, [0, 0])
 
-        response = self.client.get(url + 'skill' + '&types=skills')
+        response = self.client.get(url + "skill" + "&types=skills")
         assert_len(response, 0, 0, 0, [2, 0])
 
-        response = self.client.get(url + 'Interest' + '&types=interests')
+        response = self.client.get(url + "Interest" + "&types=interests")
         assert_len(response, 0, 0, 0, [0, 2])
 
         # Test partial fields
-        response = self.client.get(url + 'wncc&types=bodies')
+        response = self.client.get(url + "wncc&types=bodies")
         assert_len(response, 1, 0, 0, [0, 0])
 
         # Test sanitization with sonic
         if settings.USE_SONIC:
-            response = self.client.get(url + 'script&types=bodies,users,skills,events,interests')
+            response = self.client.get(
+                url + "script&types=bodies,users,skills,events,interests"
+            )
             assert_len(response, 0, 0, 0, [0, 0])
 
     def test_search_misc(self):
@@ -131,21 +136,21 @@ class OtherTestCase(TransactionTestCase):
 
         # Create Fake External Blog Entry
         ent = ExternalBlogEntry.objects.create(title="entry-1")
-        self.assertEqual(index_pair(ent)[0], 'external')
+        self.assertEqual(index_pair(ent)[0], "external")
 
         # Test indexing of PT blog
-        ent = BlogEntry(title='strategy comp', blog_url=settings.PLACEMENTS_URL_VAL)
-        self.assertEqual(index_pair(ent)[0], 'placement')
-        ent = BlogEntry(title='ecomm comp', blog_url=settings.TRAINING_BLOG_URL_VAL)
-        self.assertEqual(index_pair(ent)[0], 'training')
-        ent = BlogEntry(title='why this', blog_url='https://google.com')
-        self.assertEqual(index_pair(ent)[0], 'blogs')
+        ent = BlogEntry(title="strategy comp", blog_url=settings.PLACEMENTS_URL_VAL)
+        self.assertEqual(index_pair(ent)[0], "placement")
+        ent = BlogEntry(title="ecomm comp", blog_url=settings.TRAINING_BLOG_URL_VAL)
+        self.assertEqual(index_pair(ent)[0], "training")
+        ent = BlogEntry(title="why this", blog_url="https://google.com")
+        self.assertEqual(index_pair(ent)[0], "blogs")
 
         # Test indexing of news
-        ent = NewsEntry(id='bigid', title='insightiitb', blog_url='https://google.com')
-        self.assertEqual(index_pair(ent)[0], 'news')
+        ent = NewsEntry(id="bigid", title="insightiitb", blog_url="https://google.com")
+        self.assertEqual(index_pair(ent)[0], "news")
         push_obj_sync(ent)
-        self.assertIn('bigid', run_query_sync('news', 'insightiitb'))
+        self.assertIn("bigid", run_query_sync("news", "insightiitb"))
 
     def test_notifications(self):  # pylint: disable=R0914,R0915
         """Test notifications API."""
@@ -178,30 +183,33 @@ class OtherTestCase(TransactionTestCase):
         celery_delay()
 
         # Get notifications
-        url = '/api/notifications'
+        url = "/api/notifications"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         # Check if notifications are correct three
         self.assertEqual(len(response.data), 3)
-        actors = [n['actor'] for n in response.data]
+        actors = [n["actor"] for n in response.data]
         self.assertIn(EventSerializer(event1).data, actors)
         self.assertIn(EventSerializer(event2).data, actors)
         self.assertIn(EventSerializer(event3).data, actors)
 
         # Mark event2 as read
         def e2notif():
-            return Notification.objects.get(pk=e2n['id'])
-        e2n = [n for n in response.data if n['actor'] == EventSerializer(event2).data][0]
+            return Notification.objects.get(pk=e2n["id"])
+
+        e2n = [n for n in response.data if n["actor"] == EventSerializer(event2).data][
+            0
+        ]
         self.assertEqual(e2notif().unread, True)
         self.assertEqual(e2notif().deleted, False)
-        response = self.client.get(url + '/read/' + str(e2n['id']))
+        response = self.client.get(url + "/read/" + str(e2n["id"]))
         self.assertEqual(response.status_code, 204)
         self.assertEqual(e2notif().unread, False)
         self.assertEqual(e2notif().deleted, False)
 
         # Mark event2 as deleted
-        response = self.client.get(url + '/read/' + str(e2n['id']) + '?delete=1')
+        response = self.client.get(url + "/read/" + str(e2n["id"]) + "?delete=1")
         self.assertEqual(response.status_code, 204)
         self.assertEqual(e2notif().unread, False)
         self.assertEqual(e2notif().deleted, True)
@@ -212,17 +220,17 @@ class OtherTestCase(TransactionTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
-        actors = [n['actor'] for n in response.data]
+        actors = [n["actor"] for n in response.data]
         self.assertIn(EventSerializer(event1).data, actors)
         self.assertIn(EventSerializer(event3).data, actors)
 
         # Follow event 4
-        uesurl = '/api/user-me/ues/' + str(event4.id) + '?status=1'
-        response = self.client.get(uesurl, format='json')
+        uesurl = "/api/user-me/ues/" + str(event4.id) + "?status=1"
+        response = self.client.get(uesurl, format="json")
         self.assertEqual(response.status_code, 204)
 
         # Update event 4
-        event4.name = 'UpdatedEvent4'
+        event4.name = "UpdatedEvent4"
         event4.save()
 
         celery_delay()
@@ -231,18 +239,18 @@ class OtherTestCase(TransactionTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)
-        actors = [n['actor'] for n in response.data]
+        actors = [n["actor"] for n in response.data]
         self.assertIn(EventSerializer(event1).data, actors)
         self.assertIn(EventSerializer(event3).data, actors)
         self.assertIn(EventSerializer(event4).data, actors)
 
         # Follow event 5
-        uesurl = '/api/user-me/ues/' + str(event5.id) + '?status=1'
-        response = self.client.get(uesurl, format='json')
+        uesurl = "/api/user-me/ues/" + str(event5.id) + "?status=1"
+        response = self.client.get(uesurl, format="json")
         self.assertEqual(response.status_code, 204)
 
         # Update event 5
-        event5.name = 'UpdatedEvent5'
+        event5.name = "UpdatedEvent5"
         event5.save()
 
         # Check no notification is added for event 5
@@ -251,10 +259,10 @@ class OtherTestCase(TransactionTestCase):
         self.assertEqual(len(response.data), 3)
 
         # Check no notification after unfollowing event - unfollow 4 and update again
-        uesurl = '/api/user-me/ues/' + str(event4.id) + '?status=0'
-        response = self.client.get(uesurl, format='json')
+        uesurl = "/api/user-me/ues/" + str(event4.id) + "?status=0"
+        response = self.client.get(uesurl, format="json")
         self.assertEqual(response.status_code, 204)
-        event4.name = 'AUpdatedEvent4'
+        event4.name = "AUpdatedEvent4"
         event4.save()
 
         celery_delay()
@@ -263,7 +271,7 @@ class OtherTestCase(TransactionTestCase):
         self.assertEqual(len(response.data), 3)
 
         # Mark all notifications as read and check
-        response = self.client.get(url + '/read')
+        response = self.client.get(url + "/read")
         self.assertEqual(response.status_code, 204)
 
         response = self.client.get(url)
@@ -280,21 +288,33 @@ class OtherTestCase(TransactionTestCase):
 
         # Add one news for each
         ne1 = NewsEntry.objects.create(
-            body=body1, title="NewsEntry1", blog_url=body1.blog_url, published=timezone.now())
+            body=body1,
+            title="NewsEntry1",
+            blog_url=body1.blog_url,
+            published=timezone.now(),
+        )
         NewsEntry.objects.create(
-            body=body2, title="NewsEntry2", blog_url=body2.blog_url, published=timezone.now())
+            body=body2,
+            title="NewsEntry2",
+            blog_url=body2.blog_url,
+            published=timezone.now(),
+        )
 
         # Test that notifications are not created if notify=False
         NewsEntry.objects.create(
-            body=body1, title="NewsEntry3", blog_url=body1.blog_url,
-            published=timezone.now(), notify=False)
+            body=body1,
+            title="NewsEntry3",
+            blog_url=body1.blog_url,
+            published=timezone.now(),
+            notify=False,
+        )
 
         # Get notifications
-        url = '/api/notifications'
+        url = "/api/notifications"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['actor']['title'], ne1.title)
+        self.assertEqual(response.data[0]["actor"]["title"], ne1.title)
 
     def test_comment_notifications(self):
         """Test notifications for complaint subscribers when comments are made"""
@@ -304,27 +324,30 @@ class OtherTestCase(TransactionTestCase):
         complaint.subscriptions.add(test_creator.profile)
 
         # Comments url
-        url = '/api/venter/complaints/' + str(complaint.id) + '/comments'
+        url = "/api/venter/complaints/" + str(complaint.id) + "/comments"
 
         # First comment on the new complaint, should generate 1 new notification (Total = 1)
         test_commenter_1 = get_new_user()
         self.client.force_authenticate(user=test_commenter_1)
 
-        data = {'text': 'test'}
-        response = self.client.post(url, data, format='json')
+        data = {"text": "test"}
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 201)
 
         # Get notifications for test_creator.
         # There should be one notification from the first comment made by test_commenter_1
-        url = '/api/notifications'
+        url = "/api/notifications"
         self.client.force_authenticate(user=test_creator)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['actor']['commented_by']['id'], str(test_commenter_1.profile.id))
+        self.assertEqual(
+            response.data[0]["actor"]["commented_by"]["id"],
+            str(test_commenter_1.profile.id),
+        )
 
         # Comment url
-        url = '/api/venter/complaints/' + str(complaint.id) + '/comments'
+        url = "/api/venter/complaints/" + str(complaint.id) + "/comments"
 
         # Second comment on the complaint, should generate 2 new notifications.
         # One new notification each will be made for test_creator and test_commenter_1.
@@ -332,50 +355,57 @@ class OtherTestCase(TransactionTestCase):
         test_commenter_2 = get_new_user()
         self.client.force_authenticate(user=test_commenter_2)
 
-        data = {'text': 'test'}
-        response = self.client.post(url, data, format='json')
+        data = {"text": "test"}
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 201)
 
         # Get notifications for test_creator.
         # A total of two notifications should exist, one for each comment.
         # The most recent notification should be by the person who made the corresponding comment
-        url = '/api/notifications'
+        url = "/api/notifications"
         self.client.force_authenticate(user=test_creator)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]['actor']['commented_by']['id'], str(test_commenter_2.profile.id))
+        self.assertEqual(
+            response.data[0]["actor"]["commented_by"]["id"],
+            str(test_commenter_2.profile.id),
+        )
 
         # Get notifications for test_commenter_1.
         # 1 notification should exist due to the comment made by test_commenter_2
-        url = '/api/notifications'
+        url = "/api/notifications"
         self.client.force_authenticate(user=test_commenter_1)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['actor']['commented_by']['id'], str(test_commenter_2.profile.id))
+        self.assertEqual(
+            response.data[0]["actor"]["commented_by"]["id"],
+            str(test_commenter_2.profile.id),
+        )
 
     def test_pt_notifications(self):
         """Test notifications for placement blog (Incomplete - only serializer)"""
         # Create dummy
         entry = BlogEntry.objects.create(
-            title="BlogEntry1", blog_url='https://test.com', published=timezone.now())
+            title="BlogEntry1", blog_url="https://test.com", published=timezone.now()
+        )
 
         # Notify
         notify.send(entry, recipient=self.user, verb="TEST")
 
         # Get notifications
-        url = '/api/notifications'
+        url = "/api/notifications"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['actor']['title'], entry.title)
+        self.assertEqual(response.data[0]["actor"]["title"], entry.title)
 
     def test_sitemap(self):
         """Test dynamic sitemap."""
 
         # Get the sitemap
-        url = '/sitemap.xml'
+        url = "/sitemap.xml"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -384,7 +414,7 @@ class OtherTestCase(TransactionTestCase):
 
         # Test each URL in the sitemap
         for urlobj in urlset:
-            for loc in [L for L in urlobj if 'loc' in L.tag]:
+            for loc in [L for L in urlobj if "loc" in L.tag]:
                 response = self.client.get(loc.text)
                 self.assertEqual(response.status_code, 200)
 
@@ -397,40 +427,46 @@ class OtherTestCase(TransactionTestCase):
         # Create test users for matching
         profiles = [get_new_user().profile for x in range(6)]
         for profile in profiles:
-            profile.department = 'ME'
-        profiles[0].hostel = '1'
-        profiles[1].hostel = ''
-        profiles[1].roll_no = '2'
-        profiles[2].hostel = '3'
-        profiles[3].hostel = '1'
-        profiles[3].department = 'EP'
-        profiles[4].hostel = '2'
-        profiles[4].roll_no = '2'
-        profiles[5].hostel = '1'
+            profile.department = "ME"
+        profiles[0].hostel = "1"
+        profiles[1].hostel = ""
+        profiles[1].roll_no = "2"
+        profiles[2].hostel = "3"
+        profiles[3].hostel = "1"
+        profiles[3].department = "EP"
+        profiles[4].hostel = "2"
+        profiles[4].roll_no = "2"
+        profiles[5].hostel = "1"
         profiles[5].active = False
         for profile in profiles:
             profile.save()
 
         # Create tags in 2 categories
-        t1 = create_usertag(cat1, '1')
-        t2 = create_usertag(cat1, '1', target='hostel', secondary_target='roll_no', secondary_regex='2')
-        t3 = create_usertag(cat2, 'ME', target='department')
+        t1 = create_usertag(cat1, "1")
+        t2 = create_usertag(
+            cat1, "1", target="hostel", secondary_target="roll_no", secondary_regex="2"
+        )
+        t3 = create_usertag(cat2, "ME", target="department")
 
-        url = '/api/user-tags'
+        url = "/api/user-tags"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
-        self.assertEqual(len(response.data[0]['tags']), 2)
+        self.assertEqual(len(response.data[0]["tags"]), 2)
 
-        url = '/api/user-tags/reach'
-        response = self.client.post(url, json.dumps([]), content_type="application/json")
+        url = "/api/user-tags/reach"
+        response = self.client.post(
+            url, json.dumps([]), content_type="application/json"
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(response.data['count'], 4)
+        self.assertGreaterEqual(response.data["count"], 4)
 
         data = [t1.id, t2.id, t3.id]
-        response = self.client.post(url, json.dumps(data), content_type="application/json")
+        response = self.client.post(
+            url, json.dumps(data), content_type="application/json"
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data["count"], 2)
 
     def test_test_notifications(self):
         """Test test notifications API."""
@@ -438,13 +474,13 @@ class OtherTestCase(TransactionTestCase):
         profile = self.profile
         profile.user.notifications.all().delete()
 
-        url = '/api/test/notification'
+        url = "/api/test/notification"
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         notif = Notification.objects.get(recipient=self.user)
-        self.assertEqual(notif.verb, 'Test notification')
+        self.assertEqual(notif.verb, "Test notification")
 
         # Check throttling
         response = self.client.get(url)

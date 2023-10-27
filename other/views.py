@@ -26,71 +26,109 @@ from helpers.misc import users_from_tags
 from buyandsell.models import Product
 from buyandsell.serializers import ProductSerializer
 
+
 def get_notif_queryset(queryset):
     return queryset.unread().filter(timestamp__gte=timezone.now() - timedelta(days=7))
 
-class OtherViewset(viewsets.ViewSet):
 
+class OtherViewset(viewsets.ViewSet):
     @staticmethod
     def search(request):
         """EXPENSIVE: Search with query param `query` throughout the database."""
         MIN_LENGTH = 3
 
-        types = ('bodies', 'events', 'users')
-        req_types = request.GET.get('types')
+        types = ("bodies", "events", "users")
+        req_types = request.GET.get("types")
         if req_types:
-            types = tuple(req_types.split(','))
+            types = tuple(req_types.split(","))
 
         req_query = request.GET.get("query")
-        if (not req_query or len(req_query) < MIN_LENGTH) and not ('interests' in types or 'skills' in types):
+        if (not req_query or len(req_query) < MIN_LENGTH) and not (
+            "interests" in types or "skills" in types
+        ):
             return Response({"message": "No query or too short!"}, status=400)
 
         # Include only the types we want
         bodies, events, users, skills, interests, products = ([] for i in range(6))
 
         # Search bodies by name and description
-        if 'bodies' in types:
+        if "bodies" in types:
             bodies = query_search(
-                request, MIN_LENGTH, Body.objects, ['name', 'canonical_name', 'description'],
-                'bodies', order_relevance=True)
+                request,
+                MIN_LENGTH,
+                Body.objects,
+                ["name", "canonical_name", "description"],
+                "bodies",
+                order_relevance=True,
+            )
 
         # Search events by name and description
-        if 'events' in types:
-            events = get_prioritized(query_search(
-                request, MIN_LENGTH, Event.objects, ['name', 'description'], 'events')[:20], request)
+        if "events" in types:
+            events = get_prioritized(
+                query_search(
+                    request,
+                    MIN_LENGTH,
+                    Event.objects,
+                    ["name", "description"],
+                    "events",
+                )[:20],
+                request,
+            )
 
         # Search users by only name: don't add anything else here
-        if 'users' in types:
+        if "users" in types:
             users = query_search(
-                request, MIN_LENGTH, UserProfile.objects.filter(active=True),
-                ['name', 'ldap_id', 'roll_no'], 'profiles', order_relevance=True)[:20]
+                request,
+                MIN_LENGTH,
+                UserProfile.objects.filter(active=True),
+                ["name", "ldap_id", "roll_no"],
+                "profiles",
+                order_relevance=True,
+            )[:20]
 
         # Search skills by title
-        if 'skills' in types:
+        if "skills" in types:
             skills = query_search(
-                request, 0, Skill.objects.all(),
-                ["title"], 'skills', order_relevance=True)[:20]
+                request,
+                0,
+                Skill.objects.all(),
+                ["title"],
+                "skills",
+                order_relevance=True,
+            )[:20]
 
         # Search interests by title
-        if 'interests' in types:
+        if "interests" in types:
             interests = query_search(
-                request, 0, Interest.objects.all(),
-                ["title"], 'interests', order_relevance=True)
+                request,
+                0,
+                Interest.objects.all(),
+                ["title"],
+                "interests",
+                order_relevance=True,
+            )
 
         # Search products by name,brand
-        if 'products' in types:
+        if "products" in types:
             products = query_search(
-                request, MIN_LENGTH, Product.objects.all(),
-                ['name', 'description', 'category', 'brand'], 'products', order_relevance=True)[:20]
+                request,
+                MIN_LENGTH,
+                Product.objects.all(),
+                ["name", "description", "category", "brand"],
+                "products",
+                order_relevance=True,
+            )[:20]
 
-        return Response({
-            "bodies": BodySerializerMin(bodies, many=True).data,
-            "events": EventSerializer(events, many=True).data,
-            "users": UserProfileSerializer(users, many=True).data,
-            "skills": SkillSerializer(skills, many=True).data,
-            "interests": InterestSerializer(interests, many=True).data,
-            "products": ProductSerializer(products, many=True).data
-        })
+        return Response(
+            {
+                "bodies": BodySerializerMin(bodies, many=True).data,
+                "events": EventSerializer(events, many=True).data,
+                "users": UserProfileSerializer(users, many=True).data,
+                "skills": SkillSerializer(skills, many=True).data,
+                "interests": InterestSerializer(interests, many=True).data,
+                "products": ProductSerializer(products, many=True).data,
+            }
+        )
 
     @classmethod
     @login_required_ajax
@@ -126,15 +164,16 @@ class OtherViewset(viewsets.ViewSet):
     @login_required_ajax
     def get_all_user_tags(cls, request):
         """Get a list of categories of user tags with nested tags."""
-        return Response(UserTagCategorySerializer(
-            UserTagCategory.objects.all(), many=True).data)
+        return Response(
+            UserTagCategorySerializer(UserTagCategory.objects.all(), many=True).data
+        )
 
     @classmethod
     @login_required_ajax
     def get_user_tags_reach(cls, request):
         """Get reach of selected user tags."""
         tags = UserTag.objects.filter(id__in=request.data)
-        return Response({'count': users_from_tags(tags).filter(active=True).count()})
+        return Response({"count": users_from_tags(tags).filter(active=True).count()})
 
     @classmethod
     @login_required_ajax
@@ -142,15 +181,20 @@ class OtherViewset(viewsets.ViewSet):
         user = request.user
 
         # Throttle test notification
-        test_notifications = request.user.notifications.filter(verb='Test notification').first()
+        test_notifications = request.user.notifications.filter(
+            verb="Test notification"
+        ).first()
 
         if test_notifications is not None:
             last_notif_timestamp = test_notifications.timestamp
             if last_notif_timestamp > timezone.now() - timedelta(minutes=15):
-                return Response({
-                    "message": "Too soon",
-                    "detail": "Last test notification was sent within last 15 minutes."
-                }, status=429)
+                return Response(
+                    {
+                        "message": "Too soon",
+                        "detail": "Last test notification was sent within last 15 minutes.",
+                    },
+                    status=429,
+                )
 
-        notify.send(user, recipient=user, verb='Test notification')
+        notify.send(user, recipient=user, verb="Test notification")
         return Response(status=200)

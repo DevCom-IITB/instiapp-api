@@ -10,17 +10,19 @@ from bs4 import BeautifulSoup
 from users.models import UserProfile
 from other.search import run_query_sync
 
+
 def get_url_friendly(name):
     """Converts the name to a url friendly string for use in `str_id`"""
     # Return blank in case None is passed
     if not name:
-        return ''
+        return ""
 
     # Strip whitespaces and replace with dashes
-    temp = '-'.join(name.lower().split())
+    temp = "-".join(name.lower().split())
 
     # Remove special characters except dashes
-    return ''.join(c for c in temp if c.isalnum() or c == '-')
+    return "".join(c for c in temp if c.isalnum() or c == "-")
+
 
 def query_from_num(request, default_num, queryset):
     """Returns queryset with from and num if the query parameters are valid."""
@@ -29,19 +31,21 @@ def query_from_num(request, default_num, queryset):
     num = default_num
 
     # Set values from query paramters if available and valid
-    from_q = request.GET.get('from')
-    num_q = request.GET.get('num')
+    from_q = request.GET.get("from")
+    num_q = request.GET.get("num")
     if from_q is not None and str.isdigit(from_q):
         from_i = int(from_q)
     if num_q is not None and str.isdigit(num_q) and int(num_q) <= 100:
         num = int(num_q)
 
-    return queryset[from_i: from_i + num]
+    return queryset[from_i : from_i + num]
+
 
 def query_search(  # pylint: disable=too-many-arguments
-        request, min_length, queryset, fields, collection, order_relevance=False):
+    request, min_length, queryset, fields, collection, order_relevance=False
+):
     """Returns queryset with search filter."""
-    search = request.GET.get('query')
+    search = request.GET.get("query")
     if search is not None and len(search) >= min_length:
         # Use a FTS backend if we have one
         if settings.USE_SONIC:
@@ -60,62 +64,66 @@ def query_search(  # pylint: disable=too-many-arguments
 
     return queryset
 
+
 def query_search_fallback(queryset, fields, search):  # pragma: no cover
     """Perform query search by falling back to icontains."""
     all_queries = Q()
     for field in fields:
-        all_queries = all_queries | Q(**{field + '__icontains': search})
+        all_queries = all_queries | Q(**{field + "__icontains": search})
     return queryset.filter(all_queries)
+
 
 def sort_by_field(queryset, field, reverse=False, filt=None):
     """Return a queryset ordered by a field"""
     queryset = queryset.annotate(field_count=Count(field, filter=filt))
-    return queryset.order_by(('-' if reverse else '') + 'field_count')
+    return queryset.order_by(("-" if reverse else "") + "field_count")
+
 
 def table_to_markdown(html):
     # Initialize
-    md = ''
+    md = ""
     MAX_COLS = 0
-    HEADER_SEPARATOR = 'HEADER_SEPARATOR'
+    HEADER_SEPARATOR = "HEADER_SEPARATOR"
 
     # Parse
-    SOUP = BeautifulSoup(html, features='html.parser')
+    SOUP = BeautifulSoup(html, features="html.parser")
 
     # Count maximum columns
-    for row in SOUP.find_all('tr'):
-        cols = row.find_all(['td', 'th'])
+    for row in SOUP.find_all("tr"):
+        cols = row.find_all(["td", "th"])
         MAX_COLS = max(MAX_COLS, len(cols))
 
     if MAX_COLS == 0:
         return md
 
     if MAX_COLS == 1:
-        for row in SOUP.find_all('tr'):
-            md += row.find(['td', 'th']).text.replace('\n', '') + '\n'
+        for row in SOUP.find_all("tr"):
+            md += row.find(["td", "th"]).text.replace("\n", "") + "\n"
         return md
 
     # Iterate all rows and columns
-    for i, row in enumerate(SOUP.find_all('tr')):
+    for i, row in enumerate(SOUP.find_all("tr")):
         # Iterate all columns
-        cols = row.find_all(['td', 'th'])
+        cols = row.find_all(["td", "th"])
         for col in cols:
-            txt = col.text.replace('\n', '')
-            md += txt + '&zwnj; | '
+            txt = col.text.replace("\n", "")
+            md += txt + "&zwnj; | "
 
         if len(cols) < MAX_COLS:
-            md += '&zwnj; | ' * (MAX_COLS - len(cols))
+            md += "&zwnj; | " * (MAX_COLS - len(cols))
 
         # Insert newline after each row
-        md += '\n'
+        md += "\n"
 
         # Insert header and separator placeholder
         if i == 0:
-            md += HEADER_SEPARATOR + '\n'
+            md += HEADER_SEPARATOR + "\n"
 
     # Replace header separator
-    md = md.replace(HEADER_SEPARATOR, '---|' * MAX_COLS)
+    md = md.replace(HEADER_SEPARATOR, "---|" * MAX_COLS)
 
     return md
+
 
 def users_from_tags(tags):
     """Get a queryset of UserProfile from list of tags."""
@@ -133,7 +141,9 @@ def users_from_tags(tags):
     def get_query(tag):
         query = Q(**{"%s__regex" % tag.target: tag.regex})
         if tag.secondary_target and tag.secondary_regex:
-            t_null_q = Q(**{"%s__isnull" % tag.target: True}) | Q(**{"%s__exact" % tag.target: ''})
+            t_null_q = Q(**{"%s__isnull" % tag.target: True}) | Q(
+                **{"%s__exact" % tag.target: ""}
+            )
             secondary_q = Q(**{"%s__regex" % tag.secondary_target: tag.secondary_regex})
             query = query | (t_null_q & secondary_q)
         return query

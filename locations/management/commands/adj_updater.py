@@ -1,6 +1,7 @@
 import os
 import math as m
 
+
 class UpdateAdjList:
     def __init__(self):
         self.adj_list = self.load_adj_list()
@@ -10,7 +11,7 @@ class UpdateAdjList:
         adj_list_path = f"{os.getcwd()}/locations/management/commands/adj_list.py"
         adj_list = {}
 
-        with open(adj_list_path, 'r') as f:
+        with open(adj_list_path, "r") as f:
             adj_list = dict(eval(f.read()))
 
         return adj_list
@@ -30,11 +31,12 @@ class UpdateAdjList:
         x_loc2 = loc2.pixel_x if loc2.pixel_x else 0
         y_loc2 = loc2.pixel_y if loc2.pixel_y else 0
 
-        return m.sqrt(0.001 * ((x_loc1 - x_loc2)**2 + (y_loc1 - y_loc2)**2))
+        return m.sqrt(0.001 * ((x_loc1 - x_loc2) ** 2 + (y_loc1 - y_loc2) ** 2))
 
     """
     This function updates the adj_list with the new connections and distances betweem them.
     """
+
     def add_conns(self, loc1, connections=[]):
         new_data = self.adj_list.copy()
         for loc2 in connections:
@@ -53,7 +55,7 @@ class UpdateAdjList:
                 new_data[loc1_name][loc2_name] = distance
                 new_data[loc2_name][loc1_name] = distance
 
-                with open(self.adj_list_path, 'w') as f:
+                with open(self.adj_list_path, "w") as f:
                     f.write(str(new_data))
 
     def delete_all_connections(self, location):
@@ -66,7 +68,7 @@ class UpdateAdjList:
                 if loc_name in new_data[key]:
                     new_data[key].pop(loc_name)
 
-        with open(self.adj_list_path, 'w') as f:
+        with open(self.adj_list_path, "w") as f:
             f.write(str(new_data))
 
     def delete_connections(self, location, connections):
@@ -83,5 +85,5 @@ class UpdateAdjList:
                 if loc2_name in new_data[loc1_name]:
                     new_data[loc1_name].pop(loc2_name)
 
-        with open(self.adj_list_path, 'w') as f:
+        with open(self.adj_list_path, "w") as f:
             f.write(str(new_data))

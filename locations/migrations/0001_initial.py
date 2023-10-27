@@ -4,20 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Location',
+            name="Location",
             fields=[
-                ('id', models.UUIDField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=50)),
-                ('lat', models.CharField(max_length=50)),
-                ('lng', models.CharField(max_length=50)),
+                ("id", models.UUIDField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=50)),
+                ("lat", models.CharField(max_length=50)),
+                ("lng", models.CharField(max_length=50)),
             ],
         ),
     ]

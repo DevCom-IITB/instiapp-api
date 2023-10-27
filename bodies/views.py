@@ -19,18 +19,22 @@ from roles.helpers import login_required_ajax
 from roles.helpers import insti_permission_required
 from helpers.misc import sort_by_field
 
+
 class BodyViewSet(viewsets.ModelViewSet):
     """Body"""
+
     queryset = Body.objects
     serializer_class = BodySerializer
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
     @staticmethod
     def list(request):
         queryset = Body.objects.all()
-        queryset = sort_by_field(queryset, 'followers', reverse=True, filt=Q(followers__active=True))
+        queryset = sort_by_field(
+            queryset, "followers", reverse=True, filt=Q(followers__active=True)
+        )
         serializer = BodySerializerMin(queryset, many=True)
         return Response(serializer.data)
 
@@ -45,10 +49,10 @@ class BodyViewSet(viewsets.ModelViewSet):
         body = self.get_body(pk)
 
         # Serialize the body
-        serialized = BodySerializer(body, context={'request': request}).data
+        serialized = BodySerializer(body, context={"request": request}).data
         return Response(serialized)
 
-    @insti_permission_required('AddB')
+    @insti_permission_required("AddB")
     def create(self, request):
         """Create Body.
         Needs the `AddB` Institute Role permission."""
@@ -60,11 +64,11 @@ class BodyViewSet(viewsets.ModelViewSet):
         """Update Body.
         Needs the `UpdB` permission."""
 
-        if not user_has_privilege(request.user.profile, pk, 'UpdB'):
+        if not user_has_privilege(request.user.profile, pk, "UpdB"):
             return forbidden_no_privileges()
         return super().update(request, pk)
 
-    @insti_permission_required('DelB')
+    @insti_permission_required("DelB")
     def destroy(self, request, pk):
         """Delete Body.
         Needs the `DelB` institute permission."""
@@ -98,13 +102,15 @@ class BodyViewSet(viewsets.ModelViewSet):
         body = self.get_body(pk)
 
         # Get query param
-        archived = 'archived' in request.GET
+        archived = "archived" in request.GET
 
         if archived:
-            queryset = Event.objects.filter(bodies=body).order_by('-start_time')
+            queryset = Event.objects.filter(bodies=body).order_by("-start_time")
         else:
             last_year = timezone.now() - timedelta(days=366)
-            queryset = Event.objects.filter(bodies=body, start_time__gte=last_year).order_by('-start_time')
+            queryset = Event.objects.filter(
+                bodies=body, start_time__gte=last_year
+            ).order_by("-start_time")
         serialized = EventMinSerializer(queryset, many=True)
         return Response(serialized.data)
 
@@ -116,7 +122,9 @@ class BodyViewSet(viewsets.ModelViewSet):
         except ValueError:
             return get_object_or_404(self.queryset, str_id=pk)
 
+
 class BodyFollowersViewSet(viewsets.ModelViewSet):
     """List followers of body."""
+
     queryset = Body.objects.all()
     serializer_class = BodyFollowersSerializer

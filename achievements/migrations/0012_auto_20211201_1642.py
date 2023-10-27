@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('achievements', '0011_interest_userinterest'),
+        ("achievements", "0011_interest_userinterest"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='interest',
-            name='title',
+            model_name="interest",
+            name="title",
             field=models.CharField(max_length=80, unique=True),
         ),
     ]

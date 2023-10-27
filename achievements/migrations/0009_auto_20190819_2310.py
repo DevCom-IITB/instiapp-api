@@ -4,9 +4,8 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('achievements', '0008_achievement_hidden'),
+        ("achievements", "0008_achievement_hidden"),
     ]
 
     operations = []

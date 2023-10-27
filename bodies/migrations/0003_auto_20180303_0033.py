@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bodies', '0002_auto_20180303_0033'),
+        ("bodies", "0002_auto_20180303_0033"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='body',
-            name='image_url',
+            model_name="body",
+            name="image_url",
             field=models.URLField(blank=True, null=True),
         ),
     ]

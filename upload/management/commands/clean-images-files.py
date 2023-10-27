@@ -5,15 +5,15 @@ from django.conf import settings
 from upload.models import UploadedImage
 
 # Other reserved files
-reserved = [
-    'useravatar.jpg'
-]
+reserved = ["useravatar.jpg"]
+
 
 def is_reserved(file):
     return any(r in file for r in reserved)
 
+
 class Command(BaseCommand):
-    help = 'Clean static directory.'
+    help = "Clean static directory."
 
     def handle(self, *args, **options):
         """Clean static directory."""
@@ -26,7 +26,11 @@ class Command(BaseCommand):
         images = [x.picture.path for x in UploadedImage.objects.all()]
 
         # List of all files recursive
-        files = [y for x in os.walk(settings.MEDIA_ROOT) for y in glob(os.path.join(x[0], '*'))]
+        files = [
+            y
+            for x in os.walk(settings.MEDIA_ROOT)
+            for y in glob(os.path.join(x[0], "*"))
+        ]
         for file in files:
             if not os.path.isfile(file):
                 continue
@@ -35,12 +39,16 @@ class Command(BaseCommand):
             # Check if the file is valid
             if file in images or is_reserved(file):
                 verified += 1
-                print('Verified', file)
+                print("Verified", file)
             else:
                 cleaned += 1
-                print('Cleaned', file)
+                print("Cleaned", file)
                 size += os.path.getsize(file)
                 os.remove(file)
 
-        self.stdout.write(self.style.SUCCESS(
-            '%i uploaded image files verified, %i cleaned, %fMB saved' % (verified, cleaned, (size / (1024 * 1024)))))
+        self.stdout.write(
+            self.style.SUCCESS(
+                "%i uploaded image files verified, %i cleaned, %fMB saved"
+                % (verified, cleaned, (size / (1024 * 1024)))
+            )
+        )

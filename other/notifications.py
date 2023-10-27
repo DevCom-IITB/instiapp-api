@@ -10,16 +10,18 @@ from events.models import Event
 from news.models import NewsEntry
 from venter.models import ComplaintComment
 
+
 # pylint: disable=W0223,W0613
 def notify_new_event(instance, action, **kwargs):
     """Notify users that a new event was added for a followed body."""
-    if action == 'post_add' and isinstance(instance, Event):
+    if action == "post_add" and isinstance(instance, Event):
         # Skip notification
         if not instance.notify:
             return
 
         # Notify all body followers
         tasks.notify_new_event.delay(instance.id)
+
 
 def notify_upd_event(instance):
     """Notify users that a followed event was updated."""
@@ -30,41 +32,59 @@ def notify_upd_event(instance):
     # Notify all event followers
     tasks.notify_upd_event.delay(instance.id)
 
+
 def notify_new_commpost(instance, created, **kwargs):
     """Notify users that a new post was created."""
     if isinstance(instance, CommunityPost):
-        if (instance.thread_rank == 1 and instance.status == 1 and not instance.deleted):
+        if instance.thread_rank == 1 and instance.status == 1 and not instance.deleted:
             # Notify all body followers
             tasks.notify_new_commpost.delay(instance.id)
-        elif (instance.thread_rank > 1 and instance.status == 1 and not instance.deleted):
+        elif instance.thread_rank > 1 and instance.status == 1 and not instance.deleted:
             tasks.notify_new_comm.delay(instance.id)
-        elif (instance.thread_rank == 1 and instance.status == 0 and not instance.deleted):
+        elif (
+            instance.thread_rank == 1 and instance.status == 0 and not instance.deleted
+        ):
             # Notify all body followers
             tasks.notify_new_commpostadmin.delay(instance.id)
+
 
 def notify_new_reaction(instance, created, **kwargs):
     """Notify users a new reaction on their post"""
     if isinstance(instance, CommunityPostUserReaction) and created:
         tasks.notify_new_reaction.delay(instance.id)
 
+
 def event_saved(instance, created, **kwargs):
     """Notify users when an event changes."""
     if not created:
         notify_upd_event(instance)
 
+
 def news_saved(instance, created, **kwargs):
     """Notify users when a followed body adds new news."""
     if created and instance.body and instance.notify:
-        users = User.objects.filter(id__in=instance.body.followers.filter(active=True).values('user_id'))
-        notify.send(instance, recipient=users, verb=instance.body.name + " added a new news article")
+        users = User.objects.filter(
+            id__in=instance.body.followers.filter(active=True).values("user_id")
+        )
+        notify.send(
+            instance,
+            recipient=users,
+            verb=instance.body.name + " added a new news article",
+        )
+
 
 def new_comment(instance, created, **kwargs):
     """Notify users when a followed complaint gets a new comment."""
     if created:
         # Preventing the user who commented from being notified about their own comment
         profiles = instance.complaint.subscriptions.exclude(id=instance.commented_by.id)
-        users = User.objects.filter(id__in=profiles.values('user_id'))
-        notify.send(instance, recipient=users, verb="New comment on a complaint you're following")
+        users = User.objects.filter(id__in=profiles.values("user_id"))
+        notify.send(
+            instance,
+            recipient=users,
+            verb="New comment on a complaint you're following",
+        )
+
 
 def notification_saved(instance, created, **kwargs):
     """Queue up push notifications."""

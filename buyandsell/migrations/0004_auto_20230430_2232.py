@@ -5,20 +5,23 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('buyandsell', '0003_alter_product_product_image'),
+        ("buyandsell", "0003_alter_product_product_image"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='limit',
-            name='endtime',
+            model_name="limit",
+            name="endtime",
             field=models.DateTimeField(auto_created=True),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='category',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='buyandsell.category'),
+            model_name="product",
+            name="category",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="buyandsell.category",
+            ),
         ),
     ]

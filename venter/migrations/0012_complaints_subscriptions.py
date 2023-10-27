@@ -4,16 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0027_auto_20181003_1609'),
-        ('venter', '0011_auto_20190101_1731'),
+        ("users", "0027_auto_20181003_1609"),
+        ("venter", "0011_auto_20190101_1731"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='complaints',
-            name='subscriptions',
-            field=models.ManyToManyField(blank=True, related_name='subscriptions', to='users.UserProfile'),
+            model_name="complaints",
+            name="subscriptions",
+            field=models.ManyToManyField(
+                blank=True, related_name="subscriptions", to="users.UserProfile"
+            ),
         ),
     ]

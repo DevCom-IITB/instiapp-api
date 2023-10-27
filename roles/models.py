@@ -4,15 +4,16 @@ from django.db import models
 from multiselectfield import MultiSelectField
 
 PERMISSION_CHOICES = (
-    ('AddE', 'Add Event'),
-    ('UpdE', 'Update Event'),
-    ('DelE', 'Delete Event'),
-    ('UpdB', 'Update Body'),
-    ('Role', 'Modify Roles'),
-    ('VerA', 'Verify Achievements'),
-    ('AppP', 'Moderate Post'),
-    ('ModC', 'Moderate Comment')
+    ("AddE", "Add Event"),
+    ("UpdE", "Update Event"),
+    ("DelE", "Delete Event"),
+    ("UpdB", "Update Body"),
+    ("Role", "Modify Roles"),
+    ("VerA", "Verify Achievements"),
+    ("AppP", "Moderate Post"),
+    ("ModC", "Moderate Comment"),
 )
+
 
 class BodyRole(models.Model):
     """A role for a bodywhich can be granted to multiple users."""
@@ -20,7 +21,9 @@ class BodyRole(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     time_of_creation = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=50)
-    body = models.ForeignKey('bodies.Body', on_delete=models.CASCADE, related_name='roles')
+    body = models.ForeignKey(
+        "bodies.Body", on_delete=models.CASCADE, related_name="roles"
+    )
     inheritable = models.BooleanField(default=False)
     permissions = MultiSelectField(choices=PERMISSION_CHOICES)
     priority = models.IntegerField(default=0)
@@ -37,13 +40,14 @@ class BodyRole(models.Model):
 
 
 INSTITUTE_PERMISSION_CHOICES = (
-    ('AddB', 'Add Body'),
-    ('DelB', 'Delete Body'),
-    ('BodyChild', 'Modify Body-Child Relations'),
-    ('Location', 'Full control over locations'),
-    ('Role', 'Modify Institute Roles'),
-    ('RoleB', 'Modify roles for any body'),
+    ("AddB", "Add Body"),
+    ("DelB", "Delete Body"),
+    ("BodyChild", "Modify Body-Child Relations"),
+    ("Location", "Full control over locations"),
+    ("Role", "Modify Institute Roles"),
+    ("RoleB", "Modify roles for any body"),
 )
+
 
 class InstituteRole(models.Model):
     """An institute role which can be granted to multiple users."""

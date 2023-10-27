@@ -7,8 +7,9 @@ from pyfcm import FCMNotification
 from events.models import Event
 from helpers.fcm import send_notification_fcm
 
+
 class Command(BaseCommand):
-    help = 'Sends push notifications of event starting'
+    help = "Sends push notifications of event starting"
 
     def handle(self, *args, **options):
         # Initiate connection
@@ -19,16 +20,16 @@ class Command(BaseCommand):
 
         # Iterate all upcoming events
         for event in Event.objects.filter(
-                start_time__range=(timezone.now(), timezone.now() + timedelta(minutes=30)),
-                starting_notified=False):
-
+            start_time__range=(timezone.now(), timezone.now() + timedelta(minutes=30)),
+            starting_notified=False,
+        ):
             # Stop the spam!
             event.starting_notified = True
             event.notify = False
             event.save()
 
             # Event About to Start
-            print('EATS -', event.name)
+            print("EATS -", event.name)
 
             # Construct object
             data_message = {
@@ -37,7 +38,7 @@ class Command(BaseCommand):
                 "title": event.name,
                 "verb": "Event is about to start",
                 "large_icon": event.bodies.first().image_url,
-                "image_url": event.image_url
+                "image_url": event.image_url,
             }
 
             # Notify all followers
@@ -46,5 +47,7 @@ class Command(BaseCommand):
                 for device in profile.devices.all():
                     count += send_notification_fcm(push_service, device, data_message)
 
-        print('Sent', count, 'rich notifications')
-        self.stdout.write(self.style.SUCCESS('Event starting chore completed successfully'))
+        print("Sent", count, "rich notifications")
+        self.stdout.write(
+            self.style.SUCCESS("Event starting chore completed successfully")
+        )

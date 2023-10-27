@@ -3,6 +3,7 @@ from uuid import uuid4
 from django.db import models
 from django.utils.timezone import now
 
+
 class ExternalBlogEntry(models.Model):
     """A single entry on the external blog."""
 
@@ -22,5 +23,9 @@ class ExternalBlogEntry(models.Model):
         verbose_name_plural = "External Blog Entries"
         ordering = ("-published",)
         indexes = [
-            models.Index(fields=['guid', ]),
+            models.Index(
+                fields=[
+                    "guid",
+                ]
+            ),
         ]

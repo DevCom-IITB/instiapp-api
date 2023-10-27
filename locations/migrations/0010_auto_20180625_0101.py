@@ -5,50 +5,53 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('locations', '0009_auto_20180401_2303'),
+        ("locations", "0009_auto_20180401_2303"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='location',
-            name='description',
+            model_name="location",
+            name="description",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='location',
-            name='group_id',
+            model_name="location",
+            name="group_id",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='location',
-            name='parent',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='locations.Location'),
+            model_name="location",
+            name="parent",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="locations.Location",
+            ),
         ),
         migrations.AddField(
-            model_name='location',
-            name='parent_relation',
+            model_name="location",
+            name="parent_relation",
             field=models.CharField(blank=True, max_length=20, null=True),
         ),
         migrations.AddField(
-            model_name='location',
-            name='pixel_x',
+            model_name="location",
+            name="pixel_x",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='location',
-            name='pixel_y',
+            model_name="location",
+            name="pixel_y",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='location',
-            name='short_name',
+            model_name="location",
+            name="short_name",
             field=models.CharField(blank=True, max_length=50, null=True),
         ),
         migrations.AlterField(
-            model_name='location',
-            name='name',
+            model_name="location",
+            name="name",
             field=models.CharField(max_length=150),
         ),
     ]

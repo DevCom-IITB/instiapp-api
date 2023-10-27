@@ -7,14 +7,14 @@ from roles.helpers import login_required_ajax
 from helpers.misc import query_from_num
 from helpers.misc import query_search
 
-class PlacementBlogViewset(viewsets.ViewSet):
 
+class PlacementBlogViewset(viewsets.ViewSet):
     @classmethod
     @login_required_ajax
     def placement_blog(cls, request):
         """Get Placement Blog."""
         queryset = BlogEntry.objects.filter(blog_url=settings.PLACEMENTS_URL_VAL)
-        queryset = query_search(request, 3, queryset, ['title', 'content'], 'placement')
+        queryset = query_search(request, 3, queryset, ["title", "content"], "placement")
         # queryset = queryset.order_by('-pinned', "-published")
         queryset = query_from_num(request, 20, queryset)
 
@@ -25,7 +25,7 @@ class PlacementBlogViewset(viewsets.ViewSet):
     def training_blog(cls, request):
         """Get Training Blog."""
         queryset = BlogEntry.objects.filter(blog_url=settings.TRAINING_BLOG_URL_VAL)
-        queryset = query_search(request, 3, queryset, ['title', 'content'], 'training')
+        queryset = query_search(request, 3, queryset, ["title", "content"], "training")
         # queryset = queryset.order_by('-pinned', "-published")
         queryset = query_from_num(request, 20, queryset)
         return Response(BlogEntrySerializer(queryset, many=True).data)

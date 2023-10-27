@@ -5,15 +5,16 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('locations', '0002_location_time_of_creation'),
+        ("locations", "0002_location_time_of_creation"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='location',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
+            model_name="location",
+            name="id",
+            field=models.UUIDField(
+                default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+            ),
         ),
     ]

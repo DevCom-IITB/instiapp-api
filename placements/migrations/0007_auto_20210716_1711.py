@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('placements', '0006_blogentry_pin_unpin'),
+        ("placements", "0006_blogentry_pin_unpin"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='blogentry',
-            old_name='pin_unpin',
-            new_name='pinned',
+            model_name="blogentry",
+            old_name="pin_unpin",
+            new_name="pinned",
         ),
     ]

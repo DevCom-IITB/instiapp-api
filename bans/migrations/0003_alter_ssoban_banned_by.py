@@ -5,16 +5,21 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0040_remove_userprofile_followed_communities'),
-        ('bans', '0002_rename_ssobans_ssoban'),
+        ("users", "0040_remove_userprofile_followed_communities"),
+        ("bans", "0002_rename_ssobans_ssoban"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='ssoban',
-            name='banned_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='banned_by', to='users.userprofile'),
+            model_name="ssoban",
+            name="banned_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="banned_by",
+                to="users.userprofile",
+            ),
         ),
     ]

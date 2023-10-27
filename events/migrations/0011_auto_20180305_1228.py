@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0010_auto_20180305_0125'),
+        ("events", "0010_auto_20180305_0125"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='description',
+            model_name="event",
+            name="description",
             field=models.CharField(blank=True, max_length=500),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='image_url',
+            model_name="event",
+            name="image_url",
             field=models.URLField(blank=True, null=True),
         ),
     ]
