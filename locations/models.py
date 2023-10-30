@@ -42,7 +42,7 @@ class Location(models.Model):
         if self.connected_locs:
             adj_data = self.connected_locs.split(",")
         else:
-            self.connected_locs = []
+            ## self.connected_locs = []
             adj_data = []
 
         if Location.objects.filter(name=self.name).exists():
