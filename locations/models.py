@@ -2,6 +2,7 @@
 from uuid import uuid4
 from django.db import models
 from helpers.misc import get_url_friendly
+from locations.management.commands.adj_updater import UpdateAdjList
 
 
 class Location(models.Model):
@@ -28,7 +29,7 @@ class Location(models.Model):
     lat = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     lng = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     reusable = models.BooleanField(default=False)
-
+    connected_locs = models.TextField(blank=True, null=True)
     adjacent_locs = models.ManyToManyField(
         "locations.Location",
         through="LocationLocationDistance",
@@ -36,9 +37,54 @@ class Location(models.Model):
         blank=True,
     )
 
-    def save(self, *args, **kwargs):  # pylint: disable=W0222
+    def save(self, *args, **kwargs):  # pylint: disable =W0222
         self.str_id = get_url_friendly(self.short_name)
+        if self.connected_locs:
+            adj_data = self.connected_locs.split(",")
+        else:
+            # self.connected_locs = []
+            adj_data = []
+
+        if Location.objects.filter(name=self.name).exists():
+            old_instance = Location.objects.get(name=self.name)
+            if old_instance.connected_locs:
+                old_instance_adj = old_instance.connected_locs.split(",")
+            else:
+                old_instance_adj = []
+
+            deletedConnections = list(set(old_instance_adj) - set(adj_data))
+
+            UpdatedConnectionsLoc = []
+            for loc in adj_data:
+                if loc:
+                    loc_object = Location.objects.get(name=loc)
+                    UpdatedConnectionsLoc.append(loc_object)
+            UpdateAdjList().add_conns(
+                self, UpdatedConnectionsLoc
+            )  # Accounts for coordinates change also.
+
+            deleted_connections_locs = []
+            if deletedConnections:
+                for loc in deletedConnections:
+                    deleted_loc = Location.objects.get(name=loc)
+                    if deleted_loc is not None:
+                        deleted_connections_locs.append(deleted_loc)
+                UpdateAdjList().delete_connections(self, deleted_connections_locs)
+
+        else:
+            if adj_data:
+                locs = adj_data
+                connections = [
+                    Location.objects.filter(name=x).first() for x in locs if x
+                ]
+
+                UpdateAdjList().add_conns(self, connections)
+
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        UpdateAdjList().delete_all_connections(self)
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return (self.short_name if self.short_name else "") + " - " + self.name

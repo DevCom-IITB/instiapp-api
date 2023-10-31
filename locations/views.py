@@ -244,8 +244,8 @@ These are the errors that may occur when running the Dijkstra code. It provides 
 
 @api_view(["GET"])
 def checkerrors(request):
-    adj_list = {}  # change this list accordingly
-
+    adj_list = handle_entry().load_adj_list()  # change this list accordingly
+    # adj_list ={}
     items = {}
     items["Failed : Location Does Not Exist"] = []
     items["Failed : MultipleObjectsReturned"] = []
