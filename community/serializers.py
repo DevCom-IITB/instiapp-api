@@ -5,6 +5,7 @@ from community.serializer_min import CommunityPostSerializerMin
 from roles.serializers import RoleSerializerMin
 from users.models import UserProfile
 from bodies.models import Body
+from users.serializers import UserProfileSerializer
 
 class CommunitySerializers(serializers.ModelSerializer):
 
@@ -57,10 +58,22 @@ class CommunitySerializers(serializers.ModelSerializer):
 
 class CommunityPostSerializers(CommunityPostSerializerMin):
     comments = serializers.SerializerMethodField()
+    posted_by = serializers.SerializerMethodField()
 
     def get_comments(self, obj):
         comments = obj.comments.filter(deleted=False, status=1)
         return CommunityPostSerializerMin(comments, many=True).data
+    
+    def get_posted_by(self, obj):
+        pb =  UserProfile.objects.get(id=obj.posted_by.id)
+        if(obj.anonymous and "return_for_mod" in self.context and not self.context["return_for_mod"]):
+            pb.name = "Anonymous"
+            pb.id = "null"
+            pb.ldap_id = "null" 
+            pb.profile_pic = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM9q9XJKxlskry5gXTz1OXUyem5Ap59lcEGg&usqp=CAU"
+        elif(obj.anonymous and "return_for_mod" in self.context and self.context["return_for_mod"]):
+            pb.name += "  (Anon)"
+        return UserProfileSerializer(pb).data
 
     class Meta:
         model = CommunityPost

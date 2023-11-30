@@ -62,7 +62,10 @@ class PostViewSet(viewsets.ModelViewSet):
 
         self.queryset = CommunityPostSerializers.setup_eager_loading(self.queryset, request)
         post = self.get_community_post(pk)
-        serialized = CommunityPostSerializers(post, context={'request': request}).data
+        return_for_mod = False
+        if(user_has_privilege(request.user.profile, post.community.body.id, "AppP")):
+            return_for_mod = True
+        serialized = CommunityPostSerializers(post, context={'return_for_mod': return_for_mod}).data
 
         return Response(serialized)
 
@@ -94,8 +97,11 @@ class PostViewSet(viewsets.ModelViewSet):
                     status=status, community=community, deleted=False, thread_rank=1).order_by("-time_of_modification")
         queryset = query_search(request, 3, queryset, ['content'], 'posts')
         queryset = query_from_num(request, 20, queryset)
+        return_for_mod = False
+        if(user_has_privilege(request.user.profile, community.body.id, "AppP")):
+            return_for_mod = True
 
-        serializer = CommunityPostSerializerMin(queryset, many=True, context={'request': request})
+        serializer = CommunityPostSerializerMin(queryset, many=True, context={'return_for_mod': return_for_mod})
         data = serializer.data
 
         return Response({'count': len(data), 'data': data})
