@@ -69,6 +69,7 @@ base_urlpatterns = [
     path(api_base(), include('community.urls')),
     path(api_base(), include('buyandsell.urls')),
     path(api_base('venter'), include("venter.urls")),
+    path(api_base(), include('lostandfound.urls')),
 
 
     # Non-API

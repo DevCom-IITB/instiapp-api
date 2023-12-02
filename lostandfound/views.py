@@ -11,20 +11,18 @@ from django.shortcuts import get_object_or_404
 from roles.helpers import login_required_ajax
 
 from helpers.misc import query_from_num, query_search
+from django.contrib.auth.decorators import login_required
 from users.models import UserProfile
 from django.db.models import Count,Q
 import json
 from django.utils import timezone
+from django.shortcuts import redirect
 import traceback
 from rest_framework import viewsets
-
-
 from lostandfound.models import ProductFound
 from lostandfound.serializers import ProductFoundSerializer
 
 REPORTS_THRES = 3
-
-
 
 class LostandFoundViewset(viewsets.ModelViewSet):
     
@@ -64,3 +62,13 @@ class LostandFoundViewset(viewsets.ModelViewSet):
         product.claimed_by = request.user.profile
         product.save()
         return Response({"message": "Product claimed"}, status=200)
+
+
+@login_required
+def cso_admin_login(request):
+    if request.user.is_staff:
+        return redirect('CSOAdmin:index')
+    else:
+        return Response({"message": "Not a staff member"}, status=401)
+    
+                  
