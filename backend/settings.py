@@ -33,7 +33,7 @@ USER_AVATAR_URL = '/static/upload/useravatar.jpg'
 
 VAPID_PRIV_KEY = ""
 FCM_SERVER_KEY = ""
-MESSI_ACCESS_TOKEN = ""
+MESSI_ACCESS_TOKEN = "Tolm_fRDkfoN5WMU4oUXWxNwmn1E0MmYlbeh1LA29cU="
 
 # Change this to LOGGING to enable SQLite logging
 NO_LOGGING = {

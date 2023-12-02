@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'notifications',
     'markdownify',
     'buyandsell',
+    'lostandfound',
 ]
 
 MIDDLEWARE = [
