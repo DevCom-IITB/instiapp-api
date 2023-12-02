@@ -33,11 +33,13 @@ class LostandFoundViewset(viewsets.ModelViewSet):
     @login_required_ajax
     def list(self, request, *args, **kwargs):
         """Get list of products."""
-        queryset = self.get_queryset().filter(claimed=False)
+        queryset = self.get_queryset()
         data = self.serializer_class(queryset, many=True).data
 
         return Response(data, status=200)
-    
+
+
+
     @login_required_ajax
     def retrieve(self, request, pk):
         """Get a product from pk uuid or strid."""

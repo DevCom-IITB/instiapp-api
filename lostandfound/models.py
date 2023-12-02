@@ -47,13 +47,10 @@ class ProductFound(models.Model):
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-
-        return super().delete(*args, **kwargs)
 
     class Meta:
-        verbose_name = "Product"
-        verbose_name_plural = "Products"
+        verbose_name = "ProductFound"
+        verbose_name_plural = "ProductsFound"
         ordering = ("-time_of_creation",)
         indexes = [
             models.Index(fields=['time_of_creation', ]),

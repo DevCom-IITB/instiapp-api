@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from lostandfound.models import ProductFound
+from users.serializers import UserProfileSerializer
+
 
 class ProductFoundSerializer(serializers.ModelSerializer):
     product_image = serializers.SerializerMethodField()
@@ -13,7 +15,10 @@ class ProductFoundSerializer(serializers.ModelSerializer):
         return obj.product_image.split(',') if obj.product_image else None
     
     def get_claimed_by(self, obj):
-        return obj.claimed_by.user.username if obj.claimed_by else None
+        if obj.claimed_by:
+            return UserProfileSerializer(obj.claimed_by, context = {'extra' :['contact_no']}).data
+            
+        return None
     def get_claimed(self, obj):
         return obj.claimed
     
