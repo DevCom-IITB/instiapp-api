@@ -5,15 +5,14 @@ import upload.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('upload', '0003_auto_20180401_2303'),
+        ("upload", "0003_auto_20180401_2303"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='uploadedimage',
-            name='picture',
+            model_name="uploadedimage",
+            name="picture",
             field=models.ImageField(upload_to=upload.models.get_image_path),
         ),
     ]

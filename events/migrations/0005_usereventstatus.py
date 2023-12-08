@@ -6,18 +6,30 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0004_auto_20180217_2231'),
+        ("events", "0004_auto_20180217_2231"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UserEventStatus',
+            name="UserEventStatus",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('time_of_creation', models.DateTimeField(auto_now_add=True)),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='events.Event')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("time_of_creation", models.DateTimeField(auto_now_add=True)),
+                (
+                    "event",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="events.Event"
+                    ),
+                ),
             ],
         ),
     ]

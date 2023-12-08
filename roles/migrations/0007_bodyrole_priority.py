@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('roles', '0006_auto_20180401_2303'),
+        ("roles", "0006_auto_20180401_2303"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bodyrole',
-            name='priority',
+            model_name="bodyrole",
+            name="priority",
             field=models.IntegerField(blank=True, null=True),
         ),
     ]

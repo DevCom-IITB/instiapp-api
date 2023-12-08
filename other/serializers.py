@@ -16,7 +16,10 @@ from users.serializers import UserProfileSerializer
 from querybot.models import UnresolvedQuery
 from querybot.serializers import UnresolvedQuerySerializer
 
-class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disable=W0223
+
+class GenericNotificationRelatedField(
+    serializers.RelatedField
+):  # pylint: disable=W0223
     """Serializer for actor/target of notifications."""
 
     def to_representation(self, value):
@@ -45,8 +48,10 @@ class GenericNotificationRelatedField(serializers.RelatedField):  # pylint: disa
             return serializer.data
         return None
 
+
 class NotificationSerializer(serializers.Serializer):  # pylint: disable=W0223
     """Notification Serializer, with unread and actor"""
+
     id = serializers.IntegerField()
     verb = serializers.ReadOnlyField(read_only=True)
     unread = serializers.BooleanField(read_only=True)
@@ -60,15 +65,14 @@ class NotificationSerializer(serializers.Serializer):  # pylint: disable=W0223
 
 
 class UserTagSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = UserTag
-        fields = ('id', 'name')
+        fields = ("id", "name")
+
 
 class UserTagCategorySerializer(serializers.ModelSerializer):
-
     tags = UserTagSerializer(many=True)
 
     class Meta:
         model = UserTagCategory
-        fields = ('id', 'name', 'tags')
+        fields = ("id", "name", "tags")

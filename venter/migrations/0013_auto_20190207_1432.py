@@ -7,41 +7,50 @@ class Migration(migrations.Migration):
     atomic = False
 
     dependencies = [
-        ('users', '0028_userprofile_show_contact_no'),
-        ('venter', '0012_complaints_subscriptions'),
+        ("users", "0028_userprofile_show_contact_no"),
+        ("venter", "0012_complaints_subscriptions"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='Complaints',
-            new_name='Complaint',
+            old_name="Complaints",
+            new_name="Complaint",
         ),
         migrations.RenameModel(
-            old_name='Authorities',
-            new_name='ComplaintAuthority',
+            old_name="Authorities",
+            new_name="ComplaintAuthority",
         ),
         migrations.RenameModel(
-            old_name='Comment',
-            new_name='ComplaintComment',
+            old_name="Comment",
+            new_name="ComplaintComment",
         ),
         migrations.RenameModel(
-            old_name='ComplaintMedia',
-            new_name='ComplaintImage',
+            old_name="ComplaintMedia",
+            new_name="ComplaintImage",
         ),
         migrations.RenameModel(
-            old_name='TagUris',
-            new_name='ComplaintTag',
+            old_name="TagUris",
+            new_name="ComplaintTag",
         ),
         migrations.AlterModelOptions(
-            name='complaintauthority',
-            options={'verbose_name': 'Complaint Authority', 'verbose_name_plural': 'Complaint Authorities'},
+            name="complaintauthority",
+            options={
+                "verbose_name": "Complaint Authority",
+                "verbose_name_plural": "Complaint Authorities",
+            },
         ),
         migrations.AlterModelOptions(
-            name='complaintimage',
-            options={'verbose_name': 'Complaint Image', 'verbose_name_plural': 'Complaint Images'},
+            name="complaintimage",
+            options={
+                "verbose_name": "Complaint Image",
+                "verbose_name_plural": "Complaint Images",
+            },
         ),
         migrations.AlterModelOptions(
-            name='complainttag',
-            options={'verbose_name': 'Complaint Tag', 'verbose_name_plural': 'Complaint Tags'},
+            name="complainttag",
+            options={
+                "verbose_name": "Complaint Tag",
+                "verbose_name_plural": "Complaint Tags",
+            },
         ),
     ]

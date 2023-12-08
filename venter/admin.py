@@ -8,88 +8,106 @@ from venter.models import ComplaintTag
 from venter.models import ComplaintImage
 from venter.models import ComplaintAuthority
 
+
 class ComplaintCommentTabularInline(admin.TabularInline):
     model = ComplaintComment
-    readonly_fields = ('text', 'time', 'commented_by',)
+    readonly_fields = (
+        "text",
+        "time",
+        "commented_by",
+    )
+
 
 class TagTabularInline(admin.TabularInline):
     model = Complaint.tags.through
-    verbose_name = 'Tag'
-    verbose_name_plural = 'Tags'
+    verbose_name = "Tag"
+    verbose_name_plural = "Tags"
+
 
 class UserLikedTabularInline(admin.TabularInline):
     model = Complaint.users_up_voted.through
-    readonly_fields = ('userprofile',)
-    verbose_name = 'User up Voted'
-    verbose_name_plural = 'Users up voted'
+    readonly_fields = ("userprofile",)
+    verbose_name = "User up Voted"
+    verbose_name_plural = "Users up voted"
+
 
 class UserSubscribedTabularInline(admin.TabularInline):
     model = Complaint.subscriptions.through
-    readonly_fields = ('userprofile',)
-    verbose_name = 'Subscribed User'
-    verbose_name_plural = 'Subscribed Users'
+    readonly_fields = ("userprofile",)
+    verbose_name = "Subscribed User"
+    verbose_name_plural = "Subscribed Users"
+
 
 class ComplaintImageTabularInline(admin.TabularInline):
     model = ComplaintImage
-    readonly_fields = ('image_url',)
+    readonly_fields = ("image_url",)
+
 
 class ComplaintImageModelAdmin(admin.ModelAdmin):
-    list_display = ['image_url', 'complaint']
-    raw_id_fields = ('complaint',)
+    list_display = ["image_url", "complaint"]
+    raw_id_fields = ("complaint",)
     model = ComplaintImage
 
+
 class ComplaintCommentModelAdmin(admin.ModelAdmin):
-    list_display = ['text', 'complaint', 'time']
-    readonly_fields = ('commented_by', 'complaint')
+    list_display = ["text", "complaint", "time"]
+    readonly_fields = ("commented_by", "complaint")
     model = ComplaintComment
 
+
 class ComplaintAuthorityModelAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email']
+    list_display = ["name", "email"]
     model = ComplaintAuthority
 
+
 class ComplaintModelAdmin(admin.ModelAdmin):
-    readonly_fields = ['created_by']
-    list_display = ['report_date', 'status', 'email_list', 'email_sent_to']
-    list_editable = ['status']
-    list_filter = ['status']
-    filter_horizontal = ('authorities',)
+    readonly_fields = ["created_by"]
+    list_display = ["report_date", "status", "email_list", "email_sent_to"]
+    list_editable = ["status"]
+    list_filter = ["status"]
+    filter_horizontal = ("authorities",)
     inlines = [
         ComplaintCommentTabularInline,
         TagTabularInline,
         UserLikedTabularInline,
         ComplaintImageTabularInline,
-        UserSubscribedTabularInline
+        UserSubscribedTabularInline,
     ]
-    exclude = ('tags', 'users_up_voted', 'media', 'subscriptions')
-    search_fields = ['status', 'description', 'created_by__name']
-    actions = ['mark_as_resolved', 'mark_as_in_progress', 'mark_as_deleted', 'send_emails']
+    exclude = ("tags", "users_up_voted", "media", "subscriptions")
+    search_fields = ["status", "description", "created_by__name"]
+    actions = [
+        "mark_as_resolved",
+        "mark_as_in_progress",
+        "mark_as_deleted",
+        "send_emails",
+    ]
 
     @staticmethod
-    def mark_as_resolved(modeladmin, request, queryset):    # pylint: disable=W0613
+    def mark_as_resolved(modeladmin, request, queryset):  # pylint: disable=W0613
         """
         Admin action to change complaint status to 'Resolved'
         Queryset contains the selected complaints and this is a batch SQL UPDATE process for the complaint status
         """
-        queryset.update(status='Resolved')
+        queryset.update(status="Resolved")
 
     @staticmethod
-    def mark_as_in_progress(modeladmin, request, queryset):     # pylint: disable=W0613
+    def mark_as_in_progress(modeladmin, request, queryset):  # pylint: disable=W0613
         """
         Admin action to change complaint status to 'In Progress'
         Queryset contains the selected complaints, and this is a batch SQL UPDATE process for the complaint status
         """
-        queryset.update(status='In Progress')
+        queryset.update(status="In Progress")
 
     @staticmethod
-    def mark_as_deleted(modeladmin, request, queryset):     # pylint: disable=W0613
+    def mark_as_deleted(modeladmin, request, queryset):  # pylint: disable=W0613
         """
         Admin action to change complaint status to 'In Progress'
         Queryset contains the selected complaints, and this is a batch SQL UPDATE process for the complaint status
         """
-        queryset.update(status='Deleted')
+        queryset.update(status="Deleted")
 
     @staticmethod
-    def send_emails(modeladmin, request, queryset):         # pylint: disable=W0613
+    def send_emails(modeladmin, request, queryset):  # pylint: disable=W0613
         """
         Admin action to compose a preformatted email message and to send it to the selected authority's email ID
         Queryset contains selected complaints. This is a process to send a preformatted batch of emails to authorities
@@ -111,37 +129,43 @@ class ComplaintModelAdmin(admin.ModelAdmin):
             if not item.authorities.all().exists():
                 continue
 
-            input_list = list(ComplaintImage.objects.filter(complaint=item.id).values('image_url'))
+            input_list = list(
+                ComplaintImage.objects.filter(complaint=item.id).values("image_url")
+            )
             output_list = [images[key] for images in input_list for key in images]
 
-            subject = f'Complaint from {item.created_by} on {item.report_date:%A, %d %b %Y at %I:%M %p}'
+            subject = f"Complaint from {item.created_by} on {item.report_date:%A, %d %b %Y at %I:%M %p}"
 
-            message = f'{item.description}\n\n' \
-                      f'Location Description: {item.location_description}\n\n' \
-                      f'Status: {item.status}\n\n'
+            message = (
+                f"{item.description}\n\n"
+                f"Location Description: {item.location_description}\n\n"
+                f"Status: {item.status}\n\n"
+            )
             # Adds links to attached images into the message if any
             if output_list:
-                message = message + f'Images: {output_list}'
+                message = message + f"Images: {output_list}"
 
             # The 'DEFAULT_FROM_EMAIL' setting is recommended by django when the site has an independent mailing server
             sender_id = settings.DEFAULT_FROM_EMAIL
 
             # Retrieves a list of email ids for the selected authorities. Excludes the authority bodies with no email id
-            recipient_list = queryset.values_list('authorities__email', flat=True).exclude(authorities__email=None)
-            authority = item.authorities.values_list('name', flat=True)
-            authorities_sent = ', '.join(authority)
+            recipient_list = queryset.values_list(
+                "authorities__email", flat=True
+            ).exclude(authorities__email=None)
+            authority = item.authorities.values_list("name", flat=True)
+            authorities_sent = ", ".join(authority)
 
             # Composes the email to be sent to the authorities and sends it to the recipients
             send_mail(subject, message, sender_id, recipient_list)
 
             # check if email_sent_to list is empty or not, if empty assign auth value else append auth value
             if item.email_sent_to:
-                item.email_sent_to += ', ' + authorities_sent
+                item.email_sent_to += ", " + authorities_sent
             else:
                 item.email_sent_to = authorities_sent
 
             item.authorities.clear()
-            item.status = 'In Progress'
+            item.status = "In Progress"
             item.email_status = True
             item.save()
 

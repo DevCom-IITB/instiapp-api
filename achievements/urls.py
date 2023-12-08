@@ -4,25 +4,40 @@ from achievements.views import AchievementViewSet, UserInterestViewSet
 from achievements.views import OfferedAchievementViewSet
 
 urlpatterns = [
-    path('achievements', AchievementViewSet.as_view({
-        'get': 'list', 'post': 'create'
-    })),
-    path('achievements/<pk>', AchievementViewSet.as_view({
-        'put': 'update', 'delete': 'destroy', 'get': 'retrieve', 'patch': 'update'
-    })),
-    path('achievements-body/<pk>', AchievementViewSet.as_view({
-        'get': 'list_body'
-    })),
-    path('achievements-offer', OfferedAchievementViewSet.as_view({
-        'post': 'create'
-    })),
-    path('achievements-offer/<pk>', OfferedAchievementViewSet.as_view({
-        'get': 'retrieve', 'put': 'update', 'delete': 'destroy', 'post': 'claim_secret'
-    })),
-    path('interests', UserInterestViewSet.as_view({
-         'post': 'create',
-         })),
-    path('interests/<pk>', UserInterestViewSet.as_view({
-         'delete': 'delete',
-         })),
+    path("achievements", AchievementViewSet.as_view({"get": "list", "post": "create"})),
+    path(
+        "achievements/<pk>",
+        AchievementViewSet.as_view(
+            {"put": "update", "delete": "destroy", "get": "retrieve", "patch": "update"}
+        ),
+    ),
+    path("achievements-body/<pk>", AchievementViewSet.as_view({"get": "list_body"})),
+    path("achievements-offer", OfferedAchievementViewSet.as_view({"post": "create"})),
+    path(
+        "achievements-offer/<pk>",
+        OfferedAchievementViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "delete": "destroy",
+                "post": "claim_secret",
+            }
+        ),
+    ),
+    path(
+        "interests",
+        UserInterestViewSet.as_view(
+            {
+                "post": "create",
+            }
+        ),
+    ),
+    path(
+        "interests/<pk>",
+        UserInterestViewSet.as_view(
+            {
+                "delete": "delete",
+            }
+        ),
+    ),
 ]

@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('community', '0011_auto_20220714_1428'),
+        ("community", "0011_auto_20220714_1428"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='communitypost',
-            name='hidden',
+            model_name="communitypost",
+            name="hidden",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='communitypost',
-            name='reported',
+            model_name="communitypost",
+            name="reported",
             field=models.BooleanField(default=False),
         ),
     ]

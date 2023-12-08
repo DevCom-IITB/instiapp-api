@@ -4,18 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('locations', '0012_auto_20180625_0139'),
+        ("locations", "0012_auto_20180625_0139"),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='location',
-            index=models.Index(fields=['reusable'], name='locations_l_reusabl_2954ea_idx'),
+            model_name="location",
+            index=models.Index(
+                fields=["reusable"], name="locations_l_reusabl_2954ea_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='location',
-            index=models.Index(fields=['reusable', 'group_id'], name='locations_l_reusabl_fc1a6b_idx'),
+            model_name="location",
+            index=models.Index(
+                fields=["reusable", "group_id"], name="locations_l_reusabl_fc1a6b_idx"
+            ),
         ),
     ]

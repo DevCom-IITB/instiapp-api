@@ -4,16 +4,15 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bodies', '0006_remove_body_followers'),
-        ('users', '0001_initial'),
+        ("bodies", "0006_remove_body_followers"),
+        ("users", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='followed_bodies',
-            field=models.ManyToManyField(related_name='followers', to='bodies.Body'),
+            model_name="userprofile",
+            name="followed_bodies",
+            field=models.ManyToManyField(related_name="followers", to="bodies.Body"),
         ),
     ]

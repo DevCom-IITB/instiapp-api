@@ -8,14 +8,15 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 
 TAG_TARGET_CHOICES = (
-    ('roll_no', 'Roll No'),
-    ('department', 'Department'),
-    ('degree', 'Degree'),
-    ('join_year', 'Join Year'),
-    ('graduation_year', 'Graduation Year'),
-    ('hostel', 'Hostel'),
-    ('room', 'Room'),
+    ("roll_no", "Roll No"),
+    ("department", "Department"),
+    ("degree", "Degree"),
+    ("join_year", "Join Year"),
+    ("graduation_year", "Graduation Year"),
+    ("hostel", "Hostel"),
+    ("room", "Room"),
 )
+
 
 class UserProfile(models.Model):
     """Profile of a unique user."""
@@ -25,7 +26,8 @@ class UserProfile(models.Model):
 
     # Linked Django User object
     user = models.OneToOneField(
-        User, related_name='profile', on_delete=models.CASCADE, null=True, blank=True)
+        User, related_name="profile", on_delete=models.CASCADE, null=True, blank=True
+    )
 
     # Basic info from SSO
     name = models.CharField(max_length=50, blank=True)
@@ -47,12 +49,17 @@ class UserProfile(models.Model):
 
     # InstiApp feature fields
     active = models.BooleanField(default=True)
-    followed_bodies = models.ManyToManyField('bodies.Body', related_name='followers', blank=True)
-
+    followed_bodies = models.ManyToManyField(
+        "bodies.Body", related_name="followers", blank=True
+    )
     # InstiApp roles
-    roles = models.ManyToManyField('roles.BodyRole', related_name='users', blank=True)
+    roles = models.ManyToManyField("roles.BodyRole", related_name="users", blank=True)
     former_roles = models.ManyToManyField(
-        'roles.BodyRole', related_name='former_users', blank=True, through='UserFormerRole')
+        "roles.BodyRole",
+        related_name="former_users",
+        blank=True,
+        through="UserFormerRole",
+    )
     institute_roles = models.ManyToManyField(
         'roles.InstituteRole', related_name='users', blank=True)
     # community_roles = models.ManyToManyField('roles.CommunityRole', related_name='users', blank=True)
@@ -67,39 +74,59 @@ class UserProfile(models.Model):
         verbose_name = "Profile"
         verbose_name_plural = "Profiles"
         indexes = [
-            models.Index(fields=['active', ]),
-            models.Index(fields=['ldap_id', ]),
+            models.Index(
+                fields=[
+                    "active",
+                ]
+            ),
+            models.Index(
+                fields=[
+                    "ldap_id",
+                ]
+            ),
         ]
 
     class ExMeta:
-        user_editable = ('show_contact_no', 'fcm_id', 'about', 'android_version', 'website_url')
+        user_editable = (
+            "show_contact_no",
+            "fcm_id",
+            "about",
+            "android_version",
+            "website_url",
+        )
 
     def __str__(self):
         return f"{self.name} - {self.roll_no}"
+
 
 class UserFormerRole(models.Model):
     """Through field for former_role from UserProfile to BodyRole."""
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE,
-                             default=uuid4, related_name='ufr')
-    role = models.ForeignKey('roles.BodyRole', on_delete=models.CASCADE,
-                             default=uuid4, related_name='ufr')
-    year = models.CharField(default='', max_length=20, blank=True)
+    user = models.ForeignKey(
+        "users.UserProfile", on_delete=models.CASCADE, default=uuid4, related_name="ufr"
+    )
+    role = models.ForeignKey(
+        "roles.BodyRole", on_delete=models.CASCADE, default=uuid4, related_name="ufr"
+    )
+    year = models.CharField(default="", max_length=20, blank=True)
+
 
 class WebPushSubscription(models.Model):
     """One web push subscription."""
+
     user = models.ForeignKey(
-        UserProfile, on_delete=models.CASCADE, related_name='web_push_subscriptions')
+        UserProfile, on_delete=models.CASCADE, related_name="web_push_subscriptions"
+    )
     endpoint = models.TextField()
     endpoint_hash = models.CharField(max_length=60, unique=True)
     p256dh = models.CharField(max_length=200)
     auth = models.CharField(max_length=100)
 
-    def save(self, *args, **kwargs):        # pylint: disable=W0222
+    def save(self, *args, **kwargs):  # pylint: disable=W0222
         # Create hash of endpoint
         ehash = hashlib.sha1()
-        ehash.update(str(self.endpoint).encode('utf-8'))
+        ehash.update(str(self.endpoint).encode("utf-8"))
         self.endpoint_hash = ehash.hexdigest()
 
         super().save(*args, **kwargs)
@@ -107,26 +134,33 @@ class WebPushSubscription(models.Model):
     def __str__(self):
         return self.user.name
 
+
 class UserTagCategory(models.Model):
     """A category of tags.
     A user will typically have only only one tag from each category."""
+
     name = models.CharField(max_length=30)
 
     def __str__(self):
         return self.name
 
+
 class UserTag(models.Model):
     """A single tag that a user can match."""
 
     name = models.CharField(max_length=30)
-    category = models.ForeignKey(UserTagCategory, on_delete=models.CASCADE, related_name='tags')
+    category = models.ForeignKey(
+        UserTagCategory, on_delete=models.CASCADE, related_name="tags"
+    )
     target = models.CharField(max_length=40, choices=TAG_TARGET_CHOICES)
     regex = models.CharField(max_length=150)
-    secondary_target = models.CharField(max_length=40, choices=TAG_TARGET_CHOICES, blank=True, null=True)
+    secondary_target = models.CharField(
+        max_length=40, choices=TAG_TARGET_CHOICES, blank=True, null=True
+    )
     secondary_regex = models.CharField(max_length=150, blank=True, null=True)
 
     def __str__(self):
-        return '%s %s' % (self.target, self.regex)
+        return "%s %s" % (self.target, self.regex)
 
     def match(self, user):
         """Match a user with a tag and return a Match object."""

@@ -5,21 +5,22 @@ from django.conf import settings
 from PIL import Image
 from locations.models import Location
 
-MAP_FILE = 'map.jpg'
-MARKER_FILE = 'marker.png'
+MAP_FILE = "map.jpg"
+MARKER_FILE = "marker.png"
 PIXEL_SPAN_H = 500
 PIXEL_SPAN_V = 400
 MARKER_SIZE = 54, 54
-SAVE_FOLDER = '%s/map' % (settings.STATIC_ROOT)
+SAVE_FOLDER = "%s/map" % (settings.STATIC_ROOT)
+
 
 # pylint: disable=R0914
 class Command(BaseCommand):
-    help = 'Generate thumbnails for all reusable locations'
+    help = "Generate thumbnails for all reusable locations"
 
     def handle(self, *args, **options):
         # Provide this the map file in the working directory
-        image = Image.open(open(MAP_FILE, 'rb'))
-        marker = Image.open(open(MARKER_FILE, 'rb'))
+        image = Image.open(open(MAP_FILE, "rb"))
+        marker = Image.open(open(MARKER_FILE, "rb"))
         marker.thumbnail(MARKER_SIZE, Image.ANTIALIAS)
         marker_width, marker_height = marker.size
 
@@ -53,8 +54,8 @@ class Command(BaseCommand):
             cropped.paste(marker, (marker_x, marker_y), marker)
 
             # Save the image
-            save_path = '%s/%s.jpg' % (SAVE_FOLDER, location.id)
-            cropped.save(save_path, 'JPEG', quality=90, optimize=True, progressive=True)
+            save_path = "%s/%s.jpg" % (SAVE_FOLDER, location.id)
+            cropped.save(save_path, "JPEG", quality=90, optimize=True, progressive=True)
 
             # Print a message
-            print('Created image for', location.short_name)
+            print("Created image for", location.short_name)

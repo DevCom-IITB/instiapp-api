@@ -5,15 +5,19 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('locations', '0010_auto_20180625_0101'),
+        ("locations", "0010_auto_20180625_0101"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='location',
-            name='parent',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='locations.Location'),
+            model_name="location",
+            name="parent",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="locations.Location",
+            ),
         ),
     ]

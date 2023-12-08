@@ -4,18 +4,25 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bodies', '0013_auto_20180329_1256'),
+        ("bodies", "0013_auto_20180329_1256"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='body',
-            options={'ordering': ('name',), 'verbose_name': 'Body', 'verbose_name_plural': 'Bodies'},
+            name="body",
+            options={
+                "ordering": ("name",),
+                "verbose_name": "Body",
+                "verbose_name_plural": "Bodies",
+            },
         ),
         migrations.AlterModelOptions(
-            name='bodychildrelation',
-            options={'ordering': ('parent__name',), 'verbose_name': 'Body-Child Relation', 'verbose_name_plural': 'Body-Child Relations'},
+            name="bodychildrelation",
+            options={
+                "ordering": ("parent__name",),
+                "verbose_name": "Body-Child Relation",
+                "verbose_name_plural": "Body-Child Relations",
+            },
         ),
     ]

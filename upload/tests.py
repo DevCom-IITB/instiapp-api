@@ -14,12 +14,16 @@ from helpers.test_helpers import create_body
 
 from upload.models import UploadedImage
 
+
 def get_image():
-    return SimpleUploadedFile("img.jpg", open("./upload/img.jpg", "rb").read(), content_type="image/jpeg")
+    return SimpleUploadedFile(
+        "img.jpg", open("./upload/img.jpg", "rb").read(), content_type="image/jpeg"
+    )
 
 
 def new_upload(slf):
-    return slf.client.post('/api/upload', {'picture': get_image()})
+    return slf.client.post("/api/upload", {"picture": get_image()})
+
 
 class UploadTestCase(APITestCase):
     """Check if logged in users can upload files."""
@@ -42,16 +46,16 @@ class UploadTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
 
         # Check if extension was guessed right
-        img_id = response.data['id']
+        img_id = response.data["id"]
         img = UploadedImage.objects.get(pk=img_id)
-        self.assertIn('.jpg', str(img.picture))
+        self.assertIn(".jpg", str(img.picture))
 
         # Check __str__
         self.assertEqual(str(img), str(img.time_of_creation))
 
         # Test delete
-        url = '/api/upload/' + img_id
-        response = self.client.delete(url, format='json')
+        url = "/api/upload/" + img_id
+        response = self.client.delete(url, format="json")
         self.assertEqual(response.status_code, 204)
 
     def test_clean_images_chore(self):
@@ -65,15 +69,16 @@ class UploadTestCase(APITestCase):
             for i in range(1, 5):
                 res[i] = new_upload(self)
 
-            event1 = create_event(image_url=res[2].data['picture'])
-            body1 = create_body(image_url=res[3].data['picture'])
+            event1 = create_event(image_url=res[2].data["picture"])
+            body1 = create_body(image_url=res[3].data["picture"])
 
         # Get path for checking deletion
         def obj(res):
-            return UploadedImage.objects.get(pk=res.data['id'])
+            return UploadedImage.objects.get(pk=res.data["id"])
 
         def obj_exists(res):
-            return UploadedImage.objects.filter(pk=res.data['id']).exists()
+            return UploadedImage.objects.filter(pk=res.data["id"]).exists()
+
         paths = [obj(r).picture.path for r in res]
 
         # Check if deleting a non existent file is fine
@@ -85,7 +90,8 @@ class UploadTestCase(APITestCase):
 
         # Call the chore
         def clean():
-            return call_command('clean-images')
+            return call_command("clean-images")
+
         clean()
 
         # Check if unclaimed images were removed
@@ -99,7 +105,7 @@ class UploadTestCase(APITestCase):
         self.assertFalse(isfile(paths[1]))
 
         # Check after invalidating claimant
-        body1.image_url = 'https://insti.app'
+        body1.image_url = "https://insti.app"
         body1.save()
         clean()
         self.assertTrue(obj_exists(res[2]))

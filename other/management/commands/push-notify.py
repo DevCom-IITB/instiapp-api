@@ -9,8 +9,9 @@ from helpers.fcm import send_fcm_notification_message
 from helpers.fcm import get_rich_notification
 from helpers.webpush import send_notification_webpush
 
+
 class Command(BaseCommand):
-    help = 'Sends push notifications'
+    help = "Sends push notifications"
 
     def handle(self, *args, **options):  # noqa: C901
         """Send Push notifications."""
@@ -23,7 +24,6 @@ class Command(BaseCommand):
 
         # Iterate all unsent notifications
         for notification in Notification.objects.filter(emailed=False)[:1000]:
-
             # Check invalid subscriptions
             if not notification or not notification.actor:
                 continue
@@ -43,8 +43,10 @@ class Command(BaseCommand):
             data_message = get_rich_notification(notification)
 
             # Retro method for transition
-            if profile.fcm_id and profile.fcm_id != '':
-                send_fcm_notification_message(push_service, profile.fcm_id, data_message)
+            if profile.fcm_id and profile.fcm_id != "":
+                send_fcm_notification_message(
+                    push_service, profile.fcm_id, data_message
+                )
 
             # Send FCM push notification
             for device in profile.devices.all():
@@ -56,8 +58,13 @@ class Command(BaseCommand):
                 webpush_sent += send_notification_webpush(subscription, data_message)
 
         print(
-            "WebPush:", webpush_sent,
-            "WebPush FAIL:", webpush_total - webpush_sent,
-            "FCM:", fcm_sent
+            "WebPush:",
+            webpush_sent,
+            "WebPush FAIL:",
+            webpush_total - webpush_sent,
+            "FCM:",
+            fcm_sent,
         )
-        self.stdout.write(self.style.SUCCESS('Push notification chore completed successfully'))
+        self.stdout.write(
+            self.style.SUCCESS("Push notification chore completed successfully")
+        )

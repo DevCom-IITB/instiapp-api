@@ -5,15 +5,20 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('community', '0001_initial'),
+        ("community", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='communitypost',
-            name='parent',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='communitypost_parent', to='community.communitypost'),
+            model_name="communitypost",
+            name="parent",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="communitypost_parent",
+                to="community.communitypost",
+            ),
         ),
     ]

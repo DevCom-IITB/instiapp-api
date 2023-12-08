@@ -9,17 +9,25 @@ from querybot.models import UnresolvedQuery
 from helpers.device import fill_device_firebase
 from other.views import get_notif_queryset
 
+
 def send_fcm_data_message(push_service, registration_id, data_message):
     """Send a data FCM message."""
     push_service.notify_single_device(
-        registration_id=registration_id, data_message=data_message)
+        registration_id=registration_id, data_message=data_message
+    )
+
 
 def send_fcm_notification_message(push_service, registration_id, data_message):
     """Send a notification FCM message."""
     push_service.notify_single_device(
-        registration_id=registration_id, message_title=data_message['title'],
-        message_body=data_message['verb'], data_message=data_message,
-        click_action=data_message.get('click_action', None), sound='default')
+        registration_id=registration_id,
+        message_title=data_message["title"],
+        message_body=data_message["verb"],
+        data_message=data_message,
+        click_action=data_message.get("click_action", None),
+        sound="default",
+    )
+
 
 def send_notification_fcm(push_service, device, data_message):
     """Attempt to send a single FCM notification."""
@@ -51,10 +59,12 @@ def send_notification_fcm(push_service, device, data_message):
 
     return 0
 
+
 def get_news_image(news):
-    if 'yt:video' in news.guid:
-        return settings.YOUTUBE_THUMB(news.guid.split('video:')[1])
+    if "yt:video" in news.guid:
+        return settings.YOUTUBE_THUMB(news.guid.split("video:")[1])
     return None
+
 
 def get_rich_notification(notification):
     # Get title
@@ -92,7 +102,9 @@ def get_rich_notification(notification):
         # Rich field for news entry
         if isinstance(actor, NewsEntry):
             notification_large_icon = actor.body.image_url
-            notification_large_content = BeautifulSoup(actor.content, features='html5lib').text
+            notification_large_content = BeautifulSoup(
+                actor.content, features="html5lib"
+            ).text
             notification_image = get_news_image(actor)
 
         # ComplaintComment
@@ -115,21 +127,25 @@ def get_rich_notification(notification):
         "notification_id": str(notification.id),
         "title": truncated(title, 60),
         "verb": notification.verb,
-        "total_count": get_notif_queryset(
-            notification.recipient.notifications).count()
+        "total_count": get_notif_queryset(notification.recipient.notifications).count(),
     }
 
     # Set rich fields if present
     if notification_large_icon is not None:
-        data_message['large_icon'] = settings.NOTIFICATION_LARGE_ICON_TRANSFORM(notification_large_icon)
+        data_message["large_icon"] = settings.NOTIFICATION_LARGE_ICON_TRANSFORM(
+            notification_large_icon
+        )
     if notification_large_content is not None:
-        data_message['large_content'] = truncated(notification_large_content, 250)
+        data_message["large_content"] = truncated(notification_large_content, 250)
     if notification_image is not None:
-        data_message['image_url'] = settings.NOTIFICATION_IMAGE_TRANSFORM(notification_image)
+        data_message["image_url"] = settings.NOTIFICATION_IMAGE_TRANSFORM(
+            notification_image
+        )
 
     return data_message
 
+
 def truncated(val, max_len):
     if val and len(val) > max_len - 4:
-        return val[:max_len] + ' ...'
+        return val[:max_len] + " ..."
     return val

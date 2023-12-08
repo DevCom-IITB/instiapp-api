@@ -1,6 +1,7 @@
 import sys
 import asyncio
 
+
 def run_sync(main, debug=False):  # pragma: no cover
     """Run a coroutine.
     For compatibility with python3.6

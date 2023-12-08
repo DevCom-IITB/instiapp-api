@@ -6,25 +6,30 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0006_userprofile_user'),
+        ("users", "0006_userprofile_user"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userprofile',
-            name='name',
+            model_name="userprofile",
+            name="name",
             field=models.CharField(blank=True, max_length=50, null=True),
         ),
         migrations.AlterField(
-            model_name='userprofile',
-            name='roll_no',
+            model_name="userprofile",
+            name="roll_no",
             field=models.CharField(blank=True, max_length=10, null=True),
         ),
         migrations.AlterField(
-            model_name='userprofile',
-            name='user',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL),
+            model_name="userprofile",
+            name="user",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="profile",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

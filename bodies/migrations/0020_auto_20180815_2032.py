@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bodies', '0019_body_cover_url'),
+        ("bodies", "0019_body_cover_url"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='body',
-            options={'verbose_name': 'Body', 'verbose_name_plural': 'Bodies'},
+            name="body",
+            options={"verbose_name": "Body", "verbose_name_plural": "Bodies"},
         ),
     ]

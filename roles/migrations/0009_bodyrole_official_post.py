@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('roles', '0008_auto_20180619_1855'),
+        ("roles", "0008_auto_20180619_1855"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bodyrole',
-            name='official_post',
+            model_name="bodyrole",
+            name="official_post",
             field=models.BooleanField(default=True),
         ),
     ]

@@ -10,33 +10,42 @@ from cryptography.fernet import Fernet
 from messmenu.models import Hostel, MessCalEvent
 from messmenu.serializers import HostelSerializer, MessCalEventSerializer
 
-@api_view(['GET', ])
+
+@api_view(
+    [
+        "GET",
+    ]
+)
 def get_mess(request):
     """Get mess menus of all hostels."""
     queryset = Hostel.objects.all()
     queryset = HostelSerializer.setup_eager_loading(queryset)
     return Response(HostelSerializer(queryset, many=True).data)
 
-@api_view(['GET', ])
+
+@api_view(
+    [
+        "GET",
+    ]
+)
 def getUserMess(request):
     """Get mess status for a user"""
 
     try:
         request.user.profile
     except AttributeError:
-        return Response({
-            'message': 'unauthenticated',
-            'detail': 'Log in to continue!'
-        }, status=401)
+        return Response(
+            {"message": "unauthenticated", "detail": "Log in to continue!"}, status=401
+        )
 
     user = request.user.profile
     rollno = user.roll_no
 
-    start = request.GET.get('start')
-    end = request.GET.get('end')
+    start = request.GET.get("start")
+    end = request.GET.get("end")
 
-    start = datetime.strptime(start, '%Y-%m-%d %H:%M:%S')
-    end = datetime.strptime(end, '%Y-%m-%d %H:%M:%S')
+    start = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+    end = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
 
     curr = start
 
@@ -53,19 +62,18 @@ def getUserMess(request):
 
 def binaryDecode(x):
     b_x = "{0:b}".format(int(x))
-    day = int(b_x[len(b_x) - 5:len(b_x)], 2)
-    meal = b_x[len(b_x) - 8:len(b_x) - 5]
-    time = int(b_x[len(b_x) - 19:len(b_x) - 8], 2)
-    hostel = int(b_x[0:len(b_x) - 19], 2)
-    return {'hostel': hostel, 'time': time, 'meal': meal, 'day': day}
+    day = int(b_x[len(b_x) - 5: len(b_x)], 2)
+    meal = b_x[len(b_x) - 8: len(b_x) - 5]
+    time = int(b_x[len(b_x) - 19: len(b_x) - 8], 2)
+    hostel = int(b_x[0: len(b_x) - 19], 2)
+    return {"hostel": hostel, "time": time, "meal": meal, "day": day}
+
 
 def getMessForMonth(user, rollno, curr):
     items = []
-    url = f'{settings.MESSI_BASE_URL}/api/get_details?roll={rollno}&year={curr.year}&month={curr.month}'
+    url = f"{settings.MESSI_BASE_URL}/api/get_details?roll={rollno}&year={curr.year}&month={curr.month}"
     payload = {}
-    headers = {
-        'x-access-token': settings.MESSI_ACCESS_TOKEN
-    }
+    headers = {"x-access-token": settings.MESSI_ACCESS_TOKEN}
 
     res = requests.request("GET", url, headers=headers, data=payload, timeout=10)
 
@@ -90,14 +98,18 @@ def getMessForMonth(user, rollno, curr):
                 "011": "Dinner",
                 "100": "Milk",
                 "101": "Egg",
-                "110": "Fruit"
+                "110": "Fruit",
             }.get(mealnum, "Other")
 
-            date = datetime(curr.year, curr.month, k["day"], k["time"] // 60, k["time"] % 60)
+            date = datetime(
+                curr.year, curr.month, k["day"], k["time"] // 60, k["time"] % 60
+            )
             date = make_aware(date)
             hostel = k["hostel"]
 
-            item, c = MessCalEvent.objects.get_or_create(user=user, datetime=date, hostel=hostel)
+            item, c = MessCalEvent.objects.get_or_create(
+                user=user, datetime=date, hostel=hostel
+            )
             if c or item.title != title:
                 item.title = title
                 item.save()
@@ -109,16 +121,19 @@ def getMessForMonth(user, rollno, curr):
 
     return items
 
-@api_view(['GET', ])
-def getRnoQR(request):
 
+@api_view(
+    [
+        "GET",
+    ]
+)
+def getRnoQR(request):
     try:
         request.user.profile
     except AttributeError:
-        return Response({
-            'message': 'unauthenticated',
-            'detail': 'Log in to continue!'
-        }, status=401)
+        return Response(
+            {"message": "unauthenticated", "detail": "Log in to continue!"}, status=401
+        )
 
     try:
         user = request.user.profile
@@ -127,11 +142,13 @@ def getRnoQR(request):
         time = str(datetime.now())
         rnom = (rollno + "," + time).encode()
 
-        f = Fernet(b'Tolm_fRDkfoN5WMU4oUXWxNwmn1E0MmYlbeh1LA29cU=')
+        f = Fernet(b"Tolm_fRDkfoN5WMU4oUXWxNwmn1E0MmYlbeh1LA29cU=")
         encrRno = f.encrypt(rnom)
 
         return Response({"qrstring": encrRno})
     except Exception as e:
-        return Response({
-            'qrstring': str(e),
-        })
+        return Response(
+            {
+                "qrstring": str(e),
+            }
+        )
