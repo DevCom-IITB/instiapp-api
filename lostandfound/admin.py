@@ -10,12 +10,6 @@ from upload.models import UploadedImage
 from django import forms
 from users.models import UserProfile
 
-# class ImageInline(admin.TabularInline):
-#     model = UploadedImage
-# class UserProfileInline(admin.StackedInline):
-#     model = UserProfile
-#     can_delete = False
-
 class UserProfileAdmin(admin.ModelAdmin):
     search_fields = ['ldap_id', 'name', 'roll_no']
     list_display = ['ldap_id', 'name', 'roll_no']
@@ -48,18 +42,28 @@ class ProductFoundAdmin(admin.ModelAdmin):
         class CustomChangeForm(forms.ModelForm):
             class Meta:
                 model = ProductFound
-                fields = '__all__'
+                fields = ['name', 'description', 'category', 'found_at',            
+                    'claimed', 'contact_details',  'claimed_by', 'product_image1', 'product_image2', 'product_image3']
+                
 
-
-            new_images = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
-            names = forms.CharField(required=True)
         self.form = CustomChangeForm
         return super().change_view(request, object_id, form_url, extra_context)
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
 
 
-       
+class ProductFoundAdmin(admin.ModelAdmin):
+    list_display = ['name',  'product_image_display', 'category', 'found_at',
+                    'claimed']  
+    search_fields = ['name', 'description', 'category', 'found_at',
+                    'claimed', 'contact_details', 'time_of_creation', 'claimed_by'] 
+    autocomplete_fields = ['claimed_by']
+
+    def product_image_display(self, obj):
+        images = obj.product_image.split(',')
+        return format_html('<div style = "width :200px margin-left:50px"><img src="{}"style="max-height: 150px; /></div>'.format(images[0]))
+        
+
 
 
 class CSOAdminSite(admin.AdminSite):
@@ -67,11 +71,6 @@ class CSOAdminSite(admin.AdminSite):
     site_title = "CSO Admin Portal"
     index_title = "Welcome to CSO Admin Portal"
 
-    # def has_permission(self, request: HttpRequest):
-    #     user_has_permission = request.user.is_active and request.user.is_staff
-    #     logging.debug(f'User: {request.user}, Has Permission: {user_has_permission}')
-    #     print(f'User: {request.user}, Has Permission: {user_has_permission}')
-    #     return user_has_permission
 
 cso_admin_site = CSOAdminSite(name='CSOAdmin')
 cso_admin_site.register(ProductFound, ProductFoundAdmin)
