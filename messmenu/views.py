@@ -9,7 +9,7 @@ from django.utils.timezone import make_aware
 from cryptography.fernet import Fernet
 from messmenu.models import Hostel, MessCalEvent
 from messmenu.serializers import HostelSerializer, MessCalEventSerializer
-from backend.settings_prod import MESSI_ACCESS_TOKEN
+from backend.settings import MESSI_ACCESS_TOKEN
 
 
 @api_view(
