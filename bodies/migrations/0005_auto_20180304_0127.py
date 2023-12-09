@@ -6,31 +6,42 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0001_initial'),
-        ('bodies', '0004_merge_20180303_1612'),
+        ("users", "0001_initial"),
+        ("bodies", "0004_merge_20180303_1612"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='body',
-            name='followers',
-            field=models.ManyToManyField(related_name='followed_bodies', to='users.UserProfile'),
+            model_name="body",
+            name="followers",
+            field=models.ManyToManyField(
+                related_name="followed_bodies", to="users.UserProfile"
+            ),
         ),
         migrations.AlterField(
-            model_name='body',
-            name='events',
-            field=models.ManyToManyField(related_name='bodies', to='events.Event'),
+            model_name="body",
+            name="events",
+            field=models.ManyToManyField(related_name="bodies", to="events.Event"),
         ),
         migrations.AlterField(
-            model_name='bodychildrelation',
-            name='child',
-            field=models.ForeignKey(default=uuid.uuid4, on_delete=django.db.models.deletion.CASCADE, related_name='parents', to='bodies.Body'),
+            model_name="bodychildrelation",
+            name="child",
+            field=models.ForeignKey(
+                default=uuid.uuid4,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="parents",
+                to="bodies.Body",
+            ),
         ),
         migrations.AlterField(
-            model_name='bodychildrelation',
-            name='parent',
-            field=models.ForeignKey(default=uuid.uuid4, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='bodies.Body'),
+            model_name="bodychildrelation",
+            name="parent",
+            field=models.ForeignKey(
+                default=uuid.uuid4,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="children",
+                to="bodies.Body",
+            ),
         ),
     ]

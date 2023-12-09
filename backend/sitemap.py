@@ -3,6 +3,7 @@ from events.models import Event
 from events.prioritizer import get_fresh_events
 from bodies.models import Body
 
+
 class EventSitemap(Sitemap):
     changefreq = "never"
     priority = 0.7
@@ -12,6 +13,7 @@ class EventSitemap(Sitemap):
 
     def lastmod(self, obj):
         return obj.time_of_modification
+
 
 class BodySitemap(Sitemap):
     changefreq = "never"
@@ -23,19 +25,21 @@ class BodySitemap(Sitemap):
     def lastmod(self, obj):
         return obj.time_of_modification
 
+
 class StaticViewSitemap(Sitemap):
     priority = 0.9
-    changefreq = 'daily'
+    changefreq = "daily"
 
     def items(self):
-        return ['/', '/news', '/explore']
+        return ["/", "/news", "/explore"]
 
     def location(self, item):
         return item
 
+
 def sitemaps():
     return {
-        'event': EventSitemap,
-        'body': BodySitemap,
-        'static': StaticViewSitemap,
+        "event": EventSitemap,
+        "body": BodySitemap,
+        "static": StaticViewSitemap,
     }

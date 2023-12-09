@@ -22,22 +22,23 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from backend.sitemap import sitemaps
 
+
 def api_base(prefix=None):
     """Get the base URL for an endpoint set."""
     if prefix is None:
-        return 'api/'
-    return 'api/%s/' % prefix
+        return "api/"
+    return "api/%s/" % prefix
 
 
 # Set admin site titles
-admin.site.site_header = 'InstiApp admin'
-admin.site.site_title = 'InstiApp admin'
+admin.site.site_header = "InstiApp admin"
+admin.site.site_title = "InstiApp admin"
 
 # Swagger schema view
 schema_view = get_schema_view(
     openapi.Info(
         title="InstiApp API",
-        default_version='v1',
+        default_version="v1",
         description="InstiApp IIT Bombay API",
         terms_of_service="https://insti.app/tos.html",
         contact=openapi.Contact(email="devcom@iitb.ac.in"),
@@ -49,35 +50,39 @@ schema_view = get_schema_view(
 
 base_urlpatterns = [
     # Admin site
-    path('admin/', admin.site.urls),
-
+    path("admin/", admin.site.urls),
     # API
-    path(api_base(), include('achievements.urls')),
-    path(api_base(), include('bodies.urls')),
-    path(api_base(), include('events.urls')),
-    path(api_base(), include('locations.urls')),
-    path(api_base(), include('users.urls')),
-    path(api_base(), include('upload.urls')),
-    path(api_base(), include('roles.urls')),
-    path(api_base(), include('messmenu.urls')),
-    path(api_base(), include('news.urls')),
-    path(api_base(), include('login.urls')),
-    path(api_base(), include('placements.urls')),
-    path(api_base(), include('other.urls')),
-    path(api_base(), include('querybot.urls')),
-    path(api_base(), include('external.urls')),
-    path(api_base(), include('community.urls')),
-    path(api_base(), include('buyandsell.urls')),
-    path(api_base('venter'), include("venter.urls")),
-    path(api_base(), include('lostandfound.urls')),
-
-
+    path(api_base(), include("achievements.urls")),
+    path(api_base(), include("bodies.urls")),
+    path(api_base(), include("events.urls")),
+    path(api_base(), include("locations.urls")),
+    path(api_base(), include("users.urls")),
+    path(api_base(), include("upload.urls")),
+    path(api_base(), include("roles.urls")),
+    path(api_base(), include("messmenu.urls")),
+    path(api_base(), include("news.urls")),
+    path(api_base(), include("login.urls")),
+    path(api_base(), include("placements.urls")),
+    path(api_base(), include("other.urls")),
+    path(api_base(), include("querybot.urls")),
+    path(api_base(), include("external.urls")),
+    path(api_base(), include("community.urls")),
+    path(api_base(), include("buyandsell.urls")),
+    path(api_base(), include("bans.urls")),
+    path(api_base("venter"), include("venter.urls")),
     # Non-API
-    path('', include('prerender.urls')),
-    path(api_base('docs'), schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('sitemap.xml', sitemap, {
-        'sitemaps': sitemaps()
-    }, name='django.contrib.sitemaps.views.sitemap')
+    path("", include("prerender.urls")),
+    path(
+        api_base("docs"),
+        schema_view.with_ui("redoc", cache_timeout=0),
+        name="schema-redoc",
+    ),
+    path(
+        "sitemap.xml",
+        sitemap,
+        {"sitemaps": sitemaps()},
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
 ]
 
 urlpatterns = [

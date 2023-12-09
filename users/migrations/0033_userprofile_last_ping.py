@@ -5,15 +5,14 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0032_auto_20190329_1914'),
+        ("users", "0032_auto_20190329_1914"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='last_ping',
+            model_name="userprofile",
+            name="last_ping",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
     ]

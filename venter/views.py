@@ -20,6 +20,7 @@ from venter.serializers import ComplaintPostSerializer
 from venter.serializers import CommentPostSerializer
 from venter.serializers import CommentSerializer
 
+
 class TagViewSet(viewsets.ModelViewSet):
     queryset = ComplaintTag.objects
     serializer_class = TagSerializer
@@ -28,13 +29,12 @@ class TagViewSet(viewsets.ModelViewSet):
     def list(cls, request):
         """TagViewSet for the getting related tags"""
         queryset = ComplaintTag.objects.all()
-        if 'tags' in request.GET:
-            val = request.query_params.get('tags')
+        if "tags" in request.GET:
+            val = request.query_params.get("tags")
             queryset = ComplaintTag.objects.filter(tag_uri__icontains=val)
 
         # Serialize and return
-        serialized = TagSerializer(
-            queryset, context={'get': 'list'}, many=True).data
+        serialized = TagSerializer(queryset, context={"get": "list"}, many=True).data
 
         return Response(serialized)
 
@@ -46,15 +46,22 @@ class ComplaintViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk):
         """ComplaintViewSet to get the complaints"""
         complaint = self.get_complaint(
-            pk, queryset=self.queryset.prefetch_related('subscriptions', 'users_up_voted'))
-        serialized = ComplaintSerializer(
-            complaint, context={'request': request}).data
+            pk,
+            queryset=self.queryset.prefetch_related("subscriptions", "users_up_voted"),
+        )
+        serialized = ComplaintSerializer(complaint, context={"request": request}).data
 
-        is_sub = request.user.is_authenticated and request.user.profile in complaint.subscriptions.all()
-        serialized['is_subscribed'] = is_sub
+        is_sub = (
+            request.user.is_authenticated
+            and request.user.profile in complaint.subscriptions.all()
+        )
+        serialized["is_subscribed"] = is_sub
 
-        upvoted = request.user.is_authenticated and request.user.profile in complaint.users_up_voted.all()
-        serialized['upvoted'] = upvoted
+        upvoted = (
+            request.user.is_authenticated
+            and request.user.profile in complaint.users_up_voted.all()
+        )
+        serialized["upvoted"] = upvoted
 
         return Response(serialized)
 
@@ -64,20 +71,21 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
         # Get the list of complaints excluding objects marked deleted
         complaints = self.queryset.prefetch_related(
-            'subscriptions', 'users_up_voted').exclude(status='Deleted')
+            "subscriptions", "users_up_voted"
+        ).exclude(status="Deleted")
 
         # Check if the user specific filter is present
-        if 'filter' in request.GET and request.user.is_authenticated:
+        if "filter" in request.GET and request.user.is_authenticated:
             complaints = complaints.filter(created_by=request.user.profile)
 
         # Filter for a particular word search
-        if 'search' in request.GET:
-            val = request.query_params.get('search')
+        if "search" in request.GET:
+            val = request.query_params.get("search")
             complaints = complaints.filter(description__icontains=val)
 
         # For multiple tags and single tags
-        if 'tags' in request.GET:
-            val = request.query_params.getlist('tags')
+        if "tags" in request.GET:
+            val = request.query_params.getlist("tags")
             clauses = (Q(tags__tag_uri__icontains=p) for p in val)
             query = reduce(operator.or_, clauses)
             complaints = complaints.filter(query)
@@ -87,14 +95,21 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
         # Serialize and return
         serialized = ComplaintSerializer(
-            complaints, context={'request': request}, many=True).data
+            complaints, context={"request": request}, many=True
+        ).data
 
         for complaint_object, serialized_object in zip(complaints, serialized):
-            is_sub = request.user.is_authenticated and request.user.profile in complaint_object.subscriptions.all()
-            serialized_object['is_subscribed'] = is_sub
+            is_sub = (
+                request.user.is_authenticated
+                and request.user.profile in complaint_object.subscriptions.all()
+            )
+            serialized_object["is_subscribed"] = is_sub
 
-            upvoted = request.user.is_authenticated and request.user.profile in complaint_object.users_up_voted.all()
-            serialized_object['upvoted'] = upvoted
+            upvoted = (
+                request.user.is_authenticated
+                and request.user.profile in complaint_object.users_up_voted.all()
+            )
+            serialized_object["upvoted"] = upvoted
 
         return Response(serialized)
 
@@ -102,12 +117,13 @@ class ComplaintViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def create(cls, request):
         # Check for images and tags
-        images = request.data.get('images', [])
-        tags = request.data.get('tags', [])
+        images = request.data.get("images", [])
+        tags = request.data.get("tags", [])
 
         # Deserialize POST data
         serializer = ComplaintPostSerializer(
-            data=request.data, context={'request': request})
+            data=request.data, context={"request": request}
+        )
 
         # Save if valid
         if serializer.is_valid():
@@ -125,18 +141,16 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
             # Create and save all images if present
             for image in images:
-                ComplaintImage.objects.create(
-                    complaint=complaint, image_url=image
-                )
+                ComplaintImage.objects.create(complaint=complaint, image_url=image)
             # Add the complaint creator to the subscribers list
             if settings.COMPLAINT_AUTO_SUBSCRIBE:
                 complaint.subscriptions.add(complaint.created_by)
                 complaint.save()
 
         # Return new serialized response
-        return Response(ComplaintSerializer(
-            Complaint.objects.get(id=complaint.id)
-        ).data, status=201)
+        return Response(
+            ComplaintSerializer(Complaint.objects.get(id=complaint.id)).data, status=201
+        )
 
     @login_required_ajax
     def up_vote(self, request, pk):
@@ -156,9 +170,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         else:
             return Response({"message": "Invalid Action"}, status=400)
 
-        return Response(ComplaintSerializer(
-            Complaint.objects.get(id=complaint.id)
-        ).data, status=200)
+        return Response(
+            ComplaintSerializer(Complaint.objects.get(id=complaint.id)).data, status=200
+        )
 
     @login_required_ajax
     def subscribe(self, request, pk):
@@ -178,13 +192,14 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         else:
             return Response({"message": "Invalid Action"}, status=400)
 
-        return Response(ComplaintSerializer(
-            Complaint.objects.get(id=complaint.id)
-        ).data, status=200)
+        return Response(
+            ComplaintSerializer(Complaint.objects.get(id=complaint.id)).data, status=200
+        )
 
     def get_complaint(self, pk, queryset=None):
         """Shortcut for get_object_or_404 with pk"""
         return get_object_or_404(queryset or self.queryset, id=pk)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = ComplaintComment.objects
@@ -194,9 +209,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def create(cls, request, pk):  # pylint: disable=W0237
         get_complaint = get_object_or_404(Complaint.objects.all(), id=pk)
-        get_text = request.data['text']
+        get_text = request.data["text"]
         comment = ComplaintComment.objects.create(
-            text=get_text, commented_by=request.user.profile, complaint=get_complaint)
+            text=get_text, commented_by=request.user.profile, complaint=get_complaint
+        )
         # Auto subscribes the commenter to the complaint
         if settings.COMPLAINT_AUTO_SUBSCRIBE:
             get_complaint.subscriptions.add(request.user.profile)
@@ -210,13 +226,15 @@ class CommentViewSet(viewsets.ModelViewSet):
         """Update a comment if created by current user."""
 
         # Retrieve the comment and updated text
-        text = request.data['text']
+        text = request.data["text"]
         comment = self.get_comment(pk)
 
         # Check if the comment is done by current user
         if comment.commented_by == self.request.user.profile:
             ComplaintComment.objects.filter(id=pk).update(text=text)
-            serialized = CommentPostSerializer(self.get_comment(pk), context={'request': request}).data
+            serialized = CommentPostSerializer(
+                self.get_comment(pk), context={"request": request}
+            ).data
             return Response(serialized)
 
         # If not authorized
@@ -234,7 +252,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk):
         """Get a single comment."""
         comment = self.get_comment(pk)
-        serialized = CommentSerializer(comment, context={'request': request}).data
+        serialized = CommentSerializer(comment, context={"request": request}).data
         return Response(serialized)
 
     def get_comment(self, pk):

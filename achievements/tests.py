@@ -9,6 +9,7 @@ from helpers.test_helpers import create_body
 from helpers.test_helpers import create_event
 from roles.models import BodyRole
 
+
 class AchievementTestCase(APITestCase):
     """Check if we can create and verify achievement requests."""
 
@@ -28,49 +29,67 @@ class AchievementTestCase(APITestCase):
 
         # Body roles
         self.body_1_role = BodyRole.objects.create(
-            name="Body1Role", body=self.body_1, permissions='VerA,AddE')
+            name="Body1Role", body=self.body_1, permissions="VerA,AddE"
+        )
 
     def test_get_achievement(self):
         """Test retrieve method of achievement viewset."""
 
         achievement_1 = Achievement.objects.create(
-            description="Test Achievement", body=self.body_1, user=self.user.profile)
+            description="Test Achievement", body=self.body_1, user=self.user.profile
+        )
 
-        url = '/api/achievements/%s' % achievement_1.id
+        url = "/api/achievements/%s" % achievement_1.id
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['description'], achievement_1.description)
+        self.assertEqual(response.data["description"], achievement_1.description)
 
     def test_list_achievement(self):
         """Test listing method of achievement viewset."""
 
         # Create objects, one verified
         Achievement.objects.create(
-            description="Test Achievement 1", body=self.body_1, user=self.user.profile)
+            description="Test Achievement 1", body=self.body_1, user=self.user.profile
+        )
         Achievement.objects.create(
-            description="Test Achievement 2", body=self.body_1, user=self.user.profile, verified=True)
+            description="Test Achievement 2",
+            body=self.body_1,
+            user=self.user.profile,
+            verified=True,
+        )
         Achievement.objects.create(
-            description="Hidden Achievement", body=self.body_1, user=self.user.profile,
-            verified=True, dismissed=True, hidden=True)
+            description="Hidden Achievement",
+            body=self.body_1,
+            user=self.user.profile,
+            verified=True,
+            dismissed=True,
+            hidden=True,
+        )
         Achievement.objects.create(
-            description="Different User Ach 3", body=self.body_1, user=self.user_2.profile)
+            description="Different User Ach 3",
+            body=self.body_1,
+            user=self.user_2.profile,
+        )
         Achievement.objects.create(
-            description="Different User Body 4", body=self.body_2, user=self.user_2.profile)
+            description="Different User Body 4",
+            body=self.body_2,
+            user=self.user_2.profile,
+        )
 
         # Test listing endpoint
-        url = '/api/achievements'
+        url = "/api/achievements"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)
 
         # Test user me list (only verified and not hidden)
-        url = '/api/user-me'
+        url = "/api/user-me"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['achievements']), 1)
+        self.assertEqual(len(response.data["achievements"]), 1)
 
         # Test body list (without role)
-        url = '/api/achievements-body/%s' % self.body_1.id
+        url = "/api/achievements-body/%s" % self.body_1.id
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 
@@ -85,19 +104,24 @@ class AchievementTestCase(APITestCase):
         """Test patching (hiding) achievements."""
 
         achievement_1 = Achievement.objects.create(
-            description="Test Achievement", body=self.body_1, user=self.user.profile, hidden=False)
+            description="Test Achievement",
+            body=self.body_1,
+            user=self.user.profile,
+            hidden=False,
+        )
         achievement_2 = Achievement.objects.create(
-            description="Test Achievement", body=self.body_1, user=self.user_2.profile)
+            description="Test Achievement", body=self.body_1, user=self.user_2.profile
+        )
 
         # Try to patch someone else's achievement
-        data = {'hidden': True}
-        url = '/api/achievements/%s' % achievement_2.id
-        response = self.client.patch(url, data, format='json')
+        data = {"hidden": True}
+        url = "/api/achievements/%s" % achievement_2.id
+        response = self.client.patch(url, data, format="json")
         self.assertEqual(response.status_code, 403)
 
         # Try to patch own achievement
-        url = '/api/achievements/%s' % achievement_1.id
-        response = self.client.patch(url, data, format='json')
+        url = "/api/achievements/%s" % achievement_1.id
+        response = self.client.patch(url, data, format="json")
         self.assertEqual(response.status_code, 204)
         achievement_1.refresh_from_db()
         self.assertEqual(achievement_1.hidden, True)
@@ -107,44 +131,44 @@ class AchievementTestCase(APITestCase):
 
         # Try creating request without body
         data = {
-            'title': 'My Big Achievement',
-            'image_url': 'http://example.com/image2.png',
-            'verified': True,
-            'dismissed': True,
-            'isSkill': False
+            "title": "My Big Achievement",
+            "image_url": "http://example.com/image2.png",
+            "verified": True,
+            "dismissed": True,
+            "isSkill": False,
         }
-        url = '/api/achievements'
-        response = self.client.post(url, data, format='json')
+        url = "/api/achievements"
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 403)
 
         # Create (malicious) request from user
-        data['body'] = str(self.body_1.id)
-        data['event'] = str(self.event_1.id)
-        response = self.client.post(url, data, format='json')
+        data["body"] = str(self.body_1.id)
+        data["event"] = str(self.event_1.id)
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data['verified'], False)
-        self.assertEqual(response.data['dismissed'], False)
-        self.assertEqual(response.data['event_detail']['name'], self.event_1.name)
+        self.assertEqual(response.data["verified"], False)
+        self.assertEqual(response.data["dismissed"], False)
+        self.assertEqual(response.data["event_detail"]["name"], self.event_1.name)
 
         # Get achievement id for further use
-        achievement_id = response.data['id']
+        achievement_id = response.data["id"]
 
         # Try to verify without privileges
-        url = '/api/achievements/%s' % achievement_id
-        response = self.client.put(url, data, format='json')
+        url = "/api/achievements/%s" % achievement_id
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, 403)
 
         # Acquire privileges
         self.user.profile.roles.add(self.body_1_role)
 
         # Try to verify after changing body ID (with privilege)
-        data['body'] = str(self.body_2.id)
-        response = self.client.put(url, data, format='json')
+        data["body"] = str(self.body_2.id)
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, 400)
 
         # Try to verify correctly
-        data['body'] = str(self.body_1.id)
-        response = self.client.put(url, data, format='json')
+        data["body"] = str(self.body_1.id)
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, 200)
 
         # Invoke delete API
@@ -156,8 +180,9 @@ class AchievementTestCase(APITestCase):
 
         # Try deleting a new one
         achievement_1 = Achievement.objects.create(
-            description="Test Achievement", body=self.body_1, user=self.user.profile)
-        url = '/api/achievements/%s' % achievement_1.id
+            description="Test Achievement", body=self.body_1, user=self.user.profile
+        )
+        url = "/api/achievements/%s" % achievement_1.id
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
 
@@ -166,40 +191,45 @@ class AchievementTestCase(APITestCase):
 
         # Setup data
         data = {
-            'title': 'My Big Achievement',
-            'priority': 1,
-            'body': str(self.body_1.id),
-            'event': str(self.event_1.id),
+            "title": "My Big Achievement",
+            "priority": 1,
+            "body": str(self.body_1.id),
+            "event": str(self.event_1.id),
         }
-        url = '/api/achievements-offer'
+        url = "/api/achievements-offer"
 
         # Try create without privileges
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 403)
 
         # Acquire privileges and try
         self.user.profile.roles.add(self.body_1_role)
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 201)
         self.user.profile.roles.remove(self.body_1_role)
 
         # Create two achievements, one hidden
-        offer_id = response.data['id']
+        offer_id = response.data["id"]
         a1 = Achievement.objects.create(
-            title="Test", body=self.body_1,
-            user=self.user.profile, offer_id=offer_id)
+            title="Test", body=self.body_1, user=self.user.profile, offer_id=offer_id
+        )
         Achievement.objects.create(
-            title="Test", body=self.body_1, verified=True,
-            user=self.user_2.profile, offer_id=offer_id, hidden=True)
+            title="Test",
+            body=self.body_1,
+            verified=True,
+            user=self.user_2.profile,
+            offer_id=offer_id,
+            hidden=True,
+        )
 
         # Try update without privileges
-        url = '/api/achievements-offer/%s' % offer_id
-        response = self.client.put(url, data, format='json')
+        url = "/api/achievements-offer/%s" % offer_id
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, 403)
 
         # Test if no users are present without verification
-        response = self.client.get(url, data, format='json')
-        self.assertEqual(len(response.data['users']), 0)
+        response = self.client.get(url, data, format="json")
+        self.assertEqual(len(response.data["users"]), 0)
 
         # Verify both achievements
         a1.verified = True
@@ -207,20 +237,20 @@ class AchievementTestCase(APITestCase):
 
         # Try getting secret without privileges
         # Check if only one user is present
-        response = self.client.get(url, data, format='json')
-        self.assertNotIn('secret', response.data)
-        self.assertEqual(len(response.data['users']), 1)
+        response = self.client.get(url, data, format="json")
+        self.assertNotIn("secret", response.data)
+        self.assertEqual(len(response.data["users"]), 1)
 
         # Acquire privileges and try
         self.user.profile.roles.add(self.body_1_role)
-        response = self.client.put(url, data, format='json')
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, 200)
 
         # Try getting secret
         # Assert both users are present
-        response = self.client.get(url, data, format='json')
-        self.assertIn('secret', response.data)
-        self.assertEqual(len(response.data['users']), 2)
+        response = self.client.get(url, data, format="json")
+        self.assertIn("secret", response.data)
+        self.assertEqual(len(response.data["users"]), 2)
         self.user.profile.roles.remove(self.body_1_role)
 
         # Try delete without privileges
@@ -229,121 +259,123 @@ class AchievementTestCase(APITestCase):
 
         # Acquire privileges and try
         self.user.profile.roles.add(self.body_1_role)
-        response = self.client.delete(url, data, format='json')
+        response = self.client.delete(url, data, format="json")
         self.assertEqual(response.status_code, 204)
         self.user.profile.roles.remove(self.body_1_role)
 
     def test_totp_claim(self):
         offer_1 = OfferedAchievement.objects.create(
-            title="Test Achievement", body=self.body_1, event=self.event_1)
+            title="Test Achievement", body=self.body_1, event=self.event_1
+        )
         offer_2 = OfferedAchievement.objects.create(
-            title="Test Achievement", body=self.body_1, event=self.event_1)
+            title="Test Achievement", body=self.body_1, event=self.event_1
+        )
 
         # Setup data
-        data = {
-            'secret': 'something'
-        }
-        url = '/api/achievements-offer/%s' % offer_1.id
+        data = {"secret": "something"}
+        url = "/api/achievements-offer/%s" % offer_1.id
 
         # Try with invalid secret
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 403)
 
         # Try with master secret
-        data['secret'] = offer_1.secret
-        response = self.client.post(url, data, format='json')
+        data["secret"] = offer_1.secret
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 201)
 
         # Try to get again master secret
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 200)
 
         # Try with TOTP for offer 2
-        url = '/api/achievements-offer/%s' % offer_2.id
-        data['secret'] = pyotp.TOTP(offer_2.secret).now()
-        response = self.client.post(url, data, format='json')
+        url = "/api/achievements-offer/%s" % offer_2.id
+        data["secret"] = pyotp.TOTP(offer_2.secret).now()
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 201)
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 200)
 
     def test_description_non_null(self):
         """Make sure description doesn't return NULL (a67becd8)"""
         offer_1 = OfferedAchievement.objects.create(
-            title="Test Achievement", body=self.body_1, event=self.event_1)
+            title="Test Achievement", body=self.body_1, event=self.event_1
+        )
         self.assertEqual(offer_1.description, "")
 
         achievement_1 = Achievement.objects.create(
-            body=self.body_1, user=self.user.profile)
+            body=self.body_1, user=self.user.profile
+        )
         self.assertEqual(achievement_1.description, "")
 
-        url = '/api/achievements/%s' % achievement_1.id
+        url = "/api/achievements/%s" % achievement_1.id
         response = self.client.get(url)
-        self.assertEqual(response.data['description'], "")
+        self.assertEqual(response.data["description"], "")
 
     def test_skill_create(self):
         Skill.objects.create(title="a Real Skill", body=self.body_1)
 
         data = {
-            'title': 'Not a Skill',
-            'image_url': 'http://example.com/image2.png',
-            'verified': False,
-            'dismissed': False,
-            'isSkill': True
+            "title": "Not a Skill",
+            "image_url": "http://example.com/image2.png",
+            "verified": False,
+            "dismissed": False,
+            "isSkill": True,
         }
-        url = '/api/achievements'
+        url = "/api/achievements"
 
         # Create request without legitimate title from user
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 403)
 
         # Creating a legitimate request
-        data['title'] = "a Real Skill"
+        data["title"] = "a Real Skill"
 
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data['isSkill'], True)
-        self.assertEqual(response.data['verified'], False)
-        self.assertEqual(response.data['dismissed'], False)
+        self.assertEqual(response.data["isSkill"], True)
+        self.assertEqual(response.data["verified"], False)
+        self.assertEqual(response.data["dismissed"], False)
 
     def test_user_interest(self):
         i1 = Interest.objects.create(title="Interest-1")
 
-        url = '/api/interests'
+        url = "/api/interests"
         data = {}
-        data['id'] = 'fake'
+        data["id"] = "fake"
 
         # Create request without legitimate interest
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 404)
 
-        data['id'] = uuid4()
-        response = self.client.post(url, data, format='json')
+        data["id"] = uuid4()
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 404)
 
         # Creating a legitimate request
-        data['id'] = i1.id
-        data['title'] = i1.title
-        response = self.client.post(url, data, format='json')
+        data["id"] = i1.id
+        data["title"] = i1.title
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 201)
 
         # Adding same interest again
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 400)
 
         # Checking the user endpoint for the interest
-        response = self.client.get('/api/user-me', format='json')
+        response = self.client.get("/api/user-me", format="json")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['interests']), 1)
+        self.assertEqual(len(response.data["interests"]), 1)
 
         # Deleting the interest
-        response = self.client.delete(url + '/Interest-1', format='json')
+        response = self.client.delete(url + "/Interest-1", format="json")
         self.assertEqual(response.status_code, 201)
 
         # Checking the user endpoint to confirm deletion
-        response = self.client.get('/api/user-me', format='json')
+        response = self.client.get("/api/user-me", format="json")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['interests']), 0)
+        self.assertEqual(len(response.data["interests"]), 0)
 
         # Trying to Delete it again
-        response = self.client.delete(url + '/{i1.title}', format='json')
+        response = self.client.delete(url + "/{i1.title}", format="json")
         self.assertEqual(response.status_code, 404)

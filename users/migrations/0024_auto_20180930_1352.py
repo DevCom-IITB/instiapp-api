@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0023_userprofile_android_version'),
+        ("users", "0023_userprofile_android_version"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userprofile',
-            name='android_version',
+            model_name="userprofile",
+            name="android_version",
             field=models.IntegerField(default=0),
         ),
     ]

@@ -4,20 +4,43 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0029_auto_20190220_1550'),
+        ("users", "0029_auto_20190220_1550"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='usertag',
-            name='secondary_target',
-            field=models.CharField(blank=True, choices=[('roll_no', 'Roll No'), ('department', 'Department'), ('degree', 'Degree'), ('join_year', 'Join Year'), ('graduation_year', 'Graduation Year'), ('hostel', 'Hostel'), ('room', 'Room')], max_length=40, null=True),
+            model_name="usertag",
+            name="secondary_target",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("roll_no", "Roll No"),
+                    ("department", "Department"),
+                    ("degree", "Degree"),
+                    ("join_year", "Join Year"),
+                    ("graduation_year", "Graduation Year"),
+                    ("hostel", "Hostel"),
+                    ("room", "Room"),
+                ],
+                max_length=40,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='usertag',
-            name='target',
-            field=models.CharField(choices=[('roll_no', 'Roll No'), ('department', 'Department'), ('degree', 'Degree'), ('join_year', 'Join Year'), ('graduation_year', 'Graduation Year'), ('hostel', 'Hostel'), ('room', 'Room')], max_length=40),
+            model_name="usertag",
+            name="target",
+            field=models.CharField(
+                choices=[
+                    ("roll_no", "Roll No"),
+                    ("department", "Department"),
+                    ("degree", "Degree"),
+                    ("join_year", "Join Year"),
+                    ("graduation_year", "Graduation Year"),
+                    ("hostel", "Hostel"),
+                    ("room", "Room"),
+                ],
+                max_length=40,
+            ),
         ),
     ]

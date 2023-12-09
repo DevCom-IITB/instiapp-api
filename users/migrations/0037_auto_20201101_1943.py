@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0036_auto_20201101_1934'),
+        ("users", "0036_auto_20201101_1934"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='webpushsubscription',
-            name='endpoint_hash',
+            model_name="webpushsubscription",
+            name="endpoint_hash",
             field=models.CharField(max_length=60, unique=True),
         ),
     ]

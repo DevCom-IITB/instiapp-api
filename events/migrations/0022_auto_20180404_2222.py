@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0021_event_str_id'),
+        ("events", "0021_event_str_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='str_id',
+            model_name="event",
+            name="str_id",
             field=models.CharField(editable=False, max_length=58, null=True),
         ),
     ]

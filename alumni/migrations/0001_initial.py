@@ -4,20 +4,26 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='AlumniUser',
+            name="AlumniUser",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('ldap', models.CharField(max_length=30)),
-                ('keyStored', models.CharField(blank=True, max_length=6, null=True)),
-                ('timeLoginRequest', models.DateTimeField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("ldap", models.CharField(max_length=30)),
+                ("keyStored", models.CharField(blank=True, max_length=6, null=True)),
+                ("timeLoginRequest", models.DateTimeField()),
             ],
         ),
     ]

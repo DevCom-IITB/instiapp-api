@@ -6,25 +6,39 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='UserProfile',
+            name="UserProfile",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=50)),
-                ('roll_no', models.CharField(max_length=10, null=True)),
-                ('profile_pic', models.URLField(null=True)),
-                ('gcm_id', models.IntegerField(null=True)),
-                ('email', models.EmailField(max_length=254)),
-                ('year', models.IntegerField(default=1, null=True)),
-                ('about', models.TextField(blank=True, null=True)),
-                ('mapped_user', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='users.UserProfile')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                ("roll_no", models.CharField(max_length=10, null=True)),
+                ("profile_pic", models.URLField(null=True)),
+                ("gcm_id", models.IntegerField(null=True)),
+                ("email", models.EmailField(max_length=254)),
+                ("year", models.IntegerField(default=1, null=True)),
+                ("about", models.TextField(blank=True, null=True)),
+                (
+                    "mapped_user",
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="users.UserProfile",
+                    ),
+                ),
             ],
         ),
     ]

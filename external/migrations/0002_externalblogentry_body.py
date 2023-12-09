@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('external', '0001_initial'),
+        ("external", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='externalblogentry',
-            name='body',
+            model_name="externalblogentry",
+            name="body",
             field=models.TextField(blank=True, max_length=50),
         ),
     ]

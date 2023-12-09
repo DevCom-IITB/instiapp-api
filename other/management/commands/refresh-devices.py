@@ -5,8 +5,9 @@ from pyfcm import FCMNotification
 from other.models import Device
 from helpers.device import fill_device_firebase
 
+
 class Command(BaseCommand):
-    help = 'Sends push notifications of event starting'
+    help = "Sends push notifications of event starting"
 
     def handle(self, *args, **options):
         # Initiate connection
@@ -18,5 +19,5 @@ class Command(BaseCommand):
                 pass
             else:
                 device.delete()
-                print(device.user.name + ' - ', end='', flush=True)
-                print('FAIL')
+                print(device.user.name + " - ", end="", flush=True)
+                print("FAIL")

@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('community', '0014_alter_communitypost_thread_rank'),
+        ("community", "0014_alter_communitypost_thread_rank"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='communitypost',
-            name='thread_rank',
+            model_name="communitypost",
+            name="thread_rank",
             field=models.IntegerField(default=1, null=True),
         ),
     ]

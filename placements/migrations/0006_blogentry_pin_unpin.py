@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('placements', '0005_auto_20181001_2020'),
+        ("placements", "0005_auto_20181001_2020"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='blogentry',
-            name='pin_unpin',
+            model_name="blogentry",
+            name="pin_unpin",
             field=models.BooleanField(default=False),
         ),
     ]

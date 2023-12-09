@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('achievements', '0003_achievement_event'),
+        ("achievements", "0003_achievement_event"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='achievement',
-            options={'ordering': ('-time_of_creation',)},
+            name="achievement",
+            options={"ordering": ("-time_of_creation",)},
         ),
     ]

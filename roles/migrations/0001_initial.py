@@ -7,23 +7,46 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('bodies', '0009_auto_20180306_1631'),
+        ("bodies", "0009_auto_20180306_1631"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BodyRole',
+            name="BodyRole",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('time_of_creation', models.DateTimeField(auto_now_add=True)),
-                ('name', models.CharField(max_length=50)),
-                ('inheritable', models.BooleanField(default=False)),
-                ('permissions', multiselectfield.db.fields.MultiSelectField(choices=[('AddE', 'Add Event'), ('UpdE', 'Update Event'), ('DelE', 'Delete Event'), ('UpdB', 'Update Body')], max_length=19)),
-                ('body', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='bodies.Body')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("time_of_creation", models.DateTimeField(auto_now_add=True)),
+                ("name", models.CharField(max_length=50)),
+                ("inheritable", models.BooleanField(default=False)),
+                (
+                    "permissions",
+                    multiselectfield.db.fields.MultiSelectField(
+                        choices=[
+                            ("AddE", "Add Event"),
+                            ("UpdE", "Update Event"),
+                            ("DelE", "Delete Event"),
+                            ("UpdB", "Update Body"),
+                        ],
+                        max_length=19,
+                    ),
+                ),
+                (
+                    "body",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="bodies.Body"
+                    ),
+                ),
             ],
         ),
     ]

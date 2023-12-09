@@ -15,11 +15,18 @@ from helpers.device import update_fcm_device
 from alumni.models import AlumniUser
 from backend.settings import EMAIL_HOST_USER
 
+
 # pylint: disable=R0914,W0702
 def perform_login(auth_code, redir, request):
     """Perform login with code and redir."""
 
-    post_data = 'code=' + auth_code + '&redirect_uri=' + redir + '&grant_type=authorization_code'
+    post_data = (
+        "code="
+        + auth_code
+        + "&redirect_uri="
+        + redir
+        + "&grant_type=authorization_code"
+    )
 
     # Get our access token
     response = requests.post(
@@ -27,33 +34,41 @@ def perform_login(auth_code, redir, request):
         data=post_data,
         headers={
             "Authorization": "Basic " + settings.SSO_CLIENT_ID_SECRET_BASE64,
-            "Content-Type": "application/x-www-form-urlencoded"
-        }, verify=not settings.SSO_BAD_CERT, timeout=10)
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        verify=not settings.SSO_BAD_CERT,
+        timeout=10,
+    )
     response_json = response.json()
 
     # Check that we have the access token
-    if 'access_token' not in response_json:
+    if "access_token" not in response_json:
         return Response(response_json, status=400)
 
     # Get the user's profile
     profile_response = requests.get(
         settings.SSO_PROFILE_URL,
         headers={
-            "Authorization": "Bearer " + response_json['access_token'],
-        }, verify=not settings.SSO_BAD_CERT, timeout=10)
+            "Authorization": "Bearer " + response_json["access_token"],
+        },
+        verify=not settings.SSO_BAD_CERT,
+        timeout=10,
+    )
     profile_json = profile_response.json()
 
     # Check if we got at least the user's SSO id
-    if 'id' not in profile_json:
+    if "id" not in profile_json:
         return Response(profile_response, status=400)
 
     # Check that we have basic details like name and roll no.
-    required_fields = ['first_name', 'roll_number', 'username']
-    if not all([((field in profile_json) and profile_json[field]) for field in required_fields]):
-        return Response({'message': 'All required fields not present'}, status=403)
+    required_fields = ["first_name", "roll_number", "username"]
+    if not all(
+        [((field in profile_json) and profile_json[field]) for field in required_fields]
+    ):
+        return Response({"message": "All required fields not present"}, status=403)
 
-    username = str(profile_json['id'])
-    roll_no = str(profile_json['roll_number'])
+    username = str(profile_json["id"])
+    roll_no = str(profile_json["roll_number"])
 
     # Check if a user exists with same username or roll number
     query = Q(username=username)
@@ -73,7 +88,7 @@ def perform_login(auth_code, redir, request):
         queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
         user_profile = queryset.get(user=user)
     except UserProfile.DoesNotExist:
-        user_profile = UserProfile.objects.create(user=user, name='iitbuser')
+        user_profile = UserProfile.objects.create(user=user, name="iitbuser")
 
     # Fill models with new data
     fill_models_from_sso(user_profile, user, profile_json)
@@ -83,24 +98,29 @@ def perform_login(auth_code, redir, request):
     request.session.save()
 
     # Deprecated: update fcm id
-    fcm_id = request.GET.get('fcm_id')
+    fcm_id = request.GET.get("fcm_id")
     if fcm_id is not None:
         update_fcm_device(request, fcm_id)
 
     # Return the session id
-    return Response({
-        'sessionid': request.session.session_key,
-        'user': user.username,
-        'profile_id': user_profile.id,
-        'profile': UserProfileFullSerializer(
-            user_profile, context={'request': request}).data
-    })
+    return Response(
+        {
+            "sessionid": request.session.session_key,
+            "user": user.username,
+            "profile_id": user_profile.id,
+            "profile": UserProfileFullSerializer(
+                user_profile, context={"request": request}
+            ).data,
+        }
+    )
+
 
 def fill_models_from_sso(user_profile, user, profile_json):
     """Fill models from SSO data."""
     SSOFiller(user_profile, user, profile_json).fill().save()
 
-class SSOFiller():
+
+class SSOFiller:
     """Helper class to fill user model from SSO."""
 
     def __init__(self, user_profile, user, profile_json):
@@ -111,7 +131,7 @@ class SSOFiller():
     def fill(self):
         self.fill_common()
         self.fill_name()
-        self.oset('email')
+        self.oset("email")
         self.fill_contact()
         self.fill_profile_pic()
         self.fill_program()
@@ -124,45 +144,49 @@ class SSOFiller():
         return self
 
     def fill_common(self):
-        """Fill in common data into the profile from SSO. """
+        """Fill in common data into the profile from SSO."""
         for response_key, data_key in {
-                'first_name': 'name',
-                'email': 'email',
-                'mobile': 'contact_no',
-                'roll_number': 'roll_no',
-                'username': 'ldap_id'
+            "first_name": "name",
+            "email": "email",
+            "mobile": "contact_no",
+            "roll_number": "roll_no",
+            "username": "ldap_id",
         }.items():
             self.oset(response_key, data_key)
 
     def fill_name(self):
-        if self.jhas('first_name') and self.jhas('last_name'):
-            self.user_profile.name = ('%s %s' % (self.jget('first_name'), self.jget('last_name'))).title()
-            self.user.first_name = str(self.jget('first_name')).title()
-            self.user.last_name = str(self.jget('last_name')).title()
+        if self.jhas("first_name") and self.jhas("last_name"):
+            self.user_profile.name = (
+                "%s %s" % (self.jget("first_name"), self.jget("last_name"))
+            ).title()
+            self.user.first_name = str(self.jget("first_name")).title()
+            self.user.last_name = str(self.jget("last_name")).title()
 
     def fill_contact(self):
-        if self.jhas('contacts') and self.jget('contacts'):
-            self.user_profile.contact_no = self.jget('contacts')[0]['number']
+        if self.jhas("contacts") and self.jget("contacts"):
+            self.user_profile.contact_no = self.jget("contacts")[0]["number"]
 
     def fill_profile_pic(self):
-        if self.jhas('profile_picture'):
-            self.user_profile.profile_pic = 'https://gymkhana.iitb.ac.in' + self.jget('profile_picture')
+        if self.jhas("profile_picture"):
+            self.user_profile.profile_pic = "https://gymkhana.iitb.ac.in" + self.jget(
+                "profile_picture"
+            )
 
     def fill_program(self):
-        if self.jhas('program'):
-            target = self.jget('program')
-            self.oset('join_year', target=target)
-            self.oset('department', target=target)
-            self.oset('department_name', target=target)
-            self.oset('degree', target=target)
-            self.oset('degree_name', target=target)
-            self.oset('graduation_year', target=target)
+        if self.jhas("program"):
+            target = self.jget("program")
+            self.oset("join_year", target=target)
+            self.oset("department", target=target)
+            self.oset("department_name", target=target)
+            self.oset("degree", target=target)
+            self.oset("degree_name", target=target)
+            self.oset("graduation_year", target=target)
 
     def fill_insti_address(self):
-        if self.jhas('insti_address'):
-            target = self.jget('insti_address')
-            self.oset('hostel', target=target)
-            self.oset('room', target=target)
+        if self.jhas("insti_address"):
+            target = self.jget("insti_address")
+            self.oset("hostel", target=target)
+            self.oset("room", target=target)
 
     def jhas(self, response_key, target=None):
         if not target:
@@ -180,8 +204,10 @@ class SSOFiller():
         if self.jhas(response_key, target):
             setattr(self.user_profile, data_key, target[response_key])
 
+
 def generate_alumni_key():
     return secrets.choice(range(100000, 999999))
+
 
 def create_key_send_mail(ldap_req):
     # Checking if LDAP is right
@@ -193,7 +219,7 @@ def create_key_send_mail(ldap_req):
     # Check 15 minute window
     pastRequests = AlumniUser.objects.filter(ldap=ldap_req)
     if pastRequests:
-        lastRequest = pastRequests.order_by('-timeLoginRequest').first()
+        lastRequest = pastRequests.order_by("-timeLoginRequest").first()
         if timezone.now() <= lastRequest.timeLoginRequest + timedelta(minutes=15):
             return True, "An OTP was already sent to your mail before"
 
@@ -201,20 +227,23 @@ def create_key_send_mail(ldap_req):
     key = generate_alumni_key()
     try:
         send_mail(
-            'Alumni Login Request on InstiApp',
-            'Your OTP for Alumni Login on Instiapp is ' + str(key),
+            "Alumni Login Request on InstiApp",
+            "Your OTP for Alumni Login on Instiapp is " + str(key),
             EMAIL_HOST_USER,
-            [str(ldap_req) + '@iitb.ac.in'],
-            fail_silently=False
+            [str(ldap_req) + "@iitb.ac.in"],
+            fail_silently=False,
         )
     except:  # noqa: E722
         # Mail couldn't be sent
-        return False, 'Server issues, please retry later'
+        return False, "Server issues, please retry later"
 
     # Generate instance
-    new_otp_req = AlumniUser(ldap=ldap_req, keyStored=str(key), timeLoginRequest=timezone.now())
+    new_otp_req = AlumniUser(
+        ldap=ldap_req, keyStored=str(key), timeLoginRequest=timezone.now()
+    )
     new_otp_req.save()
-    return True, 'fine'
+    return True, "fine"
+
 
 def perform_alumni_login(request, ldap_entered):
     query = Q(ldap_id=ldap_entered)
@@ -223,8 +252,9 @@ def perform_alumni_login(request, ldap_entered):
     request.session.save()
     queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
     user_profile = queryset.get(user=user)
-    return request.session.session_key, user.username, user_profile.id, UserProfileFullSerializer(
-        user_profile, context={
-            'request': request
-        }
-    ).data
+    return (
+        request.session.session_key,
+        user.username,
+        user_profile.id,
+        UserProfileFullSerializer(user_profile, context={"request": request}).data,
+    )

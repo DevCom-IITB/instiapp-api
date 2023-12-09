@@ -4,17 +4,16 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('news', '0002_newssource'),
+        ("news", "0002_newssource"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='newssource',
-            name='body',
+            model_name="newssource",
+            name="body",
         ),
         migrations.DeleteModel(
-            name='NewsSource',
+            name="NewsSource",
         ),
     ]

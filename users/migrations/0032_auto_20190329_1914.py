@@ -6,48 +6,76 @@ import uuid
 
 former_roles_cache = None
 
+
 def get_former_roles(apps, schema_editor):
     global former_roles_cache
-    BodyRole = apps.get_model('roles', 'BodyRole')
-    former_roles_cache = list(BodyRole.objects.prefetch_related('former_users').all())
+    BodyRole = apps.get_model("roles", "BodyRole")
+    former_roles_cache = list(BodyRole.objects.prefetch_related("former_users").all())
+
 
 def put_former_roles(apps, schema_editor):
     global former_roles_cache
-    UserFormerRole = apps.get_model('users', 'UserFormerRole')
+    UserFormerRole = apps.get_model("users", "UserFormerRole")
     for crole in former_roles_cache:
         for user in crole.former_users.all():
             UserFormerRole.objects.create(role_id=crole.id, user_id=user.id)
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ('roles', '0010_bodyrole_permanent'),
-        ('users', '0031_auto_20190222_1732'),
+        ("roles", "0010_bodyrole_permanent"),
+        ("users", "0031_auto_20190222_1732"),
     ]
 
     operations = [
         migrations.RunPython(get_former_roles, reverse_code=migrations.RunPython.noop),
         migrations.CreateModel(
-            name='UserFormerRole',
+            name="UserFormerRole",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('year', models.CharField(blank=True, default='', max_length=20)),
-                ('role', models.ForeignKey(default=uuid.uuid4, on_delete=django.db.models.deletion.CASCADE, related_name='ufr', to='roles.BodyRole')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("year", models.CharField(blank=True, default="", max_length=20)),
+                (
+                    "role",
+                    models.ForeignKey(
+                        default=uuid.uuid4,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="ufr",
+                        to="roles.BodyRole",
+                    ),
+                ),
             ],
         ),
         migrations.RemoveField(
-            model_name='userprofile',
-            name='former_roles',
+            model_name="userprofile",
+            name="former_roles",
         ),
         migrations.AddField(
-            model_name='userprofile',
-            name='former_roles',
-            field=models.ManyToManyField(blank=True, related_name='former_users', through='users.UserFormerRole', to='roles.BodyRole'),
+            model_name="userprofile",
+            name="former_roles",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="former_users",
+                through="users.UserFormerRole",
+                to="roles.BodyRole",
+            ),
         ),
         migrations.AddField(
-            model_name='userformerrole',
-            name='user',
-            field=models.ForeignKey(default=uuid.uuid4, on_delete=django.db.models.deletion.CASCADE, related_name='ufr', to='users.UserProfile'),
+            model_name="userformerrole",
+            name="user",
+            field=models.ForeignKey(
+                default=uuid.uuid4,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="ufr",
+                to="users.UserProfile",
+            ),
         ),
         migrations.RunPython(put_former_roles, reverse_code=migrations.RunPython.noop),
     ]

@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.contrib.sessions.models import Session
 from other.models import Device
 
+
 def update_fcm_device(request, fcm_id):
     """Create or update device."""
     if not request.user.is_authenticated or not fcm_id:  # pragma: no cover
@@ -30,8 +31,9 @@ def update_fcm_device(request, fcm_id):
     device.save()
 
     # Reset for existing devices
-    profile.fcm_id = ''
+    profile.fcm_id = ""
     profile.save()
+
 
 def fill_device_firebase(push_service, device):  # pragma: no cover
     """Get/save information about device from Firebase."""
@@ -42,9 +44,9 @@ def fill_device_firebase(push_service, device):  # pragma: no cover
         return None
 
     # Fill up the device info
-    device.application = info['application']
-    device.app_version = info['applicationVersion']
-    device.platform = info['platform']
+    device.application = info["application"]
+    device.app_version = info["applicationVersion"]
+    device.platform = info["platform"]
     device.last_refresh = timezone.now()
     device.save()
 

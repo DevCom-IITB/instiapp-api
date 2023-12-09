@@ -19,23 +19,28 @@ from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
 from querybot.models import ChatBotLog
 
+
 class UserProfileViewSet(viewsets.ModelViewSet):
     """UserProfile"""
+
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileFullSerializer
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
     def retrieve(self, request, pk):
         try:
             UUID(pk, version=4)
             return super().retrieve(self, request, pk)
         except ValueError:
-            queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
+            queryset = UserProfileFullSerializer.setup_eager_loading(
+                UserProfile.objects
+            )
             profile = get_object_or_404(queryset, ldap_id=pk)
-            return Response(UserProfileFullSerializer(
-                profile, context={'request': request}).data)
+            return Response(
+                UserProfileFullSerializer(profile, context={"request": request}).data
+            )
 
     @login_required_ajax
     def retrieve_me(self, request):
@@ -45,18 +50,21 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
         # WARNING: DEPREACATED
         # Update fcm id if present
-        if 'fcm_id' in request.GET:
-            update_fcm_device(request, request.GET['fcm_id'])
+        if "fcm_id" in request.GET:
+            update_fcm_device(request, request.GET["fcm_id"])
 
-        return Response(UserProfileFullSerializer(
-            user_profile, context=self.get_serializer_context()).data)
+        return Response(
+            UserProfileFullSerializer(
+                user_profile, context=self.get_serializer_context()
+            ).data
+        )
 
     @login_required_ajax
     def update_me(self, request):
         """Update current user."""
         # Create device instead of updating profile
-        if 'fcm_id' in request.data:
-            update_fcm_device(request, request.data.pop('fcm_id', None))
+        if "fcm_id" in request.data:
+            update_fcm_device(request, request.data.pop("fcm_id", None))
 
         # Check if all fields are exposed ones
         if any(f not in UserProfile.ExMeta.user_editable for f in request.data):
@@ -68,7 +76,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         profile.active = True
 
         serializer = UserProfileFullSerializer(
-            profile, data=request.data, context=self.get_serializer_context())
+            profile, data=request.data, context=self.get_serializer_context()
+        )
         if not serializer.is_valid():
             return Response(serializer.errors, status=400)
         serializer.save()
@@ -81,13 +90,15 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         This will create or update if record exists."""
 
         # Get status from query paramter
-        status = request.GET.get('status')
+        status = request.GET.get("status")
         if status is None:
             return Response({"message": "status is required"}, status=400)
         status = int(status)
 
         # Try to get existing UES
-        ues = UserEventStatus.objects.filter(event__id=event_pk, user=request.user.profile).first()
+        ues = UserEventStatus.objects.filter(
+            event__id=event_pk, user=request.user.profile
+        ).first()
 
         # Delete record if unknown status
         if status not in (1, 2):
@@ -99,7 +110,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         if not ues:
             get_event = get_object_or_404(Event.objects.all(), pk=event_pk)
             UserEventStatus.objects.create(
-                event=get_event, user=request.user.profile, status=status)
+                event=get_event, user=request.user.profile, status=status
+            )
             return Response(status=204)
 
         # Update existing UserEventStatus
@@ -114,18 +126,21 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         This will create or update if record exists."""
 
         # Get reaction from query parameter
-        reaction = request.GET.get('reaction')
+        reaction = request.GET.get("reaction")
         if reaction is None:
             return Response({"message": "reaction is required"}, status=400)
 
         # Get existing record if it exists
-        unr = UserNewsReaction.objects.filter(news__id=news_pk, user=request.user.profile).first()
+        unr = UserNewsReaction.objects.filter(
+            news__id=news_pk, user=request.user.profile
+        ).first()
 
         # Create new UserNewsReaction if not existing
         if not unr:
             get_news = get_object_or_404(NewsEntry.objects.all(), pk=news_pk)
             UserNewsReaction.objects.create(
-                news=get_news, user=request.user.profile, reaction=reaction)
+                news=get_news, user=request.user.profile, reaction=reaction
+            )
             return Response(status=204)
 
         # Update existing UserNewsReaction
@@ -140,9 +155,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         This will create or update if record exists."""
 
         # Get reaction from query parameter
-        reaction = request.data['reaction']
-        answer = request.data['answer']
-        question = request.data['question']
+        reaction = request.data["reaction"]
+        answer = request.data["answer"]
+        question = request.data["question"]
         if reaction is None or answer is None or question is None:
             return Response({"message": "reaction is required"}, status=400)
 
@@ -157,18 +172,21 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         This will create or update if record exists."""
 
         # Get reaction from query parameter
-        reaction = request.GET.get('reaction')
+        reaction = request.GET.get("reaction")
         if reaction is None:
             return Response({"message": "reaction is required"}, status=400)
 
         # Get existing record if it exists
-        upr = CommunityPostUserReaction.objects.filter(communitypost__id=post_pk, user=request.user.profile).first()
+        upr = CommunityPostUserReaction.objects.filter(
+            communitypost__id=post_pk, user=request.user.profile
+        ).first()
 
         # Create new UserNewsReaction if not existing
         if not upr:
             get_post = get_object_or_404(CommunityPost.objects.all(), pk=post_pk)
             CommunityPostUserReaction.objects.create(
-                communitypost=get_post, user=request.user.profile, reaction=reaction)
+                communitypost=get_post, user=request.user.profile, reaction=reaction
+            )
             return Response(status=204)
 
         # Update existing UserNewsReaction
@@ -189,18 +207,20 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     def subscribe_web_push(cls, request):
         """Subscribe to web push."""
         data = request.data
-        sub = request.user.profile.web_push_subscriptions.filter(endpoint=data['endpoint']).first()
+        sub = request.user.profile.web_push_subscriptions.filter(
+            endpoint=data["endpoint"]
+        ).first()
 
         # Create new subscription if not found
         if not sub:
             sub = WebPushSubscription(
                 user=request.user.profile,
-                endpoint=data['endpoint'],
+                endpoint=data["endpoint"],
             )
 
         # Update values
-        sub.p256dh = data['keys']['p256dh']
-        sub.auth = data['keys']['auth']
+        sub.p256dh = data["keys"]["p256dh"]
+        sub.auth = data["keys"]["auth"]
         sub.save()
 
         return Response(status=204)

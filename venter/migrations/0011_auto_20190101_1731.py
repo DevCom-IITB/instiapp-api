@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('venter', '0010_auto_20181220_1954'),
+        ("venter", "0010_auto_20181220_1954"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='complaints',
-            name='location_details',
+            model_name="complaints",
+            name="location_details",
             field=models.TextField(blank=True),
         ),
         migrations.AddField(
-            model_name='complaints',
-            name='suggestions',
+            model_name="complaints",
+            name="suggestions",
             field=models.TextField(blank=True),
         ),
     ]

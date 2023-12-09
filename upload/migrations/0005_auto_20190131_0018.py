@@ -5,30 +5,35 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('upload', '0004_auto_20180928_1948'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("upload", "0004_auto_20180928_1948"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='uploadedimage',
-            name='claimant_id',
+            model_name="uploadedimage",
+            name="claimant_id",
             field=models.UUIDField(null=True),
         ),
         migrations.AddField(
-            model_name='uploadedimage',
-            name='claimant_type',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType'),
+            model_name="uploadedimage",
+            name="claimant_type",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="contenttypes.ContentType",
+            ),
         ),
         migrations.AddField(
-            model_name='uploadedimage',
-            name='is_claimed',
+            model_name="uploadedimage",
+            name="is_claimed",
             field=models.BooleanField(default=False),
         ),
         migrations.AddIndex(
-            model_name='uploadedimage',
-            index=models.Index(fields=['is_claimed'], name='upload_uplo_is_clai_8be643_idx'),
+            model_name="uploadedimage",
+            index=models.Index(
+                fields=["is_claimed"], name="upload_uplo_is_clai_8be643_idx"
+            ),
         ),
     ]

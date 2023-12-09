@@ -4,16 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('roles', '0001_initial'),
-        ('users', '0008_auto_20180317_1721'),
+        ("roles", "0001_initial"),
+        ("users", "0008_auto_20180317_1721"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='roles',
-            field=models.ManyToManyField(blank=True, related_name='users', to='roles.BodyRole'),
+            model_name="userprofile",
+            name="roles",
+            field=models.ManyToManyField(
+                blank=True, related_name="users", to="roles.BodyRole"
+            ),
         ),
     ]

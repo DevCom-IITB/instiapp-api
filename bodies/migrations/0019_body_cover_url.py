@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bodies', '0018_auto_20180525_2235'),
+        ("bodies", "0018_auto_20180525_2235"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='body',
-            name='cover_url',
+            model_name="body",
+            name="cover_url",
             field=models.URLField(blank=True, null=True),
         ),
     ]

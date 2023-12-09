@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('buyandsell', '0004_auto_20230430_2232'),
+        ("buyandsell", "0004_auto_20230430_2232"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='limit',
-            name='endtime',
+            model_name="limit",
+            name="endtime",
             field=models.DateTimeField(auto_created=True, null=True),
         ),
     ]

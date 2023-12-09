@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0012_userprofile_website_url'),
+        ("users", "0012_userprofile_website_url"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='ldap_id',
+            model_name="userprofile",
+            name="ldap_id",
             field=models.CharField(blank=True, max_length=50, null=True),
         ),
     ]

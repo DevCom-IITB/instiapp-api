@@ -5,21 +5,24 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0026_auto_20181003_1442'),
+        ("users", "0026_auto_20181003_1442"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='usertag',
-            name='name',
-            field=models.CharField(default='TAG', max_length=30),
+            model_name="usertag",
+            name="name",
+            field=models.CharField(default="TAG", max_length=30),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='usertag',
-            name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tags', to='users.UserTagCategory'),
+            model_name="usertag",
+            name="category",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="tags",
+                to="users.UserTagCategory",
+            ),
         ),
     ]
