@@ -37,11 +37,13 @@ class BodyRole(models.Model):
 
     def __str__(self):
         return self.body.name + " " + self.name
-    
-''' 
-Added Community Role Model : To allow to have various communities in a single body and have different roles for each community.
+
+
+"""
+Added Community Role Model : To allow to have various communities in a single body and have different roles for each
+community.
 Ditched For Now
-'''
+"""
 # class CommunityRole(models.Model):
 #     """A role for a bodywhich can be granted to multiple users."""
 

@@ -9,7 +9,6 @@ class BodyRoleAdmin(admin.ModelAdmin):
     search_fields = ("body__name", "name")
 
 
-
 class InstittuteRoleAdmin(admin.ModelAdmin):
     list_display = ("name", "permissions")
     search_fields = ["name"]

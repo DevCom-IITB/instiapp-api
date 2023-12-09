@@ -2,7 +2,6 @@ from datetime import datetime
 from uuid import uuid4
 from django.db import models
 from helpers.misc import get_url_friendly
-from users.models import UserProfile
 
 
 class Community(models.Model):

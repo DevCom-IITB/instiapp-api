@@ -82,10 +82,14 @@ def notify_new_commpost(pk):
     notify.send(instance, recipient=users, verb="New post added in " + community.name)
 
     for interest in instance.interests.all():
-        users = User.objects.filter(
-           
-            id__in=UserInterest.objects.filter(title=interest.title)).filter(is_active=True).values('id')
-        
+        users = (
+            User.objects.filter(
+                id__in=UserInterest.objects.filter(title=interest.title)
+            )
+            .filter(is_active=True)
+            .values("id")
+        )
+
         notify.send(
             instance,
             recipient=users,

@@ -61,7 +61,8 @@ class UserProfile(models.Model):
         through="UserFormerRole",
     )
     institute_roles = models.ManyToManyField(
-        'roles.InstituteRole', related_name='users', blank=True)
+        "roles.InstituteRole", related_name="users", blank=True
+    )
     # community_roles = models.ManyToManyField('roles.CommunityRole', related_name='users', blank=True)
     # User exposed fields
     show_contact_no = models.BooleanField(default=False)

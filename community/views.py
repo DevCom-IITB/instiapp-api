@@ -12,6 +12,8 @@ from roles.helpers import forbidden_no_privileges
 from helpers.misc import query_from_num
 from helpers.misc import query_search
 from users.models import UserProfile
+
+
 class ModeratorViewSet(viewsets.ModelViewSet):
     queryset = CommunityPost.objects
     serializer_class = CommunityPostSerializers
@@ -70,9 +72,11 @@ class PostViewSet(viewsets.ModelViewSet):
         )
         post = self.get_community_post(pk)
         return_for_mod = False
-        if(user_has_privilege(request.user.profile, post.community.body.id, "AppP")):
+        if user_has_privilege(request.user.profile, post.community.body.id, "AppP"):
             return_for_mod = True
-        serialized = CommunityPostSerializers(post, context={'return_for_mod': return_for_mod}).data
+        serialized = CommunityPostSerializers(
+            post, context={"return_for_mod": return_for_mod}
+        ).data
 
         return Response(serialized)
 
@@ -90,25 +94,30 @@ class PostViewSet(viewsets.ModelViewSet):
 
         # If your posts
         if status is None:
-            queryset = CommunityPost.objects.filter(thread_rank=1, community=community, posted_by=request.user
-                                                    .profile).order_by("-time_of_modification")
+            queryset = CommunityPost.objects.filter(
+                thread_rank=1, community=community, posted_by=request.user.profile
+            ).order_by("-time_of_modification")
         else:
             # If reported posts
             if status == "3":
                 queryset = CommunityPost.objects.filter(
-                    status=status, community=community, deleted=False).order_by("-time_of_modification")
+                    status=status, community=community, deleted=False
+                ).order_by("-time_of_modification")
                 # queryset = CommunityPost.objects.all()
 
             else:
                 queryset = CommunityPost.objects.filter(
-                    status=status, community=community, deleted=False, thread_rank=1).order_by("-time_of_modification")
-        queryset = query_search(request, 3, queryset, ['content'], 'posts')
+                    status=status, community=community, deleted=False, thread_rank=1
+                ).order_by("-time_of_modification")
+        queryset = query_search(request, 3, queryset, ["content"], "posts")
         queryset = query_from_num(request, 20, queryset)
         return_for_mod = False
-        if(user_has_privilege(request.user.profile, community.body.id, "AppP")):
+        if user_has_privilege(request.user.profile, community.body.id, "AppP"):
             return_for_mod = True
 
-        serializer = CommunityPostSerializerMin(queryset, many=True, context={'return_for_mod': return_for_mod})
+        serializer = CommunityPostSerializerMin(
+            queryset, many=True, context={"return_for_mod": return_for_mod}
+        )
         data = serializer.data
 
         return Response({"count": len(data), "data": data})
@@ -243,7 +252,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
 
     @login_required_ajax
     def create(self, request):
-        name = request.data['name']
+        name = request.data["name"]
         user, created = UserProfile.objects.get_or_create(user=request.user)
         if not Community.objects.all().filter(name=name).exists():
             super().create(request)

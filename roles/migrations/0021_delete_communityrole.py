@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0043_remove_userprofile_community_roles'),
-        ('roles', '0020_communityrole'),
+        ("users", "0043_remove_userprofile_community_roles"),
+        ("roles", "0020_communityrole"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='CommunityRole',
+            name="CommunityRole",
         ),
     ]
