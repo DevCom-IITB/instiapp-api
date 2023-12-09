@@ -71,7 +71,7 @@ class CommunityTestCase(TransactionTestCase):
 
     def test_communitypost_alllist(self):
         """Test if communityposts can be listed."""
-        url = "/api/communityposts?status=1"
+        url = "/api/communityposts?status=1&comm_id=" + str(self.test_community_1.id)
         response = self.client1.get(url, format="json")
         data = response.data["data"]
         self.assertEqual(response.status_code, 200)
@@ -82,7 +82,7 @@ class CommunityTestCase(TransactionTestCase):
         )
 
     def test_communitypost_yourlist(self):
-        url = "/api/communityposts"
+        url = "/api/communityposts?comm_id=" + str(self.test_community_1.id)   
         response = self.client1.get(url, format="json")
         data = response.data["data"]
         self.assertEqual(response.status_code, 200)
@@ -98,7 +98,7 @@ class CommunityTestCase(TransactionTestCase):
         )
 
     def test_communitypost_pendinglist(self):
-        url = "/api/communityposts?status=0"
+        url = "/api/communityposts?status=0&comm_id=" + str(self.test_community_1.id)
         response = self.client1.get(url, format="json")
         data = response.data["data"]
         self.assertEqual(response.status_code, 200)
