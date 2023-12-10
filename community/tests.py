@@ -82,14 +82,14 @@ class CommunityTestCase(TransactionTestCase):
         )
 
     def test_communitypost_yourlist(self):
-        url = "/api/communityposts?community=" + str(self.test_community_1.id)   
+        url = "/api/communityposts?community=" + str(self.test_community_1.id)
         response = self.client1.get(url, format="json")
         data = response.data["data"]
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.data["count"],
             CommunityPost.objects.filter(
-                thread_rank=1, posted_by=self.user1.profile, Community=self.test_community_1
+                thread_rank=1, posted_by=self.user1.profile, community=self.test_community_1
             ).count(),
         )
         self.assertListEqual(
