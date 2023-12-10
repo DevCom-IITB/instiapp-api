@@ -48,7 +48,8 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
     reactions_count = serializers.SerializerMethodField()
     user_reaction = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
-    posted_by = UserProfileSerializer(read_only=True)
+    # posted_by = UserProfileSerializer(read_only=True)
+    posted_by = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
     most_liked_comment = serializers.SerializerMethodField()
     community = CommunitySerializerMin(read_only=True)
@@ -58,13 +59,34 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
     has_user_reported = serializers.SerializerMethodField()
     posted_by = serializers.SerializerMethodField()
 
+    # def get_posted_by(self, obj):
+    #     pb = UserProfile.objects.get(id=obj.posted_by.id)
+    #     if obj.anonymous:
+    #         pb.name = "Anonymous"
+    #         pb.id = "null"
+    #         pb.ldap_id = "null"
+    #         pb.profile_pic = \
+    #             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM9q9XJKxlskry5gXTz1OXUyem5Ap59lcEGg&usqp=CAU'
+    #     return UserProfileSerializer(pb).data
+
     def get_posted_by(self, obj):
-        pb =  UserProfile.objects.get(id=obj.posted_by.id)
-        if(obj.anonymous):
+        pb = UserProfile.objects.get(id=obj.posted_by.id)
+        if (
+            obj.anonymous
+            and "return_for_mod" in self.context
+            and not self.context["return_for_mod"]
+        ):
             pb.name = "Anonymous"
             pb.id = "null"
-            pb.ldap_id = "null" 
-            pb.profile_pic = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM9q9XJKxlskry5gXTz1OXUyem5Ap59lcEGg&usqp=CAU"
+            pb.ldap_id = "null"
+            pb.profile_pic = \
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM9q9XJKxlskry5gXTz1OXUyem5Ap59lcEGg&usqp=CAU'
+        elif (
+            obj.anonymous
+            and "return_for_mod" in self.context
+            and self.context["return_for_mod"]
+        ):
+            pb.name += "  (Anon)"
         return UserProfileSerializer(pb).data
 
     def get_most_liked_comment(self, obj):
