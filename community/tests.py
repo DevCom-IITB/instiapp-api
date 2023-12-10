@@ -89,7 +89,7 @@ class CommunityTestCase(TransactionTestCase):
         self.assertEqual(
             response.data["count"],
             CommunityPost.objects.filter(
-                thread_rank=1, posted_by=self.user1.profile
+                thread_rank=1, posted_by=self.user1.profile, Community=self.test_community_1
             ).count(),
         )
         self.assertListEqual(
