@@ -9,6 +9,7 @@ from django.utils.timezone import make_aware
 from cryptography.fernet import Fernet
 from messmenu.models import Hostel, MessCalEvent
 from messmenu.serializers import HostelSerializer, MessCalEventSerializer
+from backend.settings import MESSI_ACCESS_TOKEN
 
 
 @api_view(
@@ -142,7 +143,7 @@ def getRnoQR(request):
         time = str(datetime.now())
         rnom = (rollno + "," + time).encode()
 
-        f = Fernet(b"Tolm_fRDkfoN5WMU4oUXWxNwmn1E0MmYlbeh1LA29cU=")
+        f = Fernet(MESSI_ACCESS_TOKEN)
         encrRno = f.encrypt(rnom)
 
         return Response({"qrstring": encrRno})
