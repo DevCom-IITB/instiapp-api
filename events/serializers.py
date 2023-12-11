@@ -173,6 +173,8 @@ class EventFullSerializer(serializers.ModelSerializer):
             "str_id",
             "name",
             "description",
+            "email_body",
+            "email_verified",
             "image_url",
             "start_time",
             "end_time",

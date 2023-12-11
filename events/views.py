@@ -23,14 +23,20 @@ class EventViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         return {"request": self.request}
 
+    @login_required_ajax
     def retrieve(self, request, pk):
         """Get Event.
         Get by `uuid` or `str_id`"""
 
         self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
         event = self.get_event(pk)
-        serialized = EventFullSerializer(event, context={"request": request}).data
+        user_has_VerE_permission = user_has_privilege(request.user.profile, event.id, "VerE")
 
+        if user_has_VerE_permission or event.email_verified:
+            serialized = EventFullSerializer(event, context={"request": request}).data
+        else:
+            serialized = EventSerializer(event, context={"request": request}).data
+        
         return Response(serialized)
 
     def list(self, request):
