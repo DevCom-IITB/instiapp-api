@@ -62,6 +62,7 @@ class EventSerializer(serializers.ModelSerializer):
             "str_id",
             "name",
             "description",
+            "longdescription",
             "image_url",
             "start_time",
             "end_time",
