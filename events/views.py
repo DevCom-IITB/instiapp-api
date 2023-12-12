@@ -12,8 +12,8 @@ from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
-
-
+from django.core.mail import send_mail
+from backend.settings import EMAIL_HOST_USER
 class EventViewSet(viewsets.ModelViewSet):
     """Event"""
 
@@ -189,3 +189,34 @@ def get_update_venue_ids(venue_names, event):
     added_venue_ids = create_unreusable_locations(added_venues)
 
     return added_venue_ids + common_venue_ids
+
+
+class EventMailVerificationViewSet(viewsets.ViewSet):
+    
+    @login_required_ajax
+    def verify_and_send_mail(self, request, pk):
+        try:
+            event = Event.objects.get(id=pk)
+        except Event.DoesNotExist:
+            return Response({"error": "Event not found"})
+
+        user_has_VerE_permission = user_has_privilege(request.user.profile, event.id, "VerE")
+
+        if user_has_VerE_permission:
+            if request.data.get('approve', False):
+                subject = "Event Mail Subject"  
+                message = event.email_content  
+                recipient_list = ['amitmalakar887@gmail.com'] 
+                try:
+                    send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=False)
+                    event.email_verified = True
+                    event.save()
+                    return Response({"success": "Mail sent successfully"})
+                except Exception as e:
+                    return Response({"error_status": True, "msg": f"Error sending mail: {str(e)}"})
+            else:
+                event.email_content = ""
+                event.save()
+                return Response({"success": "Mail rejected and content deleted"})
+        else:
+            return forbidden_no_privileges()
