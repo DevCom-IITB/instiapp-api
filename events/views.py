@@ -30,13 +30,16 @@ class EventViewSet(viewsets.ModelViewSet):
 
         self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
         event = self.get_event(pk)
-        user_has_VerE_permission = user_has_privilege(request.user.profile, event.id, "VerE")
-
+        body_ids = [(body.id) for body in event.bodies.all()]
+        user_has_VerE_permission = user_has_privilege(request.user.profile, body_ids[0], "VerE")
+        longdescription_visible = False
         if user_has_VerE_permission or event.email_verified:
-            serialized = EventFullSerializer(event, context={"request": request}).data
+            longdescription_visible = True
+            serialized = EventFullSerializer(event, context={"request": request, "longdescription_visible": longdescription_visible}).data
         else:
-            serialized = EventSerializer(event, context={"request": request}).data
-        
+            longdescription_visible = False
+            serialized = EventFullSerializer(event, context={"request": request, "longdescription_visible": longdescription_visible}).data
+            serialized["longdescription"]=[]
         return Response(serialized)
 
     def list(self, request):
