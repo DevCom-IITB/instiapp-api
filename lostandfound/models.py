@@ -86,4 +86,3 @@ class ProductFound(models.Model):
                 ]
             ),
         ]
-
