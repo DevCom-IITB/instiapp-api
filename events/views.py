@@ -30,11 +30,8 @@ class EventViewSet(viewsets.ModelViewSet):
 
         self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
         event = self.get_event(pk)
-        body_ids = [(body.id) for body in event.bodies.all()]
-        if all(
-            [user_has_privilege(request.user.profile, id, "VerE")
-            for id in body_ids]
-        ) or event.email_verified:
+        council_id = event.verification_body.id
+        if user_has_privilege(request.user.profile, council_id, "VerE"):
             longdescription_visible = True
             serialized = EventFullSerializer(event, context={"request": request, "longdescription_visible": longdescription_visible}).data
         else:

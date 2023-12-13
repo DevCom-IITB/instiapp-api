@@ -2,6 +2,14 @@
 from uuid import uuid4
 from django.db import models
 from helpers.misc import get_url_friendly
+from multiselectfield import MultiSelectField
+
+COUNCIL_IDS = (
+    ("91199c20-7488-41c5-9f6b-6f6c7c5b897d", "Institute Cultural Council"),
+    ("81e05a1a-7fd1-45b5-84f6-074e52c0f085", "Institute Technical Council"),
+    ("a9f81e69-fcc9-4fe3-b261-9e5e7a13f898", "Institute Sports Council"),
+    ("f3ae5230-4441-4586-81a8-bf75a2e47318", "Hostel Affairs"),
+)
 
 
 class Event(models.Model):
@@ -20,6 +28,7 @@ class Event(models.Model):
     description = models.TextField(blank=True)
     longdescription = models.TextField(default='')
     email_verified = models.BooleanField(default=False)
+    verification_body = MultiSelectField(choices=COUNCIL_IDS)
     bodies = models.ManyToManyField("bodies.Body", related_name="events", blank=True)
     image_url = models.URLField(blank=True, null=True)
     website_url = models.URLField(blank=True, null=True)
