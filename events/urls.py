@@ -10,7 +10,6 @@ urlpatterns = [
     ),
     path(
         "events/<pk>/verify-and-send-mail",
-        EventMailVerificationViewSet.as_view({"post": "verify_and_send_mail"}),
-        name="event-verify-and-send-mail",
+        EventMailVerificationViewSet.as_view({"post": "verify_and_send_mail"})
     ),
 ]

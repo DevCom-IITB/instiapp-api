@@ -201,12 +201,12 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
         except Event.DoesNotExist:
             return Response({"error": "Event not found"})
 
-        user_has_VerE_permission = user_has_privilege(request.user.profile, event.id, "VerE")
+        user_has_VerE_permission = user_has_privilege(request.user.profile,"VerE")
 
         if user_has_VerE_permission:
-            if request.data.get('approve', False):
-                subject = "Event Mail Subject"  
-                message = event.email_content  
+            if "approve" in request.data:
+                subject = event.description  
+                message = event.longdescription 
                 recipient_list = ['amitmalakar887@gmail.com'] 
                 try:
                     send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=False)
@@ -215,9 +215,11 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
                     return Response({"success": "Mail sent successfully"})
                 except Exception as e:
                     return Response({"error_status": True, "msg": f"Error sending mail: {str(e)}"})
-            else:
+            elif "reject" in request.data:
                 event.email_content = ""
                 event.save()
                 return Response({"success": "Mail rejected and content deleted"})
+            else:
+                return Response({"error": "Invalid action specified in request data"})
         else:
             return forbidden_no_privileges()
