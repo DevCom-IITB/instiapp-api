@@ -193,34 +193,44 @@ def get_update_venue_ids(venue_names, event):
 
 
 class EventMailVerificationViewSet(viewsets.ViewSet):
-    
+
     @login_required_ajax
-    def verify_and_send_mail(self, request, pk):
+    def approve_mail(self, request, pk):
         try:
             event = Event.objects.get(id=pk)
         except Event.DoesNotExist:
             return Response({"error": "Event not found"})
+
         council_id = event.get_verification_body_id()
-        print(council_id)
-        user_has_VerE_permission = user_has_privilege(request.user.profile,council_id,"VerE")
+        user_has_VerE_permission = user_has_privilege(request.user.profile, council_id, "VerE")
 
         if user_has_VerE_permission:
-            if "approve" in request.data:
-                subject = event.description  
-                message = event.longdescription 
-                recipient_list = ['amitmalakar887@gmail.com'] 
-                try:
-                    send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=False)
-                    event.email_verified = True
-                    event.save()
-                    return Response({"success": "Mail sent successfully"})
-                except Exception as e:
-                    return Response({"error_status": True, "msg": f"Error sending mail: {str(e)}"})
-            elif "reject" in request.data:
-                event.email_content = ""
+            subject = event.description
+            message = event.longdescription
+            recipient_list = ['amitmalakar887@gmail.com']
+            try:
+                send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=False)
+                event.email_verified = True
                 event.save()
-                return Response({"success": "Mail rejected and content deleted"})
-            else:
-                return Response({"error": "Invalid action specified in request data"})
+                return Response({"success": "Mail sent successfully"})
+            except Exception as e:
+                return Response({"error_status": True, "msg": f"Error sending mail: {str(e)}"})
+        else:
+            return forbidden_no_privileges()
+
+    @login_required_ajax
+    def reject_mail(self, request, pk):
+        try:
+            event = Event.objects.get(id=pk)
+        except Event.DoesNotExist:
+            return Response({"error": "Event not found"})
+
+        council_id = event.get_verification_body_id()
+        user_has_VerE_permission = user_has_privilege(request.user.profile, council_id, "VerE")
+
+        if user_has_VerE_permission:
+            event.email_content = ""
+            event.save()
+            return Response({"success": "Mail rejected and content deleted"})
         else:
             return forbidden_no_privileges()

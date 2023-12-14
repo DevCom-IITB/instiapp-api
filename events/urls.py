@@ -9,7 +9,14 @@ urlpatterns = [
         EventViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),
     ),
     path(
-        "events/<pk>/verify-and-send-mail",
-        EventMailVerificationViewSet.as_view({"post": "verify_and_send_mail"})
+        "events/<pk>/approve-mail",
+        EventMailVerificationViewSet.as_view({"post": "approve_mail"}),
+        name="event-approve-mail"
+    ),
+
+    path(
+        "events/<pk>/reject-mail",
+        EventMailVerificationViewSet.as_view({"post": "reject_mail"}),
+        name="event-reject-mail"
     ),
 ]
