@@ -35,6 +35,8 @@ class EventSerializer(serializers.ModelSerializer):
     each category, i.e. interested and going and minimal
     venue info. Use `EventFullSerializer` if you want information
     on individual users and venues.
+
+    Basically this is the serializzer used in the min view for the event that passes only a few fields 
     """
 
     # pylint: disable=C0415
@@ -62,8 +64,6 @@ class EventSerializer(serializers.ModelSerializer):
             "str_id",
             "name",
             "description",
-            "longdescription",
-            "verification_body",
             "image_url",
             "start_time",
             "end_time",
@@ -176,6 +176,7 @@ class EventFullSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "longdescription",
+            "email_verified",
             "verification_body",
             "image_url",
             "start_time",
