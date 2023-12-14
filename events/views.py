@@ -200,8 +200,9 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
             event = Event.objects.get(id=pk)
         except Event.DoesNotExist:
             return Response({"error": "Event not found"})
-
-        user_has_VerE_permission = user_has_privilege(request.user.profile,"VerE")
+        council_id = event.get_verification_body_id()
+        print(council_id)
+        user_has_VerE_permission = user_has_privilege(request.user.profile,council_id,"VerE")
 
         if user_has_VerE_permission:
             if "approve" in request.data:
