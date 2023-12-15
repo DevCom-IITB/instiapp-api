@@ -207,7 +207,7 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
         if user_has_VerE_permission:
             subject = event.description
             message = event.longdescription
-            recipient_list = ['amitmalakar887@gmail.com']
+            recipient_list = ['']
             try:
                 send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=False)
                 event.email_verified = True
