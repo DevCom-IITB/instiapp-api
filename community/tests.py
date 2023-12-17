@@ -28,7 +28,7 @@ class CommunityTestCase(TransactionTestCase):
         self.test_body_2 = create_body()
 
         self.body_1_role = BodyRole.objects.create(
-            name="Body1Role", body=self.test_body_1, permissions="AppP,ModC"
+            name="Body1Role", body=self.test_body_1, permissions="ModC"
         )
         self.user1.profile.roles.add(self.body_1_role)
 
@@ -89,7 +89,9 @@ class CommunityTestCase(TransactionTestCase):
         self.assertEqual(
             response.data["count"],
             CommunityPost.objects.filter(
-                thread_rank=1, posted_by=self.user1.profile, community=self.test_community_1
+                thread_rank=1,
+                posted_by=self.user1.profile,
+                community=self.test_community_1,
             ).count(),
         )
         self.assertListEqual(

@@ -129,7 +129,7 @@ def notify_new_commpostadmin(pk):
     roles = instance.community.body.roles.all()
     users = []
     for role in roles:
-        if "AppP" in role.permissions:
+        if "ModC" in role.permissions:
             users.extend(map(lambda user: user.user, role.users.all()))
     print(users)
     notify.send(
