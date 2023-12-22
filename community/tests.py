@@ -48,7 +48,7 @@ class CommunityTestCase(TransactionTestCase):
 
     def test_community_list(self):
         """Test if communities can be listed."""
-        url = "/api/events"
+        url = "/api/communities"
         response = self.client1.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
