@@ -32,8 +32,7 @@ class EventViewSet(viewsets.ModelViewSet):
         event = self.get_event(pk)
 
         councils = event.verification_bodies.all()
-        
- 
+        serialized = None
         for council in councils:
             council_id = council.id
             if user_has_privilege(request.user.profile, council_id, "VerE"):
@@ -78,15 +77,21 @@ class EventViewSet(viewsets.ModelViewSet):
         print("verified verifying body")
 
         # Prevent events without any body
-        if "bodies_id" not in request.data or not request.data.getlist("bodies_id"):
+        if "bodies_id" not in request.data or not request.data["bodies_id"]:
             return forbidden_no_privileges()
         print("verified bodies_id")
-        print(request.data.getlist("bodies_id"))
+        print(request.data["bodies_id"])
+        print(request.data.get("verification_bodies"))
+
+        if (type(request.data["bodies_id"]) == type("Jatin Singhal") and user_has_privilege(request.user.profile, request.data["bodies_id"],"AddE")):
+            return super().create(request)
+        
         # Check privileges for all bodies
-        if all(
+        elif all(
             [
                 user_has_privilege(request.user.profile, id, "AddE")
-                for id in request.data.getlist("bodies_id")
+               
+                for id in request.data["bodies_id"]
             ]
         ):
             # Fill in ids of venues

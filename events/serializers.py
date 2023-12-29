@@ -156,7 +156,7 @@ class EventFullSerializer(serializers.ModelSerializer):
     )
     verification_bodies = BodySerializerMin(many=True, read_only=True)
     verification_bodies_id = serializers.PrimaryKeyRelatedField(
-        many=True, read_only=False, queryset=Body.objects.all(), source="bodies"
+        many=True, read_only=False, queryset=Body.objects.all(), source="verification_bodies"
     )
 
     user_tags = serializers.PrimaryKeyRelatedField(
