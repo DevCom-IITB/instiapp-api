@@ -30,15 +30,19 @@ class EventViewSet(viewsets.ModelViewSet):
 
         self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
         event = self.get_event(pk)
-        council_id = event.get_verification_body_id()
-        print(council_id)
-        if user_has_privilege(request.user.profile, council_id, "VerE"):
-            longdescription_visible = True
-            serialized = EventFullSerializer(event, context={"request": request, "longdescription_visible": longdescription_visible}).data
-        else:
-            longdescription_visible = False
-            serialized = EventFullSerializer(event, context={"request": request, "longdescription_visible": longdescription_visible}).data
-            serialized["longdescription"]=[]
+
+        councils = event.verification_bodies.all()
+        
+ 
+        for council in councils:
+            council_id = council.id
+            if user_has_privilege(request.user.profile, council_id, "VerE"):
+                longdescription_visible = True
+                serialized = EventFullSerializer(event, context={"request": request, "longdescription_visible": longdescription_visible}).data
+            else:
+                longdescription_visible = False
+                serialized = EventFullSerializer(event, context={"request": request, "longdescription_visible": longdescription_visible}).data
+                serialized["longdescription"]=[]
         return Response(serialized) 
 
     def list(self, request):
@@ -86,11 +90,11 @@ class EventViewSet(viewsets.ModelViewSet):
             ]
         ):
             # Fill in ids of venues
-            print("User has privileges")
-            try:
-                request.data["venue_ids"] = create_unreusable_locations(request.data["venue_names"])
-            except KeyError:
-                request.data["venue_ids"]
+            # print("User has privileges")
+            # try:
+            #     request.data["venue_ids"] = create_unreusable_locations(request.data["venue_names"])
+            # except KeyError:
+            #     request.data["venue_ids"]
 
             return super().create(request)
 
@@ -200,23 +204,23 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
             event = Event.objects.get(id=pk)
         except Event.DoesNotExist:
             return Response({"error": "Event not found"})
-
-        council_id = event.get_verification_body_id()
-        user_has_VerE_permission = user_has_privilege(request.user.profile, council_id, "VerE")
-
-        if user_has_VerE_permission:
-            subject = event.description
-            message = event.longdescription
-            recipient_list = ['']
-            try:
-                send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=False)
-                event.email_verified = True
-                event.save()
-                return Response({"success": "Mail sent successfully"})
-            except Exception as e:
-                return Response({"error_status": True, "msg": f"Error sending mail: {str(e)}"})
-        else:
-            return forbidden_no_privileges()
+        councils = event.verification_bodies.all()
+        for council in councils:
+            council_id = council.id
+            user_has_VerE_permission = user_has_privilege(request.user.profile, council_id, "VerE")
+            if user_has_VerE_permission:
+                subject = event.description
+                message = event.longdescription
+                recipient_list = ['']
+                try:
+                    send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=False)
+                    event.email_verified = True
+                    event.save()
+                    return Response({"success": "Mail sent successfully"})
+                except Exception as e:
+                    return Response({"error_status": True, "msg": f"Error sending mail: {str(e)}"})
+            else:
+                return forbidden_no_privileges()
 
     @login_required_ajax
     def reject_mail(self, request, pk):
@@ -225,12 +229,14 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
         except Event.DoesNotExist:
             return Response({"error": "Event not found"})
 
-        council_id = event.get_verification_body_id()
-        user_has_VerE_permission = user_has_privilege(request.user.profile, council_id, "VerE")
+        councils = event.verification_bodies.all()
+        for council in councils:
+            council_id = council.id
+            user_has_VerE_permission = user_has_privilege(request.user.profile, council_id, "VerE")
 
-        if user_has_VerE_permission:
-            event.email_content = ""
-            event.save()
-            return Response({"success": "Mail rejected and content deleted"})
-        else:
-            return forbidden_no_privileges()
+            if user_has_VerE_permission:
+                event.email_content = ""
+                event.save()
+                return Response({"success": "Mail rejected and content deleted"})
+            else:
+                return forbidden_no_privileges()

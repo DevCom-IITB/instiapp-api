@@ -149,9 +149,13 @@ class EventFullSerializer(serializers.ModelSerializer):
         queryset=Location.objects.all(),
         required=False,
     )
-
+   
     bodies = BodySerializerMin(many=True, read_only=True)
     bodies_id = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=False, queryset=Body.objects.all(), source="bodies"
+    )
+    verification_bodies = BodySerializerMin(many=True, read_only=True)
+    verification_bodies_id = serializers.PrimaryKeyRelatedField(
         many=True, read_only=False, queryset=Body.objects.all(), source="bodies"
     )
 
@@ -178,7 +182,8 @@ class EventFullSerializer(serializers.ModelSerializer):
             "description",
             "longdescription",
             "email_verified",
-            "verification_body",
+            "verification_bodies",
+            "verification_bodies_id",
             "image_url",
             "start_time",
             "end_time",

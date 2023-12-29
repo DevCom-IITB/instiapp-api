@@ -14,7 +14,7 @@ from multiselectfield import MultiSelectField
 
 COUNCIL_IDS = (
     ("", "Institute Cultural Council"),
-    ("06868e3e-773e-43d1-8bbb-efe17bb67ed1", "Institute Technical Council"),
+    ("efb6423a-13a0-457e-9138-8f70d1d73c29", "Institute Technical Council"),
     ("", "Institute Sports Council"),
     ("", "Hostel Affairs"),
 )
@@ -36,8 +36,8 @@ class Event(models.Model):
     description = models.TextField(blank=True)
     longdescription = models.TextField(default='')
     email_verified = models.BooleanField(default=False)
-    verification_body = MultiSelectField(choices=COUNCIL_IDS)
     bodies = models.ManyToManyField("bodies.Body", related_name="events", blank=True)
+    verification_bodies = models.ManyToManyField("bodies.Body",  blank=True, related_name="verEvents")
     image_url = models.URLField(blank=True, null=True)
     website_url = models.URLField(blank=True, null=True)
     start_time = models.DateTimeField()
@@ -95,11 +95,7 @@ class Event(models.Model):
     def all_bodies(self):
         return [str(body) for body in self.bodies.all()]
     
-    def get_verification_body_id(self):
-        for key, name in COUNCIL_IDS :
-            if name == str(self.verification_body): 
-                return key
-        return
+  
 
     class Meta:
         verbose_name = "Event"
