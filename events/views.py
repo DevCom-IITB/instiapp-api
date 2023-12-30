@@ -216,7 +216,7 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
             if user_has_VerE_permission:
                 subject = event.description
                 message = event.longdescription
-                recipient_list = ['']
+                recipient_list = ['22b1277@iitb.ac.in']
                 try:
                     send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=False)
                     event.email_verified = True
@@ -240,7 +240,10 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
             user_has_VerE_permission = user_has_privilege(request.user.profile, council_id, "VerE")
 
             if user_has_VerE_permission:
-                event.email_content = ""
+                print(event.longdescription)
+                event.longdescription = ""
+                event.email_verified = True
+             
                 event.save()
                 return Response({"success": "Mail rejected and content deleted"})
             else:

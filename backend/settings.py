@@ -71,8 +71,8 @@ NO_LOGGING = {
 # EMAIL settings
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = "587"
-EMAIL_HOST_USER =  ""
-EMAIL_HOST_PASSWORD = ""
+EMAIL_HOST_USER =  "jatinsinghal2003@gmail.com"
+EMAIL_HOST_PASSWORD = "hrtp zedb ynyi uelc"
 EMAIL_USE_TLS = True
 
 CORS_ORIGIN_ALLOW_ALL = True
