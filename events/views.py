@@ -107,7 +107,7 @@ class EventViewSet(viewsets.ModelViewSet):
             return super().create(request)
 
         # Check privileges for all bodies
-        elif all(
+        if all(
             [
                 user_has_privilege(request.user.profile, id, "AddE")
                 for id in request.data["bodies_id"]
@@ -121,7 +121,6 @@ class EventViewSet(viewsets.ModelViewSet):
             #     request.data["venue_ids"]
 
             return super().create(request)
-
         return forbidden_no_privileges()
 
     @login_required_ajax

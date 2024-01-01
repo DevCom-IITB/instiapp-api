@@ -1,5 +1,5 @@
 [flake8]
 exclude = .git,__pycache__,backend/settings*,*/migrations/*,venv,.venv
-ignore = E302,E731,W503,C901,E501
-max-complexity = 15
-max-line-length = 120
+ignore = E302,E731,W503
+max-complexity = 25
+max-line-length = 150
