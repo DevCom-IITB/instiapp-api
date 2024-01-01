@@ -11,12 +11,11 @@ urlpatterns = [
     path(
         "events/<pk>/approve-mail",
         EventMailVerificationViewSet.as_view({"post": "approve_mail"}),
-        name="event-approve-mail"
+        name="event-approve-mail",
     ),
-
     path(
         "events/<pk>/reject-mail",
         EventMailVerificationViewSet.as_view({"post": "reject_mail"}),
-        name="event-reject-mail"
+        name="event-reject-mail",
     ),
 ]

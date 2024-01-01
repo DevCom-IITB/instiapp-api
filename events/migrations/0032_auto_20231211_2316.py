@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0031_alter_event_event_interest'),
+        ("events", "0031_alter_event_event_interest"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='email_body',
-            field=models.TextField(default=''),
+            model_name="event",
+            name="email_body",
+            field=models.TextField(default=""),
         ),
         migrations.AddField(
-            model_name='event',
-            name='email_verified',
+            model_name="event",
+            name="email_verified",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -5,9 +5,13 @@ from helpers.misc import get_url_friendly
 PDT_NAME_MAX_LENGTH = 60
 CONTACT_MAX_LENGTH = 300
 
+
 def get_image_path(instance, filename):
     userid = str(instance.uploaded_by.id)
-    return './' + userid[0:2] + '/' + userid[2:4] + '/' + userid + '-' + filename + '.jpg'
+    return (
+        "./" + userid[0:2] + "/" + userid[2:4] + "/" + userid + "-" + filename + ".jpg"
+    )
+
 
 class ProductFound(models.Model):
     CATEGORY_CHOICES = (
@@ -23,7 +27,9 @@ class ProductFound(models.Model):
     product_image = models.TextField(
         blank=True, null=True
     )  # Contains URLs of all three images.
-    product_image1 = models.ImageField(upload_to=get_image_path, null=False, blank=False)
+    product_image1 = models.ImageField(
+        upload_to=get_image_path, null=False, blank=False
+    )
     product_image2 = models.ImageField(upload_to=get_image_path, null=False, blank=True)
     product_image3 = models.ImageField(upload_to=get_image_path, null=False, blank=True)
     category = models.CharField(

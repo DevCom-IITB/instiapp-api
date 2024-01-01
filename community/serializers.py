@@ -98,8 +98,7 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
             pb.name = "Anonymous"
             pb.id = "null"
             pb.ldap_id = "null"
-            pb.profile_pic = \
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM9q9XJKxlskry5gXTz1OXUyem5Ap59lcEGg&usqp=CAU'
+            pb.profile_pic = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM9q9XJKxlskry5gXTz1OXUyem5Ap59lcEGg&usqp=CAU"
         elif (
             obj.anonymous
             and "return_for_mod" in self.context

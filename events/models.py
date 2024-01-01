@@ -2,9 +2,6 @@
 from uuid import uuid4
 from django.db import models
 from helpers.misc import get_url_friendly
-from multiselectfield import MultiSelectField
-
-
 
 
 class Event(models.Model):
@@ -21,10 +18,12 @@ class Event(models.Model):
 
     name = models.CharField(max_length=60)
     description = models.TextField(blank=True)
-    longdescription = models.TextField(default='')
+    longdescription = models.TextField(default="")
     email_verified = models.BooleanField(default=False)
     bodies = models.ManyToManyField("bodies.Body", related_name="events", blank=True)
-    verification_bodies = models.ManyToManyField("bodies.Body",  blank=True, related_name="verEvents")
+    verification_bodies = models.ManyToManyField(
+        "bodies.Body", blank=True, related_name="verEvents"
+    )
     image_url = models.URLField(blank=True, null=True)
     website_url = models.URLField(blank=True, null=True)
     start_time = models.DateTimeField()
@@ -81,8 +80,6 @@ class Event(models.Model):
 
     def all_bodies(self):
         return [str(body) for body in self.bodies.all()]
-    
-  
 
     class Meta:
         verbose_name = "Event"

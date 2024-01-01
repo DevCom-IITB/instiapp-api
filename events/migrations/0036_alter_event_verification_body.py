@@ -5,15 +5,31 @@ import multiselectfield.db.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0035_alter_event_verification_body'),
+        ("events", "0035_alter_event_verification_body"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='verification_body',
-            field=multiselectfield.db.fields.MultiSelectField(choices=[('Institute Cultural Council', 'd920d898-0998-4ed9-8fb8-f270310b2bec'), ('ae084ebb-6009-4095-a774-44ad0f107bc0', 'Institute Technical Council'), ('0aa10bcc-f08f-44c6-bf50-1ce9b5c2f0f0', 'Institute Sports Council'), ('6c43632e-de1f-4088-8e77-60af60139e91', 'Hostel Affairs')], max_length=137),
+            model_name="event",
+            name="verification_body",
+            field=multiselectfield.db.fields.MultiSelectField(
+                choices=[
+                    (
+                        "Institute Cultural Council",
+                        "d920d898-0998-4ed9-8fb8-f270310b2bec",
+                    ),
+                    (
+                        "ae084ebb-6009-4095-a774-44ad0f107bc0",
+                        "Institute Technical Council",
+                    ),
+                    (
+                        "0aa10bcc-f08f-44c6-bf50-1ce9b5c2f0f0",
+                        "Institute Sports Council",
+                    ),
+                    ("6c43632e-de1f-4088-8e77-60af60139e91", "Hostel Affairs"),
+                ],
+                max_length=137,
+            ),
         ),
     ]

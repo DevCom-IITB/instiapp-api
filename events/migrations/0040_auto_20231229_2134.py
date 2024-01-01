@@ -4,20 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('bodies', '0023_body_canonical_name'),
-        ('events', '0039_alter_event_verification_body'),
+        ("bodies", "0023_body_canonical_name"),
+        ("events", "0039_alter_event_verification_body"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='event',
-            name='verification_body',
+            model_name="event",
+            name="verification_body",
         ),
         migrations.AddField(
-            model_name='event',
-            name='verification_bodies',
-            field=models.ManyToManyField(blank=True, related_name='verEvents', to='bodies.Body'),
+            model_name="event",
+            name="verification_bodies",
+            field=models.ManyToManyField(
+                blank=True, related_name="verEvents", to="bodies.Body"
+            ),
         ),
     ]

@@ -36,7 +36,7 @@ class EventSerializer(serializers.ModelSerializer):
     venue info. Use `EventFullSerializer` if you want information
     on individual users and venues.
 
-    Basically this is the serializzer used in the min view for the event that passes only a few fields 
+    Basically this is the serializzer used in the min view for the event that passes only a few fields
     """
 
     # pylint: disable=C0415
@@ -149,14 +149,17 @@ class EventFullSerializer(serializers.ModelSerializer):
         queryset=Location.objects.all(),
         required=False,
     )
-   
+
     bodies = BodySerializerMin(many=True, read_only=True)
     bodies_id = serializers.PrimaryKeyRelatedField(
         many=True, read_only=False, queryset=Body.objects.all(), source="bodies"
     )
     verification_bodies = BodySerializerMin(many=True, read_only=True)
     verification_bodies_id = serializers.PrimaryKeyRelatedField(
-        many=True, read_only=False, queryset=Body.objects.all(), source="verification_bodies"
+        many=True,
+        read_only=False,
+        queryset=Body.objects.all(),
+        source="verification_bodies",
     )
 
     user_tags = serializers.PrimaryKeyRelatedField(

@@ -5,16 +5,33 @@ import multiselectfield.db.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0033_rename_email_body_event_longdescription'),
+        ("events", "0033_rename_email_body_event_longdescription"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='verification_body',
-            field=multiselectfield.db.fields.MultiSelectField(choices=[('91199c20-7488-41c5-9f6b-6f6c7c5b897d', 'Institute Cultural Council'), ('81e05a1a-7fd1-45b5-84f6-074e52c0f085', 'Institute Technical Council'), ('a9f81e69-fcc9-4fe3-b261-9e5e7a13f898', 'Institute Sports Council'), ('f3ae5230-4441-4586-81a8-bf75a2e47318', 'Hostel Affairs')], default='91199c20-7488-41c5-9f6b-6f6c7c5b897d', max_length=147),
+            model_name="event",
+            name="verification_body",
+            field=multiselectfield.db.fields.MultiSelectField(
+                choices=[
+                    (
+                        "91199c20-7488-41c5-9f6b-6f6c7c5b897d",
+                        "Institute Cultural Council",
+                    ),
+                    (
+                        "81e05a1a-7fd1-45b5-84f6-074e52c0f085",
+                        "Institute Technical Council",
+                    ),
+                    (
+                        "a9f81e69-fcc9-4fe3-b261-9e5e7a13f898",
+                        "Institute Sports Council",
+                    ),
+                    ("f3ae5230-4441-4586-81a8-bf75a2e47318", "Hostel Affairs"),
+                ],
+                default="91199c20-7488-41c5-9f6b-6f6c7c5b897d",
+                max_length=147,
+            ),
             preserve_default=False,
         ),
     ]

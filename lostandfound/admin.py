@@ -75,6 +75,7 @@ class ProductFoundAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
 
+
 class CSOAdminSite(admin.AdminSite):
     site_header = "CSO Admin"
     site_title = "CSO Admin Portal"
