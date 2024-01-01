@@ -14,6 +14,7 @@ from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
 from django.core.mail import send_mail
 from backend.settings import EMAIL_HOST_USER
+from backend.settings import RECIPIENT_LIST
 class EventViewSet(viewsets.ModelViewSet):
     """Event"""
 
@@ -216,7 +217,7 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
             if user_has_VerE_permission:
                 subject = event.description
                 message = event.longdescription
-                recipient_list = ['']
+                recipient_list = RECIPIENT_LIST
                 try:
                     send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=False)
                     event.email_verified = True
