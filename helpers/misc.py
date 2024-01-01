@@ -38,7 +38,7 @@ def query_from_num(request, default_num, queryset):
     if num_q is not None and str.isdigit(num_q) and int(num_q) <= 100:
         num = int(num_q)
 
-    return queryset[from_i : from_i + num]
+    return queryset[from_i: from_i + num]
 
 
 def query_search(  # pylint: disable=too-many-arguments

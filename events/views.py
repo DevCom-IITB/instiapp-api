@@ -101,9 +101,7 @@ class EventViewSet(viewsets.ModelViewSet):
         print(request.data["bodies_id"])
         print(request.data.get("verification_bodies"))
 
-        if type(request.data["bodies_id"]) == type(
-            "Jatin Singhal"
-        ) and user_has_privilege(
+        if isinstance(request.data["bodies_id"], str) and user_has_privilege(
             request.user.profile, request.data["bodies_id"], "AddE"
         ):
             return super().create(request)

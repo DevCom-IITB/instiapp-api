@@ -63,10 +63,10 @@ def getUserMess(request):
 
 def binaryDecode(x):
     b_x = "{0:b}".format(int(x))
-    day = int(b_x[len(b_x) - 5 : len(b_x)], 2)
-    meal = b_x[len(b_x) - 8 : len(b_x) - 5]
-    time = int(b_x[len(b_x) - 19 : len(b_x) - 8], 2)
-    hostel = int(b_x[0 : len(b_x) - 19], 2)
+    day = int(b_x[len(b_x) - 5: len(b_x)], 2)
+    meal = b_x[len(b_x) - 8: len(b_x) - 5]
+    time = int(b_x[len(b_x) - 19: len(b_x) - 8], 2)
+    hostel = int(b_x[0: len(b_x) - 19], 2)
     return {"hostel": hostel, "time": time, "meal": meal, "day": day}
 
 
