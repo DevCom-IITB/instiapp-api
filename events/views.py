@@ -233,7 +233,7 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
             user_has_VerE_permission = user_has_privilege(
                 request.user.profile, council_id, "VerE"
             )
-            if user_has_VerE_permission:
+            if user_has_VerE_permission and not event.email_verified:
                 subject = event.description
                 message = event.longdescription
                 recipient_list = RECIPIENT_LIST
@@ -269,7 +269,7 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
                 request.user.profile, council_id, "VerE"
             )
 
-            if user_has_VerE_permission:
+            if user_has_VerE_permission and not event.email_verified:
                 print(event.longdescription)
                 event.longdescription = ""
                 event.email_verified = True
