@@ -66,6 +66,7 @@ class ProductFoundAdmin(admin.ModelAdmin):
                     "product_image1",
                     "product_image2",
                     "product_image3",
+                    "uploaded_by",
                 ]
 
         self.form = CustomChangeForm
@@ -73,6 +74,7 @@ class ProductFoundAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
+
 
 class CSOAdminSite(admin.AdminSite):
     site_header = "CSO Admin"
