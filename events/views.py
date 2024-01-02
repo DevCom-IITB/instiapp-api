@@ -13,9 +13,10 @@ from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
 from django.core.mail import send_mail
-from backend.settings import EMAIL_HOST_USER
-from backend.settings import RECIPIENT_LIST
+from django.conf import settings
 
+EMAIL_HOST_USER = settings.EMAIL_HOST_USER
+RECIPIENT_LIST = settings.RECIPIENT_LIST
 
 class EventViewSet(viewsets.ModelViewSet):
     """Event"""
