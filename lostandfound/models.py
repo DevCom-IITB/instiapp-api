@@ -6,8 +6,8 @@ PDT_NAME_MAX_LENGTH = 60
 CONTACT_MAX_LENGTH = 300
 
 def get_image_path(instance, filename):
-    userid = str(instance.uploaded_by.id)
-    return './' + userid[0:2] + '/' + userid[2:4] + '/' + userid + '-' + filename + '.jpg'
+    random_str = str(uuid4()) #WARNING : Generates random string for every photo - every pic is stored in a new directory
+    return './' + random_str[0:4] + '/'+ random_str + '-' + filename + '.jpg'
 
 class ProductFound(models.Model):
     CATEGORY_CHOICES = (
@@ -38,14 +38,6 @@ class ProductFound(models.Model):
         max_length=CONTACT_MAX_LENGTH, blank=False, null=False
     )
     time_of_creation = models.DateTimeField(auto_now_add=True)
-
-    uploaded_by = models.ForeignKey(
-        "users.UserProfile",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="uploaded_products",
-    )
 
     claimed_by = models.ForeignKey(
         "users.UserProfile",

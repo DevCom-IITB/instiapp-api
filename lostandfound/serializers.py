@@ -20,7 +20,6 @@ class ProductFoundSerializer(serializers.ModelSerializer):
             "claimed",
             "contact_details",
             "time_of_creation",
-            "claimed_by",
         )
 
     def get_product_image(self, obj):
