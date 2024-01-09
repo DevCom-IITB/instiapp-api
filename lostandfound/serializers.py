@@ -18,6 +18,7 @@ class ProductFoundSerializer(serializers.ModelSerializer):
             "category",
             "found_at",
             "claimed",
+            "claimed_by",
             "contact_details",
             "time_of_creation",
         )
