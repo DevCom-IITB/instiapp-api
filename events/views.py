@@ -17,6 +17,8 @@ from django.conf import settings
 
 EMAIL_HOST_USER = settings.EMAIL_HOST_USER
 RECIPIENT_LIST = settings.RECIPIENT_LIST
+EMAIL_HOST_PASSWORD =settings.EMAIL_HOST_PASSWORD
+AUTH_USER = settings.AUTH_USER
 
 class EventViewSet(viewsets.ModelViewSet):
     """Event"""
@@ -93,12 +95,10 @@ class EventViewSet(viewsets.ModelViewSet):
             and "verification_body" not in request.data
         ):
             return Response({"error": "Verification body id not provided"})
-        print("verified verifying body")
 
         # Prevent events without any body
         if "bodies_id" not in request.data or not request.data["bodies_id"]:
             return forbidden_no_privileges()
-        print("verified bodies_id")
         print(request.data["bodies_id"])
         print(request.data.get("verification_bodies"))
 
@@ -245,6 +245,8 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
                         EMAIL_HOST_USER,
                         recipient_list,
                         fail_silently=False,
+                        auth_user=AUTH_USER,
+                        auth_password=EMAIL_HOST_PASSWORD,
                     )
                     event.email_verified = True
                     event.save()
