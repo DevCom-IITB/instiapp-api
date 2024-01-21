@@ -1,12 +1,16 @@
-from django.db import models
 from uuid import uuid4
+
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from helpers.misc import get_url_friendly
 
 PDT_NAME_MAX_LENGTH = 60
 CONTACT_MAX_LENGTH = 300
 
 def get_image_path(instance, filename):
-    random_str = str(uuid4()) #WARNING : Generates random string for every photo - every pic is stored in a new directory
+    random_str = "fd9a457a-a5b5-4560-b81e-6654129e5df8" # NOTE: Since we not using uploaded by - all the images are stored in the same folder.
     return './' + random_str[0:4] + '/'+ random_str + '-' + filename + '.jpg'
 
 class ProductFound(models.Model):
@@ -51,21 +55,14 @@ class ProductFound(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        # NOTE: The ProductFound object is updated after the images are saved.
         if self.claimed_by is not None:
             self.claimed = True
         else:
             self.claimed = False
-
-        image_urls = ""
-        image_urls += self.product_image1.url + ","
-        if self.product_image2:
-            image_urls += self.product_image2.url + ","
-        if self.product_image3:
-            image_urls += self.product_image3.url
-
-        self.product_image = image_urls
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
+
 
     class Meta:
         verbose_name = "ProductFound"
@@ -78,3 +75,17 @@ class ProductFound(models.Model):
                 ]
             ),
         ]
+
+
+@receiver(post_save, sender=ProductFound, dispatch_uid="update_product_found")
+def update_product_found(sender, instance, **kwargs):
+    """Update the product_image field of ProductFound after the image is saved.
+    This is done to avoid the problem of the correct image url not being available."""
+    image_urls = ""
+    image_urls += instance.product_image1.url + ","
+    if instance.product_image2:            
+        image_urls += instance.product_image2.url + ","
+    if instance.product_image3:
+        image_urls += instance.product_image3.url
+
+    sender.objects.filter(id=instance.id).update(product_image=image_urls)
