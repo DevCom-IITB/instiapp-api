@@ -1,12 +1,10 @@
+from django import forms
 from django.contrib import admin
 from django.http.response import HttpResponse
 from django.utils.html import format_html
 
-# Register your models here.
 from lostandfound.models import ProductFound
-from django import forms
 from users.models import UserProfile
-
 
 class UserProfileAdmin(admin.ModelAdmin):
     search_fields = ["ldap_id", "name", "roll_no"]
@@ -43,7 +41,10 @@ class ProductFoundAdmin(admin.ModelAdmin):
     # inlines = [UserProfileInline]
 
     def product_image_display(self, obj):
-        images = obj.product_image.split(",")
+        try:
+            images = obj.product_image.split(",")
+        except AttributeError:
+            images = ['']
         return format_html(
             '<div style = "width :200px margin-left:50px"><img src="{}"style="max-height: 150px; /></div>'.format(
                 images[0]
@@ -66,7 +67,7 @@ class ProductFoundAdmin(admin.ModelAdmin):
                     "product_image1",
                     "product_image2",
                     "product_image3",
-                    "uploaded_by",
+                
                 ]
 
         self.form = CustomChangeForm
