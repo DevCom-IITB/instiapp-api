@@ -17,7 +17,7 @@ from django.conf import settings
 
 EMAIL_HOST_USER = settings.EMAIL_HOST_USER
 RECIPIENT_LIST = settings.RECIPIENT_LIST
-EMAIL_HOST_PASSWORD =settings.EMAIL_HOST_PASSWORD
+EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
 AUTH_USER = settings.AUTH_USER
 
 class EventViewSet(viewsets.ModelViewSet):
