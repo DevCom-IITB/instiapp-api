@@ -65,7 +65,7 @@ class ProductFound(models.Model):
             self.claimed = False
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
-        
+
     class Meta:
         verbose_name = "ProductFound"
         verbose_name_plural = "ProductsFound"
