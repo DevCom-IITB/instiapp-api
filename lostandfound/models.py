@@ -11,7 +11,7 @@ CONTACT_MAX_LENGTH = 300
 
 
 def get_image_path(instance, filename):
-    random_str = "fd9a457a-a5b5-4560-b81e-6654129e5df8"  #  NOTE: Since we not using uploaded by - all the images are stored in the same folder.
+    random_str = "fd9a457a-a5b5-4560-b81e-6654129e5df8"  # NOTE: Since we not using uploaded by - all the images are stored in the same folder.
     return './' + random_str[0:4] + '/' + random_str + '-' + filename + '.jpg'
 
 class ProductFound(models.Model):
@@ -65,6 +65,7 @@ class ProductFound(models.Model):
             self.claimed = False
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
+        
     class Meta:
         verbose_name = "ProductFound"
         verbose_name_plural = "ProductsFound"
