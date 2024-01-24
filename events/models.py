@@ -18,7 +18,12 @@ class Event(models.Model):
 
     name = models.CharField(max_length=60)
     description = models.TextField(blank=True)
+    longdescription = models.TextField(default="")
+    email_verified = models.BooleanField(default=False)
     bodies = models.ManyToManyField("bodies.Body", related_name="events", blank=True)
+    verification_bodies = models.ManyToManyField(
+        "bodies.Body", blank=True, related_name="verEvents"
+    )
     image_url = models.URLField(blank=True, null=True)
     website_url = models.URLField(blank=True, null=True)
     start_time = models.DateTimeField()

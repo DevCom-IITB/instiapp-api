@@ -1,7 +1,7 @@
+from uuid import uuid4
 from django.db.models.deletion import SET
 from django.db.models.fields.related import ForeignKey
 from django.db import models
-from uuid import uuid4
 from helpers.misc import get_url_friendly
 
 PDT_NAME_MAX_LENGTH = 60

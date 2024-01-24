@@ -7,6 +7,7 @@ PERMISSION_CHOICES = (
     ("AddE", "Add Event"),
     ("UpdE", "Update Event"),
     ("DelE", "Delete Event"),
+    ("VerE", "Verify Event"),
     ("UpdB", "Update Body"),
     ("Role", "Modify Roles"),
     ("VerA", "Verify Achievements"),

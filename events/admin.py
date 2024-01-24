@@ -6,6 +6,7 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = (
         "start_time",
         "bodies",
+        "venues",
     )
     list_display = (
         "name",
