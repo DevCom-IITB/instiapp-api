@@ -1,11 +1,11 @@
 """Helper functions for implementing roles."""
+import datetime
 from rest_framework.response import Response
+from dateutil.relativedelta import relativedelta
 from bodies.models import Body
 from community.models import Community
 from bans.models import SSOBan
 from users.models import UserProfile
-import datetime
-from dateutil.relativedelta import relativedelta
 
 
 def user_is_banned(profile):
@@ -18,12 +18,11 @@ def user_is_banned(profile):
         if ban_duration == "Permanent":
             return True
 
-        else:
-            duration_month = int(ban_duration.split(" ")[0])
-            banned_till = ban_created + relativedelta(months=duration_month)
+        duration_month = int(ban_duration.split(" ")[0])
+        banned_till = ban_created + relativedelta(months=duration_month)
 
-            if banned_till > current_time:
-                return True
+        if banned_till > current_time:
+            return True
         return False
     except SSOBan.DoesNotExist:
         return False
@@ -109,7 +108,7 @@ def login_required_ajax(func):
             profile = UserProfile.objects.get(user=user)
             if not user_is_banned(profile):
                 return func(*args, **kw)
-            if user_is_banned:
+            else:
                 return Response(
                     {"message": "banned", "detail": "your SSO has been banned/disabled"}
                 )

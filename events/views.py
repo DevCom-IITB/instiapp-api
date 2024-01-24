@@ -3,6 +3,8 @@ from uuid import UUID
 from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
+from django.core.mail import send_mail
+from django.conf import settings
 from events.prioritizer import get_fresh_prioritized_events
 from events.prioritizer import get_prioritized
 from events.serializers import EventSerializer
@@ -12,8 +14,6 @@ from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
 from locations.helpers import create_unreusable_locations
-from django.core.mail import send_mail
-from django.conf import settings
 
 EMAIL_HOST_USER = settings.EMAIL_HOST_USER
 RECIPIENT_LIST = settings.RECIPIENT_LIST
@@ -279,5 +279,4 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
 
                 event.save()
                 return Response({"success": "Mail rejected and content deleted"})
-            else:
-                return forbidden_no_privileges()
+            return forbidden_no_privileges()

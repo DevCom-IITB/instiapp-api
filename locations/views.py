@@ -1,8 +1,8 @@
 """Views for locations app."""
+import sys
 from rest_framework import viewsets
 from rest_framework.response import Response
-from locations.serializers import LocationSerializer
-from locations.models import Location
+from rest_framework.decorators import api_view
 from roles.helpers import insti_permission_required
 from roles.helpers import login_required_ajax
 from roles.helpers import user_has_insti_privilege
@@ -10,8 +10,8 @@ from roles.helpers import user_has_privilege
 from roles.helpers import forbidden_no_privileges
 from django.db.models import Q
 from django.http import HttpRequest
-import sys
-from rest_framework.decorators import api_view
+from locations.serializers import LocationSerializer
+from locations.models import Location
 from locations.management.commands.mapnav import (
     handle_entry,
     dijkstra,
@@ -254,7 +254,7 @@ def checkerrors(request):
     items["Passed : Coordinates are null"] = []
 
     for x in adj_list:
-        if type(x) == str:
+        if isinstance(x, str):
             try:
                 a = Location.objects.get(name=x)
                 if a.pixel_x is None or a.pixel_y is None:
@@ -266,7 +266,7 @@ def checkerrors(request):
                 items["Failed : MultipleObjectsReturned"].append(x)
 
         for y in adj_list[x]:
-            if type(y) == str:
+            if isinstance(y, str):
                 try:
                     a = Location.objects.get(name=y)
                     if a.pixel_x is None or a.pixel_y is None:
