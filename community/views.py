@@ -31,11 +31,8 @@ class ModeratorViewSet(viewsets.ModelViewSet):
         post = self.get_community_post(pk)
 
         if (
-            user_has_privilege(request.user.profile, post.community.body.id, "AppP")
-            and post.thread_rank == 1
-        ) or (
             user_has_privilege(request.user.profile, post.community.body.id, "ModC")
-            and post.thread_rank > 1
+            and post.thread_rank > 0
         ):
             # Get query param
             status = request.data["status"]
@@ -72,7 +69,7 @@ class PostViewSet(viewsets.ModelViewSet):
         )
         post = self.get_community_post(pk)
         return_for_mod = False
-        if user_has_privilege(request.user.profile, post.community.body.id, "AppP"):
+        if user_has_privilege(request.user.profile, post.community.body.id, "ModC"):
             return_for_mod = True
         serialized = CommunityPostSerializers(
             post, context={"return_for_mod": return_for_mod}
@@ -112,7 +109,7 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = query_search(request, 3, queryset, ["content"], "posts")
         queryset = query_from_num(request, 20, queryset)
         return_for_mod = False
-        if user_has_privilege(request.user.profile, community.body.id, "AppP"):
+        if user_has_privilege(request.user.profile, community.body.id, "ModC"):
             return_for_mod = True
 
         serializer = CommunityPostSerializerMin(
@@ -153,7 +150,7 @@ class PostViewSet(viewsets.ModelViewSet):
             if all(
                 [
                     user_has_privilege(
-                        request.user.profile, post.community.body.id, "AppP"
+                        request.user.profile, post.community.body.id, "ModC"
                     )
                 ]
             ):
@@ -184,7 +181,7 @@ class PostViewSet(viewsets.ModelViewSet):
             if all(
                 [
                     user_has_privilege(
-                        request.user.profile, post.community.body.id, "AppP"
+                        request.user.profile, post.community.body.id, "ModC"
                     )
                 ]
             ):
