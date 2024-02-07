@@ -1,6 +1,6 @@
 """URLs for events."""
 from django.urls import path
-from events.views import EventViewSet, EventMailVerificationViewSet
+from events.views import EventViewSet, EventMailVerificationViewSet, BodiesWithPrivilegeView
 
 urlpatterns = [
     path("events", EventViewSet.as_view({"get": "list", "post": "create"})),
@@ -18,4 +18,6 @@ urlpatterns = [
         EventMailVerificationViewSet.as_view({"post": "reject_mail"}),
         name="event-reject-mail",
     ),
+    path('bodies-with-privilege/', BodiesWithPrivilegeView.as_view({"get": "get_bodies"}), name='bodies-with-privilege'),
+
 ]

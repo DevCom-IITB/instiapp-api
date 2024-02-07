@@ -6,6 +6,8 @@ from bodies.models import Body
 from community.models import Community
 from bans.models import SSOBan
 from users.models import UserProfile
+from roles.models import BodyRole
+from bodies.serializer_min import BodySerializerMin
 
 
 def user_is_banned(profile):
@@ -133,3 +135,14 @@ def insti_permission_required(permission):
         return wrapper
 
     return real_decorator
+
+def bodies_with_users_having_privilege(privilege):
+    bodies_with_privilege = set()
+    all_user_profiles = UserProfile.objects.all()
+    for user_profile in all_user_profiles:
+        if any(role.permissions and privilege in role.permissions for role in user_profile.roles.all()):
+            bodies_with_privilege.update(role.body for role in user_profile.roles.all())
+
+    serialized_bodies = BodySerializerMin(list(bodies_with_privilege), many=True).data
+
+    return serialized_bodies

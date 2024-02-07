@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
+from bodies.serializers import BodySerializerMin
 from events.prioritizer import get_fresh_prioritized_events
 from events.prioritizer import get_prioritized
 from events.serializers import EventSerializer
@@ -13,6 +14,7 @@ from events.models import Event
 from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
+from roles.helpers import bodies_with_users_having_privilege
 from locations.helpers import create_unreusable_locations
 
 EMAIL_HOST_USER = settings.EMAIL_HOST_USER
@@ -280,3 +282,19 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
                 event.save()
                 return Response({"success": "Mail rejected and content deleted"})
             return forbidden_no_privileges()
+
+
+class BodiesWithPrivilegeView(viewsets.ModelViewSet):
+    @login_required_ajax
+    def get_bodies(self, request):
+        """Get bodies with users having a specific privilege."""
+        privilege = request.data.get('privilege')
+
+        if not privilege:
+            return Response({"error": "Please provide a privilege in the request data."}, status=400)
+
+        bodies_with_privilege = bodies_with_users_having_privilege(privilege)
+
+        serialized_bodies = BodySerializerMin(bodies_with_privilege, many=True).data
+
+        return Response(serialized_bodies)
