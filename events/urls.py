@@ -18,6 +18,6 @@ urlpatterns = [
         EventMailVerificationViewSet.as_view({"post": "reject_mail"}),
         name="event-reject-mail",
     ),
-    path('bodies-with-privilege/', BodiesWithPrivilegeView.as_view({"get": "get_bodies"}), name='bodies-with-privilege'),
+    path("bodies-with-privilege/", BodiesWithPrivilegeView.as_view({"get": "get_bodies"}), name='bodies-with-privilege'),
 
 ]

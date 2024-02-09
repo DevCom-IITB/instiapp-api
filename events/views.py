@@ -284,16 +284,11 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
             return forbidden_no_privileges()
 
 
-class BodiesWithPrivilegeView(viewsets.ModelViewSet):
+class BodiesWithPrivilegeView(viewsets.ViewSet):
     @login_required_ajax
     def get_bodies(self, request):
         """Get bodies with users having a specific privilege."""
-        privilege = request.data.get('privilege')
-
-        if not privilege:
-            return Response({"error": "Please provide a privilege in the request data."}, status=400)
-
-        bodies_with_privilege = bodies_with_users_having_privilege(privilege)
+        bodies_with_privilege = bodies_with_users_having_privilege("VerE")
 
         serialized_bodies = BodySerializerMin(bodies_with_privilege, many=True).data
 
