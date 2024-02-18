@@ -285,7 +285,6 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
 
 
 class BodiesWithPrivilegeView(viewsets.ViewSet):
-    @login_required_ajax
     def get_bodies(self, request):
         """Get bodies with users having a specific privilege."""
         bodies_with_privilege = bodies_with_users_having_privilege("VerE")

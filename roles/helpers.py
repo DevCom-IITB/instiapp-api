@@ -138,10 +138,10 @@ def insti_permission_required(permission):
 
 def bodies_with_users_having_privilege(privilege):
     bodies_with_privilege = set()
-    all_user_profiles = UserProfile.objects.all()
-    for user_profile in all_user_profiles:
-        if any(role.permissions and privilege in role.permissions for role in user_profile.roles.all()):
-            bodies_with_privilege.update(role.body for role in user_profile.roles.all())
+    body_roles = BodyRole.objects.all()
+    for role in body_roles:
+        if (role.permissions and privilege in role.permissions):
+            bodies_with_privilege.add(role.body)
 
     serialized_bodies = BodySerializerMin(list(bodies_with_privilege), many=True).data
 
