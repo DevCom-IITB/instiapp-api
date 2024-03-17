@@ -3,8 +3,8 @@ from achievements.models import Interest
 from community.models import Community, CommunityPost
 from community.serializer_min import CommunityPostSerializerMin
 from roles.serializers import RoleSerializerMin
-from users.models import UserProfile
 from bodies.models import Body
+from users.models import UserProfile
 from users.serializers import UserProfileSerializer
 
 

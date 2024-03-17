@@ -1,5 +1,5 @@
 [flake8]
-exclude = .git,__pycache__,backend/settings*,*/migrations/*,venv,.venv
+exclude = .git,__pycache__,backend/settings*,*/migrations/*,venv,.venv,adj_list.py
 ignore = E302,E731,W503
 max-complexity = 15
 max-line-length = 120
