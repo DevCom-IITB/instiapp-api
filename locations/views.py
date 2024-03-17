@@ -1,21 +1,21 @@
 """Views for locations app."""
+import sys
+
+from django.db.models import Q
+from django.http import HttpRequest
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
 from locations.serializers import LocationSerializer
 from locations.models import Location
+from locations.management.commands.mapnav import handle_entry, dijkstra
+
 from roles.helpers import insti_permission_required
 from roles.helpers import login_required_ajax
 from roles.helpers import user_has_insti_privilege
 from roles.helpers import user_has_privilege
 from roles.helpers import forbidden_no_privileges
-from django.db.models import Q
-from django.http import HttpRequest
-import sys
-from rest_framework.decorators import api_view
-from locations.management.commands.mapnav import (
-    handle_entry,
-    dijkstra,
-)
 
 
 class LocationViewSet(viewsets.ModelViewSet):
@@ -79,14 +79,12 @@ class LocationViewSet(viewsets.ModelViewSet):
 
         return super().destroy(request, pk)
 
-
-"""
-This endpoint gives the shortest path between two points on the map in a sequence of locations.
-"""
-
-
 @api_view(("POST",))
 def get_shortest_path(request):
+    """
+    This endpoint gives the shortest path between two points on the map in a sequence of locations.
+    """
+
     try:
         start = request.data["origin"]
         formatted_origin = True
@@ -133,8 +131,7 @@ def get_shortest_path(request):
                     ]
                 )
 
-            for a in range(len(path)):
-                i = path[a]
+            for _, i in enumerate(path):
                 if isinstance(i, str):
                     loc_i = Location.objects.get(name=i)
                 else:
@@ -157,14 +154,14 @@ def get_shortest_path(request):
         return Response(data={"detail": "No path found"})
     return Response()
 
-
-"""
-Finding the nearest two points for a given set of coordinates.
-"""
-
-
 @api_view(("POST",))
 def nearest_points(request):
+    """
+    Finding the nearest two points for a given set of coordinates.
+    """
+
+    # pylint: disable=too-many-branches
+
     xcor = request.data["xcor"]
     ycor = request.data["ycor"]
 
@@ -182,8 +179,6 @@ def nearest_points(request):
                 pixel_x__range=[xcor - 1200, xcor + 1200],
                 pixel_y__range=[ycor - 1200, ycor + 1200],
             )
-            # filtered_locations = location.filter(
-            # pixel_x__range=[xcor - 400, xcor + 400], pixel_y__range=[ycor - 400, ycor + 400])
         else:
             location = Location
             filtered_locations = location.objects.filter(
@@ -232,18 +227,16 @@ def nearest_points(request):
             locations[1] = LocationSerializer(filtered_locations[snpi]).data
 
             return Response(data=locations)
-        else:
-            return Response(data={"detail": "No Locations"})
 
-
-"""
-"Testing errors in the adjacency list:
-These are the errors that may occur when running the Dijkstra code. It provides common error outputs."
-"""
-
+    return Response(data={"detail": "No Locations"})
 
 @api_view(["GET"])
 def checkerrors(request):
+    """
+    Testing errors in the adjacency list:
+    These are the errors that may occur when running the Dijkstra code. It provides common error outputs."
+    """
+
     adj_list = handle_entry().load_adj_list()  # change this list accordingly
 
     items = {}
@@ -253,6 +246,7 @@ def checkerrors(request):
     items["Passed : Coordinates null"] = []
     items["Passed : Coordinates are null"] = []
 
+    # pylint: disable=consider-using-dict-items
     for x in adj_list:
         if isinstance(x, str):
             try:

@@ -130,7 +130,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if "community" not in request.data or not request.data["community"]:
             return forbidden_no_privileges()
 
-        user, created = UserProfile.objects.get_or_create(user=request.user)
+        UserProfile.objects.get_or_create(user=request.user)
         return super().create(request)
 
     @login_required_ajax
@@ -253,7 +253,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def create(self, request):
         name = request.data["name"]
-        user, created = UserProfile.objects.get_or_create(user=request.user)
+        UserProfile.objects.get_or_create(user=request.user)
         if not Community.objects.all().filter(name=name).exists():
             super().create(request)
             return Response({"message": "Community created"})

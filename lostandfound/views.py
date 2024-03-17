@@ -1,12 +1,15 @@
 """Views for BuyAndSell."""
 from uuid import UUID
-from rest_framework.response import Response
-from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
-from roles.helpers import login_required_ajax
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
+
+from rest_framework.response import Response
+from rest_framework import viewsets
+
+from roles.helpers import login_required_ajax
+
 from lostandfound.models import ProductFound
 from lostandfound.serializers import ProductFoundSerializer
 
@@ -56,5 +59,5 @@ class LostandFoundViewset(viewsets.ModelViewSet):
 def cso_admin_login(request):
     if request.user.is_staff:
         return redirect("CSOAdmin:index")
-    else:
-        return Response({"message": "Not a staff member"}, status=401)
+
+    return Response({"message": "Not a staff member"}, status=401)

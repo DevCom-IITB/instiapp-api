@@ -12,6 +12,7 @@ class UpdateAdjList:
         adj_list = {}
 
         with open(adj_list_path, "r") as f:
+            # pylint: disable=eval-used
             adj_list = dict(eval(f.read()))
 
         return adj_list
@@ -33,11 +34,14 @@ class UpdateAdjList:
 
         return m.sqrt(0.001 * ((x_loc1 - x_loc2) ** 2 + (y_loc1 - y_loc2) ** 2))
 
-    """
-    This function updates the adj_list with the new connections and distances betweem them.
-    """
+    def add_conns(self, loc1, connections=None):
+        """
+        This function updates the adj_list with the new connections and distances betweem them.
+        """
 
-    def add_conns(self, loc1, connections=[]):
+        if not connections:
+            connections = []
+
         new_data = self.adj_list.copy()
         for loc2 in connections:
             if loc2:

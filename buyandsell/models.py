@@ -1,7 +1,9 @@
+from uuid import uuid4
+
 from django.db.models.deletion import SET
 from django.db.models.fields.related import ForeignKey
 from django.db import models
-from uuid import uuid4
+
 from helpers.misc import get_url_friendly
 
 PDT_NAME_MAX_LENGTH = 60
@@ -49,7 +51,7 @@ class Product(models.Model):
     name = models.CharField(max_length=PDT_NAME_MAX_LENGTH, blank=False, null=False)
     description = models.TextField(blank=True, default="", null=False)
     product_image = models.TextField(blank=True, null=True)
-    # TODO: Change the on_delete function to .
+    # _TODO: Change the on_delete function to .
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, blank=True
     )

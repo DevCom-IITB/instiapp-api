@@ -1,6 +1,6 @@
 [MASTER]
 load-plugins=pylint_django
-ignore=.git,__pycache__,backend,migrations,venv,.venv
+ignore=.git,__pycache__,backend,migrations,venv,.venv,adj_list.py
 
 [MESSAGES CONTROL]
 max-line-length=120

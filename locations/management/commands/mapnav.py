@@ -2,29 +2,10 @@ import os
 import sys
 import math as m
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from locations.serializers import LocationSerializerMin
 from locations.models import Location
-
-# class ProfileFetcher():
-#     """Helper to get dictionary of profiles efficiently."""
-#     def __init__(self):
-#         self.roll_nos = None
-
-#     def get_roll(self):
-#         if not self.roll_nos:
-#             self.roll_nos = UserProfile.objects.filter(active=True).values_list('roll_no', flat=True)
-#         return self.roll_nos
-
-
-# profile_fetcher = ProfileFetcher()
-
-"""
-Returns adj_list with the distances and updates database for
-Locations models to contain the node points (if they didn't).
-"""
 
 class handle_entry:
     def __init__(self):
@@ -291,27 +272,21 @@ class handle_entry:
 
     # flake8: noqa: C901
     def update(self):
-        """Caution: Avoid executing the update function during active requests as it may cause significant delays (~20s).
-        If any modifications need to be made to the adj_list, it is essential to ensure that the
-        adj_list is updated accordingly,
-        including the distances between nodes.
+        """Caution: Avoid executing the update function during active requests as
+        it may cause significant delays (~20s). If any modifications need to be
+        made to the adj_list, it is essential to ensure that the adj_list is
+        updated accordingly, including the distances between nodes.
         """
+        # pylint: disable=consider-using-dict-items, too-many-branches, too-many-nested-blocks
 
         for x in self.adj_list:
             if not isinstance(x, str):
                 for y in self.adj_list[x]:
                     if not isinstance(y, str):
                         self.adj_list[x][y] = m.sqrt(
-                            abs(
-                                0.001
-                                * (
-                                    (self.coordinates[x][0] - self.coordinates[y][0])
-                                    ** 2
-                                    + (self.coordinates[x][1] - self.coordinates[y][1])
-                                    ** 2
-                                )
-                            )
-                        )
+                            abs(0.001 * (
+                                (self.coordinates[x][0] - self.coordinates[y][0]) ** 2
+                              + (self.coordinates[x][1] - self.coordinates[y][1]) ** 2)))
                     else:
                         try:
                             x_cor = Location.objects.filter(name=y)[0].pixel_x
@@ -376,9 +351,7 @@ class handle_entry:
             i = 0
             loc_list = []
             for p in self.coordinates:
-                loc, c = Location.objects.get_or_create(
-                    pixel_x=p[0], pixel_y=p[1], name="Node" + str(i)
-                )
+                loc, _ = Location.objects.get_or_create(pixel_x=p[0], pixel_y=p[1], name="Node" + str(i))
                 loc_list.append(loc)
                 i += 1
 
@@ -414,7 +387,7 @@ class handle_entry:
         adj_list = {}
 
         with open(adj_list_path, "r") as f:
-            adj_list = dict(eval(f.read()))
+            adj_list = dict(eval(f.read()))  # pylint: disable=eval-used
 
         return adj_list
 
@@ -422,8 +395,7 @@ class handle_entry:
         """Gets the nearest Node near a location on the map."""
 
         if "Node" in loc:
-            k = int(loc.replace("Node", ""))
-            return k
+            return int(loc.replace("Node", ""))
 
         min_dist = sys.maxsize
         nearest_loc = None
@@ -444,7 +416,7 @@ class handle_entry:
         """Returns the adj_list which contains only the node points containing the endpoint and the start point"""
 
         new_adjoint_list = {}
-        for i in self.adj_list:
+        for i in self.adj_list:  # pylint: disable=consider-using-dict-items
             if isinstance(i, int) or i == start or i == end:
                 new_adjoint_list[i] = {}
                 for j in self.adj_list[i]:
@@ -526,13 +498,16 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Run the chore."""
 
-        handle_entry(settings.EXTERNAL_BLOG_URL)
-        self.stdout.write(
-            self.style.SUCCESS("External Blog Chore completed successfully")
-        )
+        # not sure wth is happening here
+        handle_entry()
+        self.stdout.write(self.style.SUCCESS("External Blog Chore completed successfully"))
 
 def fn_nearest_points(request):
-    """ This command gets the nearest points for some x,y coordinates. Although a simliar function is defined in views.py"""
+    """
+    This command gets the nearest points for some x,y coordinates.
+    Although a simliar function is defined in views.py
+    """
+    # pylint: disable=too-many-branches
 
     xcor = request.data2["xcor"]
     ycor = request.data2["ycor"]
@@ -543,16 +518,14 @@ def fn_nearest_points(request):
             xcor = int(xcor)
             ycor = int(ycor)
         except TypeError:
-            data = {"detail": "Invalid Coordinates "}
-            return data
+            return {"detail": "Invalid Coordinates "}
+
         if "only_nodes" in request.data2:
             filtered_locations = Location.objects.filter(
                 Q(name__contains="Node"),
                 pixel_x__range=[xcor - 1200, xcor + 1200],
                 pixel_y__range=[ycor - 1200, ycor + 1200],
             )
-            # filtered_locations = location.filter
-            # (pixel_x__range=[xcor - 400, xcor +   # 400], pixel_y__range=[ycor - 400, ycor # + 400])
         else:
             location = Location
             filtered_locations = location.objects.filter(
@@ -601,5 +574,5 @@ def fn_nearest_points(request):
             locations[1] = LocationSerializerMin(filtered_locations[snpi]).data
 
             return locations
-        else:
-            return {"detail": "No Locations"}
+
+    return {"detail": "No Locations"}

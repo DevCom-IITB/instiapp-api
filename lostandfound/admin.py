@@ -72,9 +72,6 @@ class ProductFoundAdmin(admin.ModelAdmin):
         self.form = CustomChangeForm
         return super().change_view(request, object_id, form_url, extra_context)
 
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-
 class CSOAdminSite(admin.AdminSite):
     site_header = "CSO Admin"
     site_title = "CSO Admin Portal"
