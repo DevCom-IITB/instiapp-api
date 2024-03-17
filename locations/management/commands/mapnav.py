@@ -1,11 +1,12 @@
+import os
+import sys
+import math as m
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Q
-import sys
 from locations.serializers import LocationSerializerMin
 from locations.models import Location
-import os
-import math as m
 
 # class ProfileFetcher():
 #     """Helper to get dictionary of profiles efficiently."""
@@ -22,9 +23,8 @@ import math as m
 
 """
 Returns adj_list with the distances and updates database for
-Locations models to contain the node points(if they didn't).
+Locations models to contain the node points (if they didn't).
 """
-
 
 class handle_entry:
     def __init__(self):
@@ -289,17 +289,18 @@ class handle_entry:
 
         self.adj_list = self.load_adj_list()
 
-    """Caution: Avoid executing the update function during active requests as it may cause significant delays (~20s).
-    If any modifications need to be made to the adj_list, it is essential to ensure that the
-    adj_list is updated accordingly,
-    including the distances between nodes.
-    """
-
+    # flake8: noqa: C901
     def update(self):
+        """Caution: Avoid executing the update function during active requests as it may cause significant delays (~20s).
+        If any modifications need to be made to the adj_list, it is essential to ensure that the
+        adj_list is updated accordingly,
+        including the distances between nodes.
+        """
+
         for x in self.adj_list:
-            if type(x) != str:
+            if not isinstance(x, str):
                 for y in self.adj_list[x]:
-                    if type(y) != str:
+                    if not isinstance(y, str):
                         self.adj_list[x][y] = m.sqrt(
                             abs(
                                 0.001
@@ -346,7 +347,7 @@ class handle_entry:
                     y_cor = 0
 
                 for y in self.adj_list[x]:
-                    if type(y) != str:
+                    if not isinstance(y, str):
                         self.adj_list[x][y] = m.sqrt(
                             abs(
                                 0.001
@@ -386,11 +387,11 @@ class handle_entry:
             with open(adj_list_path, "w") as f:
                 f.write(str(self.adj_list))
 
-    """
-    Updates the 'connected_locs' field of Location objects with conected locations
-    """
-
     def update_locations_with_connected_loc(self):
+        """
+        Updates the 'connected_locs' field of Location objects with conected locations
+        """
+
         # Need to run this to ensure the location objects contain the adjacent locations that they are connected to.
         all_locations = Location.objects.all()
         for location in all_locations:
@@ -408,8 +409,6 @@ class handle_entry:
             except KeyError:
                 pass
 
-    """Gets the nearest Node near a location on the map."""
-
     def load_adj_list(self):
         adj_list_path = f"{os.getcwd()}/locations/management/commands/adj_list.py"
         adj_list = {}
@@ -419,9 +418,9 @@ class handle_entry:
 
         return adj_list
 
-    import sys
-
     def get_nearest(self, loc):
+        """Gets the nearest Node near a location on the map."""
+
         if "Node" in loc:
             k = int(loc.replace("Node", ""))
             return k
@@ -441,9 +440,9 @@ class handle_entry:
 
         return nearest_loc
 
-    """Returns the adj_list which contains only the node points containing the endpoint and the start point"""
-
     def graph(self, end, start):
+        """Returns the adj_list which contains only the node points containing the endpoint and the start point"""
+
         new_adjoint_list = {}
         for i in self.adj_list:
             if isinstance(i, int) or i == start or i == end:
@@ -532,11 +531,9 @@ class Command(BaseCommand):
             self.style.SUCCESS("External Blog Chore completed successfully")
         )
 
-
-""" This command gets the nearest points for some x,y coordinates. Although a simliar function is defined in views.py"""
-
-
 def fn_nearest_points(request):
+    """ This command gets the nearest points for some x,y coordinates. Although a simliar function is defined in views.py"""
+
     xcor = request.data2["xcor"]
     ycor = request.data2["ycor"]
 

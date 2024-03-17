@@ -67,7 +67,6 @@ class ProductFoundAdmin(admin.ModelAdmin):
                     "product_image1",
                     "product_image2",
                     "product_image3",
-                
                 ]
 
         self.form = CustomChangeForm

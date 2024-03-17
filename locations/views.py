@@ -135,7 +135,7 @@ def get_shortest_path(request):
 
             for a in range(len(path)):
                 i = path[a]
-                if type(i) == str:
+                if isinstance(i, str):
                     loc_i = Location.objects.get(name=i)
                 else:
                     name = "Node" + str(i)
@@ -245,7 +245,7 @@ These are the errors that may occur when running the Dijkstra code. It provides 
 @api_view(["GET"])
 def checkerrors(request):
     adj_list = handle_entry().load_adj_list()  # change this list accordingly
-    # adj_list ={}
+
     items = {}
     items["Failed : Location Does Not Exist"] = []
     items["Failed : MultipleObjectsReturned"] = []
@@ -254,7 +254,7 @@ def checkerrors(request):
     items["Passed : Coordinates are null"] = []
 
     for x in adj_list:
-        if type(x) == str:
+        if isinstance(x, str):
             try:
                 a = Location.objects.get(name=x)
                 if a.pixel_x is None or a.pixel_y is None:
@@ -266,7 +266,7 @@ def checkerrors(request):
                 items["Failed : MultipleObjectsReturned"].append(x)
 
         for y in adj_list[x]:
-            if type(y) == str:
+            if isinstance(y, str):
                 try:
                     a = Location.objects.get(name=y)
                     if a.pixel_x is None or a.pixel_y is None:
