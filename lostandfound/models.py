@@ -9,9 +9,11 @@ from helpers.misc import get_url_friendly
 PDT_NAME_MAX_LENGTH = 60
 CONTACT_MAX_LENGTH = 300
 
+
 def get_image_path(instance, filename):
-    random_str = "fd9a457a-a5b5-4560-b81e-6654129e5df8" # NOTE: Since we not using uploaded by - all the images are stored in the same folder.
-    return './' + random_str[0:4] + '/'+ random_str + '-' + filename + '.jpg'
+    # NOTE: Since we not using uploaded by - all the images are stored in the same folder.
+    random_str = "fd9a457a-a5b5-4560-b81e-6654129e5df8"
+    return './' + random_str[0:4] + '/' + random_str + '-' + filename + '.jpg'
 
 class ProductFound(models.Model):
     CATEGORY_CHOICES = (
@@ -27,7 +29,9 @@ class ProductFound(models.Model):
     product_image = models.TextField(
         blank=True, null=True
     )  # Contains URLs of all three images.
-    product_image1 = models.ImageField(upload_to=get_image_path, null=False, blank=False)
+    product_image1 = models.ImageField(
+        upload_to=get_image_path, null=False, blank=False
+    )
     product_image2 = models.ImageField(upload_to=get_image_path, null=False, blank=True)
     product_image3 = models.ImageField(upload_to=get_image_path, null=False, blank=True)
     category = models.CharField(
@@ -63,7 +67,6 @@ class ProductFound(models.Model):
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
         super().save(*args, **kwargs)
 
-
     class Meta:
         verbose_name = "ProductFound"
         verbose_name_plural = "ProductsFound"
@@ -83,7 +86,7 @@ def update_product_found(sender, instance, **kwargs):
     This is done to avoid the problem of the correct image url not being available."""
     image_urls = ""
     image_urls += instance.product_image1.url + ","
-    if instance.product_image2:            
+    if instance.product_image2:
         image_urls += instance.product_image2.url + ","
     if instance.product_image3:
         image_urls += instance.product_image3.url
