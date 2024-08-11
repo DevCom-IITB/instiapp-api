@@ -73,6 +73,7 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = "587"
 EMAIL_HOST_USER = ""
 EMAIL_HOST_PASSWORD = ""
+EMAIL_EVENT_HOST_USER = ""
 EMAIL_USE_TLS = True
 RECIPIENT_LIST = ['recipient1@example.com', 'recipient2@example.com']
 CORS_ORIGIN_ALLOW_ALL = True

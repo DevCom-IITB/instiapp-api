@@ -17,7 +17,7 @@ from roles.helpers import forbidden_no_privileges, diff_set
 from roles.helpers import bodies_with_users_having_privilege
 from locations.helpers import create_unreusable_locations
 
-EMAIL_HOST_USER = settings.EMAIL_HOST_USER
+EMAIL_EVENT_HOST_USER = settings.EMAIL_EVENT_HOST_USER
 RECIPIENT_LIST = settings.RECIPIENT_LIST
 EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
 AUTH_USER = settings.AUTH_USER
@@ -244,7 +244,7 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
                     send_mail(
                         subject,
                         message,
-                        EMAIL_HOST_USER,
+                        EMAIL_EVENT_HOST_USER,
                         recipient_list,
                         fail_silently=False,
                         auth_user=AUTH_USER,
