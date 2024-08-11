@@ -161,6 +161,7 @@ class EventFullSerializer(serializers.ModelSerializer):
         queryset=Body.objects.all(),
         source="verification_bodies",
     )
+    email_verified = serializers.BooleanField(required=False)
 
     user_tags = serializers.PrimaryKeyRelatedField(
         many=True, read_only=False, queryset=UserTag.objects.all(), default=[]
