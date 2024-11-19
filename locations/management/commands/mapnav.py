@@ -295,6 +295,7 @@ class handle_entry:
     including the distances between nodes.
     """
 
+    # noqa: C901
     def update(self):
         for x in self.adj_list:
             if type(x) != str:

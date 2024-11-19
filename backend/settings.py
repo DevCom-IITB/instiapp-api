@@ -26,8 +26,8 @@ CORS_ALLOW_CREDENTIALS = True
 # SSO Config
 SSO_TOKEN_URL = "https://gymkhana.iitb.ac.in/sso/oauth/token/"
 SSO_PROFILE_URL = "https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number"
-SSO_CLIENT_ID = "HeKlfCluQLxa5cG5c4yHYiAEFZynroiKwylpiwNV"
-SSO_CLIENT_ID_SECRET_BASE64 = "SGVLbGZDbHVRTHhhNWNHNWM0eUhZaUFFRlp5bnJvaUt3eWxwaXdOVjpYbDg4OHNaOWFhbVVmV1FMR0Y3SjI1MU5taUFYeHRtdzRtM3pHejJLUVQ1d3M0b3hTRGNCTnhSNWw4SXpYbHNDTVVWVHh3MUE0VXRnRU5YZ1FpWlFDZ1RUcERoVHFXeUZmckhLdDhadU5SQk9SY2Q3Z2ZmWjNXUzQ5bGxCMXNBUg=="
+SSO_CLIENT_ID = "0vptOdXpmB8MIGhV6ZeADQxNQ7xuaa3ntITZwqPX"
+SSO_CLIENT_ID_SECRET_BASE64 = "MHZwdE9kWHBtQjhNSUdoVjZaZUFEUXhOUTd4dWFhM250SVRad3FQWDpsanRQbVN2WGZVTnlXZEVRTWQ1aElaYUNXRXZyVFRXTllTU0p3cExwbUhTZ1pTRXI5WUdZWm40SHFOczZlWHBhQjBlSXhzV3p2UlJSSTRoM3FreDJlbmFrSzczUXhPRldiVFh6RkRuUFk4aVdNeERuZndXdU8yOEg0eVloSlpWZw=="
 
 # Password Login
 SSO_DEFAULT_REDIR = "https://insti.app/login"
@@ -72,4 +72,10 @@ NO_LOGGING = {
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = "587"
 EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
+EMAIL_EVENT_HOST_USER = ""
 EMAIL_USE_TLS = True
+RECIPIENT_LIST = ['recipient1@example.com', 'recipient2@example.com']
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+AUTH_USER = ""
