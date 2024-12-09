@@ -168,7 +168,9 @@ TRAINING_BLOG_URL = (
     "https://campus.placements.iitb.ac.in/blog/internship/authinternship/?feed=rss2"
 )
 
-PLACEMENTS_URL_VAL = "https://campus.placements.iitb.ac.in/blog/placement/?feed=rss2"
+PLACEMENTS_URL_VAL = (
+    "https://campus.placements.iitb.ac.in/blog/placement/?feed=rss2"
+)
 TRAINING_BLOG_URL_VAL = (
     "https://campus.placements.iitb.ac.in/blog/internship/?feed=rss2"
 )
