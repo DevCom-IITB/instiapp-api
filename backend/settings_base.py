@@ -162,7 +162,7 @@ LOGO_URL = "https://insti.app/assets/logo.png"
 
 # Placement blog URLs
 PLACEMENTS_URL = (
-    "https://campus.placements.iitb.ac.in/blog/placement/authplacement/?feed=rss2"
+    "https://campus.placements.iitb.ac.in/blog/placement/?feed=rss2"
 )
 TRAINING_BLOG_URL = (
     "https://campus.placements.iitb.ac.in/blog/internship/authinternship/?feed=rss2"
