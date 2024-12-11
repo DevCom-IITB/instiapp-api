@@ -95,6 +95,7 @@ def fill_blog(url, body_name, url_val):
         #     settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
 
         response = s.get(url, verify=False, timeout=10)
+        response = s.get(url, verify=False, timeout=10)
 
         feeds = feedparser.parse(response.content)
 
