@@ -18,6 +18,7 @@ class Event(models.Model):
 
     name = models.CharField(max_length=60)
     description = models.TextField(blank=True)
+    email_subject = models.TextField(default="")
     longdescription = models.TextField(default="")
     email_verified = models.BooleanField(default=False)
     email_rejected = models.BooleanField(default=False)
