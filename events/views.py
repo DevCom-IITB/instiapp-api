@@ -75,15 +75,14 @@ class EventViewSet(viewsets.ModelViewSet):
         if start is not None and end is not None:
             # Try date-filtered if we have the params
             queryset = get_prioritized(
-                self.queryset.filter(start_time__range=(start, end)), request
+                self.queryset.filter(start_time__range=(start, end),email_rejected=False), request
             )
         else:
             # Respond with recent events
-            queryset = get_fresh_prioritized_events(self.queryset, request)
+            queryset = get_fresh_prioritized_events(self.queryset.filter(email_rejected=False), request)
 
         serializer = EventSerializer(queryset, many=True, context={"request": request})
         data = serializer.data
-
         return Response({"count": len(data), "data": data})
 
     @login_required_ajax
@@ -278,7 +277,7 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
                 print(event.longdescription)
                 event.longdescription = ""
                 event.email_verified = True
-
+                event.email_rejected = True
                 event.save()
                 return Response({"success": "Mail rejected and content deleted"})
             return forbidden_no_privileges()

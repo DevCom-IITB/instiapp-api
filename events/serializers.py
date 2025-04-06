@@ -162,6 +162,7 @@ class EventFullSerializer(serializers.ModelSerializer):
         source="verification_bodies",
     )
     email_verified = serializers.BooleanField(required=False)
+    email_rejected = serializers.BooleanField(required=False)
 
     user_tags = serializers.PrimaryKeyRelatedField(
         many=True, read_only=False, queryset=UserTag.objects.all(), default=[]
@@ -186,6 +187,7 @@ class EventFullSerializer(serializers.ModelSerializer):
             "description",
             "longdescription",
             "email_verified",
+            "email_rejected",
             "verification_bodies",
             "verification_bodies_id",
             "image_url",

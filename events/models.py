@@ -20,6 +20,7 @@ class Event(models.Model):
     description = models.TextField(blank=True)
     longdescription = models.TextField(default="")
     email_verified = models.BooleanField(default=False)
+    email_rejected = models.BooleanField(default=False)
     bodies = models.ManyToManyField("bodies.Body", related_name="events", blank=True)
     verification_bodies = models.ManyToManyField(
         "bodies.Body", blank=True, related_name="verEvents"
