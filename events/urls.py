@@ -4,6 +4,7 @@ from events.views import EventViewSet, EventMailVerificationViewSet, BodiesWithP
 
 urlpatterns = [
     path("events", EventViewSet.as_view({"get": "list", "post": "create"})),
+    path("events-all", EventViewSet.as_view({"get": "list_all"})),
     path(
         "events/<pk>",
         EventViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),

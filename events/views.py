@@ -84,6 +84,16 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer = EventSerializer(queryset, many=True, context={"request": request})
         data = serializer.data
         return Response({"count": len(data), "data": data})
+    
+    def list_all(self, request):
+        """List Events.
+        List fresh events prioritized for the current user."""
+
+        queryset = self.queryset.all().order_by('-start_time')
+        serializer = EventSerializer(queryset, many=True, context={"request": request})
+        data = serializer.data
+   
+        return Response({"count": len(data), "data": data})
 
     @login_required_ajax
     def create(self, request):
