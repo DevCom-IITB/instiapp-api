@@ -14,6 +14,7 @@ urlpatterns = [
             }
         ),
     ),  # viewing a particular community
+    path("communities/poll/<pk>", PostViewSet.as_view({"post": "vote_on_poll"})),
     path(
         "communityposts", PostViewSet.as_view({"get": "list", "post": "create"})
     ),  # viewing, creating, updating and deleting the list of posts in their minimum view
@@ -28,4 +29,5 @@ urlpatterns = [
     path(
         "communityposts/<action>/<pk>", PostViewSet.as_view({"put": "perform_action"})
     ),  # setting featured posts
+
 ]

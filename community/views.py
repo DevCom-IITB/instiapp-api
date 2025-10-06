@@ -4,14 +4,17 @@ from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from community.models import Community
 from community.models import CommunityPost
+from community.models import Poll, PollOption, PollVote
 from community.serializer_min import CommunitySerializerMin, CommunityPostSerializerMin
-from community.serializers import CommunitySerializers, CommunityPostSerializers
+from community.serializers import CommunitySerializers, CommunityPostSerializers, PollSerializer, PollOptionSerializer 
 from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
 from helpers.misc import query_from_num
 from helpers.misc import query_search
 from users.models import UserProfile
+from rest_framework import status
+from django.db import transaction
 
 
 class ModeratorViewSet(viewsets.ModelViewSet):
@@ -129,10 +132,68 @@ class PostViewSet(viewsets.ModelViewSet):
         # Prevent posts without any community
         if "community" not in request.data or not request.data["community"]:
             return forbidden_no_privileges()
+        
+        serializer = self.get_serializer(data=request.data)
 
-        user, created = UserProfile.objects.get_or_create(user=request.user)
-        return super().create(request)
+        serializer.is_valid(raise_exception=True)
 
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        # user, created = UserProfile.objects.get_or_create(user=request.user)
+
+        # response = super().create(request)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @login_required_ajax
+    def vote_on_poll(self, request, pk):
+        try:
+            community_post = self.get_community_post(pk)
+            poll = get_object_or_404(Poll, id=community_post.poll.id)
+            user = request.user.profile
+            option_ids = request.data.get('options', [])
+
+            with transaction.atomic():
+                if poll.allow_multiple_answers:
+                    # --- Handle Multiple-Choice ---
+                    if not option_ids:
+                        PollVote.objects.filter(poll=poll, user=user).delete()
+                        message = "All votes removed"
+                    else:
+                        valid_options = list(PollOption.objects.filter(id__in=option_ids, poll=poll))
+                        if len(valid_options) != len(option_ids):
+                            return Response({"error": "One or more option IDs are invalid."}, status=status.HTTP_400_BAD_REQUEST)
+                        
+                        PollVote.objects.filter(poll=poll, user=user).delete()
+                        new_votes = [PollVote(poll=poll, option=option, user=user) for option in valid_options]
+                        PollVote.objects.bulk_create(new_votes)
+                        message = f"Voted for {len(valid_options)} options"
+                else:
+                    # --- Handle Single-Choice ---
+                    if not option_ids:
+                        PollVote.objects.filter(poll=poll, user=user).delete()
+                        message = "Vote removed"
+                    else:
+                        if len(option_ids) > 1:
+                            return Response({"error": "Only one option is allowed."}, status=status.HTTP_400_BAD_REQUEST)
+                        
+                        option = get_object_or_404(PollOption, id=option_ids[0], poll=poll)
+                        deleted_count, _ = PollVote.objects.filter(poll=poll, user=user, option=option).delete()
+
+                        if deleted_count > 0:
+                            message = "Vote removed"
+                        else:
+                            PollVote.objects.filter(poll=poll, user=user).delete()
+                            PollVote.objects.create(poll=poll, option=option, user=user)
+                            message = "Vote updated"
+            
+            # Return the full, updated poll data
+            poll_serializer = PollSerializer(poll, context={'request': request})
+            return Response({"message": message, "poll": poll_serializer.data}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(f"Error in vote_on_poll: {e}") # Good for debugging
+            return Response({"error": "An unexpected error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     @login_required_ajax
     def update(self, request, pk):
         """Update Event.
@@ -205,6 +266,8 @@ class PostViewSet(viewsets.ModelViewSet):
             # post.reports -=1
             post.save()
             return Response({"message": "Post unreported"})
+        if action == "vote":
+            return self._vote_on_poll(request, post)
 
         return Response({"message": "action not supported"}, status=400)
 
@@ -259,3 +322,62 @@ class CommunityViewSet(viewsets.ModelViewSet):
             return Response({"message": "Community created"})
 
         return Response({"message": "Community already exists"}, status=400)
+
+    # @login_required_ajax
+    # def _vote_on_poll(self, request, post):
+    #     """Vote on a poll option"""
+    #     try:
+    #         if not hasattr(post, 'poll'):
+    #             return Response({'error': 'This post is not a poll'}, status=400)
+    #         poll = Poll.objects.get(id=poll_id)
+    #         option_ids = request.data.get('option_ids', [])
+            
+    #         if not option_ids:
+    #             return Response({'error': 'No options selected'}, status=400)
+            
+    #         # Remove existing votes if single answer poll
+    #         if not poll.allow_multiple_answers:
+    #             PollVote.objects.filter(poll=poll, user=request.user.profile).delete()
+            
+    #         # Create new votes
+    #         for option_id in option_ids:
+    #             option = PollOption.objects.get(id=option_id, poll=poll)
+    #             PollVote.objects.get_or_create(
+    #                 poll=poll,
+    #                 option=option,
+    #                 user=request.user.profile
+    #             )
+            
+    #         return Response({'message': 'Vote recorded'})
+            
+    #     except Poll.DoesNotExist:
+    #         return Response({'error': 'Poll not found'}, status=404)
+    #     except PollOption.DoesNotExist:
+    #         return Response({'error': 'Invalid poll option'}, status=400)
+        
+    # def _get_poll_results(self,request, post):
+    #     """Get poll results"""
+    #     try:
+    #         if not hasattr(post, 'poll'):
+    #             return Response({'error': 'This post is not a poll'}, status=400)
+            
+    #         poll = Poll.objects.get(id=poll_id)
+    #         total_votes = PollVote.objects.filter(poll=poll).count()
+            
+    #         results = []
+    #         for option in poll.options.all():
+    #             vote_count = PollVote.objects.filter(option=option).count()
+    #             percentage = (vote_count / total_votes * 100) if total_votes > 0 else 0
+    #             results.append({
+    #                 'id': str(option.id),
+    #                 'text': option.text,
+    #                 'vote_count': vote_count,
+    #                 'percentage': round(percentage, 1)
+    #             })
+            
+    #         return Response({
+    #             'total_votes': total_votes,
+    #             'options': results
+    #         })
+    #     except Poll.DoesNotExist:
+    #         return Response({'error': 'Poll not found'}, status=404)
