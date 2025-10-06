@@ -1,11 +1,68 @@
 from rest_framework import serializers
 from achievements.models import Interest
-from community.models import Community, CommunityPost
+from community.models import Community, CommunityPost, Poll, PollOption, PollVote
 from community.serializer_min import CommunityPostSerializerMin
 from roles.serializers import RoleSerializerMin
 from users.models import UserProfile
 from bodies.models import Body
 from users.serializers import UserProfileSerializer
+from django.db import transaction
+
+
+# class PollOptionWriteSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = PollOption
+#         fields = ['text']
+
+# class PollWriteSerializer(serializers.ModelSerializer):
+#     options = PollOptionWriteSerializer(many=True)
+
+#     class Meta:
+#         model = Poll
+#         fields = ['question', 'allow_multiple_answers', 'options']
+
+
+
+class PollOptionSerializer(serializers.ModelSerializer):
+    vote_count = serializers.SerializerMethodField()
+    user_voted = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PollOption
+        fields = ['id', 'text', 'order', 'vote_count', 'user_voted']
+        read_only_fields = ['id', 'order', 'vote_count', 'user_voted']
+    
+    def get_vote_count(self, obj):
+        return PollVote.objects.filter(option=obj).count()
+        
+    def get_user_voted(self, obj):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and request.user.is_authenticated:
+            return PollVote.objects.filter(
+                poll=obj.poll, 
+                option=obj, 
+                user=request.user.profile
+            ).exists()
+        return False
+    
+class PollSerializer(serializers.ModelSerializer):
+    options = PollOptionSerializer(many=True)
+    total_votes = serializers.SerializerMethodField()
+    user_voted = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Poll
+        fields = ['id', 'question', 'allow_multiple_answers', 'created_at', 'options', 'total_votes', 'user_voted']
+        read_only_fields = ['id', 'created_at', 'total_votes', 'user_voted']
+    
+    def get_total_votes(self, obj):
+        return PollVote.objects.filter(poll=obj).count()
+    
+    def get_user_voted(self, obj):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and request.user.is_authenticated:
+            return PollVote.objects.filter(poll=obj, user=request.user.profile).exists()
+        return False
 
 
 class CommunitySerializers(serializers.ModelSerializer):
@@ -73,6 +130,8 @@ class CommunitySerializers(serializers.ModelSerializer):
 class CommunityPostSerializers(CommunityPostSerializerMin):
     comments = serializers.SerializerMethodField()
     posted_by = serializers.SerializerMethodField()
+    ispoll = serializers.BooleanField(required=False, default=False)
+    poll = PollSerializer(allow_null=True, required=False)
 
     # def get_posted_by(self, obj):
     #     pb = UserProfile.objects.get(id=obj.posted_by.id)
@@ -131,9 +190,12 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
             "deleted",
             "anonymous",
             "reported_by",
+            "poll",
+            "ispoll",
         )
 
     def create(self, validated_data):
+        poll_data = validated_data.pop('poll', None)
         data = self.context["request"].data
         if "parent" in data and data["parent"]:
             parent = CommunityPost.objects.get(id=data["parent"])
@@ -161,10 +223,26 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
             ]
         validated_data["posted_by"] = self.context["request"].user.profile
         validated_data["community"] = Community.objects.get(id=data["community"]["id"])
-        return super().create(validated_data)
+
+        with transaction.atomic():
+            # First, create the CommunityPost instance
+            community_post = super().create(validated_data)
+
+            # If poll data was provided and the ispoll flag is true, create the poll
+            if community_post.ispoll and poll_data:
+                options_data = poll_data.pop('options')
+                poll = Poll.objects.create(community_post=community_post, **poll_data)
+                
+                # Create each poll option
+                for index, option_data in enumerate(options_data):
+                    PollOption.objects.create(poll=poll, order=index, **option_data)
+
+        return community_post
 
     def update(self, instance, validated_data):
+        poll_data = validated_data.pop('poll', None)
         data = self.context["request"].data
+        is_poll = validated_data.get('ispoll', instance.ispoll)
         if "tag_user" in data and data["tag_user"]:
             validated_data["tag_user"] = [
                 UserProfile.objects.get(id=i["id"]) for i in data["tag_user"]
@@ -185,7 +263,35 @@ class CommunityPostSerializers(CommunityPostSerializerMin):
             if "image_url" in data and data["image_url"]
             else ""
         )
-        return super().update(instance, validated_data)
+
+        with transaction.atomic():
+            # Update the CommunityPost instance
+            community_post = super().update(instance, validated_data)
+            community_post.ispoll = is_poll
+
+            if is_poll and poll_data:
+                options_data = poll_data.pop('options', [])
+                
+                # If the post already has a poll, update it; otherwise, create a new one
+                if hasattr(community_post, 'poll'):
+                    poll = community_post.poll
+                    poll.question = poll_data.get('question', poll.question)
+                    poll.allow_multiple_answers = poll_data.get('allow_multiple_answers', poll.allow_multiple_answers)
+                    poll.save()
+                    
+                    # Clear existing options and recreate them
+                    poll.options.all().delete()
+                    for index, option_data in enumerate(options_data):
+                        PollOption.objects.create(poll=poll, order=index, **option_data)
+                else:
+                    poll = Poll.objects.create(community_post=community_post, **poll_data)
+                    for index, option_data in enumerate(options_data):
+                        PollOption.objects.create(poll=poll, order=index, **option_data)
+            elif not is_poll and hasattr(community_post, 'poll'):
+                # If the post is no longer a poll but had one before, delete it
+                community_post.poll.delete()
+            community_post.save()
+        return community_post
 
     def destroy(self, instance, validated_data):
         data = self.context["request"].data

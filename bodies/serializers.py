@@ -21,7 +21,11 @@ class BodySerializer(serializers.ModelSerializer):
 
     events = serializers.SerializerMethodField()
     roles = RoleSerializerMin(many=True, read_only=True)
+    photoalbum_urls = serializers.SerializerMethodField()
 
+    def get_photoalbum_urls(self, obj):
+        return obj.photoalbum_urls.split(",") if obj.photoalbum_urls else None
+    
     class Meta:
         model = Body
         fields = (
@@ -40,6 +44,9 @@ class BodySerializer(serializers.ModelSerializer):
             "website_url",
             "blog_url",
             "cover_url",
+            "whatsapp_group_url",
+            "instagram_url",
+            "photoalbum_urls",
         )
 
     @staticmethod

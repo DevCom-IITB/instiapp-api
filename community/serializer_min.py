@@ -2,10 +2,37 @@
 from rest_framework import serializers
 from achievements.serializers import InterestSerializer
 from bodies.serializer_min import BodySerializerMin
-from community.models import Community, CommunityPost
+from community.models import Community, CommunityPost, Poll, PollOption, PollVote
 from users.models import UserProfile
 from users.serializers import UserProfileSerializer
+    
+class PollOptionSerializerMin(serializers.ModelSerializer):
+    """Minimal serializer for Poll Options, for use in list views."""
+    user_voted = serializers.SerializerMethodField()
+    vote_count = serializers.IntegerField(read_only=True)
 
+
+    class Meta:
+        model = PollOption
+        fields = ['id', 'text', 'vote_count', 'user_voted']
+
+    def get_user_voted(self, obj):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and request.user.is_authenticated:
+            # NOTE: This can be slow. See performance note below.
+            return obj.votes.filter(user=request.user.profile).exists()
+        return False
+
+class PollSerializerMin(serializers.ModelSerializer):
+    total_votes = serializers.SerializerMethodField()
+    options = PollOptionSerializerMin(many=True, read_only=True)
+    
+    class Meta:
+        model = Poll
+        fields = ['id', 'question', 'allow_multiple_answers', 'total_votes', 'options']
+    
+    def get_total_votes(self, obj):
+        return PollVote.objects.filter(poll=obj).count()
 
 class CommunitySerializerMin(serializers.ModelSerializer):
     """Minimal serializer for Community."""
@@ -58,6 +85,8 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
     interests = InterestSerializer(read_only=True, many=True)
     has_user_reported = serializers.SerializerMethodField()
     posted_by = serializers.SerializerMethodField()
+    ispoll = serializers.BooleanField(read_only=True)
+    poll = PollSerializerMin(read_only=True)
 
     # def get_posted_by(self, obj):
     #     pb = UserProfile.objects.get(id=obj.posted_by.id)
@@ -164,6 +193,8 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
 
             return obj.reported_by.filter(id=profile.id).exists()
         return False
+    
+
 
     class Meta:
         model = CommunityPost
@@ -190,4 +221,6 @@ class CommunityPostSerializerMin(serializers.ModelSerializer):
             "anonymous",
             "reported_by",
             "has_user_reported",
+            "poll",
+            "ispoll",
         )
