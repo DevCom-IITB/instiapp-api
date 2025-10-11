@@ -39,6 +39,12 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
+            "department",
+            "department_name",
+            "degree",
+            "degree_name",
+            "join_year",
+            "graduation_year",
             "profile_pic",
             "events_interested",
             "events_going",
@@ -58,6 +64,14 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
             "former_roles",
             "achievements",
             "interests",
+        )
+        read_only_fields = (
+            "department",
+            "department_name",
+            "degree",
+            "degree_name",
+            "join_year",
+            "graduation_year",
         )
 
     def get_events_going(self, obj):

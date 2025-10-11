@@ -47,7 +47,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         """Get current user."""
         queryset = UserProfileFullSerializer.setup_eager_loading(UserProfile.objects)
         user_profile = queryset.get(user=request.user)
-
+        
         # WARNING: DEPREACATED
         # Update fcm id if present
         if "fcm_id" in request.GET:
