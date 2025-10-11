@@ -19,6 +19,7 @@ class BodySerializerMin(serializers.ModelSerializer):
             "image_url",
             "cover_url",
             "followers_count",
+            "short_name",
         )
 
     def get_followers_count(self, obj):

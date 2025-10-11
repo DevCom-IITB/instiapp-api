@@ -15,6 +15,8 @@ from helpers.misc import query_search
 from users.models import UserProfile
 from rest_framework import status
 from django.db import transaction
+from django.db.models import Exists, OuterRef, Subquery, Prefetch
+from django.db import transaction
 
 
 class ModeratorViewSet(viewsets.ModelViewSet):
@@ -85,45 +87,63 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @login_required_ajax
     def list(self, request):
-        """List Of Posts.
-        List fresh posts arranged chronologiaclly for the current user."""
+        """List Of Posts with corrected annotation logic."""
 
-        # Check for time and date filtered query params
+        # 1. Get required parameters from the request
         status = request.GET.get("status")
         comm_id = request.GET.get("community")
+
         if comm_id is None:
             return Response({"message": "comm_id is required"}, status=400)
+        
         community = get_object_or_404(Community.objects, id=comm_id)
+        user_profile = request.user.profile
 
-        # If your posts
+        # 2. Define the base queryset with common filters
+        queryset = CommunityPost.objects.filter(community=community, deleted=False)
+
+        # 3. Apply conditional filters based on the 'status' parameter
         if status is None:
-            queryset = CommunityPost.objects.filter(
-                thread_rank=1, community=community, posted_by=request.user.profile
-            ).order_by("-time_of_modification")
+            # "Your posts" filter
+            queryset = queryset.filter(thread_rank=1, posted_by=user_profile)
+        elif status == "3":
+            # "Reported posts" filter
+            queryset = queryset.filter(status=status)
         else:
-            # If reported posts
-            if status == "3":
-                queryset = CommunityPost.objects.filter(
-                    status=status, community=community, deleted=False
-                ).order_by("-time_of_modification")
-                # queryset = CommunityPost.objects.all()
+            # Filter by any other status
+            queryset = queryset.filter(status=status, thread_rank=1)
 
-            else:
-                queryset = CommunityPost.objects.filter(
-                    status=status, community=community, deleted=False, thread_rank=1
-                ).order_by("-time_of_modification")
+        # At this point, `queryset` is guaranteed to have a value.
+
+        # 4. Apply the poll vote annotation for performance
+        user_vote_subquery = PollVote.objects.filter(
+            option_id=OuterRef('pk'), 
+            user=user_profile
+        )
+        options_with_vote = PollOption.objects.annotate(
+            user_voted=Exists(user_vote_subquery)
+        )
+        
+        queryset = queryset.prefetch_related(
+            'poll',
+            Prefetch('poll__options', queryset=options_with_vote)
+        )
+
+        # 5. Apply ordering, searching, and pagination
+        queryset = queryset.order_by("-time_of_modification")
         queryset = query_search(request, 3, queryset, ["content"], "posts")
         queryset = query_from_num(request, 20, queryset)
-        return_for_mod = False
-        if user_has_privilege(request.user.profile, community.body.id, "AppP"):
-            return_for_mod = True
+        
+        # 6. Serialize the data and return the response
+        return_for_mod = user_has_privilege(user_profile, community.body.id, "AppP")
 
-        serializer = CommunityPostSerializerMin(
-            queryset, many=True, context={"return_for_mod": return_for_mod}
-        )
-        data = serializer.data
-
-        return Response({"count": len(data), "data": data})
+        context = {
+            "request": request,
+            "return_for_mod": return_for_mod
+        }
+        serializer = CommunityPostSerializerMin(queryset, many=True, context=context)
+        
+        return Response({"count": len(serializer.data), "data": serializer.data})
 
     @login_required_ajax
     def create(self, request):
@@ -152,6 +172,7 @@ class PostViewSet(viewsets.ModelViewSet):
             poll = get_object_or_404(Poll, id=community_post.poll.id)
             user = request.user.profile
             option_ids = request.data.get('options', [])
+            print(f"Voting on poll {poll.id} with options {option_ids} by user {user.id}")
 
             with transaction.atomic():
                 if poll.allow_multiple_answers:

@@ -9,17 +9,23 @@ from users.serializers import UserProfileSerializer
 class PollOptionSerializerMin(serializers.ModelSerializer):
     """Minimal serializer for Poll Options, for use in list views."""
     user_voted = serializers.SerializerMethodField()
-    vote_count = serializers.IntegerField(read_only=True)
+    vote_count = serializers.SerializerMethodField()
 
 
     class Meta:
         model = PollOption
         fields = ['id', 'text', 'vote_count', 'user_voted']
 
+
+    def get_vote_count(self, obj):
+        return PollVote.objects.filter(option=obj).count()
+
     def get_user_voted(self, obj):
+        print("context keys:", self.context)
         request = self.context.get('request')
         if request and hasattr(request, 'user') and request.user.is_authenticated:
             # NOTE: This can be slow. See performance note below.
+            print("hell")
             return obj.votes.filter(user=request.user.profile).exists()
         return False
 

@@ -47,6 +47,7 @@ class BodySerializer(serializers.ModelSerializer):
             "whatsapp_group_url",
             "instagram_url",
             "photoalbum_urls",
+            "short_name",
         )
 
     @staticmethod
