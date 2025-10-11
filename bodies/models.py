@@ -23,7 +23,7 @@ class Body(models.Model):
     whatsapp_group_url = models.URLField(null=True, blank=True)
     instagram_url = models.URLField(null=True, blank=True)
     photoalbum_urls = models.TextField(null=True, blank=True)
-    short_name = models.CharField(max_length=20, blank=True)
+    short_name = models.CharField(max_length=20, blank=True, null=True)
 
     def save(self, *args, **kwargs):  # pylint: disable=W0222
         self.str_id = get_url_friendly(
