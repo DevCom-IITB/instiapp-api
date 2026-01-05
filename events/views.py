@@ -22,6 +22,15 @@ RECIPIENT_LIST = settings.RECIPIENT_LIST
 EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
 AUTH_USER = settings.AUTH_USER
 
+
+def prepend_venue_room(event):
+    if hasattr(event, "venue_room") and event.venue_room and event.venues.exists():
+        first_venue = event.venues.first()
+        prefix = f"{event.venue_room}, "
+        if not first_venue.name.startswith(prefix):
+            first_venue.name = prefix + first_venue.name
+            first_venue.save()
+
 class EventViewSet(viewsets.ModelViewSet):
     """Event"""
 

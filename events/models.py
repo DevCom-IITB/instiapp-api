@@ -26,6 +26,7 @@ class Event(models.Model):
     verification_bodies = models.ManyToManyField(
         "bodies.Body", blank=True, related_name="verEvents"
     )
+    venue_room = models.TextField(blank=True, null=True)
     image_url = models.URLField(blank=True, null=True)
     website_url = models.URLField(blank=True, null=True)
     start_time = models.DateTimeField()
