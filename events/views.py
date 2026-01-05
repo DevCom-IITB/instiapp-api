@@ -16,11 +16,19 @@ from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
 from roles.helpers import bodies_with_users_having_privilege
 from locations.helpers import create_unreusable_locations
+from django.db import transaction, OperationalError
+import time
+
 
 EMAIL_EVENT_HOST_USER = settings.EMAIL_EVENT_HOST_USER
 RECIPIENT_LIST = settings.RECIPIENT_LIST
 EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
 AUTH_USER = settings.AUTH_USER
+INSTIAPP_MAIL_FOOTER = (
+    "________________________________________\n"
+    "This mail has been sent through Instiapp Events. In case of any queries, contact the council conducting the event. DevCom is **not** responsible for the contents of this email."
+)
+
 
 
 def prepend_venue_room(event):
@@ -39,39 +47,78 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_serializer_context(self):
         return {"request": self.request}
+    
+    "changed the indentation of the retrieve method to be consistent with the rest of the class"
+    # @login_required_ajax
+    # def retrieve(self, request, pk):
+    #     """Get Event.
+    #     Get by `uuid` or `str_id`"""
+    #     with transaction.atomic():
+    #         self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
+    #         event = self.get_event(pk)
 
+    #         councils = event.verification_bodies.all()
+    #         serialized = None
+    #         for council in councils:
+    #             council_id = council.id
+    #             if user_has_privilege(request.user.profile, council_id, "VerE"):
+    #                 longdescription_visible = True
+    #                 serialized = EventFullSerializer(
+    #                     event,
+    #                     context={
+    #                         "request": request,
+    #                         "longdescription_visible": longdescription_visible,
+    #                     },
+    #                 ).data
+    #             else:
+    #                 longdescription_visible = False
+    #                 serialized = EventFullSerializer(
+    #                     event,
+    #                     context={
+    #                         "request": request,
+    #                         "longdescription_visible": longdescription_visible,
+    #                     },
+    #                 ).data
+    #                 serialized["longdescription"] = []
+    #         return Response(serialized)
     @login_required_ajax
     def retrieve(self, request, pk):
-        """Get Event.
-        Get by `uuid` or `str_id`"""
-
-        self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
-        event = self.get_event(pk)
-
-        councils = event.verification_bodies.all()
-        serialized = None
-        for council in councils:
-            council_id = council.id
-            if user_has_privilege(request.user.profile, council_id, "VerE"):
-                longdescription_visible = True
-                serialized = EventFullSerializer(
-                    event,
-                    context={
-                        "request": request,
-                        "longdescription_visible": longdescription_visible,
-                    },
-                ).data
-            else:
-                longdescription_visible = False
-                serialized = EventFullSerializer(
-                    event,
-                    context={
-                        "request": request,
-                        "longdescription_visible": longdescription_visible,
-                    },
-                ).data
-                serialized["longdescription"] = []
-        return Response(serialized)
+        """Get Event with permission check and retry-safe transaction."""
+        for _ in range(3):
+            try:
+                with transaction.atomic():
+                    self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
+                    event = self.get_event(pk)
+                    councils = event.verification_bodies.all()
+                    serialized = None
+                    for council in councils:
+                        council_id = council.id
+                        if user_has_privilege(request.user.profile, council_id, "VerE"):
+                            longdescription_visible = True
+                            serialized = EventFullSerializer(
+                                event,
+                                context={
+                                    "request": request,
+                                    "longdescription_visible": longdescription_visible,
+                                },
+                            ).data
+                        else:
+                            longdescription_visible = False
+                            serialized = EventFullSerializer(
+                                event,
+                                context={
+                                    "request": request,
+                                    "longdescription_visible": longdescription_visible,
+                                },
+                            ).data
+                            serialized["longdescription"] = []
+                    return Response(serialized)
+            except OperationalError as e:
+                if 'Deadlock' in str(e):
+                    time.sleep(0.3)
+                    continue
+                raise
+        raise OperationalError("Max retries exceeded due to deadlock.")
 
     def list(self, request):
         """List Events.
@@ -122,6 +169,12 @@ class EventViewSet(viewsets.ModelViewSet):
         print(request.data["bodies_id"])
         print(request.data.get("verification_bodies"))
 
+        try:
+            request.data["venue_ids"] = create_unreusable_locations(request.data["venue_names"])
+        except KeyError:
+            request.data["venue_ids"] = []
+
+
         if isinstance(request.data["bodies_id"], str) and user_has_privilege(
             request.user.profile, request.data["bodies_id"], "AddE"
         ):
@@ -136,10 +189,10 @@ class EventViewSet(viewsets.ModelViewSet):
         ):
             # Fill in ids of venues
             # print("User has privileges")
-            # try:
-            #     request.data["venue_ids"] = create_unreusable_locations(request.data["venue_names"])
-            # except KeyError:
-            #     request.data["venue_ids"]
+             #try:
+             #    request.data["venue_ids"] = create_unreusable_locations(request.data["venue_names"])
+             #except KeyError:
+             #    request.data["venue_ids"]
 
             return super().create(request)
         return forbidden_no_privileges()
@@ -174,7 +227,10 @@ class EventViewSet(viewsets.ModelViewSet):
         except KeyError:
             request.data["venue_ids"]
 
-        return super().update(request, pk)
+        # return super().update(request, pk)
+	# Wrap the super().update in an atomic block
+        with transaction.atomic():
+           return super().update(request,pk)
 
     @login_required_ajax
     def destroy(self, request, pk):
@@ -255,8 +311,8 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
                 request.user.profile, council_id, "VerE"
             )
             if user_has_VerE_permission and not event.email_verified:
-                subject = event.email_subject
-                message = event.longdescription
+                subject = "[" + event.verification_bodies.first().canonical_name + "] " + event.email_subject
+                message = event.longdescription + "\n" + INSTIAPP_MAIL_FOOTER
                 recipient_list = RECIPIENT_LIST
                 try:
                     send_mail(

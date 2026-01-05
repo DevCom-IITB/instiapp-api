@@ -39,6 +39,7 @@ class CommunityPost(models.Model):
     time_of_modification = models.DateTimeField(auto_now=True)
     content = models.TextField(null=True, blank=True)
     image_url = models.TextField(blank=True, null=True)
+    
     reported_by = models.ManyToManyField(
         "users.UserProfile", related_name="posts_reported", blank=True
     )
@@ -58,6 +59,8 @@ class CommunityPost(models.Model):
     parent = models.ForeignKey(
         "self", blank=True, null=True, related_name="comments", on_delete=models.CASCADE
     )
+    ispoll = models.BooleanField(default=False)
+
     # comments = models.ManyToManyField(
     #     "self", blank=True, related_name="community_post_comments")
 
@@ -130,3 +133,52 @@ class CommunityPostUserReaction(models.Model):
     class Meta:
         verbose_name = "Community Post User Reaction"
         verbose_name_plural = "Community Post User Reactions"
+
+
+class Poll(models.Model):
+    """Separate poll model linked to community post"""
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    community_post = models.OneToOneField(CommunityPost, on_delete=models.CASCADE, related_name='poll')
+    question = models.TextField()
+    allow_multiple_answers = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Poll: {self.question[:50]}"
+    
+class PollOption(models.Model):
+    """Poll options"""
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    poll = models.ForeignKey(Poll, related_name='options', on_delete=models.CASCADE)
+    text = models.CharField(max_length=500)
+    order = models.PositiveIntegerField(default=0)
+    vote_count = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        ordering = ['order']
+        unique_together = ['poll', 'order']
+
+class PollVote(models.Model):
+    """User votes on poll options"""
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name='votes')
+    option = models.ForeignKey(PollOption, on_delete=models.CASCADE, related_name='votes')
+    user = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE)
+    voted_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['poll', 'user', 'option']  # Prevent duplicate votes (unless multiple answers allowed)
+
+    # def save(self, *args, **kwargs):
+    #     # Check if multiple answers are allowed
+    #     if not self.poll.allow_multiple_answers:
+    #         # Delete any existing votes by this user for this poll
+    #         PollVote.objects.filter(poll=self.poll, user=self.user).delete()
+        
+    #     super().save(*args, **kwargs)
+        
+    #     # Update vote count
+    #     self.option.vote_count = self.option.votes.count()
+    #     self.option.save()
+
+    
