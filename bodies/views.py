@@ -34,7 +34,7 @@ class BodyViewSet(viewsets.ModelViewSet):
         queryset = Body.objects.all()
         queryset = sort_by_field(
             queryset, "followers", reverse=True, filt=Q(followers__active=True)
-        )
+       )
         serializer = BodySerializerMin(queryset, many=True)
         return Response(serializer.data)
 

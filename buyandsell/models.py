@@ -10,23 +10,23 @@ MOD_EMAIL = "hardikraj08@gmail.com"
 
 
 # Create your models here.
-class Category(models.Model):
-    id = models.IntegerField(primary_key=True, editable=False)
-    name = models.CharField(max_length=100, blank=False, null=False)
-    numproducts = models.IntegerField(default=0, null=False, blank=False)
-
-    def __str__(self):
-        return self.name
+#class Category(models.Model):
+#    id = models.IntegerField(primary_key=True, editable=False)
+#    name = models.CharField(max_length=100, blank=False, null=False)
+#    numproducts = models.IntegerField(default=0, null=False, blank=False)
+#
+#    def __str__(self):
+#        return self.name
 
 
 class Product(models.Model):
     # achievements, events, users
     # placement
-    CATEGORY_CHOICES = (
-        ("electronics", "Electronics"),
-        ("stationery", "Stationery"),
-        ("Other", "Other"),
-    )
+#    CATEGORY_CHOICES = (
+#        ("electronics", "Electronics"),
+#        ("stationery", "Stationery"),
+#        ("Other", "Other"),
+#    )
     CONDITION_CHOICES = (
         ("1", "01/10"),
         ("2", "02/10"),
@@ -50,16 +50,30 @@ class Product(models.Model):
     description = models.TextField(blank=True, default="", null=False)
     product_image = models.TextField(blank=True, null=True)
     # TODO: Change the on_delete function to .
-    category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True, blank=True
+#    category = models.ForeignKey(
+#        Category, on_delete=models.SET_NULL, null=True, blank=True
+#    )
+    category = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        default='Others'
     )
+#    brand = models.CharField(
+#        max_length=PDT_NAME_MAX_LENGTH, blank=True, null=False, default=""
+#    )
     brand = models.CharField(
-        max_length=PDT_NAME_MAX_LENGTH, blank=True, null=False, default=""
+        max_length=PDT_NAME_MAX_LENGTH, blank=True, null=True, default=None
     )
-    warranty = models.BooleanField(default=False)
-    packaging = models.BooleanField(default=False)
+#    warranty = models.BooleanField(default=False)
+#    packaging = models.BooleanField(default=False)
+    warranty = models.BooleanField(null=True, blank=True, default=None)
+    packaging = models.BooleanField(null=True, blank=True, default=None)
+#    condition = models.CharField(
+#        max_length=2, choices=CONDITION_CHOICES, default="7", blank=False
+#    )
     condition = models.CharField(
-        max_length=2, choices=CONDITION_CHOICES, default="7", blank=False
+        max_length=2, choices=CONDITION_CHOICES, blank=True, null=True,
     )
     followers = models.ManyToManyField(
         "users.UserProfile", related_name="productsfollowed", blank=True
@@ -70,6 +84,7 @@ class Product(models.Model):
     status = models.BooleanField(default=True, blank=True, null=True)
     deleted = models.BooleanField(default=False, blank=True, null=True)
     price = models.IntegerField(blank=False, default=100)
+    original_price = models.IntegerField(null=True, blank=True)
     negotiable = models.BooleanField(default=True)
     user = models.ForeignKey(
         "users.UserProfile", on_delete=models.CASCADE, related_name="products"
@@ -78,6 +93,7 @@ class Product(models.Model):
         max_length=CONTACT_MAX_LENGTH, blank=False, null=False
     )
     time_of_creation = models.DateTimeField(auto_now_add=True)
+    time_inactive = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -85,6 +101,8 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         # self.category.numproducts+=1
         self.str_id = get_url_friendly(self.name) + "-" + str(self.id)[:8]
+        if not self.category:
+            self.category = "Others"
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

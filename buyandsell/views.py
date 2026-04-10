@@ -8,10 +8,12 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
 from roles.helpers import login_required_ajax
-from buyandsell.models import Ban, Category, ImageURL, Limit, Product, Report
+#from buyandsell.models import Ban, Category, ImageURL, Limit, Product, Report
+from buyandsell.models import Ban, ImageURL, Limit, Product, Report
 from buyandsell.serializers import ProductSerializer
 from helpers.misc import query_search
 from users.models import UserProfile
+from datetime import timedelta
 
 REPORTS_THRES = 3
 
@@ -63,20 +65,27 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
 
     def category_filter(self, request, queryset):
         category = request.GET.get("category")
-        if category is not None and len(Category.objects.filter(name=category)) > 0:
-            queryset = queryset.filter(category__name=category)
-        return queryset
-
-    def seller_filter(self, request, queryset):
-        seller = request.GET.get("seller")
-        if seller is not None and len(UserProfile.objects.filter(ldap_id=seller)) > 0:
-            queryset = queryset.filter(user=UserProfile.objects.get(ldap_id=seller))
+#        if category is not None and len(Category.objects.filter(name=category)) > 0:
+#            queryset = queryset.filter(category__name=category)
+#        return queryset
+#
+#    def seller_filter(self, request, queryset):
+#        seller = request.GET.get("seller")
+#        if seller is not None and len(UserProfile.objects.filter(ldap_id=seller)) > 0:
+#            queryset = queryset.filter(user=UserProfile.objects.get(ldap_id=seller))
         return queryset
 
     def list(self, request):
         # introduce tags?
         self.update_bans()
-        queryset = self.queryset.filter(status=True)
+#        queryset = self.queryset.filter(status=True)
+        queryset = self.queryset.all()
+
+        show_all = request.GET.get("all", "").lower() == "true"
+
+        if not show_all:
+            queryset = queryset.filter(status=True)
+
         """remove products from banned users"""
         bans = Ban.objects.all()
         for ban in bans:
@@ -88,7 +97,15 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
             request, 3, queryset, ["name", "description"], "buyandsell"
         )
         queryset = self.category_filter(request, queryset)
-        queryset = self.seller_filter(request, queryset)
+#        queryset = self.seller_filter(request, queryset)
+
+        # Cleanup old items
+        cleanup_threshold = timezone.now() - timedelta(days=30)
+        Product.objects.filter(
+            Q(status=False),
+            time_inactive__lte=cleanup_threshold
+        ).delete()
+
         # queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
         data = ProductSerializer(queryset, many=True).data
         return Response(data)
@@ -161,12 +178,22 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         # product.category.numproducts-=1
         # product.category.numproducts-=1
         if product.user == UserProfile.objects.get(user=request.user):
-            #    request.data._mutable = True
-            #    request.data._mutable = True
-            request = self.update_user_details(request)
-            #    self.update_image_urls(request, product)
+#            #    request.data._mutable = True
+#            #    request.data._mutable = True
+#            request = self.update_user_details(request)
+#            #    self.update_image_urls(request, product)
             return super().update(request, pk)
         return Response(ProductSerializer(product).data)
+
+    @login_required_ajax
+    def mark_sold(self, request, pk):
+        product = self.get_product(pk)
+        if product.user == UserProfile.objects.get(user=request.user):
+            product.status = False
+            product.time_inactive = timezone.now()
+            product.save()
+            return Response(ProductSerializer(product).data)
+        return Response({"error": "Permission Denied"}, status=403)
 
     def retrieve(self, request, pk):
         product = self.get_product(pk)
@@ -192,6 +219,9 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
         return Response(ProductSerializer(product).data)
 
     def get_categories(self, request):
-        return Response(
-            json.dumps({x.name: x.numproducts for x in Category.objects.all()})
-        )
+#        return Response(
+#            json.dumps({x.name: x.numproducts for x in Category.objects.all()})
+#        )
+        categories = Product.objects.filter(status=True, deleted=False) \
+            .values_list('category', flat=True).distinct()
+        return Response(list(categories))

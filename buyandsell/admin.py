@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from buyandsell.models import Ban, Category, ImageURL, Product, Report
+from buyandsell.models import Ban, ImageURL, Product, Report
 
 # Register your models here.
-admin.site.register(Category)
+#admin.site.register(Category)
 admin.site.register(ImageURL)
 admin.site.register(Report)
 admin.site.register(Ban)
@@ -13,6 +13,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "user",
+	"category",
         "description",
         "brand",
         "time_of_creation",

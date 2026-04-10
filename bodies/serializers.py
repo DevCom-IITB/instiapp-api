@@ -21,6 +21,10 @@ class BodySerializer(serializers.ModelSerializer):
 
     events = serializers.SerializerMethodField()
     roles = RoleSerializerMin(many=True, read_only=True)
+    photoalbum_urls = serializers.SerializerMethodField()
+
+    def get_photoalbum_urls(self, obj):
+        return obj.photoalbum_urls.split(",") if obj.photoalbum_urls else None
 
     class Meta:
         model = Body
@@ -40,6 +44,10 @@ class BodySerializer(serializers.ModelSerializer):
             "website_url",
             "blog_url",
             "cover_url",
+            "whatsapp_group_url",
+            "instagram_url",
+            "photoalbum_urls",
+            "short_name",
         )
 
     @staticmethod
@@ -62,7 +70,7 @@ class BodySerializer(serializers.ModelSerializer):
             children,
             "child__followers",
             reverse=True,
-            filt=Q(child__followers__active=True),
+#            filt=Q(child__followers__active=True),
         )
         return [BodySerializerMin(x.child).data for x in children.all()]
 
@@ -86,8 +94,8 @@ class BodySerializer(serializers.ModelSerializer):
         queryset = queryset.prefetch_related("parents", "children")
 
         # Annotate followers count
-        followers_count = Count("followers", filter=Q(followers__active=True))
-
+#        followers_count = Count("followers", filter=Q(followers__active=True))
+        followers_count = Count("followers")
         # Annotate user_follows
         userid = request.user.profile.id if request.user.is_authenticated else None
         user_follows = Count("followers", filter=Q(followers__id=userid))

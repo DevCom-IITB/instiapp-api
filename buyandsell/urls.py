@@ -13,4 +13,8 @@ urlpatterns = [
     ),
     path("buy/report/<pk>", BuyAndSellViewSet.as_view({"post": "report"})),
     path("buy/categories", BuyAndSellViewSet.as_view({"get": "get_categories"})),
+    path(
+        "buy/products/<pk>/sold",
+        BuyAndSellViewSet.as_view({"post": "mark_sold"})
+    ),
 ]
