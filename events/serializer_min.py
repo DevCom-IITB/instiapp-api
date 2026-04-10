@@ -8,4 +8,12 @@ class EventMinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ("id", "str_id", "name", "image_url", "start_time", "end_time")
+        fields = (
+            "id",
+            "str_id",
+            "name",
+            "tags",
+            "image_url",
+            "start_time",
+            "end_time",
+        )

@@ -5,11 +5,13 @@ from events.models import Event, UserEventStatus
 class EventAdmin(admin.ModelAdmin):
     list_filter = (
         "start_time",
+        "tags",
         "bodies",
         "venues",
     )
     list_display = (
         "name",
+        "tags",
         "all_bodies",
         "start_time",
         "end_time",

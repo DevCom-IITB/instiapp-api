@@ -11,6 +11,13 @@ class Event(models.Model):
         `followers` - relates multiple `UserEventStatus` for the Event.
     """
 
+    TAG_EVENT = "event"
+    TAG_ANNOUNCEMENT = "announcement"
+    TAG_CHOICES = (
+        (TAG_EVENT, "Event"),
+        (TAG_ANNOUNCEMENT, "Announcement"),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     str_id = models.CharField(max_length=58, editable=False, null=True)
     time_of_creation = models.DateTimeField(auto_now_add=True)
@@ -53,6 +60,13 @@ class Event(models.Model):
     notify = models.BooleanField(default=True)
     user_tags = models.ManyToManyField(
         "users.UserTag", related_name="events", blank=True
+    )
+    tags = models.CharField(
+        max_length=20,
+        choices=TAG_CHOICES,
+        blank=True,
+        null=True,
+        db_index=True,
     )
 
     starting_notified = models.BooleanField(default=False)
