@@ -4,7 +4,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from notifications.models import Notification
 from notifications.signals import notify
-from pyfcm import FCMNotification
 from achievements.models import UserInterest
 from community.models import CommunityPost, CommunityPostUserReaction
 from events.models import Event
@@ -181,14 +180,8 @@ def push_notify(pk):
     # Get rich notification
     data_message = get_rich_notification(notification)
 
-    # Get the API endpoint
-    if not hasattr(settings, "FCM_SERVER_KEY"):
-        return
-
-    try:
-        push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
-    except Exception:
-        return
+    # Firebase Admin is initialized in backend/celery.py
+    push_service = None
 
     # Send FCM push notification
     for device in profile.devices.all():

@@ -6,56 +6,68 @@ from events.models import Event
 from news.models import NewsEntry
 from venter.models import ComplaintComment
 from querybot.models import UnresolvedQuery
-from helpers.device import fill_device_firebase
 from other.views import get_notif_queryset
 
-
-def send_fcm_data_message(push_service, registration_id, data_message):
-    """Send a data FCM message."""
-    push_service.notify_single_device(
-        registration_id=registration_id, data_message=data_message
-    )
+try:
+    from firebase_admin import messaging
+except ImportError:
+    messaging = None
 
 
-def send_fcm_notification_message(push_service, registration_id, data_message):
-    """Send a notification FCM message."""
-    push_service.notify_single_device(
-        registration_id=registration_id,
-        message_title=data_message["title"],
-        message_body=data_message["verb"],
-        data_message=data_message,
-        click_action=data_message.get("click_action", None),
-        sound="default",
+def _stringify_data_message(data_message):
+    """Convert FCM data payload values to strings as required by Firebase."""
+    return {key: "" if value is None else str(value) for key, value in data_message.items()}
+
+
+def _build_message_for_token(registration_id, data_message, notification, android_config):
+    """Build a Firebase Admin Message object."""
+    return messaging.Message(
+        token=registration_id,
+        data=data_message,
+        notification=notification,
+        android=android_config,
     )
 
 
 def send_notification_fcm(push_service, device, data_message):
-    """Attempt to send a single FCM notification."""
+    """Attempt to send a single FCM notification using Firebase Admin SDK."""
+    if messaging is None:
+        return 0
 
     try:
         registration_id = device.fcm_id
 
-        # Fill/check for invalid device
-        if device.needs_refresh() and not fill_device_firebase(push_service, device):
-            device.delete()
-            return 0
-
         # Process the message for device specific things
-        data_message = device.process_rich(data_message)
+        processed_message = device.process_rich(data_message)
+        processed_message = _stringify_data_message(processed_message)
 
-        # Check if the user supports rich notifications
-        push_method = None
-        if device.supports_rich():
-            push_method = send_fcm_data_message
-        else:
-            push_method = send_fcm_notification_message
+        # Build notification object
+        notification = messaging.Notification(
+            title=processed_message.get("title"),
+            body=processed_message.get("verb"),
+        )
 
-        # Push the notification
-        push_method(push_service, registration_id, data_message)
-        return 1
+        # Build Android config
+        android_config = messaging.AndroidConfig(
+            priority="high",
+            notification=messaging.AndroidNotification(
+                title=processed_message.get("title"),
+                body=processed_message.get("verb"),
+                sound="default",
+            ),
+        )
+
+        # Build and send message
+        msg = _build_message_for_token(
+            registration_id, processed_message, notification, android_config
+        )
+        resp = messaging.send(msg)
+        print(f"FCM send start: {device.user.name}")
+        print(f"FCM send result: {{'result': '{resp}'}}")
+        return 1 if resp else 0
 
     except Exception as ex:  # pylint: disable=W0703
-        print(device.user.name, ex)
+        print(f"FCM send failed for {device.user.name}: {ex}")
 
     return 0
 

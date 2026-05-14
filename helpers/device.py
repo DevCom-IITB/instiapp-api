@@ -35,19 +35,4 @@ def update_fcm_device(request, fcm_id):
     profile.save()
 
 
-def fill_device_firebase(push_service, device):  # pragma: no cover
-    """Get/save information about device from Firebase."""
-    info = push_service.get_registration_id_info(device.fcm_id)
 
-    # Invalid device
-    if not info:
-        return None
-
-    # Fill up the device info
-    device.application = info["application"]
-    device.app_version = info["applicationVersion"]
-    device.platform = info["platform"]
-    device.last_refresh = timezone.now()
-    device.save()
-
-    return info

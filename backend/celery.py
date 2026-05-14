@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals
+import os
 from celery import Celery
 
 app = Celery("backend")
@@ -11,6 +12,15 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
+
+# Initialize Firebase Admin SDK
+try:
+    from firebase_admin import credentials, initialize_app
+    cred_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    if cred_path:
+        initialize_app(credentials.Certificate(cred_path))
+except Exception as ex:
+    print("Firebase Admin init skipped/failed:", ex)
 
 
 @app.task(bind=True)
