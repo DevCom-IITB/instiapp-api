@@ -1,7 +1,25 @@
 import re
 import dateparser
 from bs4 import BeautifulSoup
+from slugify import slugify
 import json
+
+POST_TYPE_MAP = {
+    'iaf open': 'IAF_OPEN',
+    'test shortlist': 'TEST_SHORTLIST',
+    'test update': 'TEST_UPDATE',
+    'test': 'TEST',
+    'assignment shortlist': 'ASSIGNMENT_SHORTLIST',
+    'assignment details': 'ASSIGNMENT_DETAILS',
+    'mandatory form': 'MANDATORY_FORM',
+    'interview shortlist': 'INTERVIEW_SHORTLIST',
+    'interview schedule': 'INTERVIEW_SCHEDULE',
+    'interview update': 'INTERVIEW_UPDATE',
+    'gd schedule': 'GD_SCHEDULE',
+    'gd update': 'GD_UPDATE',
+    'round 2 shortlist': 'ROUND2_SHORTLIST',
+    'final selection': 'FINAL_SELECTION'
+}
 
 # Pre-compilation of regex patterns of the fields we need
 PATTERNS = {
@@ -89,6 +107,31 @@ def extract_interview_slots(html_content: str) -> list:
 
     return slots
 
+# to normalise the name of the company
+def normalize_company_name(title: str) -> str:
+    # Step 1: remove [Event Tag] at end
+    name = re.sub(r'\s*\[.*?\]\s*$', '', title).strip()
+    # Step 2: remove trailing (Variant) parenthetical only
+    name = re.sub(r'\s*\([^)]*\)\s*$', '', name).strip()
+    return name
+
+# to create the company slug using normalised company name
+def company_slug(title: str) -> str:
+    return slugify(normalize_company_name(title))
+
+# to extract type of the post based on post type map 
+def extract_post_type(title: str) -> str:
+    match = re.search(r'\[(.+?)\]', title)
+    if not match:
+        return 'OTHER'
+    
+    tag = match.group(1).strip().lower()
+    # Check for substring matches to handle variants
+    for key, value in POST_TYPE_MAP.items():
+        if key in tag:
+            return value
+    return 'OTHER'
+
 
 
 # For Testing the functions defined
@@ -101,30 +144,36 @@ if __name__ == "__main__":
     posts = feed_data if isinstance(feed_data, list) else feed_data.get('items', [])
         
     print(f"Successfully loaded {len(posts)} posts. Testing the first 10...\n")
-    print("-" * 60)
 
     for i, post in enumerate(posts[:10]):
         title = post.get('title', 'Unknown Title')
         content = post.get('content', '')
-        
-        print(f"[{i+1}] TITLE: {title}")
 
-        if '[IAF OPEN]' in title.upper():
+        post_type = extract_post_type(title)
+
+        print(f"[{i+1}]")
+        print(f"[Company] : {normalize_company_name(title)}")
+        print(f"[Slug] : {company_slug(title)}")
+        print(f"[Type] : {post_type}")
+
+        if post_type == 'IAF_OPEN':
             data = extract_fields(content)
-            print("    [Extracted IAF Data]:")
+            print("[Extracted IAF Data]:")
             print(json.dumps(data, indent=4, default=str))
             
-        elif 'SCHEDULE' in title.upper():
+        elif post_type in ['INTERVIEW_SCHEDULE', 'GD_SCHEDULE']:
             slots = extract_interview_slots(content)
-            print(f"    [Interview Slots Found]: {len(slots)}")
-            print("    [Sample Slots]:")
-            print(json.dumps(slots[:2], indent=4))
+            print(f"[Interview Slots Found]: {len(slots)}")
+            print("[Slots]:")
+            print(json.dumps(slots[:], indent=4))
             
 
-        elif 'SHORTLIST' in title.upper():
+        elif 'SHORTLIST' in post_type:
             rolls = extract_roll_numbers(content)
-            print(f"    [Rolls Found]: {len(rolls)}")
-            print(f"    [Sample Rolls]: {rolls[:]}")
+            print(f"[Rolls Found]: {len(rolls)}")
+            print(f"[Rolls]: {rolls[:]}")
                 
         else:
-            print("    [Status]: Other post type. Skipping.")
+            print("[Status]: Other post type. Skipping.")
+
+        print()
