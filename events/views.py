@@ -18,6 +18,7 @@ from roles.helpers import bodies_with_users_having_privilege
 from locations.helpers import create_unreusable_locations
 from django.db import transaction, OperationalError
 import time
+import markdown
 
 
 EMAIL_EVENT_HOST_USER = settings.EMAIL_EVENT_HOST_USER
@@ -304,8 +305,10 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
             if user_has_VerE_permission and not event.email_verified:
                 subject = "[" + event.verification_bodies.first().canonical_name + "] " + event.email_subject
                 message = event.longdescription + "\n" + INSTIAPP_MAIL_FOOTER
+                html_message = markdown.markdown(message)
                 recipient_list = RECIPIENT_LIST
                 try:
+                    
                     send_mail(
                         subject,
                         message,
@@ -314,6 +317,7 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
                         fail_silently=False,
                         auth_user=AUTH_USER,
                         auth_password=EMAIL_HOST_PASSWORD,
+                        html_message=html_message,
                     )
                     event.email_verified = True
                     event.save()

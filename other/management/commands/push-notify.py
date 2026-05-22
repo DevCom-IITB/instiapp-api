@@ -1,11 +1,9 @@
 """Chore to send push notifications."""
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from pyfcm import FCMNotification
 from notifications.models import Notification
 
 from helpers.fcm import send_notification_fcm
-from helpers.fcm import send_fcm_notification_message
 from helpers.fcm import get_rich_notification
 from helpers.webpush import send_notification_webpush
 
@@ -20,7 +18,8 @@ class Command(BaseCommand):
         webpush_total = 0
         fcm_sent = 0
 
-        push_service = FCMNotification(api_key=settings.FCM_SERVER_KEY)
+        # Firebase Admin is initialized in backend/celery.py
+        push_service = None
 
         # Iterate all unsent notifications
         for notification in Notification.objects.filter(emailed=False)[:1000]:
@@ -41,12 +40,6 @@ class Command(BaseCommand):
 
             # Get rich notification
             data_message = get_rich_notification(notification)
-
-            # Retro method for transition
-            if profile.fcm_id and profile.fcm_id != "":
-                send_fcm_notification_message(
-                    push_service, profile.fcm_id, data_message
-                )
 
             # Send FCM push notification
             for device in profile.devices.all():

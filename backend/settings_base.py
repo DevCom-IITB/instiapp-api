@@ -220,6 +220,14 @@ NO_CELERY = os.environ.get("NO_CELERY") != "false"
 # Number of seconds to count down
 CELERY_DELAY = 0
 
+# Celery broker and result backend configuration. Default to local Redis for
+# development; override via the `CELERY_BROKER_URL` and `CELERY_RESULT_BACKEND`
+# environment variables in production.
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get(
+    "CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/1"
+)
+
 # DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 COMPLAINT_AUTO_SUBSCRIBE = True

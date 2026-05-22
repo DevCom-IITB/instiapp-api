@@ -10,7 +10,7 @@ BASE_URL = "http://localhost:8000"
 STATIC_BASE_URL = BASE_URL
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_WHITELIST = [
@@ -30,9 +30,8 @@ LDAP_PASSWORD = os.environ.get("LDAP_PASSWORD", "")
 # SSO Config
 SSO_TOKEN_URL = "https://gymkhana.iitb.ac.in/sso/oauth/token/"
 SSO_PROFILE_URL = "https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number"
-SSO_CLIENT_ID = "0vptOdXpmB8MIGhV6ZeADQxNQ7xuaa3ntITZwqPX"
-SSO_CLIENT_ID_SECRET_BASE64 = "MHZwdE9kWHBtQjhNSUdoVjZaZUFEUXhOUTd4dWFhM250SVRad3FQWDpsanRQbVN2WGZVTnlXZEVRTWQ1aElaYUNXRXZyVFRXTllTU0p3cExwbUhTZ1pTRXI5WUdZWm40SHFOczZlWHBhQjBlSXhzV3p2UlJSSTRoM3FreDJlbmFrSzczUXhPRldiVFh6RkRuUFk4aVdNeERuZndXdU8yOEg0eVloSlpWZw=="
-
+SSO_CLIENT_ID = 'vR1pU7wXWyve1rUkg0fMS6StL1Kr6paoSmRIiLXJ'
+SSO_CLIENT_ID_SECRET_BASE64 = 'dlIxcFU3d1hXeXZlMXJVa2cwZk1TNlN0TDFLcjZwYW9TbVJJaUxYSjpaR2J6dmFydW5VZmh1d3NVWHZqdXJRSEhjMU51WXFmbDJrSjRmSm90YWhyc2tuYklxa2o1NUNKdDc0UktQMllwaXlabHpXaGVZWXNiNGpKVG1RMFVEZUU4M1B6bVViNzRaUjJCakhhYkVqWVJPVEwxSnIxY1ZwTWdZTzFiOWpPWQ=='
 # Password Login
 SSO_DEFAULT_REDIR = "https://insti.app/login"
 SSO_LOGIN_URL = (
