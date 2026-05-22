@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "markdownify",
     "buyandsell",
     "lostandfound",
+    "calendarhub.apps.CalendarhubConfig"
 ]
 
 MIDDLEWARE = [
