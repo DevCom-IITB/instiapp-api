@@ -1,0 +1,376 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | InstiApp Admin{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <span style="font-size:1.4rem">🏛</span>
+        <span>InstiApp Admin</span>
+    </a>
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    :root {
+        --primary:    #1a237e;
+        --primary-dk: #283593;
+        --accent:     #42a5f5;
+        --bg:         #f0f2f5;
+        --surface:    #ffffff;
+        --text:       #212121;
+        --muted:      #757575;
+        --border:     #e0e0e0;
+        --danger:     #e53935;
+        --success:    #43a047;
+        --radius:     8px;
+        --shadow:     0 2px 8px rgba(0,0,0,.12);
+    }
+
+    /* ── Base ── */
+    body { background: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--text); }
+    a { color: var(--primary); }
+    a:hover { color: var(--accent); }
+
+    /* ── Hide Django 4 theme toggle squares ── */
+    .theme-toggle, #theme-toggle, [data-theme-toggle],
+    button.theme-toggle { display: none !important; }
+
+    /* ── Header ── */
+    #header {
+        background: var(--primary);
+        padding: 0 24px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow);
+    }
+
+    #site-name a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff !important;
+        text-decoration: none;
+        font-size: 1.15rem;
+        font-weight: 600;
+    }
+
+    #user-tools { color: rgba(255,255,255,.9); font-size: .85rem; }
+    #user-tools a { color: #fff; border-bottom: 1px solid rgba(255,255,255,.4); padding-bottom: 1px; }
+
+    /* ── Breadcrumbs ── */
+    div.breadcrumbs {
+        background: var(--primary-dk);
+        color: rgba(255,255,255,.9);
+        padding: 8px 24px;
+        font-size: .83rem;
+    }
+    div.breadcrumbs a { color: #fff; }
+
+    /* ── Outer wrapper ── */
+    #content-main { padding: 24px; }
+    #content { padding: 0; }
+
+    /* ── App index search ── */
+    #toolbar { padding: 8px 0 16px 0; }
+    #searchbar, input#searchbar {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 8px 14px;
+        font-size: .9rem;
+        width: 280px;
+        outline: none;
+        box-shadow: var(--shadow);
+    }
+    #searchbar:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(66,165,245,.15); }
+
+    /* ── Module cards ── */
+    .module {
+        background: var(--surface);
+        border: none !important;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        margin-bottom: 20px;
+        overflow: hidden;
+        width: 100% !important;
+    }
+
+    /* ── Caption / h2 — the app name header ── */
+    .module caption,
+    .module > h2,
+    fieldset.module h2 {
+        background: var(--primary) !important;
+        color: #fff !important;
+        padding: 12px 16px !important;
+        font-size: .85rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: .6px !important;
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        text-align: left !important;
+    }
+
+    .module caption a,
+    .module caption a:visited,
+    .module caption a:hover,
+    .module > h2 a,
+    .module > h2 a:visited {
+        color: #fff !important;
+        text-decoration: none !important;
+    }
+
+    /* ── Index table — model list ── */
+    #content-main table {
+        width: 100% !important;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    #content-main table th,
+    #content-main table td {
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        font-size: .9rem;
+        vertical-align: middle;
+    }
+
+    /* Model name column */
+    #content-main table th:first-child,
+    #content-main table td:first-child {
+        width: 55%;
+        font-weight: 600;
+    }
+
+    /* Add / Change columns */
+    #content-main table td:not(:first-child),
+    #content-main table th:not(:first-child) {
+        width: 22.5%;
+        text-align: center;
+    }
+
+    #content-main tbody tr:hover { background: #e8eaf6; }
+
+    #content-main tbody tr:nth-child(even) { background: #f8f9fc; }
+
+    /* Add / Change links */
+    #content-main td a {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: .82rem;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    #content-main td a[href*="add"] {
+        background: #e8f5e9;
+        color: var(--success) !important;
+        border: 1px solid #c8e6c9;
+    }
+
+    #content-main td a[href*="add"]:hover { background: #c8e6c9; }
+
+    #content-main td a:not([href*="add"]) {
+        background: #e3f2fd;
+        color: var(--primary) !important;
+        border: 1px solid #bbdefb;
+    }
+
+    #content-main td a:not([href*="add"]):hover { background: #bbdefb; }
+
+    /* ── Changelist table ── */
+    #changelist { padding: 0; }
+
+    #changelist table {
+        width: 100%;
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border-collapse: collapse;
+    }
+
+    #changelist table thead th {
+        background: var(--primary) !important;
+        color: #fff !important;
+        font-size: .82rem;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        padding: 11px 14px;
+        border: none;
+    }
+
+    #changelist table thead th a,
+    #changelist table thead th a:visited { color: #fff !important; }
+
+    #changelist table tbody tr:nth-child(even) { background: #f5f7fa; }
+    #changelist table tbody tr:hover { background: #e8eaf6; }
+    #changelist table td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+
+    /* ── Changelist actions bar ── */
+    #changelist-form .actions {
+        background: var(--surface);
+        padding: 10px 14px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        margin-bottom: 12px;
+    }
+
+    /* ── Filter sidebar ── */
+    #changelist-filter {
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border: none !important;
+        overflow: hidden;
+        min-width: 200px;
+    }
+
+    #changelist-filter h2 {
+        background: var(--primary) !important;
+        color: #fff !important;
+        padding: 12px 16px;
+        font-size: .82rem;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    #changelist-filter h3 {
+        color: var(--muted);
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        padding: 10px 16px 4px;
+        margin: 0;
+    }
+
+    #changelist-filter ul { padding: 0 16px 12px; margin: 0; }
+    #changelist-filter li { padding: 4px 0; font-size: .88rem; list-style: none; }
+    #changelist-filter a { color: var(--primary); }
+    #changelist-filter a:hover { color: var(--accent); }
+    #changelist-filter li.selected a { font-weight: 700; color: var(--accent); }
+
+    /* ── Search bar on changelist ── */
+    #searchbar, #changelist-search input[type=text] {
+        border: 1px solid var(--border);
+        border-radius: 6px 0 0 6px;
+        padding: 8px 12px;
+        font-size: .9rem;
+        outline: none;
+    }
+
+    #changelist-search input[type=submit] {
+        border-radius: 0 6px 6px 0 !important;
+    }
+
+    /* ── Buttons ── */
+    .button, input[type=submit], input[type=button],
+    .submit-row input, a.button {
+        background: var(--primary) !important;
+        color: #fff !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 8px 18px !important;
+        font-size: .88rem !important;
+        font-weight: 500 !important;
+        cursor: pointer;
+        transition: background .15s;
+    }
+
+    .button:hover, input[type=submit]:hover { background: var(--primary-dk) !important; }
+    .button.default { background: var(--accent) !important; }
+
+    .deletelink, a.deletelink {
+        background: var(--danger) !important;
+        color: #fff !important;
+        border-radius: 6px;
+        padding: 6px 14px;
+        text-decoration: none;
+        font-size: .85rem;
+    }
+
+    /* ── Forms ── */
+    fieldset { border: none !important; }
+    .form-row { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+
+    input[type=text], input[type=password], input[type=email],
+    input[type=url], input[type=number], textarea, select {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 7px 10px;
+        font-size: .9rem;
+        max-width: 600px;
+        width: 100%;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    input[type=text]:focus, input[type=email]:focus,
+    textarea:focus, select:focus {
+        border-color: var(--accent);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(66,165,245,.15);
+    }
+
+    /* ── Submit row ── */
+    .submit-row {
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 12px 16px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    /* ── Messages ── */
+    ul.messagelist { padding: 0; }
+    ul.messagelist li {
+        border-radius: var(--radius);
+        padding: 10px 16px;
+        margin-bottom: 8px;
+        font-size: .9rem;
+        list-style: none;
+    }
+
+    .messagelist li.success { background: #e8f5e9; color: #2e7d32; border-left: 4px solid var(--success); }
+    .messagelist li.warning { background: #fff3e0; color: #e65100; border-left: 4px solid #ff9800; }
+    .messagelist li.error   { background: #ffebee; color: #c62828; border-left: 4px solid var(--danger); }
+
+    /* ── Object tools ── */
+    ul.object-tools { margin: 0 0 12px 0; padding: 0; display: flex; gap: 8px; justify-content: flex-end; }
+    ul.object-tools li { list-style: none; }
+    ul.object-tools li a {
+        background: var(--accent) !important;
+        border-radius: 20px !important;
+        padding: 6px 16px !important;
+        font-size: .82rem !important;
+        font-weight: 500 !important;
+        color: #fff !important;
+        text-decoration: none;
+    }
+    ul.object-tools li a:hover { background: var(--primary) !important; }
+
+    /* ── Pagination ── */
+    .paginator {
+        background: var(--surface);
+        border-radius: var(--radius);
+        padding: 10px 16px;
+        font-size: .88rem;
+        box-shadow: var(--shadow);
+        margin-top: 12px;
+    }
+
+    /* ── Date hierarchy ── */
+    .xfull { width: 100%; }
+    #changelist .xfull td { background: #f0f4ff; font-weight: 600; }
+</style>
+{% endblock %}
