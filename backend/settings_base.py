@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "markdownify",
     "buyandsell",
     "lostandfound",
+    "internship"
 ]
 
 MIDDLEWARE = [
