@@ -1,7 +1,7 @@
 """Urls for the calendar integration"""
 from django.urls import path
 from .views.preferences import CalendarPreferenceView, CalendarBodyPreferenceListView, CalendarBodyPreferenceDetailView
-from .views.resobin import ResobinsyncronizerView
+# from .views.resobin import ResobinsyncronizerView
 from .views.feed import FeedView
 from .views.shared import sharedCalendarInfoView,UseCalendarSubscriptionView
 
@@ -16,12 +16,12 @@ urlpatterns=[
     path(
         "calendar/preferences/bodies/<uuid:body_id>/", CalendarBodyPreferenceDetailView.as_view(), name='calendar-body-preference-detail'
     ),
-    path(
-        "calendar/resobin/sync-now/",ResobinsyncronizerView.as_view(),name='resobin-sync',#will need to decide
-    ),
-    path(
-        "calendar/resobin/status/",ResobinsyncronizerView.as_view(),name='resobin-status',#will need to decide
-    ),
+    # path(
+    #     "calendar/resobin/sync-now/",ResobinsyncronizerView.as_view(),name='resobin-sync',#will need to decide
+    # ),
+    # path(
+    #     "calendar/resobin/status/",ResobinsyncronizerView.as_view(),name='resobin-status',#will need to decide
+    # ),
      path(
         "calendar/feed/",FeedView.as_view(),name='feed',
     ),

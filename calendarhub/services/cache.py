@@ -16,5 +16,6 @@ def get_month_buckets(start, end):
 
 def get_preferences(user):
     """Get or create CalendarSourcePreference for user."""
-    prefs, _ = CalendarSourcePreference.objects.get_or_create(user=user)
-    return prefs
+    prefsa, _ = CalendarSourcePreference.objects.get_or_create(user=user)
+    return prefsa
+  

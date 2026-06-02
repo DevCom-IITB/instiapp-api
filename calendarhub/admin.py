@@ -14,7 +14,7 @@ class CalendarBodyPreferenceAdmin(admin.ModelAdmin):
     list_display  = ['user', 'body', 'enabled', 'updated_at']
     list_filter   = ['enabled']
     search_fields = ['user__name', 'user__ldap_id', 'body__name']
-    # raw_id_fields = ['user', 'body']
+    raw_id_fields = ['user', 'body']
 
 
 @admin.register(models.ExternalCalendarAccount)

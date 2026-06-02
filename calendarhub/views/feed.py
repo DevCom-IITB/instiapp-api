@@ -15,13 +15,14 @@ from calendarhub.services.aggregator import (
     get_shared_events,
     dedupe_instiapp,
     overlaps,
-    maybe_enqueue_resobin_sync,
+    # maybe_enqueue_resobin_sync,
     month_bounds,
 )
 
 MAX_WINDOW = 90
 
 class FeedView(APIView):
+    """View class for the Feed"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -48,7 +49,7 @@ class FeedView(APIView):
                 {'error': f'date range must be between 0 and {MAX_WINDOW} days'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-       items, source_status = self.build_feed(request.user.profile, start, end, tz=None)
+       items = self.build_feed(request.user.profile, start, end, tz=None)
        return Response({
            'items': items,
            'meta': {
@@ -56,7 +57,7 @@ class FeedView(APIView):
                    'start': str_date,
                    'end':   end_date,
                },
-               'source_status': source_status,
+            #    'source_status': source_status,
                'partial_errors': [],
            }
        })
@@ -95,7 +96,7 @@ class FeedView(APIView):
       months = get_month_buckets(start, end)  # e.g. ['2026-04', '2026-05', '2026-06']
 
       items = []
-      source_status = {}
+    #   source_status = {}
 
      # 3. For each month bucket
       for month in months:
@@ -142,17 +143,17 @@ class FeedView(APIView):
       except Exception:
           resobin_fresh = None
 
-      if not resobin_fresh:
-          try:
-              sync_enqueued = maybe_enqueue_resobin_sync(user)
-          except Exception:
-              sync_enqueued = False
-          source_status['resobin'] = {'status': 'stale', 'sync_enqueued': sync_enqueued}
-      else:
-          source_status['resobin'] = {'status': 'fresh'}
+    #   if not resobin_fresh:
+    #       try:
+    #           sync_enqueued = maybe_enqueue_resobin_sync(user)
+    #       except Exception:
+    #           sync_enqueued = False
+    #       source_status['resobin'] = {'status': 'stale', 'sync_enqueued': sync_enqueued}
+    #   else:
+    #       source_status['resobin'] = {'status': 'fresh'}
 
      # 5. Filter to exact [start, end], sort, return
       items = [i for i in items if overlaps(i, start, end)]
       items.sort(key=lambda x: x['start_time'])
 
-      return items, source_status
+      return items

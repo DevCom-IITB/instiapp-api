@@ -132,21 +132,21 @@ def overlaps(item, start, end):
     return item_start < end and item_end > start
 
 
-def maybe_enqueue_resobin_sync(user):
-    """Enqueue a ResoBin sync task if one is not already running. Returns True if enqueued."""
-    from redis import Redis
-    from django.conf import settings
+# def maybe_enqueue_resobin_sync(user):
+#     """Enqueue a ResoBin sync task if one is not already running. Returns True if enqueued."""
+#     from redis import Redis
+#     from django.conf import settings
 
-    redis_client = Redis.from_url(getattr(settings, 'REDIS_URL', 'redis://localhost:6379/0'))
-    lock_key = f'calendar:user:{user.id}:sync:resobin:lock'
+#     redis_client = Redis.from_url(getattr(settings, 'REDIS_URL', 'redis://localhost:6379/0'))
+#     lock_key = f'calendar:user:{user.id}:sync:resobin:lock'
 
-    acquired = redis_client.set(lock_key, '1', nx=True, ex=60)
-    if acquired:
-        redis_client.delete(lock_key)
-        from calendarhub.tasks.resobin_sync import sync_resobin_for_user
-        sync_resobin_for_user.delay(str(user.id))
-        return True
-    return False
+#     acquired = redis_client.set(lock_key, '1', nx=True, ex=60)
+#     if acquired:
+#         redis_client.delete(lock_key)
+#         from calendarhub.tasks.resobin_sync import sync_resobin_for_user
+#         sync_resobin_for_user.delay(str(user.id))
+#         return True
+#     return False
 
 
 def dedupe_instiapp(items):

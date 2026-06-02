@@ -12,7 +12,7 @@ from calendarhub.models import CalendarSourcePreference, CalendarBodyPreference
 from calendarhub.serializers import CalendarSourcePreferenceSerializer
 
 redis_client = redis_lib.Redis.from_url(
-    getattr(settings, 'REDIS_URL', 'redis://localhost:6379/0'),
+    getattr(settings, 'REDIS_URL', 'redis://localhost:6379/1'),
     decode_responses=True,
 )
 
