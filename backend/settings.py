@@ -10,7 +10,7 @@ BASE_URL = "http://localhost:8000"
 STATIC_BASE_URL = BASE_URL
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_WHITELIST = [

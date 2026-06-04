@@ -207,7 +207,7 @@
             "markers": "python_version >= '3.6'",
             "version": "==0.2.1"
         },
-        "beautifulsoup4": {
+        "attrs": {
             "hashes": [
                 "sha256:0918bfe44902e6ad8d57732ba310582e98da931428d231a5ecb9e7c703a735bb",
                 "sha256:6292b1c5186d356bba669ef9f7f051757099565ad9ada5dd630bd9de5fa7fb86"
@@ -216,7 +216,7 @@
             "markers": "python_full_version >= '3.7.0'",
             "version": "==4.14.3"
         },
-        "billiard": {
+        "beautifulsoup4": {
             "hashes": [
                 "sha256:525b42bdec68d2b983347ac312f892db930858495db601b5836ac24e6477cde5",
                 "sha256:55f542c371209e03cd5862299b74e52e4fbcba8250ba611ad94276b369b6a85f"
@@ -1490,7 +1490,7 @@
             "markers": "python_version >= '3.8'",
             "version": "==4.3.6"
         },
-        "prompt-toolkit": {
+        "propcache": {
             "hashes": [
                 "sha256:28cde192929c8e7321de85de1ddbe736f1375148b02f2e17edd840042b1be855",
                 "sha256:9aac639a3bbd33284347de5ad8d68ecc044b91a762dc39b7c21095fcd6a19955"
@@ -2034,7 +2034,7 @@
             ],
             "version": "==1.2.1"
         },
-        "tomli": {
+        "tomlkit": {
             "hashes": [
                 "sha256:01f520d4f53ef97964a240a035ec2a869fe1a37dde002b57ebc4417a27ccd853",
                 "sha256:0d85819802132122da43cb86656f8d1f8c6587d54ae7dcaf30e90533028b49fe",
@@ -2087,7 +2087,7 @@
             "markers": "python_version < '3.11'",
             "version": "==2.4.1"
         },
-        "tomlkit": {
+        "typing-extensions": {
             "hashes": [
                 "sha256:430cf247ee57df2b94ee3fbe588e71d362a941ebb545dec29b53961d61add2a1",
                 "sha256:c89c649d79ee40629a9fda55f8ace8c6a1b42deb912b2a8fd8d942ddadb606b0"
@@ -2120,11 +2120,11 @@
         },
         "uritemplate": {
             "hashes": [
-                "sha256:4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0",
-                "sha256:830c08b8d99bdd312ea4ead05994a38e8936266f84b9a7878232db50b044e02e"
+                "sha256:480c2ed180878955863323eea31b0ede668795de182617fef9c6ca09e6ec9d0e",
+                "sha256:962201ba1c4edcab02e60f9a0d3821e82dfc5d2d6662a21abd533879bdb8a686"
             ],
-            "markers": "python_version >= '3.6'",
-            "version": "==4.1.1"
+            "markers": "python_version >= '3.9'",
+            "version": "==4.2.0"
         },
         "urllib3": {
             "hashes": [
