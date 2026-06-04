@@ -3,6 +3,8 @@ import dateparser
 from bs4 import BeautifulSoup
 from slugify import slugify
 import json
+from internship.models import CompanyThread, BlogPost, ExtractedData
+from django.utils import timezone
 
 POST_TYPE_MAP = {
     'iaf open': 'IAF_OPEN',
@@ -134,46 +136,86 @@ def extract_post_type(title: str) -> str:
 
 
 
-# For Testing the functions defined
-if __name__ == "__main__":
-    file_path = 'internship_blog_last500.json'
+
+def run_database_ingestion():
+    file_path = 'internship/internship_blog_last500.json'
 
     with open(file_path, 'r', encoding='utf-8') as f:
         feed_data = json.load(f)
 
     posts = feed_data if isinstance(feed_data, list) else feed_data.get('items', [])
         
-    print(f"Successfully loaded {len(posts)} posts. Testing the first 10...\n")
+    print(f"Successfully loaded {len(posts)} posts. Starting database ingestion...\n")
 
-    for i, post in enumerate(posts[:10]):
+    for i, post in enumerate(posts):
         title = post.get('title', 'Unknown Title')
         content = post.get('content', '')
+        link = post.get('link', '') 
+        post_id = post.get('id')
+        
+        pub_date_str = post.get('published') or post.get('date_published')
+        published_date = dateparser.parse(pub_date_str) if pub_date_str else timezone.now()
 
         post_type = extract_post_type(title)
+        company_name = normalize_company_name(title)
+        c_slug = company_slug(title)
 
-        print(f"[{i+1}]")
-        print(f"[Company] : {normalize_company_name(title)}")
-        print(f"[Slug] : {company_slug(title)}")
-        print(f"[Type] : {post_type}")
+        company_thread, created = CompanyThread.objects.get_or_create(
+            company_name=company_name,
+            defaults={
+                'company_slug': c_slug,
+                'first_post_date': published_date
+            }
+        )
+        if created:
+            print(f"[NEW THREAD] Created database thread for: {company_name}")
+
+        blog_post = BlogPost.objects.create(
+            id=post_id,
+            thread=company_thread,
+            post_type=post_type,
+            raw_company_name=title,
+            published=published_date,
+            raw_content=content,
+            link=link
+        )
+
+        ext_data = ExtractedData(post=blog_post)
 
         if post_type == 'IAF_OPEN':
             data = extract_fields(content)
-            print("[Extracted IAF Data]:")
-            print(json.dumps(data, indent=4, default=str))
+            
+            company_thread.category = data.get('category', '')
+            company_thread.role = data.get('role', '')
+            company_thread.stipend = data.get('stipend', '')
+            company_thread.eligibility = data.get('eligibility', '')
+            company_thread.iaf_deadline = data.get('deadline')
+            company_thread.save()
+
+            ext_data.category = data.get('category', '')
+            ext_data.role = data.get('role', '')
+            ext_data.stipend = data.get('stipend', '')
+            ext_data.eligibility = data.get('eligibility', '')
+            ext_data.deadline = data.get('deadline')
+            ext_data.event_date = data.get('event_date')
+            ext_data.venue = data.get('venue', '')
+            ext_data.reporting_time = data.get('reporting_time', '')
+            
+            print(f"[SAVED] IAF Data extracted and saved for {company_name}")
             
         elif post_type in ['INTERVIEW_SCHEDULE', 'GD_SCHEDULE']:
-            slots = extract_interview_slots(content)
-            print(f"[Interview Slots Found]: {len(slots)}")
-            print("[Slots]:")
-            print(json.dumps(slots[:], indent=4))
-            
+            ext_data.interview_slots = extract_interview_slots(content)
+            print(f"[LOG] Saved {len(ext_data.interview_slots)} interview slots for {company_name}")
 
         elif 'SHORTLIST' in post_type:
-            rolls = extract_roll_numbers(content)
-            print(f"[Rolls Found]: {len(rolls)}")
-            print(f"[Rolls]: {rolls[:]}")
+            ext_data.shortlisted_rolls = extract_roll_numbers(content)
+            print(f"[LOG] Saved {len(ext_data.shortlisted_rolls)} shortlisted rolls for {company_name}")
                 
         else:
-            print("[Status]: Other post type. Skipping.")
+            print(f"[SKIPPED] {company_name} - Post type is {post_type}")
 
-        print()
+        ext_data.save()
+
+    print("\n Data ingestion complete! All models populated.")
+
+run_database_ingestion()
