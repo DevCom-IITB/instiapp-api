@@ -71,7 +71,7 @@ class UploadedImage(models.Model):
         factor = min(MAX_DIM / height, MAX_DIM / width)
         if factor < 0.85:
             size = (int(width * factor), int(height * factor))
-            image = image.resize(size, Image.ANTIALIAS)
+            image = image.resize(size, Image.Resampling.LANCZOS)
 
         # Save
         image.save(path, "JPEG", quality=90, optimize=True, progressive=True)
