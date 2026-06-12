@@ -3,7 +3,7 @@ from upload.models import UploadedImage
 
 
 class UploadedImageAdmin(admin.ModelAdmin):
-    list_display = ("uploaded_by", "is_claimed", "claimant")
+    list_display = ("uploaded_by", "is_claimed")
     raw_id_fields = ("uploaded_by",)
 
 

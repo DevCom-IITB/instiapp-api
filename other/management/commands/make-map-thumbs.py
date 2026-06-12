@@ -21,7 +21,7 @@ class Command(BaseCommand):
         # Provide this the map file in the working directory
         image = Image.open(open(MAP_FILE, "rb"))
         marker = Image.open(open(MARKER_FILE, "rb"))
-        marker.thumbnail(MARKER_SIZE, Image.ANTIALIAS)
+        marker.thumbnail(MARKER_SIZE, Image.Resampling.LANCZOS)
         marker_width, marker_height = marker.size
 
         # Check for target directory
