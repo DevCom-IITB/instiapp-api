@@ -50,7 +50,13 @@ def extract_string(pattern, text: str) -> str:
 # Helper function to cleanly extract date and parse it 
 def extract_date(pattern, text: str):
     date = extract_string(pattern, text)
-    return dateparser.parse(date) if date else None
+    if date:
+        parsed_date = dateparser.parse(date)
+        # If the date is naive, force it to be timezone-aware
+        if parsed_date and timezone.is_naive(parsed_date):
+            return timezone.make_aware(parsed_date)
+        return parsed_date
+    return None
 
 # To actually extract the fields 
 def extract_fields(html_content: str) -> dict:
@@ -183,10 +189,14 @@ def run_database_ingestion():
         ext_data = ExtractedData(post=blog_post)
 
         if post_type == 'IAF_OPEN':
+            from .nlp_helpers import infer_domain
+
             data = extract_fields(content)
+            role_text = data.get('role', '')
             
             company_thread.category = data.get('category', '')
             company_thread.role = data.get('role', '')
+            company_thread.domain = infer_domain(role_text)
             company_thread.stipend = data.get('stipend', '')
             company_thread.eligibility = data.get('eligibility', '')
             company_thread.iaf_deadline = data.get('deadline')
@@ -218,4 +228,30 @@ def run_database_ingestion():
 
     print("\n Data ingestion complete! All models populated.")
 
-run_database_ingestion()
+def run_production_ingestion(feed_posts):
+    
+    for post in feed_posts:
+        title = post.get('title', 'Unknown Title')
+        content = post.get('content', '')
+        link = post.get('link', '') 
+        post_id = post.get('id')
+        
+        pub_date_str = post.get('published') or post.get('date_published')
+        published_date = dateparser.parse(pub_date_str) if pub_date_str else timezone.now()
+        
+        if published_date and timezone.is_naive(published_date):
+            published_date = timezone.make_aware(published_date)
+
+        post_type = extract_post_type(title)
+
+        blog_post, created = BlogPost.objects.update_or_create(
+            id=post_id,
+            defaults={
+                'post_type': post_type,
+                'raw_company_name': title,
+                'published': published_date,
+                'raw_content': content,
+                'link': link
+            }
+        )
+
