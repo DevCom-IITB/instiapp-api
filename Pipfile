@@ -44,4 +44,9 @@ django-cors-headers = "*"
 dateparser = "*"
 beautifulsoup4 = "*"
 python-slugify = "*"
+<<<<<<< Updated upstream
 redis = "*"
+=======
+spacy = "<3.8.0"
+redis = "*"
+>>>>>>> Stashed changes
