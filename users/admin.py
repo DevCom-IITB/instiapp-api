@@ -6,6 +6,7 @@ from users.models import UserFormerRole
 from users.models import WebPushSubscription
 from users.models import UserTagCategory
 from users.models import UserTag
+from users.models import Signature
 
 
 def export_as_csv(self, request, queryset):
@@ -41,9 +42,14 @@ class UserTagAdmin(admin.ModelAdmin):
     list_display = ("category", "name", "target", "secondary_target")
     ordering = ("category", "name")
 
+class SignatureAdmin(admin.ModelAdmin):
+    list_display = ("user", "body", "signature", "timestamp")
+    raw_id_fields = ("user", "body")
+    ordering = ("-timestamp",)
 
 admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(UserFormerRole, UserFormerRoleAdmin)
 admin.site.register(WebPushSubscription, WebPushSubscriptionAdmin)
 admin.site.register(UserTagCategory)
 admin.site.register(UserTag, UserTagAdmin)
+admin.site.register(Signature, SignatureAdmin)

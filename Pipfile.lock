@@ -179,11 +179,7 @@
                 "sha256:39e3809566ff85354557ec2398b55e096c8364bacac9405a7a1fa429e77fe76c",
                 "sha256:d9321a7a3d5a6a5e187e824d2fa0793ce379a202935782d555d6e9d2735677d3"
             ],
-<<<<<<< Updated upstream
-            "markers": "python_full_version < '3.11.3'",
-=======
             "markers": "python_version >= '3.8'",
->>>>>>> Stashed changes
             "version": "==5.0.1"
         },
         "attrs": {
@@ -1901,8 +1897,6 @@
             "markers": "python_version >= '3.8'",
             "version": "==4.3.6"
         },
-<<<<<<< Updated upstream
-=======
         "preshed": {
             "hashes": [
                 "sha256:04fb860a8aab18d2201f06159337eda5568dc5eed218570d960fad79e783c7d0",
@@ -1966,7 +1960,6 @@
             "markers": "python_version < '3.15' and python_version >= '3.6'",
             "version": "==3.0.12"
         },
->>>>>>> Stashed changes
         "prompt-toolkit": {
             "hashes": [
                 "sha256:28cde192929c8e7321de85de1ddbe736f1375148b02f2e17edd840042b1be855",
