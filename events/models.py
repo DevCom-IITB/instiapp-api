@@ -23,12 +23,28 @@ class Event(models.Model):
     time_of_creation = models.DateTimeField(auto_now_add=True)
     time_of_modification = models.DateTimeField(auto_now=True)
 
+    # NEW
+    resubmitted_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Set when a previously rejected event is edited and resubmitted.",
+    )
+
     name = models.CharField(max_length=60)
     description = models.TextField(blank=True)
     email_subject = models.TextField(default="")
     longdescription = models.TextField(default="")
+
     email_verified = models.BooleanField(default=False)
     email_rejected = models.BooleanField(default=False)
+
+    # NEW
+    rejection_reason = models.TextField(
+        blank=True,
+        default="",
+        help_text="Feedback left by the verifier when rejecting an event.",
+    )
+
     bodies = models.ManyToManyField("bodies.Body", related_name="events", blank=True)
     verification_bodies = models.ManyToManyField(
         "bodies.Body", blank=True, related_name="verEvents"
@@ -97,6 +113,15 @@ class Event(models.Model):
 
     def all_bodies(self):
         return [str(body) for body in self.bodies.all()]
+
+    # NEW
+    @property
+    def verification_status(self):
+        if self.email_rejected:
+            return "rejected"
+        if self.email_verified:
+            return "approved"
+        return "pending"
 
     class Meta:
         verbose_name = "Event"

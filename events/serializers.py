@@ -57,6 +57,17 @@ class EventSerializer(serializers.ModelSerializer):
     offered_achievements = OfferedAchievementSerializer(many=True, read_only=True)
     event_interest = InterestSerializer(many=True, read_only=True)
 
+    time_of_creation = serializers.DateTimeField(read_only=True)
+    resubmitted_at = serializers.DateTimeField(read_only=True)
+    verification_status = serializers.CharField(
+    source="verification_status",
+    read_only=True,
+    )
+    rejection_reason = serializers.CharField(
+    read_only=True,
+    allow_blank=True,
+    )
+
     class Meta:
         model = Event
         fields = (
@@ -72,7 +83,7 @@ class EventSerializer(serializers.ModelSerializer):
             "end_time",
             "all_day",
             "venues",
-	    "venue_room",
+	        "venue_room",
             "bodies",
             "interested_count",
             "going_count",
@@ -81,6 +92,12 @@ class EventSerializer(serializers.ModelSerializer):
             "user_ues",
             "offered_achievements",
             "event_interest",
+            "email_verified",
+            "email_rejected",
+            "verification_status",
+            "rejection_reason",
+            "time_of_creation",
+            "resubmitted_at",
         )
 
     @staticmethod
@@ -181,6 +198,18 @@ class EventFullSerializer(serializers.ModelSerializer):
         source="event_interest",
     )
 
+    time_of_creation = serializers.DateTimeField(read_only=True)
+    resubmitted_at = serializers.DateTimeField(read_only=True,allow_null=True)
+    verification_status = serializers.CharField(
+    source="verification_status",
+    read_only=True,
+    )
+    rejection_reason = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        default=""
+    )
+
     class Meta:
         model = Event
         fields = (
@@ -200,7 +229,7 @@ class EventFullSerializer(serializers.ModelSerializer):
             "end_time",
             "all_day",
             "venues",
-	    "venue_room",
+	        "venue_room",
             "venue_names",
             "bodies",
             "bodies_id",
@@ -216,6 +245,10 @@ class EventFullSerializer(serializers.ModelSerializer):
             "offered_achievements",
             "event_interest",
             "interests_id",
+            "verification_status",
+            "rejection_reason",
+            "time_of_creation",
+            "resubmitted_at",
         )
 
     @staticmethod
@@ -234,3 +267,6 @@ class EventFullSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user.profile
         return super().create(validated_data)
+
+class EventCreatorSerializer(EventFullSerializer):
+    pass
