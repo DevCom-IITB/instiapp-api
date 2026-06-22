@@ -106,9 +106,23 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
             time_inactive__lte=cleanup_threshold
         ).delete()
 
-        # queryset = query_from_num(request, self.RESULTS_PER_PAGE, queryset)
-        data = ProductSerializer(queryset, many=True).data
-        return Response(data)
+        # Simple pagination: get 20 items per page
+        page_size = 20
+        try:
+            page = int(request.GET.get("page", 0))
+            if page < 0:
+                page = 0
+        except (ValueError, TypeError):
+            page = 0
+
+        start_index = page * page_size
+        end_index = start_index + page_size
+        paginated_queryset = queryset[start_index:end_index]
+
+        # Serialize only the products for the current page for efficiency
+        data = ProductSerializer(paginated_queryset, many=True).data
+
+        return Response({"results": data})
 
     def get_contact_details(self, userpro: UserProfile):
         return f"""
@@ -123,9 +137,10 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
             ImageURL.objects.create(product=instance, url=url)
 
     def update_user_details(self, request):
-        request.data["user"] = UserProfile.objects.get(user=request.user).id
+        user= UserProfile.objects.get(user=request.user)
+        request.data["user"] = user.id
         request.data["contact_details"] = BuyAndSellViewSet.get_contact_details(
-            UserProfile.objects.get(user=request.user)
+            user
         )
         return request
 
