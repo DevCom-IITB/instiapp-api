@@ -3,7 +3,9 @@ from uuid import UUID
 from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+import markdown
+import re
 from django.conf import settings
 from bodies.serializers import BodySerializerMin
 from events.prioritizer import get_fresh_prioritized_events
@@ -28,7 +30,9 @@ EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
 AUTH_USER = settings.AUTH_USER
 INSTIAPP_MAIL_FOOTER = (
     "________________________________________\n"
-    "This mail has been sent through Instiapp Events. In case of any queries, contact the council conducting the event. DevCom is **not** responsible for the contents of this email."
+    "This mail has been sent through Instiapp Events. In case of any queries, "
+    "contact the council conducting the event. DevCom is **not** responsible "
+    "for the contents of this email."
 )
 
 
@@ -38,6 +42,32 @@ def _user_can_verify(request, event):
         if user_has_privilege(request.user.profile, council.id, "VerE"):
             return True
     return False
+
+def render_markdown_for_email(text):
+    """Convert markdown text to HTML for email."""
+    text = text.replace("\\n", "\n")
+
+    # Ensure blank line before lists
+    text = re.sub(r'([^\n])\n(\*|-|\d+\.)\s', r'\1\n\n\2 ', text)
+
+    # ~~text~~ → <del>
+    text = re.sub(r'~~([^~]+)~~', r'<del>\1</del>', text)
+
+    # ~text~ → <del>
+    text = re.sub(
+        r'(?<!~)~(?!~)([^~]+)(?<!~)~(?!~)',
+        r'<del>\1</del>',
+        text
+    )
+
+    return markdown.markdown(
+        text,
+        extensions=[
+            "nl2br",
+            "extra",
+            "pymdownx.magiclink",
+        ],
+    )
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -328,27 +358,51 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
         if event.email_rejected:
             return Response({"error": "Event is currently rejected. Resubmission needed."}, status=400)
 
-        subject = "[" + (event.verification_bodies.first().canonical_name if event.verification_bodies.exists() else "") + "] " + event.email_subject
-        message = event.longdescription + "\n" + INSTIAPP_MAIL_FOOTER
-        recipient_list = RECIPIENT_LIST
-        try:
-            send_mail(
-                subject,
-                message,
-                EMAIL_EVENT_HOST_USER,
-                recipient_list,
-                fail_silently=False,
-                auth_user=AUTH_USER,
-                auth_password=EMAIL_HOST_PASSWORD,
+        subject = (
+            "["
+            + (
+                event.verification_bodies.first().canonical_name
+                if event.verification_bodies.exists()
+                else ""
             )
+            + "] "
+            + event.email_subject
+        )
+
+        description = event.longdescription.replace("\\n", "\n")
+
+        text_message = description + "\n\n" + INSTIAPP_MAIL_FOOTER
+
+        html_message = (
+            render_markdown_for_email(event.longdescription)
+            + "<hr>"
+            + render_markdown_for_email(INSTIAPP_MAIL_FOOTER)
+        )
+
+        try:
+            msg = EmailMultiAlternatives(
+                subject=subject,
+                body=text_message,
+                from_email=EMAIL_EVENT_HOST_USER,
+                to=RECIPIENT_LIST,
+            )
+
+            msg.attach_alternative(html_message, "text/html")
+            msg.send()
+
             event.email_verified = True
             event.email_rejected = False
             event.rejection_reason = ""
             event.save()
+
             return Response({"success": "Mail sent successfully"})
+
         except Exception as e:
             return Response(
-                {"error_status": True, "msg": f"Error sending mail: f{str(e)}"}
+                {
+                    "error_status": True,
+                    "msg": f"Error sending mail: {str(e)}"
+                }
             )
 
     @login_required_ajax
