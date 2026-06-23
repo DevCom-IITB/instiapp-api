@@ -169,8 +169,6 @@ class EventViewSet(viewsets.ModelViewSet):
         queryset = (
             self.queryset
             .filter(
-                email_verified=False,
-                email_rejected=False,
                 verification_bodies__id__in=verifiable_body_ids,
             )
             .distinct()
