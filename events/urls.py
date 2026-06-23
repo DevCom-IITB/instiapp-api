@@ -12,9 +12,9 @@ urlpatterns = [
 
     # NEW: pending events visible to verifiers
     path(
-        "events-pending-verification",
-        EventViewSet.as_view({"get": "pending_for_verifier"}),
-        name="events-pending-verification",
+        "verifier-events",
+        EventViewSet.as_view({"get": "verifier_events"}),
+        name="verifier-events",
     ),
 
     # NEW: creator dashboard

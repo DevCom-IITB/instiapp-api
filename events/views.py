@@ -124,7 +124,7 @@ class EventViewSet(viewsets.ModelViewSet):
         return Response({"count": len(data), "data": data})
 
     @login_required_ajax
-    def pending_for_verifier(self, request):
+    def verifier_events(self, request):
         """Get only pending events that the current verifier can approve."""
         profile = request.user.profile
         verifiable_body_ids = [

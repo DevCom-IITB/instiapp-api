@@ -60,7 +60,6 @@ class EventSerializer(serializers.ModelSerializer):
     time_of_creation = serializers.DateTimeField(read_only=True)
     resubmitted_at = serializers.DateTimeField(read_only=True)
     verification_status = serializers.CharField(
-    source="verification_status",
     read_only=True,
     )
     rejection_reason = serializers.CharField(
@@ -201,7 +200,6 @@ class EventFullSerializer(serializers.ModelSerializer):
     time_of_creation = serializers.DateTimeField(read_only=True)
     resubmitted_at = serializers.DateTimeField(read_only=True,allow_null=True)
     verification_status = serializers.CharField(
-    source="verification_status",
     read_only=True,
     )
     rejection_reason = serializers.CharField(
