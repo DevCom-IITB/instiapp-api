@@ -189,6 +189,7 @@ class Signature(models.Model):
         UserProfile, on_delete=models.CASCADE, related_name="signatures"
     )
     body = models.ForeignKey(
+        "bodies.Body", on_delete=models.CASCADE, related_name="signatures", blank=True,null = True
         "bodies.Body", on_delete=models.CASCADE, related_name="signatures",
         blank=True,null = True
     )
