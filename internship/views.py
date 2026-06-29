@@ -2,11 +2,15 @@ from rest_framework import generics
 from .models import CompanyThread, BlogPost
 from .serializers import CompanyThreadSerializer, CompleteThreadSerializer, BlogPostSerializer
 from django.db.models import OuterRef, Subquery
+from rest_framework.pagination import PageNumberPagination
+class InternshipPagination(PageNumberPagination):
+    page_size = 20
 
 class ThreadListView(generics.ListAPIView):
 
     queryset = CompanyThread.objects.all().order_by('-first_post_date')
     serializer_class = CompanyThreadSerializer
+    pagination_class = InternshipPagination
     
     # Can do pagination too
 
@@ -21,9 +25,11 @@ class BlogPostListView(generics.ListAPIView):
 
     queryset = BlogPost.objects.select_related('extracted').order_by('-published')
     serializer_class = BlogPostSerializer
+    pagination_class = InternshipPagination
 
 class LatestCompanyPostListView(generics.ListAPIView):
     serializer_class = BlogPostSerializer
+    pagination_class = InternshipPagination
 
     def get_queryset(self):
 
