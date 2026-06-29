@@ -1,6 +1,7 @@
 from rest_framework import generics
-from .models import CompanyThread
-from .serializers import CompanyThreadSerializer, CompleteThreadSerializer
+from .models import CompanyThread, BlogPost
+from .serializers import CompanyThreadSerializer, CompleteThreadSerializer, BlogPostSerializer
+from django.db.models import OuterRef, Subquery
 
 class ThreadListView(generics.ListAPIView):
 
@@ -15,3 +16,22 @@ class ThreadDetailView(generics.RetrieveAPIView):
     serializer_class = CompleteThreadSerializer
     
     lookup_field = 'company_slug'
+
+class BlogPostListView(generics.ListAPIView):
+
+    queryset = BlogPost.objects.select_related('extracted').order_by('-published')
+    serializer_class = BlogPostSerializer
+
+class LatestCompanyPostListView(generics.ListAPIView):
+    serializer_class = BlogPostSerializer
+
+    def get_queryset(self):
+
+        latest_post_subquery = BlogPost.objects.filter(
+            thread=OuterRef('thread')
+        ).order_by('-published').values('id')[:1]
+
+        #Filter the main BlogPost table to only include those exact IDs, 
+        return BlogPost.objects.filter(
+            id=Subquery(latest_post_subquery)
+        ).select_related('extracted').order_by('-published')
