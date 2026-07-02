@@ -442,6 +442,7 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
         event.email_rejected = False
         event.email_verified = False
         event.rejection_reason = ""
+        event.resubmitted_at = timezone.now()
         event.save()
         return Response({"success": "Event resubmitted for verification successfully."})
 
