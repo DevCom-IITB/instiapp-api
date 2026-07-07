@@ -21,11 +21,25 @@ def _stringify_data_message(data_message):
 
 def _build_message_for_token(registration_id, data_message, notification, android_config):
     """Build a Firebase Admin Message object."""
+    apns_config = messaging.APNSConfig(
+        payload=messaging.APNSPayload(
+            aps=messaging.Aps(
+                alert=messaging.ApsAlert(
+                    title=notification.title,
+                    body=notification.body,
+                ),
+                sound="default",
+                content_available=True,
+                mutable_content=True,
+            )
+        )
+    )
     return messaging.Message(
         token=registration_id,
         data=data_message,
         notification=notification,
         android=android_config,
+        apns=apns_config,
     )
 
 
