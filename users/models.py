@@ -197,4 +197,5 @@ class Signature(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        db_table='signature_model'
         unique_together = ("user", "body")

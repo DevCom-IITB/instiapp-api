@@ -1,77 +1,84 @@
 from rest_framework.views import APIView
-from other.views import get_notif_queryset
-from other.serializers import NotificationSerializer
-from roles.helpers import login_required_ajax
+from .serializer import PopUpSerializer
+from .models import PopUp, UserPopUpRead
 from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
+
 # Create your views here.
 class PopUpViewSet(APIView):
-     @login_required_ajax
-     def get(self, request):
-        """
-        Gets the latest unread notification for the current user.
-        Ideal for displaying a single popup.
-        """
+    """
+    Pop Up for the events
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, popup_id=None):
+        if popup_id is not None:
+            # Get a single popup if an ID is provided in the URL
+            popup = get_object_or_404(PopUp, id=popup_id)
+
+            # Check if the user has already read this popup
+            if UserPopUpRead.objects.filter(user=request.user.profile, popup=popup).exists():
+                return Response(
+                    {"error": "Popup has already been read."},
+                    status=status.HTTP_409_CONFLICT
+                )
+
+            serializer = PopUpSerializer(popup)
+            return Response(serializer.data)
+
+        # Get IDs of popups already read by the user
+        read_popup_ids = UserPopUpRead.objects.filter(
+            user=request.user.profile
+        ).values_list('popup_id', flat=True)
+
+        # Fetch active popups that the user has not read
+        popups = PopUp.objects.filter(is_active=True).exclude(id__in=read_popup_ids)
+
+        serializer = PopUpSerializer(popups, many=True)
+        return Response(serializer.data)
+
+    # def patch(self, request, popup_id=None):
+    #     # Authorization check: Only allow staff/admin users to update popups.
+    #     if not request.user.is_staff:
+    #         return Response(
+    #             {"error": "You do not have permission to perform this action."},
+    #             status=status.HTTP_403_FORBIDDEN
+    #         )
+
+    #     if popup_id is None:
+    #         return Response(
+    #             {"error": "You must provide a popup ID in the URL to update it."},
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
+
+    #     popup = get_object_or_404(PopUp, id=popup_id)
+
+    #     serializer = PopUpSerializer(popup, data=request.data, partial=True)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data)
         
-        latest_notification = get_notif_queryset(request.user.notifications).first()
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if not latest_notification:
-            return Response(status=204)  # No Content
 
-        serializer = NotificationSerializer(latest_notification)
-        serialized_data = serializer.data
+class PopUpMarkReadView(APIView):
+    permission_classes = [IsAuthenticated]
 
-        # The actor object contains the details of the event, news, etc.
-        actor = serialized_data.get("actor")
-
-        if not actor:
-            # Fallback for notifications without a proper actor
-            return Response(
-                {
-                    "verb": serialized_data.get("verb"),
-                    "title": "Notification",
-                    "description": serialized_data.get("verb"),
-                    "imageurl": None,
-                    "links": None,
-                }
-            )
-
-        title = actor.get("name") or actor.get("title")
-        
-        description = actor.get("description") or actor.get("content")
-
-        if serialized_data.get("actor_type") == "complaintcomment":
-            description = actor.get("text")
-
-        # Truncate long descriptions for a clean popup display
-        if description and len(description) > 150:
-            description = description[:147] + "..."
-
-        image_url = actor.get("image_url")
-        
-        link = actor.get("website_url") or actor.get("url")
-
-        request_data = {
-            "verb": serialized_data.get("verb"),
-            "title": title,
-            "description": description,
-            "imageurl": image_url,
-            "links": link,
-        }
-        return Response(request_data)
-
-class MarkLatestAsReadView(APIView):
-    @login_required_ajax
-    def post(self, request):
+    def post(self, request, popup_id=None):
         """
-        Finds the latest unread notification for the user and marks it as read.
+        Marks a specific popup as read for the current user.
         """
-        latest_notification = get_notif_queryset(request.user.notifications).first()
-
-        if not latest_notification:
-            return Response(status=204)  # No Content
-
-        # Mark as read
-        latest_notification.unread = False
-        latest_notification.save()
-
-        return Response(status=204)
+        popup = get_object_or_404(PopUp, id=popup_id)
+        
+        # Create a record to mark this popup as read for this user.
+        # get_or_create prevents creating duplicate entries.
+        UserPopUpRead.objects.get_or_create(
+            user=request.user.profile,
+            popup=popup
+        )
+        return Response({
+            "status": "success",
+            "detail": f"Popup with ID {popup_id} has been marked as read."
+        }, status=status.HTTP_200_OK)

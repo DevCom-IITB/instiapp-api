@@ -14,6 +14,7 @@ from calendarhub.models import (
 from calendarhub.serializers import (
     SharedCalendarSerializer,
     SharedCalendarEventSerializer,
+    UserSharedCalendarSubscriptionSerializer,
 )
 
 
@@ -25,16 +26,32 @@ class sharedCalendarInfoView(APIView):
     def get(self, request, slug=None):
         if slug is None:
             calendars = SharedCalendar.objects.filter(is_active=True, is_public=True)
-            return Response(SharedCalendarSerializer(calendars, many=True).data)
+            data = SharedCalendarSerializer(calendars, many=True).data
+
+            # Get the set of calendar slugs the user is subscribed to
+            subscribed_slugs = set(
+                UserSharedCalendarSubscription.objects.filter(
+                    user=request.user.profile, calendar__in=calendars
+                ).values_list("calendar__slug", flat=True)
+            )
+
+            # Add the 'subscribed' status to each calendar dictionary
+            for calendar_data in data:
+                calendar_data["subscribed"] = calendar_data["slug"] in subscribed_slugs
+
+            return Response(data)
 
         calendar = get_object_or_404(SharedCalendar, slug=slug, is_active=True)
         upcoming = (
             SharedCalendarEvent.objects
             .filter(calendar=calendar, start_time__gte=now(), is_cancelled=False)
-            .order_by('start_time')[:10]
+            .order_by('start_time')
         )
         data = SharedCalendarSerializer(calendar).data
         data['upcoming_events'] = SharedCalendarEventSerializer(upcoming, many=True).data
+        data['subscribed'] = UserSharedCalendarSubscription.objects.filter(
+            user=request.user.profile, calendar=calendar
+        ).exists()
         return Response(data)
 
     # POST /api/calendar/shared/           → create calendar
