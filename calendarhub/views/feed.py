@@ -4,9 +4,7 @@ from rest_framework.response import Response
 from datetime import datetime
 from rest_framework import status
 from calendarhub.models import CalendarBodyPreference
-from redis import Redis
 import json
-redis_client = Redis.from_url('redis://localhost:6379/0')
 from events.models import UserEventStatus, Event
 from calendarhub.services.cache import get_preferences, get_month_buckets
 from calendarhub.services.aggregator import (
@@ -100,12 +98,8 @@ class FeedView(APIView):
 
      # 3. For each month bucket
       for month in months:
-          cached = redis_client.get(f'calendar:user:{user.id}:window:{month}')
-          if cached:
-            items.extend(json.loads(cached))
-            continue
-
-        # Cache miss — build from DB
+          
+       
           month_items = []
 
           if prefs.show_instiapp_going:
@@ -126,23 +120,11 @@ class FeedView(APIView):
         # Deduplicate InstiApp events that appear via both Going and Body
           month_items = dedupe_instiapp(month_items)
 
-        # Write to Redis
-          try:
-              redis_client.setex(
-                  f'calendar:user:{user.id}:window:{month}',
-                  900,
-                  json.dumps(month_items)
-              )
-          except Exception:
-              pass
+        
           items.extend(month_items)
 
      # 4. Check ResoBin freshness, enqueue sync if stale
-      try:
-          resobin_fresh = redis_client.get(f'calendar:user:{user.id}:source:resobin:fresh')
-      except Exception:
-          resobin_fresh = None
-
+     
     #   if not resobin_fresh:
     #       try:
     #           sync_enqueued = maybe_enqueue_resobin_sync(user)

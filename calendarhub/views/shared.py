@@ -23,8 +23,16 @@ class sharedCalendarInfoView(APIView):
 
     # GET /api/calendar/shared/
     # GET /api/calendar/shared/<slug>/
-    def get(self, request, slug=None):
-        if slug is None:
+    # GET /api/calendar/shared/<slug>/events/<uuid:id>/
+    def get(self, request, slug=None, event_id=None):
+        if event_id is not None:
+            # Get a single event
+            calendar = get_object_or_404(SharedCalendar, slug=slug)
+            event = get_object_or_404(SharedCalendarEvent, id=event_id, calendar=calendar)
+            serializer = SharedCalendarEventSerializer(event)
+            return Response(serializer.data)
+
+        if slug is None: # List all public calendars
             calendars = SharedCalendar.objects.filter(is_active=True, is_public=True)
             data = SharedCalendarSerializer(calendars, many=True).data
 
@@ -41,7 +49,7 @@ class sharedCalendarInfoView(APIView):
 
             return Response(data)
 
-        calendar = get_object_or_404(SharedCalendar, slug=slug, is_active=True)
+        calendar = get_object_or_404(SharedCalendar, slug=slug, is_active=True) # Get calendar details
         upcoming = (
             SharedCalendarEvent.objects
             .filter(calendar=calendar, start_time__gte=now(), is_cancelled=False)
@@ -56,7 +64,7 @@ class sharedCalendarInfoView(APIView):
 
     # POST /api/calendar/shared/           → create calendar
     # POST /api/calendar/shared/<slug>/events/  → add event
-    def post(self, request, slug=None, event_id=None):
+    def post(self, request, slug=None):
         if not request.user.is_staff:
             return Response({'error': 'Only admins can perform this action'}, status=status.HTTP_403_FORBIDDEN)
 
