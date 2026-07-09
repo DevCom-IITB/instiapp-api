@@ -74,6 +74,7 @@ base_urlpatterns = [
     path(api_base(), include('calendarhub.urls')),
     path(api_base(),include("popup_notification.urls")),
     path(api_base(), include("internship.urls")),
+    path(api_base(), include("placementblogs.urls")),
     # Non-API
     path("", include("prerender.urls")),
     path(

@@ -9,12 +9,13 @@ class ExtractedDataSerializer(serializers.ModelSerializer):
 class BlogPostSerializer(serializers.ModelSerializer):
     extracted_data = ExtractedDataSerializer(source='extracted', read_only=True)
     post_type_display = serializers.CharField(source='get_post_type_display', read_only=True)
+    company_slug = serializers.ReadOnlyField(source='thread.company_slug')
 
     class Meta:
         model = BlogPost
         fields = [
-            'id', 'post_type', 'post_type_display', 'raw_company_name', 
-            'published', 'link', 'pinned', 'extracted_data'
+            'id', 'company_slug', 'post_type', 'post_type_display', 'raw_company_name', 
+            'published', 'link', 'pinned', 'extracted_data', 'raw_content'
         ]
 
 class CompanyThreadSerializer(serializers.ModelSerializer):

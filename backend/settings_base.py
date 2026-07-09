@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "lostandfound",
     "calendarhub.apps.CalendarhubConfig",
     "internship",
+    "placementblogs",
     "popup_notification.apps.PopupNotificationConfig",
 ]
 
