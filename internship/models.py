@@ -76,7 +76,7 @@ class ExtractedData(models.Model):
     deadline           = models.DateTimeField(null=True, blank=True)
 
     # Fields present in shortlist posts
-    shortlisted_rolls  = models.JSONField(default=list, blank=True)
+    shortlisted_rolls  = models.JSONField(default=list, blank=True, null=True)
     # stored as list of strings: ['23B0001', '23B2241', ...]
 
     # Fields present in test / interview update posts
@@ -85,7 +85,7 @@ class ExtractedData(models.Model):
     reporting_time     = models.CharField(max_length=50, blank=True)
 
     # Fields present in interview schedule posts
-    interview_slots    = models.JSONField(default=list, blank=True)
+    interview_slots    = models.JSONField(default=list, blank=True, null=True)
     # stored as list of dicts: [{'roll': '23B0001', 'name': 'Arjun', 'time': '9:00 PM'}, ...]
 
     def __str__(self):

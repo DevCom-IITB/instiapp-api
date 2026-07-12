@@ -31,12 +31,12 @@ LDAP_PASSWORD = os.environ.get("LDAP_PASSWORD", "")
 # SSO Config
 SSO_TOKEN_URL = "https://gymkhana.iitb.ac.in/sso/oauth/token/"
 SSO_PROFILE_URL = "https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number"
-SSO_CLIENT_ID = 'vR1pU7wXWyve1rUkg0fMS6StL1Kr6paoSmRIiLXJ'
-SSO_CLIENT_ID_SECRET_BASE64 = 'dlIxcFU3d1hXeXZlMXJVa2cwZk1TNlN0TDFLcjZwYW9TbVJJaUxYSjpaR2J6dmFydW5VZmh1d3NVWHZqdXJRSEhjMU51WXFmbDJrSjRmSm90YWhyc2tuYklxa2o1NUNKdDc0UktQMllwaXlabHpXaGVZWXNiNGpKVG1RMFVEZUU4M1B6bVViNzRaUjJCakhhYkVqWVJPVEwxSnIxY1ZwTWdZTzFiOWpPWQ=='
+SSO_CLIENT_ID = 'wcXeaPWFL4G3j2xA78JYEc3xZ6uZeoSwEW4xkbbx'
+SSO_CLIENT_ID_SECRET_BASE64 = 'd2NYZWFQV0ZMNEczajJ4QTc4SllFYzN4WjZ1WmVvU3dFVzR4a2JieDp2NnV0eVNVM0I4cnYxd1pIWGVkNnU3aHBZdDkwV1hBeXlWQml5ejM2QjQyNUEyS0hjb29yNVVGQk1MbTJJakRhUkM2WlYwY3h4RGdWRU5FdHFYTTl0cW1LY3piYnZORTRPenFDNHhBckdCU1JMMUx6cXVjQnBCWTJ0OFVqOEZ3bA=='
 # Password Login
 SSO_DEFAULT_REDIR = "https://insti.app/login"
 SSO_LOGIN_URL = (
-    "https://gymkhana.iitb.ac.in/sso/account/login/?next=/sso/oauth/authorize/%3Fclient_id%3DvR1pU7wXWyve1rUkg0fMS6StL1Kr6paoSmRIiLXJ%26response_type%3Dcode%26scope%3Dbasic%2520profile%2520picture%2520sex%2520ldap%2520phone%2520insti_address%2520program%2520secondary_emails%26redirect_uri%3D"
+    "https://gymkhana.iitb.ac.in/sso/account/login/?next=/sso/oauth/authorize/%3Fclient_id%3DwcXeaPWFL4G3j2xA78JYEc3xZ6uZeoSwEW4xkbbx%26response_type%3Dcode%26scope%3Dbasic%2520profile%2520picture%2520sex%2520ldap%2520phone%2520insti_address%2520program%2520secondary_emails%26redirect_uri%3D"
     + SSO_DEFAULT_REDIR
 )
 
