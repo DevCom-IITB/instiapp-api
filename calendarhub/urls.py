@@ -35,7 +35,7 @@ urlpatterns=[
         "calendar/shared/<slug:slug>/events/",sharedCalendarInfoView.as_view(),name='shared-calendar-admin',
     ),
     path(
-        "calendar/shared/<slug:slug>/events/<uuid:id>/",sharedCalendarInfoView.as_view(),name='shared-calendar-admin-editables',
+        "calendar/shared/<slug:slug>/events/<uuid:event_id>/",sharedCalendarInfoView.as_view(),name='shared-calendar-admin-editables',
     ),
     path(
         "calendar/shared/<slug:slug>/subscribe/",UseCalendarSubscriptionView.as_view(),name='calendar-subscribe',

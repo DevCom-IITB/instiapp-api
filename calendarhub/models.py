@@ -27,7 +27,8 @@ class CalendarBodyPreference(models.Model):
     )
     body = models.ForeignKey(
         'bodies.Body',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        blank=True,null = True
     )
     enabled = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)

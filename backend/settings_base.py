@@ -54,7 +54,9 @@ INSTALLED_APPS = [
     "buyandsell",
     "lostandfound",
     "calendarhub.apps.CalendarhubConfig",
-    "internship"
+    "internship",
+    "placementblogs",
+    "popup_notification.apps.PopupNotificationConfig",
 ]
 
 MIDDLEWARE = [
