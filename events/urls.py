@@ -43,7 +43,7 @@ urlpatterns = [
     ),
 
     path(
-        "bodies-with-privilege/",
+        "bodies-with-privilege",
         BodiesWithPrivilegeView.as_view({"get": "get_bodies"}),
         name="bodies-with-privilege",
     ),
