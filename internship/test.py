@@ -1,7 +1,19 @@
+import os
+import sys
+import django
 import json
-import re
-import html  
-from nlp_helpers import infer_domain
+
+# 1. ADD ROOT DIRECTORY TO SYSTEM PATH
+# This dynamically finds the root folder (instiapp-api) and tells Python to look there
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
+
+# 2. SETUP DJANGO ENVIRONMENT
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings') 
+django.setup()
+
+# 3. NOW IT IS SAFE TO IMPORT DJANGO LOGIC
+from internship.data_extractor import run_production_ingestion
 
 file_path = 'internship_blog_last500.json'
 
@@ -10,42 +22,41 @@ with open(file_path, 'r', encoding='utf-8') as f:
     
 posts = feed_data if isinstance(feed_data, list) else feed_data.get('items', [])
 
-print(f"\n--- RUNNING SPACY NLP DOMAIN TEST ---\n")
-print(f"{'COMPANY':<25} | {'ROLE EXTRACTED':<35} | {'INFERRED DOMAIN'}")
-print("-" * 80)
+print(f"Starting database ingestion for {len(posts)} posts...")
 
-match_count = 0
-unmatched_count = 0
+# This will now successfully write to db.sqlite3
+run_production_ingestion(posts)
 
-for post in posts:
-    title = post.get('title', '')
-    
-    # Only process IAF Open posts
-    if 'IAF OPEN' not in title.upper():
-        continue
-        
-    content = post.get('content', '')
-    
-    # Grab the Profile/Role from the HTML
-    role_match = re.search(r'Profile\b[^:]*:\s*([^<]+)', content, re.IGNORECASE)
-    role = role_match.group(1).strip() if role_match else ""
-    role = html.unescape(role).replace('\xa0', ' ').lower()
-    # Run it through your new spaCy engine!
-    domain = infer_domain(role)
-    
-    if not domain:
-        domain = '[UNMATCHED]'
-        unmatched_count += 1
-    else:
-        match_count += 1
-        
-    # Clean up names for the terminal printout
-    company_name = title.split('[')[0].strip()
-    short_role = (role[:32] + '...') if len(role) > 32 else role
-    
-    print(f"{company_name:<25} | {short_role:<35} | {domain}")
+print("Ingestion complete!")
 
-print("-" * 80)
-print(f"TOTAL MATCHED: {match_count}")
-print(f"TOTAL UNMATCHED: {unmatched_count}")
-print("--- TEST COMPLETE ---\n")
+
+
+from rest_framework.test import APIClient
+from django.urls import reverse
+
+# Initialize the test client
+client = APIClient()
+
+print("\n--- TESTING API VIEWS AGAINST LIVE DATABASE ---")
+
+# 1. Test the List View
+list_url = reverse('thread-list')
+response = client.get(list_url)
+
+print(f"List View Status: {response.status_code}")
+if response.status_code == 200:
+    print(f"Total Threads Fetched: {len(response.data)}")
+
+# 2. Test the Detail View (Dynamically grabbing the first thread's slug)
+if response.status_code == 200 and len(response.data) > 0:
+    first_slug = response.data[0]['company_slug']
+    first_company = response.data[0]['company_name']
+    
+    detail_url = reverse('thread-detail', kwargs={'company_slug': first_slug})
+    detail_response = client.get(detail_url)
+    
+    print(f"\nDetail View Status for '{first_company}': {detail_response.status_code}")
+    
+    if detail_response.status_code == 200 and 'posts' in detail_response.data:
+        post_count = len(detail_response.data['posts'])
+        print(f"Total updates/posts fetched for this thread: {post_count}")
