@@ -13,9 +13,9 @@ from calendarhub.models import (
 )
 from calendarhub.serializers import (
     SharedCalendarSerializer,
-    SharedCalendarEventSerializer,
-    UserSharedCalendarSubscriptionSerializer,
+    SharedCalendarEventSerializer
 )
+from calendarhub.tasks.signals import creater_approved
 
 
 class sharedCalendarInfoView(APIView):
@@ -71,7 +71,14 @@ class sharedCalendarInfoView(APIView):
         if slug is None:
             serializer = SharedCalendarSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save(created_by=request.user.profile)
+                calendar_instance = serializer.save(created_by=request.user.profile)
+
+                # Check for 'add_subscriptions' query param to bulk subscribe all users
+                flag_str = request.query_params.get('add_subscriptions', 'false')
+                if flag_str.lower() == 'true':
+                    # The signal receiver expects 'created=True'
+                    creater_approved.send(sender=SharedCalendar, instance=calendar_instance, created=True)
+
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
