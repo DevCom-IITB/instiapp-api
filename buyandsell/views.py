@@ -106,6 +106,43 @@ class BuyAndSellViewSet(viewsets.ModelViewSet):
             time_inactive__lte=cleanup_threshold
         ).delete()
 
+        
+        # Serialize only the products for the current page for efficiency
+        data = ProductSerializer(queryset, many=True).data
+
+        return Response(data)
+    
+    def list_v2(self, request):
+        # introduce tags?
+        self.update_bans()
+#        queryset = self.queryset.filter(status=True)
+        queryset = self.queryset.all()
+
+        show_all = request.GET.get("all", "").lower() == "true"
+
+        if not show_all:
+            queryset = queryset.filter(status=True)
+
+        """remove products from banned users"""
+        bans = Ban.objects.all()
+        for ban in bans:
+            if ban.endtime > timezone.localtime():
+                """Remove products from users whose bans are still running."""
+                queryset = queryset.filter(~Q(user=ban.user))
+        # TODO: allow category to be passed here too.
+        queryset = query_search(
+            request, 3, queryset, ["name", "description"], "buyandsell"
+        )
+        queryset = self.category_filter(request, queryset)
+#        queryset = self.seller_filter(request, queryset)
+
+        # Cleanup old items
+        cleanup_threshold = timezone.now() - timedelta(days=30)
+        Product.objects.filter(
+            Q(status=False),
+            time_inactive__lte=cleanup_threshold
+        ).delete()
+
         # Simple pagination: get 20 items per page
         page_size = 20
         try:
