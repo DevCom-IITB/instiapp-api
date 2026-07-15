@@ -5,6 +5,7 @@ from buyandsell.views import BuyAndSellViewSet
 urlpatterns = [
     # use list for search too to make use of pagination.
     path("buy/products", BuyAndSellViewSet.as_view({"get": "list", "post": "create"})),
+    path("buy/v2/products", BuyAndSellViewSet.as_view({"get": "list_v2", "post": "create"})),
     path(
         "buy/products/<pk>",
         BuyAndSellViewSet.as_view(

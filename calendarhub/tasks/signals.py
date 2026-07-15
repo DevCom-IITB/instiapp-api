@@ -1,9 +1,10 @@
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+# from django.db.models.signals import post_save
+from django.dispatch import receiver,Signal
 from calendarhub.models import SharedCalendar, UserSharedCalendarSubscription
 
+creater_approved=Signal()
 
-@receiver(post_save, sender=SharedCalendar)
+@receiver(creater_approved)
 def subscribe_all_users_to_new_public_calendar(sender, instance, created, **kwargs):
     """
     When a new public and active SharedCalendar is created,

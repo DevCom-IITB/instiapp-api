@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from datetime import timedelta
+from django.utils import timezone
 
 # Create your views here.
 class PopUpViewSet(APIView):
@@ -33,9 +35,10 @@ class PopUpViewSet(APIView):
             user=request.user.profile
         ).values_list('popup_id', flat=True)
 
-        # Fetch active popups that the user has not read
-        popups = PopUp.objects.filter(is_active=True).exclude(id__in=read_popup_ids)
-
+        # Fetch active popups that the user has not read and they are not older than 7 days
+        seven_days_ago = timezone.now() - timedelta(days=7)
+        popups = PopUp.objects.filter(is_active=True, updated_at__gte=seven_days_ago).exclude(id__in=read_popup_ids) 
+       
         serializer = PopUpSerializer(popups, many=True)
         return Response(serializer.data)
 
