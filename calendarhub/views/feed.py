@@ -64,7 +64,7 @@ class FeedView(APIView):
        month_start, month_end = month_bounds(month)
        statuses = UserEventStatus.objects.filter(
         user=user,
-        status=2,  # Going
+        status__in=[1, 2],  # Interested or Going
         event__start_time__lt=month_end,
         event__end_time__gt=month_start,
         ).select_related('event').prefetch_related('event__bodies')

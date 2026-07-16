@@ -41,13 +41,34 @@ class ExternalCalendarEventCacheAdmin(admin.ModelAdmin):
     date_hierarchy  = 'start_time'
 
 
+from django import forms
+from calendarhub.tasks.signals import creater_approved
+
+class SharedCalendarForm(forms.ModelForm):
+    add_subscriptions = forms.BooleanField(
+        required=False,
+        initial=True,
+        help_text="Automatically subscribe all existing users to this calendar upon creation.",
+        label="Subscribe all users"
+    )
+
+    class Meta:
+        model = models.SharedCalendar
+        fields = '__all__'
+
 @admin.register(models.SharedCalendar)
 class SharedCalendarAdmin(admin.ModelAdmin):
+    form = SharedCalendarForm
     list_display        = ['name', 'slug', 'color', 'created_by', 'is_public', 'is_active', 'created_at']
     list_filter         = ['is_public', 'is_active']
     search_fields       = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields     = ['id', 'created_at', 'updated_at']
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if form.cleaned_data.get('add_subscriptions'):
+            creater_approved.send(sender=models.SharedCalendar, instance=obj, created=True)
 
 
 @admin.register(models.SharedCalendarEvent)

@@ -12,7 +12,7 @@ class CalendarSourcePreference(models.Model):
     show_resobin = models.BooleanField(default=True)
     show_google = models.BooleanField(default=False)    # future
     show_blogs = models.BooleanField(default=False)     # future
-    notifications_enabled = models.BooleanField(default=True)
+    notifications_enabled = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
