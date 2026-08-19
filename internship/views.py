@@ -5,12 +5,20 @@ from django.db.models import OuterRef, Subquery
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from roles.helpers import login_required_ajax
+from alumni.models import AlumniUser
+from helpers.misc import query_search
 class InternshipPagination(PageNumberPagination):
     page_size = 20
 
 class FilterOptionsView(APIView):
     #Returns the unique lists of domains, categories, and companies 
+    @login_required_ajax
     def get(self, request, *args, **kwargs):
+        # Block alumni
+        user_profile = request.user.profile
+        if AlumniUser.objects.filter(ldap=user_profile.ldap_id).exists():
+            return Response({"error": "Alumni cannot access this page."}, status=403)
         # .exclude() drops empty values, .distinct() removes duplicates
         domains = CompanyThread.objects.exclude(domain__isnull=True).exclude(domain="").values_list('domain', flat=True).distinct().order_by('domain')
         categories = CompanyThread.objects.exclude(category__isnull=True).exclude(category="").values_list('category', flat=True).distinct().order_by('category')
@@ -26,6 +34,13 @@ class FilterOptionsView(APIView):
 class ThreadListView(generics.ListAPIView):
     serializer_class = CompanyThreadSerializer
     pagination_class = InternshipPagination
+
+    @login_required_ajax
+    def get(self, request, *args, **kwargs):
+        user_profile = request.user.profile
+        if AlumniUser.objects.filter(ldap=user_profile.ldap_id).exists():
+            return Response({"error": "Alumni cannot access this page."}, status=403)
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
         # Start with all threads
@@ -44,6 +59,7 @@ class ThreadListView(generics.ListAPIView):
         if companies:
             queryset = queryset.filter(thread__company_slug__in=companies)
             
+        queryset = query_search(self.request, 3, queryset, ["company_name", "role", "domain"], "internship_thread")
         return queryset
     
 class ThreadDetailView(generics.RetrieveAPIView):
@@ -53,9 +69,23 @@ class ThreadDetailView(generics.RetrieveAPIView):
     
     lookup_field = 'company_slug'
 
+    @login_required_ajax
+    def get(self, request, *args, **kwargs):
+        user_profile = request.user.profile
+        if AlumniUser.objects.filter(ldap=user_profile.ldap_id).exists():
+            return Response({"error": "Alumni cannot access this page."}, status=403)
+        return super().get(request, *args, **kwargs)
+
 class BlogPostListView(generics.ListAPIView):
     serializer_class = BlogPostSerializer
     pagination_class = InternshipPagination
+
+    @login_required_ajax
+    def get(self, request, *args, **kwargs):
+        user_profile = request.user.profile
+        if AlumniUser.objects.filter(ldap=user_profile.ldap_id).exists():
+            return Response({"error": "Alumni cannot access this page."}, status=403)
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = BlogPost.objects.select_related('extracted', 'thread').order_by('-published')
@@ -73,11 +103,19 @@ class BlogPostListView(generics.ListAPIView):
         if companies:
             queryset = queryset.filter(thread__company_slug__in=companies)
             
+        queryset = query_search(self.request, 3, queryset, ["raw_company_name", "raw_content"], "internship_post")
         return queryset
 
 class LatestCompanyPostListView(generics.ListAPIView):
     serializer_class = BlogPostSerializer
     pagination_class = InternshipPagination
+
+    @login_required_ajax
+    def get(self, request, *args, **kwargs):
+        user_profile = request.user.profile
+        if AlumniUser.objects.filter(ldap=user_profile.ldap_id).exists():
+            return Response({"error": "Alumni cannot access this page."}, status=403)
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
 
@@ -86,6 +124,8 @@ class LatestCompanyPostListView(generics.ListAPIView):
         ).order_by('-published').values('id')[:1]
 
         #Filter the main BlogPost table to only include those exact IDs, 
-        return BlogPost.objects.filter(
+        queryset = BlogPost.objects.filter(
             id=Subquery(latest_post_subquery)
         ).select_related('extracted').order_by('-published')
+        queryset = query_search(self.request, 3, queryset, ["raw_company_name", "raw_content"], "internship_post")
+        return queryset

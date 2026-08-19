@@ -86,6 +86,17 @@ class FeedView(APIView):
        return [normalize_instiapp_event(e, subsource='followed_body') for e in events]
     
 
+    def get_all_instiapp_events(self, month):
+       month_start, month_end = month_bounds(month)
+       events = Event.objects.filter(
+        email_rejected=False,
+        start_time__lt=month_end,
+        end_time__gt=month_start,
+       ).distinct().prefetch_related('bodies')
+
+       return [normalize_instiapp_event(e, subsource='all_events') for e in events]
+    
+
     def build_feed(self, user, start, end, tz):
      # 1. Load preferences (from Redis or DB)
       prefs = get_preferences(user)
@@ -102,14 +113,17 @@ class FeedView(APIView):
        
           month_items = []
 
-          if prefs.show_instiapp_going:
-            month_items.extend(self.get_instiapp_going(user, month))
+          if prefs.show_all_events:
+            month_items.extend(self.get_all_instiapp_events(month))
+          else:
+            if prefs.show_instiapp_going:
+              month_items.extend(self.get_instiapp_going(user, month))
 
-          if prefs.show_instiapp_followed_bodies:
-            disabled_body_ids = CalendarBodyPreference.objects.filter(
-                user=user, enabled=False
-            ).values_list('body_id', flat=True)
-            month_items.extend(self.get_instiapp_bodies(user, month, exclude_body_ids=disabled_body_ids))
+            if prefs.show_instiapp_followed_bodies:
+              disabled_body_ids = CalendarBodyPreference.objects.filter(
+                  user=user, enabled=False
+              ).values_list('body_id', flat=True)
+              month_items.extend(self.get_instiapp_bodies(user, month, exclude_body_ids=disabled_body_ids))
 
           if prefs.show_resobin:
             month_items.extend(get_resobin_events(user, month))

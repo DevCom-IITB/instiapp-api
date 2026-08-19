@@ -7,6 +7,7 @@ class CalendarSourcePreferenceSerializer(serializers.ModelSerializer):
         fields = [
             'show_instiapp_going',
             'show_instiapp_followed_bodies',
+            'show_all_events',
             'show_resobin',
             'notifications_enabled',
             'created_at',

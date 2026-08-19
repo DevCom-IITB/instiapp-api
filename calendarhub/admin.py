@@ -17,28 +17,28 @@ class CalendarBodyPreferenceAdmin(admin.ModelAdmin):
     raw_id_fields = ['user', 'body']
 
 
-@admin.register(models.ExternalCalendarAccount)
-class ExternalCalendarAccountAdmin(admin.ModelAdmin):
-    list_display    = ['user', 'provider', 'external_user_id', 'status'] #'last_sync_at', 'last_sync_status']
-    list_filter     = ['provider', 'status']
-    search_fields   = ['user__name', 'user__ldap_id', 'external_user_id']
-    # readonly_fields = ['last_sync_at', 'created_at', 'updated_at']
+# @admin.register(models.ExternalCalendarAccount)
+# class ExternalCalendarAccountAdmin(admin.ModelAdmin):
+#     list_display    = ['user', 'provider', 'external_user_id', 'status'] #'last_sync_at', 'last_sync_status']
+#     list_filter     = ['provider', 'status']
+#     search_fields   = ['user__name', 'user__ldap_id', 'external_user_id']
+#     # readonly_fields = ['last_sync_at', 'created_at', 'updated_at']
 
 
-@admin.register(models.ExternalCalendarSyncState)
-class ExternalCalendarSyncStateAdmin(admin.ModelAdmin):
-    list_display    = ['account', 'updated_at']
-    search_fields   = ['account__user__name', 'account__external_user_id']
-    readonly_fields = ['updated_at']
+# @admin.register(models.ExternalCalendarSyncState)
+# class ExternalCalendarSyncStateAdmin(admin.ModelAdmin):
+#     list_display    = ['account', 'updated_at']
+#     search_fields   = ['account__user__name', 'account__external_user_id']
+#     readonly_fields = ['updated_at']
 
 
-@admin.register(models.ExternalCalendarEventCache)
-class ExternalCalendarEventCacheAdmin(admin.ModelAdmin):
-    list_display    = ['user', 'provider', 'subsource', 'title', 'location', 'start_time', 'end_time', 'is_cancelled', 'synced_at']
-    list_filter     = ['provider', 'subsource', 'is_cancelled', 'all_day']
-    search_fields   = ['user__name', 'user__ldap_id', 'title', 'external_event_id']
-    readonly_fields = ['uid', 'synced_at', 'updated_at']
-    date_hierarchy  = 'start_time'
+# @admin.register(models.ExternalCalendarEventCache)
+# class ExternalCalendarEventCacheAdmin(admin.ModelAdmin):
+#     list_display    = ['user', 'provider', 'subsource', 'title', 'location', 'start_time', 'end_time', 'is_cancelled', 'synced_at']
+#     list_filter     = ['provider', 'subsource', 'is_cancelled', 'all_day']
+#     search_fields   = ['user__name', 'user__ldap_id', 'title', 'external_event_id']
+#     readonly_fields = ['uid', 'synced_at', 'updated_at']
+#     date_hierarchy  = 'start_time'
 
 
 from django import forms

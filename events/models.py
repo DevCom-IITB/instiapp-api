@@ -23,12 +23,6 @@ class Event(models.Model):
     time_of_creation = models.DateTimeField(auto_now_add=True)
     time_of_modification = models.DateTimeField(auto_now=True)
 
-    # NEW
-    resubmitted_at = models.DateTimeField(
-        null=True,
-        blank=True,
-        help_text="Set when a previously rejected event is edited and resubmitted.",
-    )
 
     name = models.CharField(max_length=60)
     description = models.TextField(blank=True)

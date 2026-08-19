@@ -58,7 +58,6 @@ class EventSerializer(serializers.ModelSerializer):
     event_interest = InterestSerializer(many=True, read_only=True)
 
     time_of_creation = serializers.DateTimeField(read_only=True)
-    resubmitted_at = serializers.DateTimeField(read_only=True)
     verification_status = serializers.CharField(
     read_only=True,
     )
@@ -96,7 +95,6 @@ class EventSerializer(serializers.ModelSerializer):
             "verification_status",
             "rejection_reason",
             "time_of_creation",
-            "resubmitted_at",
         )
 
     @staticmethod
@@ -198,7 +196,6 @@ class EventFullSerializer(serializers.ModelSerializer):
     )
 
     time_of_creation = serializers.DateTimeField(read_only=True)
-    resubmitted_at = serializers.DateTimeField(read_only=True,allow_null=True)
     verification_status = serializers.CharField(
     read_only=True,
     )
@@ -246,7 +243,6 @@ class EventFullSerializer(serializers.ModelSerializer):
             "verification_status",
             "rejection_reason",
             "time_of_creation",
-            "resubmitted_at",
         )
 
     @staticmethod

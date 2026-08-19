@@ -269,7 +269,6 @@ class EventViewSet(viewsets.ModelViewSet):
             request.data["email_rejected"] = False
             request.data["email_verified"] = False
             request.data["rejection_reason"] = ""
-            request.data["resubmitted_at"] = timezone.now().isoformat()
 
         # Wrap the super().update in an atomic block
         with transaction.atomic():
@@ -442,7 +441,6 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
         event.email_rejected = False
         event.email_verified = False
         event.rejection_reason = ""
-        event.resubmitted_at = timezone.now()
         event.save()
         return Response({"success": "Event resubmitted for verification successfully."})
 

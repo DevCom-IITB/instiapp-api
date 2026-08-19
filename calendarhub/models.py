@@ -9,6 +9,7 @@ class CalendarSourcePreference(models.Model):
     )
     show_instiapp_going = models.BooleanField(default=True)
     show_instiapp_followed_bodies = models.BooleanField(default=True)
+    show_all_events = models.BooleanField(default=True)
     show_resobin = models.BooleanField(default=True)
     show_google = models.BooleanField(default=False)    # future
     show_blogs = models.BooleanField(default=False)     # future

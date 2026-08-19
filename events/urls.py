@@ -47,4 +47,9 @@ urlpatterns = [
         BodiesWithPrivilegeView.as_view({"get": "get_bodies"}),
         name="bodies-with-privilege",
     ),
+    path(
+        "bodies-with-privilege/",
+        BodiesWithPrivilegeView.as_view({"get": "get_bodies"}),
+        name="bodies-with-privilege-slash",
+    ),
 ]

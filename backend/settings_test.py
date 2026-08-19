@@ -22,6 +22,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     "http://10.198.49.175",
     "http://10.195.160.191",
+    "https://instiapp-next.vercel.app",
 ]
 CORS_ALLOW_CREDENTIALS = True
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
