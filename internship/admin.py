@@ -6,8 +6,8 @@ class CompanyThreadAdmin(admin.ModelAdmin):
     search_fields = ('company_name', 'domain')
 
 class BlogPostAdmin(admin.ModelAdmin):
-    list_display = ('id', 'thread', 'published')
-    search_fields = ('title', 'content')
+    list_display = ('raw_company_name', 'thread', 'published')
+    search_fields = ('raw_company_name', 'raw_content')
     list_filter = ('published',)
 
 class ExtractedDataAdmin(admin.ModelAdmin):
