@@ -41,7 +41,8 @@ def handle_entry(entry, body, url):
 
     # Try to get an entry existing
     guid = entry["id"]
-    db_entry = BlogEntry.objects.filter(guid=guid).first()
+    title = entry.get("title", "")
+    db_entry = BlogEntry.objects.filter(guid=guid, title=title).first()
     new_added = False
 
     # Reuse if entry exists, create new otherwise
@@ -88,7 +89,7 @@ def handle_entry(entry, body, url):
     try:
         from django.conf import settings
         feed_post_format = [{
-            "id": db_entry.guid,
+            "id": str(db_entry.id),
             "title": db_entry.title,
             "content": db_entry.content,
             "link": db_entry.link,
