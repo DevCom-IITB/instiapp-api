@@ -1,6 +1,6 @@
 """URLs for users."""
 from django.urls import path
-from users.views import UserProfileViewSet
+from users.views import UserProfileViewSet ,UserSignatureViewSet
 from roles.views import BodyRoleViewSet
 
 urlpatterns = [
@@ -21,4 +21,19 @@ urlpatterns = [
     ),
     path("user-me/events", UserProfileViewSet.as_view({"get": "get_my_events"})),
     path("user-me/roles", BodyRoleViewSet.as_view({"get": "get_my_roles"})),
+    path(
+        "user-me/signatures",
+        UserSignatureViewSet.as_view(
+            {
+                "get": "get_signatures",
+                "post": "add_signature",
+            }
+        ),
+        name="user-signatures",
+    ),
+    path(
+        "user-me/signatures/<pk>",
+        UserSignatureViewSet.as_view({"delete": "delete_signature"}),
+        name="user-signature-detail",
+    ),
 ]

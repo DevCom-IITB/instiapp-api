@@ -180,3 +180,22 @@ class UserTag(models.Model):
         if target and regex and getattr(user, target):
             return re.match(regex, str(getattr(user, target)))
         return None
+
+
+class Signature(models.Model):
+    """Model for signature of a user for a particular body."""
+
+    user = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE, related_name="signatures"
+    )
+    body = models.ForeignKey(
+        "bodies.Body", on_delete=models.CASCADE, related_name="signatures",
+          blank=True,null = True
+    )
+    signature=models.TextField(max_length=200)
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table='signature_model'
+        unique_together = ("user", "body")

@@ -41,7 +41,8 @@ def handle_entry(entry, body, url):
 
     # Try to get an entry existing
     guid = entry["id"]
-    db_entry = BlogEntry.objects.filter(guid=guid).first()
+    title = entry.get("title", "")
+    db_entry = BlogEntry.objects.filter(guid=guid, title=title).first()
     new_added = False
 
     # Reuse if entry exists, create new otherwise
@@ -71,15 +72,38 @@ def handle_entry(entry, body, url):
             notify.send(db_entry, recipient=users, verb="New post on " + body.name)
 
         # Send notifications for mentioned users
+        import re
+        content_lower = db_entry.content.lower()
+        words_in_post = set(re.findall(r'\b\w+\b', content_lower))
+        
         roll_nos = [
-            p for p in profile_fetcher.get_roll() if p and p in db_entry.content
+            p for p in profile_fetcher.get_roll() if p and p.lower() in words_in_post
         ]
         if roll_nos:
             users = User.objects.filter(profile__roll_no__in=roll_nos)
             notify.send(
                 db_entry, recipient=users, verb="You were mentioned in a blog post"
             )
-
+            
+    # Auto-Sync the new blog into the NLP Extractor for the new models!
+    try:
+        from django.conf import settings
+        feed_post_format = [{
+            "id": str(db_entry.id),
+            "title": db_entry.title,
+            "content": db_entry.content,
+            "link": db_entry.link,
+            "published": db_entry.published.isoformat() if db_entry.published else None
+        }]
+        
+        if body and body.name == getattr(settings, "PLACEMENTS_BLOG_BODY", ""):
+            from placementblogs.data_extractor import run_production_ingestion
+            run_production_ingestion(feed_post_format)
+        elif body and body.name == getattr(settings, "TRAINING_BLOG_BODY", ""):
+            from internship.data_extractor import run_production_ingestion
+            run_production_ingestion(feed_post_format)
+    except Exception as e:
+        print(f"Failed to extract NLP data for new post: {e}")
 
 def fill_blog(url, body_name, url_val):
     # Get the body

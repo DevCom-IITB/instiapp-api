@@ -12,8 +12,8 @@ from events.serializers import EventSerializer
 from news.models import UserNewsReaction
 from news.models import NewsEntry
 from community.models import CommunityPost, CommunityPostUserReaction
-from users.serializer_full import UserProfileFullSerializer
-from users.models import UserProfile
+from users.serializer_full import UserProfileFullSerializer, SignatureSerializer
+from users.models import UserProfile,Signature
 from users.models import WebPushSubscription
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges
@@ -223,4 +223,33 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         sub.auth = data["keys"]["auth"]
         sub.save()
 
+        return Response(status=204)
+
+
+class UserSignatureViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing user signatures."""    
+    serializer_class = SignatureSerializer
+    queryset = Signature.objects.all()    
+    @login_required_ajax
+    def get_signatures(self, request):
+        """Get signatures of the user."""
+        signatures = request.user.profile.signatures.all().order_by("-timestamp")
+        serializer = self.get_serializer(signatures, many=True)
+        return Response(serializer.data)
+    
+    @login_required_ajax
+    def add_signature(self, request):
+        """Add a signature for the user."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user.profile)
+        return Response(serializer.data, status=201)
+
+    @login_required_ajax
+    def delete_signature(self, request, pk=None):
+        """Delete a signature for the user."""
+        signature = get_object_or_404(self.queryset, pk=pk)
+        if signature.user != request.user.profile:
+            return Response({"message": "Not allowed"}, status=403)
+        signature.delete()
         return Response(status=204)

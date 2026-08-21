@@ -23,6 +23,28 @@ except Exception as ex:
     print("Firebase Admin init skipped/failed:", ex)
 
 
+#update the current configurations
+app.conf.update(
+  result_backend='redis://localhost:6379/1',
+  task_track_started=True,
+  task_queues = {
+    'default':        {'exchange': 'default'},
+    # 'resobin_sync':   {'exchange': 'resobin_sync'},   # ResoBin sync tasks
+    'notifications':  {'exchange': 'notifications'},   # Push notification tasks
+    # 'stream_consumer':{'exchange': 'stream_consumer'}, # Redis stream consumer (concurrency=1)
+    'cache_fanout':   {'exchange': 'cache_fanout'},    # Body event cache invalidation
+   },
+
+  task_routes = {
+    # 'calendarhub.tasks.sync_resobin_for_user':     {'queue': 'resobin_sync'},
+    'calendarhub.tasks.send_event_reminder':       {'queue': 'notifications'},
+    'calendarhub.tasks.send_change_notification':  {'queue': 'notifications'},
+    # 'calendarhub.tasks.consume_resobin_stream':    {'queue': 'stream_consumer'},
+    'calendarhub.tasks.invalidate_followers_cache':{'queue': 'cache_fanout'},
+  },
+)
+
+
 @app.task(bind=True)
 def debug_task(self):  # pragma: no cover
     print("Request: {0!r}".format(self.request))

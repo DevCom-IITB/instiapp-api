@@ -53,6 +53,10 @@ INSTALLED_APPS = [
     "markdownify",
     "buyandsell",
     "lostandfound",
+    "calendarhub.apps.CalendarhubConfig",
+    "internship",
+    "placementblogs",
+    "popup_notification.apps.PopupNotificationConfig",
 ]
 
 MIDDLEWARE = [

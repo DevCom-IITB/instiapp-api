@@ -6,7 +6,7 @@ from achievements.serializers import (
     VerifiedAchievementSerializer,
 )
 from events.prioritizer import get_fresh_prioritized_events
-from users.models import UserProfile
+from users.models import Signature, UserProfile
 from roles.serializers import RoleSerializer
 from roles.serializers import FormerRoleSerializer
 from roles.serializers import InstituteRoleSerializer
@@ -123,3 +123,14 @@ class UserProfileFullSerializer(serializers.ModelSerializer):
         result.pop("fcm_id")
         result.pop("android_version")
         return settings.USER_PROFILE_FULL_SERIALIZER_TRANSFORM(result)
+
+
+class SignatureSerializer(serializers.ModelSerializer):
+    """Serializer for Signature model."""
+
+    class Meta:
+        model = Signature
+        fields = (
+             "id", "user", "body", "signature", "timestamp"
+        )
+        read_only_fields = ("user", "timestamp")
