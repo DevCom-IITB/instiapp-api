@@ -11,6 +11,7 @@ STATIC_BASE_URL = BASE_URL
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+NO_CELERY = False
 
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_WHITELIST = [

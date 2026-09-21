@@ -1,10 +1,10 @@
 from rest_framework import generics
 from .models import CompanyThread, BlogPost
-from .serializers import CompanyThreadSerializer, CompleteThreadSerializer, BlogPostSerializer
-from django.db.models import OuterRef, Subquery
+from .serializers import CompleteThreadSerializer, BlogPostSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.utils.dateparse import parse_date
 from roles.helpers import login_required_ajax
 from alumni.models import AlumniUser
 from helpers.misc import query_search
@@ -32,7 +32,7 @@ class FilterOptionsView(APIView):
         })
 
 class ThreadListView(generics.ListAPIView):
-    serializer_class = CompanyThreadSerializer
+    serializer_class = CompleteThreadSerializer
     pagination_class = InternshipPagination
 
     @login_required_ajax
@@ -44,38 +44,30 @@ class ThreadListView(generics.ListAPIView):
 
     def get_queryset(self):
         # Start with all threads
-        queryset = CompanyThread.objects.all().order_by('-first_post_date')
+        queryset = CompanyThread.objects.prefetch_related('posts__extracted').order_by('-first_post_date')
         
         # Grab the filters from the URL if they exist
         domains = self.request.query_params.getlist('domain')
         categories = self.request.query_params.getlist('category')
         companies = self.request.query_params.getlist('company')
+        from_date = parse_date(self.request.query_params.get('from_date', ''))
+        to_date = parse_date(self.request.query_params.get('to_date', ''))
 
         # If the list is not empty, filter using __in
         if domains:
-            queryset = queryset.filter(extracted__domain__in=domains)
+            queryset = queryset.filter(domain__in=domains)
         if categories:
-            queryset = queryset.filter(extracted__category__in=categories)
+            queryset = queryset.filter(category__in=categories)
         if companies:
-            queryset = queryset.filter(thread__company_slug__in=companies)
+            queryset = queryset.filter(company_slug__in=companies)
+        if from_date:
+            queryset = queryset.filter(first_post_date__date__gte=from_date)
+        if to_date:
+            queryset = queryset.filter(first_post_date__date__lte=to_date)
             
         queryset = query_search(self.request, 3, queryset, ["company_name", "role", "domain"], "internship_thread")
         return queryset
     
-class ThreadDetailView(generics.RetrieveAPIView):
-
-    queryset = CompanyThread.objects.prefetch_related('posts__extracted')
-    serializer_class = CompleteThreadSerializer
-    
-    lookup_field = 'company_slug'
-
-    @login_required_ajax
-    def get(self, request, *args, **kwargs):
-        user_profile = request.user.profile
-        if AlumniUser.objects.filter(ldap=user_profile.ldap_id).exists():
-            return Response({"error": "Alumni cannot access this page."}, status=403)
-        return super().get(request, *args, **kwargs)
-
 class BlogPostListView(generics.ListAPIView):
     serializer_class = BlogPostSerializer
     pagination_class = InternshipPagination
@@ -94,6 +86,8 @@ class BlogPostListView(generics.ListAPIView):
         domains = self.request.query_params.getlist('domain')
         categories = self.request.query_params.getlist('category')
         companies = self.request.query_params.getlist('company')
+        from_date = parse_date(self.request.query_params.get('from_date', ''))
+        to_date = parse_date(self.request.query_params.get('to_date', ''))
 
         # If the list is not empty, filter using __in
         if domains:
@@ -102,30 +96,10 @@ class BlogPostListView(generics.ListAPIView):
             queryset = queryset.filter(extracted__category__in=categories)
         if companies:
             queryset = queryset.filter(thread__company_slug__in=companies)
+        if from_date:
+            queryset = queryset.filter(published__date__gte=from_date)
+        if to_date:
+            queryset = queryset.filter(published__date__lte=to_date)
             
-        queryset = query_search(self.request, 3, queryset, ["raw_company_name", "raw_content"], "internship_post")
-        return queryset
-
-class LatestCompanyPostListView(generics.ListAPIView):
-    serializer_class = BlogPostSerializer
-    pagination_class = InternshipPagination
-
-    @login_required_ajax
-    def get(self, request, *args, **kwargs):
-        user_profile = request.user.profile
-        if AlumniUser.objects.filter(ldap=user_profile.ldap_id).exists():
-            return Response({"error": "Alumni cannot access this page."}, status=403)
-        return super().get(request, *args, **kwargs)
-
-    def get_queryset(self):
-
-        latest_post_subquery = BlogPost.objects.filter(
-            thread=OuterRef('thread')
-        ).order_by('-published').values('id')[:1]
-
-        #Filter the main BlogPost table to only include those exact IDs, 
-        queryset = BlogPost.objects.filter(
-            id=Subquery(latest_post_subquery)
-        ).select_related('extracted').order_by('-published')
         queryset = query_search(self.request, 3, queryset, ["raw_company_name", "raw_content"], "internship_post")
         return queryset

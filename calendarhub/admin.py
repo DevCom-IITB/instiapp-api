@@ -1,5 +1,6 @@
 from django.contrib import admin
 from calendarhub import models
+from users.models import UserProfile
 
 
 @admin.register(models.CalendarSourcePreference)
@@ -41,34 +42,35 @@ class CalendarBodyPreferenceAdmin(admin.ModelAdmin):
 #     date_hierarchy  = 'start_time'
 
 
-from django import forms
-from calendarhub.tasks.signals import creater_approved
-
-class SharedCalendarForm(forms.ModelForm):
-    add_subscriptions = forms.BooleanField(
-        required=False,
-        initial=True,
-        help_text="Automatically subscribe all existing users to this calendar upon creation.",
-        label="Subscribe all users"
-    )
-
-    class Meta:
-        model = models.SharedCalendar
-        fields = '__all__'
-
 @admin.register(models.SharedCalendar)
 class SharedCalendarAdmin(admin.ModelAdmin):
-    form = SharedCalendarForm
     list_display        = ['name', 'slug', 'color', 'created_by', 'is_public', 'is_active', 'created_at']
     list_filter         = ['is_public', 'is_active']
     search_fields       = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields     = ['id', 'created_at', 'updated_at']
+    actions = ['subscribe_all_users']
 
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-        if form.cleaned_data.get('add_subscriptions'):
-            creater_approved.send(sender=models.SharedCalendar, instance=obj, created=True)
+    @admin.action(description='Subscribe all users to selected calendars')
+    def subscribe_all_users(self, request, queryset):
+        total = 0
+        for calendar in queryset:
+            if not (calendar.is_public and calendar.is_active):
+                continue
+            subscriptions = [
+                models.UserSharedCalendarSubscription(user=user, calendar=calendar)
+                for user in UserProfile.objects.all()
+            ]
+            created = models.UserSharedCalendarSubscription.objects.bulk_create(
+                subscriptions,
+                ignore_conflicts=True,
+            )
+            total += len(created)
+
+        self.message_user(
+            request,
+            f"Subscribed {total} users across {queryset.count()} calendar(s).",
+        )
 
 
 @admin.register(models.SharedCalendarEvent)
