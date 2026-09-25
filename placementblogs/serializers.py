@@ -18,15 +18,6 @@ class PlacementBlogPostSerializer(serializers.ModelSerializer):
             'published', 'link', 'pinned', 'extracted_data', 'raw_content'
         ]
 
-class PlacementCompanyThreadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PlacementCompanyThread
-        fields = [
-            'id', 'company_name', 'company_slug', 'first_post_date',
-            'role', 'domain', 
-            'bonus_jaf', 'cpi_cutoff', 'bond', 'mode', 'jaf_deadline' 
-        ]
-
 class PlacementCompleteThreadSerializer(serializers.ModelSerializer):
     posts = PlacementBlogPostSerializer(many=True, read_only=True)
 

@@ -18,14 +18,6 @@ class BlogPostSerializer(serializers.ModelSerializer):
             'published', 'link', 'pinned', 'extracted_data', 'raw_content'
         ]
 
-class CompanyThreadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CompanyThread
-        fields = [
-            'id', 'company_name', 'company_slug', 'first_post_date',
-            'category', 'role', 'domain', 'stipend', 'eligibility', 'iaf_deadline'
-        ]
-
 class CompleteThreadSerializer(serializers.ModelSerializer):
     # 'posts' matches the related_name='posts' you defined in the BlogPost model
     posts = BlogPostSerializer(many=True, read_only=True)
