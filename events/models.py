@@ -130,6 +130,25 @@ class Event(models.Model):
         ]
 
 
+class EventEmail(models.Model):
+    """A sent group email and its thread metadata for an event."""
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="emails")
+    message_id = models.CharField(max_length=998, unique=True)
+    parent_message_id = models.CharField(max_length=998, blank=True, null=True)
+    recipients = models.JSONField(default=list)
+    to_recipients = models.JSONField(default=list)
+    cc_recipients = models.JSONField(default=list)
+    references = models.JSONField(default=list)
+    subject = models.TextField()
+    body_text = models.TextField(blank=True, default="")
+    body_html = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("created_at",)
+
+
 class UserEventStatus(models.Model):
     """Associates a User and an Event, describing probabilty of attending.
 
