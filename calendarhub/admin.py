@@ -78,8 +78,8 @@ class SharedCalendarEventAdmin(admin.ModelAdmin):
     list_display    = ['title', 'calendar', 'location', 'start_time', 'end_time', 'all_day', 'is_cancelled']
     list_filter     = ['calendar', 'all_day', 'is_cancelled']
     search_fields   = ['title', 'calendar__name']
-    readonly_fields = ['id', 'created_at', 'updated_at']
-    date_hierarchy  = 'start_time'
+    readonly_fields = ['id', 'created_at', 'updated_at']    
+    ordering = ['-start_time']
 
 
 @admin.register(models.UserSharedCalendarSubscription)
