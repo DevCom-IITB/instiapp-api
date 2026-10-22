@@ -14,13 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.contrib.sitemaps.views import sitemap
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from backend.sitemap import sitemaps
+from backend.maps_proxy import maps_proxy
 
 
 def api_base(prefix=None):
@@ -75,6 +76,18 @@ base_urlpatterns = [
     path(api_base(),include("popup_notification.urls")),
     path(api_base(), include("internship.urls")),
     path(api_base(), include("placementblogs.urls")),
+    # Forward the independent InstiMaps API and static map assets. Keep these
+    # explicit so this cannot become a general-purpose proxy.
+    re_path(
+        r"^api/(?P<maps_path>places(?:/[^/]+)?/?|route(?:/live)?/?)$",
+        maps_proxy,
+        name="maps-api-proxy",
+    ),
+    re_path(
+        r"^map/(?P<maps_path>(?:[0-9]+/[0-9]+/[0-9]+\.pbf|fonts/[^/]+/[^/]+\.pbf))$",
+        maps_proxy,
+        name="maps-asset-proxy",
+    ),
     # Non-API
     path("", include("prerender.urls")),
     path(
