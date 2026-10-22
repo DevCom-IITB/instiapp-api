@@ -1,5 +1,6 @@
 from django.contrib import admin
 from calendarhub import models
+from users.models import UserProfile
 
 
 @admin.register(models.CalendarSourcePreference)
@@ -17,28 +18,28 @@ class CalendarBodyPreferenceAdmin(admin.ModelAdmin):
     raw_id_fields = ['user', 'body']
 
 
-@admin.register(models.ExternalCalendarAccount)
-class ExternalCalendarAccountAdmin(admin.ModelAdmin):
-    list_display    = ['user', 'provider', 'external_user_id', 'status'] #'last_sync_at', 'last_sync_status']
-    list_filter     = ['provider', 'status']
-    search_fields   = ['user__name', 'user__ldap_id', 'external_user_id']
-    # readonly_fields = ['last_sync_at', 'created_at', 'updated_at']
+# @admin.register(models.ExternalCalendarAccount)
+# class ExternalCalendarAccountAdmin(admin.ModelAdmin):
+#     list_display    = ['user', 'provider', 'external_user_id', 'status'] #'last_sync_at', 'last_sync_status']
+#     list_filter     = ['provider', 'status']
+#     search_fields   = ['user__name', 'user__ldap_id', 'external_user_id']
+#     # readonly_fields = ['last_sync_at', 'created_at', 'updated_at']
 
 
-@admin.register(models.ExternalCalendarSyncState)
-class ExternalCalendarSyncStateAdmin(admin.ModelAdmin):
-    list_display    = ['account', 'updated_at']
-    search_fields   = ['account__user__name', 'account__external_user_id']
-    readonly_fields = ['updated_at']
+# @admin.register(models.ExternalCalendarSyncState)
+# class ExternalCalendarSyncStateAdmin(admin.ModelAdmin):
+#     list_display    = ['account', 'updated_at']
+#     search_fields   = ['account__user__name', 'account__external_user_id']
+#     readonly_fields = ['updated_at']
 
 
-@admin.register(models.ExternalCalendarEventCache)
-class ExternalCalendarEventCacheAdmin(admin.ModelAdmin):
-    list_display    = ['user', 'provider', 'subsource', 'title', 'location', 'start_time', 'end_time', 'is_cancelled', 'synced_at']
-    list_filter     = ['provider', 'subsource', 'is_cancelled', 'all_day']
-    search_fields   = ['user__name', 'user__ldap_id', 'title', 'external_event_id']
-    readonly_fields = ['uid', 'synced_at', 'updated_at']
-    date_hierarchy  = 'start_time'
+# @admin.register(models.ExternalCalendarEventCache)
+# class ExternalCalendarEventCacheAdmin(admin.ModelAdmin):
+#     list_display    = ['user', 'provider', 'subsource', 'title', 'location', 'start_time', 'end_time', 'is_cancelled', 'synced_at']
+#     list_filter     = ['provider', 'subsource', 'is_cancelled', 'all_day']
+#     search_fields   = ['user__name', 'user__ldap_id', 'title', 'external_event_id']
+#     readonly_fields = ['uid', 'synced_at', 'updated_at']
+#     date_hierarchy  = 'start_time'
 
 
 @admin.register(models.SharedCalendar)
@@ -48,6 +49,28 @@ class SharedCalendarAdmin(admin.ModelAdmin):
     search_fields       = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields     = ['id', 'created_at', 'updated_at']
+    actions = ['subscribe_all_users']
+
+    @admin.action(description='Subscribe all users to selected calendars')
+    def subscribe_all_users(self, request, queryset):
+        total = 0
+        for calendar in queryset:
+            if not (calendar.is_public and calendar.is_active):
+                continue
+            subscriptions = [
+                models.UserSharedCalendarSubscription(user=user, calendar=calendar)
+                for user in UserProfile.objects.all()
+            ]
+            created = models.UserSharedCalendarSubscription.objects.bulk_create(
+                subscriptions,
+                ignore_conflicts=True,
+            )
+            total += len(created)
+
+        self.message_user(
+            request,
+            f"Subscribed {total} users across {queryset.count()} calendar(s).",
+        )
 
 
 @admin.register(models.SharedCalendarEvent)
@@ -55,8 +78,8 @@ class SharedCalendarEventAdmin(admin.ModelAdmin):
     list_display    = ['title', 'calendar', 'location', 'start_time', 'end_time', 'all_day', 'is_cancelled']
     list_filter     = ['calendar', 'all_day', 'is_cancelled']
     search_fields   = ['title', 'calendar__name']
-    readonly_fields = ['id', 'created_at', 'updated_at']
-    date_hierarchy  = 'start_time'
+    readonly_fields = ['id', 'created_at', 'updated_at']    
+    ordering = ['-start_time']
 
 
 @admin.register(models.UserSharedCalendarSubscription)

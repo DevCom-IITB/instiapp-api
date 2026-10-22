@@ -3,14 +3,17 @@ from uuid import UUID
 from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
-from django.core.mail import send_mail
+import markdown
+import re
 from django.conf import settings
 from bodies.serializers import BodySerializerMin
 from events.prioritizer import get_fresh_prioritized_events
 from events.prioritizer import get_prioritized
 from events.serializers import EventSerializer
 from events.serializers import EventFullSerializer
-from events.models import Event
+from events.serializers import EventCreatorSerializer
+from events.models import Event, EventEmail
+from events.email import add_quoted_parent_body, send_group_threaded_email
 from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
@@ -18,6 +21,7 @@ from roles.helpers import bodies_with_users_having_privilege
 from locations.helpers import create_unreusable_locations
 from django.db import transaction, OperationalError
 import time
+from django.utils import timezone
 
 
 EMAIL_EVENT_HOST_USER = settings.EMAIL_EVENT_HOST_USER
@@ -26,8 +30,44 @@ EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
 AUTH_USER = settings.AUTH_USER
 INSTIAPP_MAIL_FOOTER = (
     "________________________________________\n"
-    "This mail has been sent through Instiapp Events. In case of any queries, contact the council conducting the event. DevCom is **not** responsible for the contents of this email."
+    "This mail has been sent through Instiapp Events. In case of any queries, "
+    "contact the council conducting the event. DevCom is **not** responsible "
+    "for the contents of this email."
 )
+
+
+def _user_can_verify(request, event):
+    """Return True if the request user has VerE on any verification_body."""
+    for council in event.verification_bodies.all():
+        if user_has_privilege(request.user.profile, council.id, "VerE"):
+            return True
+    return False
+
+def render_markdown_for_email(text):
+    """Convert markdown text to HTML for email."""
+    text = text.replace("\\n", "\n")
+
+    # Ensure blank line before lists
+    text = re.sub(r'([^\n])\n(\*|-|\d+\.)\s', r'\1\n\n\2 ', text)
+
+    # ~~text~~ → <del>
+    text = re.sub(r'~~([^~]+)~~', r'<del>\1</del>', text)
+
+    # ~text~ → <del>
+    text = re.sub(
+        r'(?<!~)~(?!~)([^~]+)(?<!~)~(?!~)',
+        r'<del>\1</del>',
+        text
+    )
+
+    return markdown.markdown(
+        text,
+        extensions=[
+            "nl2br",
+            "extra",
+            "pymdownx.magiclink",
+        ],
+    )
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -38,40 +78,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_serializer_context(self):
         return {"request": self.request}
-    
-    "changed the indentation of the retrieve method to be consistent with the rest of the class"
-    # @login_required_ajax
-    # def retrieve(self, request, pk):
-    #     """Get Event.
-    #     Get by `uuid` or `str_id`"""
-    #     with transaction.atomic():
-    #         self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
-    #         event = self.get_event(pk)
 
-    #         councils = event.verification_bodies.all()
-    #         serialized = None
-    #         for council in councils:
-    #             council_id = council.id
-    #             if user_has_privilege(request.user.profile, council_id, "VerE"):
-    #                 longdescription_visible = True
-    #                 serialized = EventFullSerializer(
-    #                     event,
-    #                     context={
-    #                         "request": request,
-    #                         "longdescription_visible": longdescription_visible,
-    #                     },
-    #                 ).data
-    #             else:
-    #                 longdescription_visible = False
-    #                 serialized = EventFullSerializer(
-    #                     event,
-    #                     context={
-    #                         "request": request,
-    #                         "longdescription_visible": longdescription_visible,
-    #                     },
-    #                 ).data
-    #                 serialized["longdescription"] = []
-    #         return Response(serialized)
     @login_required_ajax
     def retrieve(self, request, pk):
         """Get Event with permission check and retry-safe transaction."""
@@ -80,29 +87,20 @@ class EventViewSet(viewsets.ModelViewSet):
                 with transaction.atomic():
                     self.queryset = EventFullSerializer.setup_eager_loading(self.queryset, request)
                     event = self.get_event(pk)
-                    councils = event.verification_bodies.all()
-                    serialized = None
-                    for council in councils:
-                        council_id = council.id
-                        if user_has_privilege(request.user.profile, council_id, "VerE"):
-                            longdescription_visible = True
-                            serialized = EventFullSerializer(
-                                event,
-                                context={
-                                    "request": request,
-                                    "longdescription_visible": longdescription_visible,
-                                },
-                            ).data
-                        else:
-                            longdescription_visible = False
-                            serialized = EventFullSerializer(
-                                event,
-                                context={
-                                    "request": request,
-                                    "longdescription_visible": longdescription_visible,
-                                },
-                            ).data
-                            serialized["longdescription"] = []
+                    
+                    is_verifier = _user_can_verify(request, event)
+                    is_creator = (
+                        event.created_by_id is not None
+                        and request.user.profile.id == event.created_by_id
+                    )
+
+                    serialized = EventFullSerializer(
+                        event,
+                        context={"request": request},
+                    ).data
+
+                    if not (is_verifier or is_creator):
+                        serialized["longdescription"] = []
                     return Response(serialized)
             except OperationalError as e:
                 if 'Deadlock' in str(e):
@@ -140,6 +138,46 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer = EventSerializer(queryset, many=True, context={"request": request})
         data = serializer.data
    
+        return Response({"count": len(data), "data": data})
+
+    @login_required_ajax
+    def my_events(self, request):
+        """Get all events created by the current user."""
+        queryset = (
+            self.queryset
+            .filter(created_by=request.user.profile)
+            .order_by("-time_of_creation")
+        )
+        queryset = EventCreatorSerializer.setup_eager_loading(queryset, request)
+        serializer = EventCreatorSerializer(queryset, many=True, context={"request": request})
+        data = serializer.data
+        return Response({"count": len(data), "data": data})
+
+    @login_required_ajax
+    def verifier_events(self, request):
+        """Get only pending events that the current verifier can approve."""
+        profile = request.user.profile
+        verifiable_body_ids = [
+            str(role.body_id)
+            for role in profile.roles.all()
+            if "VerE" in (role.permissions or [])
+        ]
+
+        if not verifiable_body_ids:
+            return Response({"count": 0, "data": []})
+
+        queryset = (
+            self.queryset
+            .filter(
+                verification_bodies__id__in=verifiable_body_ids,
+            )
+            .distinct()
+            .order_by("time_of_creation")
+        )
+
+        queryset = EventSerializer.setup_eager_loading(queryset, request)
+        serializer = EventSerializer(queryset, many=True, context={"request": request})
+        data = serializer.data
         return Response({"count": len(data), "data": data})
 
     @login_required_ajax
@@ -218,8 +256,21 @@ class EventViewSet(viewsets.ModelViewSet):
         except KeyError:
             request.data["venue_ids"]
 
-        # return super().update(request, pk)
-	# Wrap the super().update in an atomic block
+        # Support inline creator resubmission if explicit parameter supplied
+        is_creator = (
+            event.created_by_id is not None
+            and request.user.profile.id == event.created_by_id
+        )
+        if (
+            is_creator
+            and event.email_rejected
+            and str(request.data.get("resubmit", "")).lower() in ("true", "1", "yes")
+        ):
+            request.data["email_rejected"] = False
+            request.data["email_verified"] = False
+            request.data["rejection_reason"] = ""
+
+        # Wrap the super().update in an atomic block
         with transaction.atomic():
            return super().update(request,pk)
 
@@ -295,35 +346,115 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
             event = Event.objects.get(id=pk)
         except Event.DoesNotExist:
             return Response({"error": "Event not found"})
-        councils = event.verification_bodies.all()
-        for council in councils:
-            council_id = council.id
-            user_has_VerE_permission = user_has_privilege(
-                request.user.profile, council_id, "VerE"
+
+        if not _user_can_verify(request, event):
+            return forbidden_no_privileges()
+
+        if event.email_verified:
+            return Response({"error": "Event is already approved."}, status=400)
+
+        parent_event_id = request.data.get("parent_event_id") or None
+        parent_message_id = request.data.get("parent_message_id") or None
+        if event.email_rejected:
+            return Response({"error": "Event is currently rejected. Resubmission needed."}, status=400)
+
+        subject = (
+            "["
+            + (
+                event.verification_bodies.first().canonical_name
+                if event.verification_bodies.exists()
+                else ""
             )
-            if user_has_VerE_permission and not event.email_verified:
-                subject = "[" + event.verification_bodies.first().canonical_name + "] " + event.email_subject
-                message = event.longdescription + "\n" + INSTIAPP_MAIL_FOOTER
-                recipient_list = RECIPIENT_LIST
-                try:
-                    send_mail(
-                        subject,
-                        message,
-                        EMAIL_EVENT_HOST_USER,
-                        recipient_list,
-                        fail_silently=False,
-                        auth_user=AUTH_USER,
-                        auth_password=EMAIL_HOST_PASSWORD,
-                    )
-                    event.email_verified = True
-                    event.save()
-                    return Response({"success": "Mail sent successfully"})
-                except Exception as e:
-                    return Response(
-                        {"error_status": True, "msg": f"Error sending mail: {str(e)}"}
-                    )
-            else:
-                return forbidden_no_privileges()
+            + "] "
+            + event.email_subject
+        )
+
+        description = event.longdescription.replace("\\n", "\n")
+
+        text_message = description + "\n\n" + INSTIAPP_MAIL_FOOTER
+
+        html_message = (
+            render_markdown_for_email(event.longdescription)
+            + "<hr>"
+            + render_markdown_for_email(INSTIAPP_MAIL_FOOTER)
+        )
+
+        parent_email = None
+        if parent_event_id:
+            parent_email = EventEmail.objects.filter(
+                event_id=parent_event_id
+            ).order_by("-created_at").first()
+            if parent_email is None:
+                return Response(
+                    {"error": "The selected event has no sent email."},
+                    status=400,
+                )
+            parent_message_id = parent_email.message_id
+        elif parent_message_id:
+            parent_email = EventEmail.objects.filter(
+                message_id=parent_message_id
+            ).first()
+            if parent_email is None:
+                return Response({"error": "Parent email was not found."}, status=400)
+
+        to_recipients = (
+            parent_email.to_recipients
+            if parent_email
+            else request.data.get("to_recipients", RECIPIENT_LIST)
+        )
+        cc_recipients = (
+            parent_email.cc_recipients
+            if parent_email
+            else request.data.get("cc_recipients", [])
+        )
+        thread_subject = parent_email.subject if parent_email else subject
+        if parent_email:
+            parent_text_message = parent_email.body_text or (
+                parent_email.event.longdescription.replace("\\n", "\n")
+                + "\n\n"
+                + INSTIAPP_MAIL_FOOTER
+            )
+            parent_html_message = parent_email.body_html or (
+                render_markdown_for_email(parent_email.event.longdescription)
+                + "<hr>"
+                + render_markdown_for_email(INSTIAPP_MAIL_FOOTER)
+            )
+            text_message, html_message = add_quoted_parent_body(
+                text_message,
+                html_message,
+                parent_text_message,
+                parent_html_message,
+                parent_email.created_at,
+                EMAIL_EVENT_HOST_USER or settings.EMAIL_HOST_USER,
+            )
+
+        try:
+            sent_email = send_group_threaded_email(
+                subject=thread_subject,
+                text_message=text_message,
+                html_message=html_message,
+                to_recipients=to_recipients,
+                cc_recipients=cc_recipients,
+                parent_message_id=parent_message_id,
+                previous_message_ids=parent_email.references if parent_email else [],
+            )
+            EventEmail.objects.create(event=event, **sent_email)
+
+            event.email_verified = True
+            event.email_rejected = False
+            event.rejection_reason = ""
+            event.save()
+
+            return Response({"success": "Mail sent successfully"})
+
+        except Exception as e:
+            return Response(
+                {
+                    "error_status": True,
+                    "msg": f"Error sending mail: {str(e)}"
+                },
+                status=503,
+            )
 
     @login_required_ajax
     def reject_mail(self, request, pk):
@@ -332,21 +463,40 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
         except Event.DoesNotExist:
             return Response({"error": "Event not found"})
 
-        councils = event.verification_bodies.all()
-        for council in councils:
-            council_id = council.id
-            user_has_VerE_permission = user_has_privilege(
-                request.user.profile, council_id, "VerE"
-            )
-
-            if user_has_VerE_permission and not event.email_verified:
-                print(event.longdescription)
-                event.longdescription = ""
-                event.email_verified = True
-                event.email_rejected = True
-                event.save()
-                return Response({"success": "Mail rejected and content deleted"})
+        if not _user_can_verify(request, event):
             return forbidden_no_privileges()
+
+        if event.email_verified and not event.email_rejected:
+            return Response({"error": "Approved events cannot be rejected."}, status=400)
+
+        event.email_verified = False
+        event.email_rejected = True
+        event.rejection_reason = request.data.get("rejection_reason", "No reason provided by verifier.")
+        event.save()
+        return Response({"success": "Mail rejected and feedback saved."})
+
+    @login_required_ajax
+    def resubmit(self, request, pk):
+        try:
+            event = Event.objects.get(id=pk)
+        except Event.DoesNotExist:
+            return Response({"error": "Event not found"})
+
+        is_creator = (
+            event.created_by_id is not None
+            and request.user.profile.id == event.created_by_id
+        )
+        if not is_creator:
+            return forbidden_no_privileges()
+
+        if not event.email_rejected:
+            return Response({"error": "Only rejected events can be resubmitted."}, status=400)
+
+        event.email_rejected = False
+        event.email_verified = False
+        event.rejection_reason = ""
+        event.save()
+        return Response({"success": "Event resubmitted for verification successfully."})
 
 
 class BodiesWithPrivilegeView(viewsets.ViewSet):

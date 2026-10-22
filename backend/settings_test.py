@@ -11,6 +11,7 @@ STATIC_BASE_URL = BASE_URL
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+NO_CELERY = False
 
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_WHITELIST = [
@@ -22,6 +23,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     "http://10.198.49.175",
     "http://10.195.160.191",
+    "https://instiapp-next.vercel.app",
 ]
 CORS_ALLOW_CREDENTIALS = True
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
@@ -74,13 +76,15 @@ NO_LOGGING = {
 }
 
 # EMAIL settings
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = "587"
-EMAIL_HOST_USER = "devcom.iitbombay@gmail.com"
-EMAIL_HOST_PASSWORD = "ioui qriy jcpe ixjz"
+EMAIL_HOST = "smtp-auth.iitb.ac.in"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "24B1300@iitb.ac.in"
+EMAIL_HOST_PASSWORD = "870e36def0c4553a0e37bc68fc3af95b"
 EMAIL_EVENT_HOST_USER = ""
 EMAIL_USE_TLS = True
-RECIPIENT_LIST = ['jyotiryaagrawal@gmail.com']
+EMAIL_TIMEOUT = 8
+RECIPIENT_LIST = ['jyotiryaagrawal@gmail.com,24B1300@iitb.ac.in']
+EMAIL_MESSAGE_ID_DOMAIN = "iitb.ac.in"
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 AUTH_USER = EMAIL_HOST_USER

@@ -6,7 +6,7 @@ class PopUp(models.Model):
     short_description = models.CharField(max_length=200, verbose_name="short description", blank=True)
     long_description = models.TextField(verbose_name="long description", blank=True)
     image_url = models.URLField(max_length=500, verbose_name="image link", blank=True)
-    links = models.JSONField(default=list, verbose_name="Add links", blank=True)
+    links = models.JSONField(default=list, verbose_name="Add links", blank=True, null=True)
     is_active = models.BooleanField(default=True, help_text="Controls whether this popup is currently being served to users.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

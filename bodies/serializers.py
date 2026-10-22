@@ -8,6 +8,20 @@ from bodies.serializer_min import BodySerializerMin
 from helpers.misc import sort_by_field
 
 
+class ListToCommaSeparatedField(serializers.Field):
+    def to_representation(self, value):
+        return value.split(",") if value else None
+
+    def to_internal_value(self, data):
+        if data is None:
+            return None
+        if isinstance(data, list):
+            return ",".join(data)
+        if isinstance(data, str):
+            return data
+        return ""
+
+
 class BodySerializer(serializers.ModelSerializer):
     """Serializer for Body."""
 
@@ -21,10 +35,7 @@ class BodySerializer(serializers.ModelSerializer):
 
     events = serializers.SerializerMethodField()
     roles = RoleSerializerMin(many=True, read_only=True)
-    photoalbum_urls = serializers.SerializerMethodField()
-
-    def get_photoalbum_urls(self, obj):
-        return obj.photoalbum_urls.split(",") if obj.photoalbum_urls else None
+    photoalbum_urls = ListToCommaSeparatedField(required=False, allow_null=True)
 
     class Meta:
         model = Body

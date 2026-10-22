@@ -248,7 +248,7 @@ class UserSignatureViewSet(viewsets.ModelViewSet):
     @login_required_ajax
     def delete_signature(self, request, pk=None):
         """Delete a signature for the user."""
-        signature = self.get_object_or_404(self.queryset, pk=pk)
+        signature = get_object_or_404(self.queryset, pk=pk)
         if signature.user != request.user.profile:
             return Response({"message": "Not allowed"}, status=403)
         signature.delete()
