@@ -21,10 +21,10 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("message_id", models.CharField(max_length=998, unique=True)),
+                ("message_id", models.CharField(max_length=255, unique=True)),
                 (
                     "parent_message_id",
-                    models.CharField(blank=True, max_length=998, null=True),
+                    models.CharField(blank=True, max_length=255, null=True),
                 ),
                 ("recipients", models.JSONField(default=list)),
                 ("to_recipients", models.JSONField(default=list)),

@@ -134,8 +134,8 @@ class EventEmail(models.Model):
     """A sent group email and its thread metadata for an event."""
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="emails")
-    message_id = models.CharField(max_length=998, unique=True)
-    parent_message_id = models.CharField(max_length=998, blank=True, null=True)
+    message_id = models.CharField(max_length=255, unique=True)
+    parent_message_id = models.CharField(max_length=255, blank=True, null=True)
     recipients = models.JSONField(default=list)
     to_recipients = models.JSONField(default=list)
     cc_recipients = models.JSONField(default=list)
