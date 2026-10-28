@@ -2,7 +2,7 @@ from django.db import models
 
 class PlacementCompanyThread(models.Model):
     company_name    = models.CharField(max_length=200)
-    company_slug    = models.SlugField(db_index=True)
+    company_slug    = models.SlugField(max_length=255, db_index=True)
     first_post_date = models.DateTimeField(db_index=True)
 
     # Enriched from the IAF Open post — filled when IAF Open is ingested

@@ -3,7 +3,6 @@ from uuid import UUID
 from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
-from django.core.mail import EmailMultiAlternatives
 import markdown
 import re
 from django.conf import settings
@@ -13,7 +12,8 @@ from events.prioritizer import get_prioritized
 from events.serializers import EventSerializer
 from events.serializers import EventFullSerializer
 from events.serializers import EventCreatorSerializer
-from events.models import Event
+from events.models import Event, EventEmail
+from events.email import add_quoted_parent_body, send_group_threaded_email
 from roles.helpers import user_has_privilege
 from roles.helpers import login_required_ajax
 from roles.helpers import forbidden_no_privileges, diff_set
@@ -352,6 +352,9 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
 
         if event.email_verified:
             return Response({"error": "Event is already approved."}, status=400)
+
+        parent_event_id = request.data.get("parent_event_id") or None
+        parent_message_id = request.data.get("parent_message_id") or None
         if event.email_rejected:
             return Response({"error": "Event is currently rejected. Resubmission needed."}, status=400)
 
@@ -376,16 +379,66 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
             + render_markdown_for_email(INSTIAPP_MAIL_FOOTER)
         )
 
-        try:
-            msg = EmailMultiAlternatives(
-                subject=subject,
-                body=text_message,
-                from_email=EMAIL_EVENT_HOST_USER,
-                to=RECIPIENT_LIST,
+        parent_email = None
+        if parent_event_id:
+            parent_email = EventEmail.objects.filter(
+                event_id=parent_event_id
+            ).order_by("-created_at").first()
+            if parent_email is None:
+                return Response(
+                    {"error": "The selected event has no sent email."},
+                    status=400,
+                )
+            parent_message_id = parent_email.message_id
+        elif parent_message_id:
+            parent_email = EventEmail.objects.filter(
+                message_id=parent_message_id
+            ).first()
+            if parent_email is None:
+                return Response({"error": "Parent email was not found."}, status=400)
+
+        to_recipients = (
+            parent_email.to_recipients
+            if parent_email
+            else request.data.get("to_recipients", RECIPIENT_LIST)
+        )
+        cc_recipients = (
+            parent_email.cc_recipients
+            if parent_email
+            else request.data.get("cc_recipients", [])
+        )
+        thread_subject = parent_email.subject if parent_email else subject
+        if parent_email:
+            parent_text_message = parent_email.body_text or (
+                parent_email.event.longdescription.replace("\\n", "\n")
+                + "\n\n"
+                + INSTIAPP_MAIL_FOOTER
+            )
+            parent_html_message = parent_email.body_html or (
+                render_markdown_for_email(parent_email.event.longdescription)
+                + "<hr>"
+                + render_markdown_for_email(INSTIAPP_MAIL_FOOTER)
+            )
+            text_message, html_message = add_quoted_parent_body(
+                text_message,
+                html_message,
+                parent_text_message,
+                parent_html_message,
+                parent_email.created_at,
+                EMAIL_EVENT_HOST_USER or settings.EMAIL_HOST_USER,
             )
 
-            msg.attach_alternative(html_message, "text/html")
-            msg.send()
+        try:
+            sent_email = send_group_threaded_email(
+                subject=thread_subject,
+                text_message=text_message,
+                html_message=html_message,
+                to_recipients=to_recipients,
+                cc_recipients=cc_recipients,
+                parent_message_id=parent_message_id,
+                previous_message_ids=parent_email.references if parent_email else [],
+            )
+            EventEmail.objects.create(event=event, **sent_email)
 
             event.email_verified = True
             event.email_rejected = False
@@ -399,7 +452,8 @@ class EventMailVerificationViewSet(viewsets.ViewSet):
                 {
                     "error_status": True,
                     "msg": f"Error sending mail: {str(e)}"
-                }
+                },
+                status=503,
             )
 
     @login_required_ajax
