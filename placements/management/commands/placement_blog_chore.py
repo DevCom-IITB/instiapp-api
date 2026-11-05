@@ -2,38 +2,15 @@ import pickle
 import re
 from os.path import exists
 from requests.auth import HTTPBasicAuth
-
-# from urllib import response
 import feedparser
 import requests
-
-# from requests.auth import HTTPBasicAuth
 from dateutil.parser import parse
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
-from notifications.signals import notify
-from users.models import UserProfile
 from bodies.models import Body
 from placements.models import BlogEntry
 from helpers.misc import table_to_markdown
-
-
-class ProfileFetcher:
-    """Helper to get dictionary of profiles efficiently."""
-
-    def __init__(self):
-        self.roll_nos = None
-
-    def get_roll(self):
-        if not self.roll_nos:
-            self.roll_nos = UserProfile.objects.filter(active=True).values_list(
-                "roll_no", flat=True
-            )
-        return self.roll_nos
-
-
-profile_fetcher = ProfileFetcher()
+from placements.cache import invalidate_blog_cache
 
 
 def handle_entry(entry, body, url):
@@ -62,79 +39,36 @@ def handle_entry(entry, body, url):
 
     db_entry.save()
 
-    # Send notification to mentioned people
-    if new_added and db_entry.content:
-        # Send notifications to followers
-        if body is not None:
-            users = User.objects.filter(
-                id__in=body.followers.filter(active=True).values("user_id")
-            )
-            notify.send(db_entry, recipient=users, verb="New post on " + body.name)
+    # Offload notifications, heavy NLP extraction, and cache invalidation to Celery
+    if new_added:
+        invalidate_blog_cache()
+        try:
+            from placements.tasks import process_blog_entry_async
+            process_blog_entry_async.delay(str(db_entry.id), body.id if body else None)
+        except Exception as e:
+            print(f"Failed to dispatch Celery task for blog entry {db_entry.id}: {e}")
 
-        # Send notifications for mentioned users
-        import re
-        content_lower = db_entry.content.lower()
-        words_in_post = set(re.findall(r'\b\w+\b', content_lower))
-        
-        roll_nos = [
-            p for p in profile_fetcher.get_roll() if p and p.lower() in words_in_post
-        ]
-        if roll_nos:
-            users = User.objects.filter(profile__roll_no__in=roll_nos)
-            notify.send(
-                db_entry, recipient=users, verb="You were mentioned in a blog post"
-            )
-            
-    # Auto-Sync the new blog into the NLP Extractor for the new models!
-    try:
-        from django.conf import settings
-        feed_post_format = [{
-            "id": str(db_entry.id),
-            "title": db_entry.title,
-            "content": db_entry.content,
-            "link": db_entry.link,
-            "published": db_entry.published.isoformat() if db_entry.published else None
-        }]
-        
-        if body and body.name == getattr(settings, "PLACEMENTS_BLOG_BODY", ""):
-            from placementblogs.data_extractor import run_production_ingestion
-            run_production_ingestion(feed_post_format)
-        elif body and body.name == getattr(settings, "TRAINING_BLOG_BODY", ""):
-            from internship.data_extractor import run_production_ingestion
-            run_production_ingestion(feed_post_format)
-    except Exception as e:
-        print(f"Failed to extract NLP data for new post: {e}")
 
 def fill_blog(url, body_name, url_val):
     # Get the body
     body = Body.objects.filter(name=body_name).first()
 
     if exists("session.obj"):
-        f = open("session.obj", "rb")
-        s = pickle.load(f)
-        f.close()
-
-        # Get the feed
-        # response = requests.get(url, auth=HTTPBasicAuth(
-        #     settings.LDAP_USERNAME, settings.LDAP_PASSWORD))
+        with open("session.obj", "rb") as f:
+            s = pickle.load(f)
 
         response = s.get(url, verify=False, timeout=10)
-        response = s.get(url, verify=False, timeout=10)
-
         feeds = feedparser.parse(response.content)
 
-        if not feeds["feed"]:
-            raise CommandError("PLACEMENTS BLOG CHORE FAILED")
+        if not feeds.get("feed"):
+            raise CommandError(f"PLACEMENTS BLOG CHORE FAILED for {body_name}: Empty or invalid feed")
 
         # Add each entry if doesn't exist
-        for entry in feeds["entries"]:
+        for entry in feeds.get("entries", []):
             handle_entry(entry, body, url_val)
 
     else:
-        # Get the body
-        body = Body.objects.filter(name=body_name).first()
-
-        # Get the feed
+        # Get the feed via basic auth fallback
         response = requests.get(
             url,
             auth=HTTPBasicAuth(settings.LDAP_USERNAME, settings.LDAP_PASSWORD),
@@ -142,12 +76,12 @@ def fill_blog(url, body_name, url_val):
         )
         feeds = feedparser.parse(response.content)
 
-        if not feeds["feed"]:
-            raise CommandError("PLACEMENTS BLOG CHORE FAILED")
+        if not feeds.get("feed"):
+            raise CommandError(f"PLACEMENTS BLOG CHORE FAILED for {body_name}: Empty or invalid feed")
 
-        # Add each entry if doesn't exist
-        for entry in feeds["entries"]:
-            handle_entry(entry, body, url)
+        # Add each entry with url_val so queries in views.py match
+        for entry in feeds.get("entries", []):
+            handle_entry(entry, body, url_val)
 
 
 def handle_html(content):
@@ -171,19 +105,34 @@ class Command(BaseCommand):
     help = "Updates the placement blog database"
 
     def handle(self, *args, **options):
-        """Run the chore."""
+        """Run the chore with fault isolation between Placement and Internship."""
+        has_error = False
 
-        fill_blog(
-            settings.PLACEMENTS_URL,
-            settings.PLACEMENTS_BLOG_BODY,
-            settings.PLACEMENTS_URL_VAL,
-        )
-        fill_blog(
-            settings.TRAINING_BLOG_URL,
-            settings.TRAINING_BLOG_BODY,
-            settings.TRAINING_BLOG_URL_VAL,
-        )
+        # 1. Scrape Placement Blog
+        try:
+            fill_blog(
+                settings.PLACEMENTS_URL,
+                settings.PLACEMENTS_BLOG_BODY,
+                settings.PLACEMENTS_URL_VAL,
+            )
+            self.stdout.write(self.style.SUCCESS("Placement blog scrape completed."))
+        except Exception as e:
+            has_error = True
+            self.stderr.write(self.style.ERROR(f"Placement blog scrape error: {e}"))
 
-        self.stdout.write(
-            self.style.SUCCESS("Placement Blog Chore completed successfully")
-        )
+        # 2. Scrape Internship Blog (isolated: runs even if Placement failed)
+        try:
+            fill_blog(
+                settings.TRAINING_BLOG_URL,
+                settings.TRAINING_BLOG_BODY,
+                settings.TRAINING_BLOG_URL_VAL,
+            )
+            self.stdout.write(self.style.SUCCESS("Internship blog scrape completed."))
+        except Exception as e:
+            has_error = True
+            self.stderr.write(self.style.ERROR(f"Internship blog scrape error: {e}"))
+
+        if has_error:
+            self.stderr.write(self.style.WARNING("Placement Blog Chore completed with errors."))
+        else:
+            self.stdout.write(self.style.SUCCESS("Placement Blog Chore completed successfully."))
