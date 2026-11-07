@@ -8,12 +8,9 @@ from placements.serializers import BlogEntrySerializer
 REDIS_URL = getattr(settings, "REDIS_CACHE_URL", "redis://127.0.0.1:6379/1")
 redis_client = Redis.from_url(REDIS_URL, decode_responses=True)
 
-CACHE_TTL = 600  # 10 minutes TTL
-
-
-def get_top_100_blogs(blog_type: str, blog_url: str):
-    """Fetch top 100 blogs from Redis, falling back to DB on cache miss."""
-    cache_key = f"blogs_top100_{blog_type}"
+def get_top_200_blogs(blog_type: str, blog_url: str):
+    """Fetch top 200 blogs from Redis, falling back to DB on cache miss."""
+    cache_key = f"blogs_top200_{blog_type}"
 
     # 1. Try fetching from Redis
     try:
@@ -23,13 +20,13 @@ def get_top_100_blogs(blog_type: str, blog_url: str):
     except Exception as e:
         print(f"[Redis Cache Error] {e}")
 
-    # 2. Cache Miss: Query Database for the latest 100 posts
-    queryset = BlogEntry.objects.filter(blog_url=blog_url).order_by("-published")[:100]
+    # 2. Cache Miss: Query Database for the latest 200 posts
+    queryset = BlogEntry.objects.filter(blog_url=blog_url).order_by("-published")[:200]
     posts = BlogEntrySerializer(queryset, many=True).data
 
-    # 3. Store in Redis with TTL
+    # 3. Store in Redis without expiry. New posts invalidate this cache.
     try:
-        redis_client.set(cache_key, json.dumps(posts), ex=CACHE_TTL)
+        redis_client.set(cache_key, json.dumps(posts))
     except Exception as e:
         print(f"[Redis Set Error] {e}")
 
@@ -40,9 +37,9 @@ def invalidate_blog_cache(blog_type: str = None):
     """Delete Redis cache key when a new blog is scraped."""
     try:
         if blog_type:
-            redis_client.delete(f"blogs_top100_{blog_type}")
+            redis_client.delete(f"blogs_top200_{blog_type}")
         else:
-            redis_client.delete("blogs_top100_placement", "blogs_top100_training")
+            redis_client.delete("blogs_top200_placement", "blogs_top200_training")
     except Exception as e:
         print(f"[Redis Delete Error] {e}")
 

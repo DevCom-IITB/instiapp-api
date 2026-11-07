@@ -8,7 +8,7 @@ from helpers.misc import query_from_num
 from helpers.misc import query_search
 from alumni.models import AlumniUser
 from users.models import UserProfile
-from placements.cache import get_top_100_blogs
+from placements.cache import get_top_200_blogs
 
 
 class PlacementBlogViewset(viewsets.ViewSet):
@@ -29,9 +29,9 @@ class PlacementBlogViewset(viewsets.ViewSet):
         from_i = int(from_q) if from_q is not None and str.isdigit(from_q) else 0
         num = int(num_q) if num_q is not None and str.isdigit(num_q) else 20
 
-        # FAST PATH: Serve slice from Redis (Top 100, no search query)
-        if not search_query and (from_i + num <= 100):
-            cached_posts = get_top_100_blogs("placement", settings.PLACEMENTS_URL_VAL)
+        # FAST PATH: Serve slice from Redis (Top 200, no search query)
+        if not search_query and num <= 100 and (from_i + num <= 200):
+            cached_posts = get_top_200_blogs("placement", settings.PLACEMENTS_URL_VAL)
             return Response(cached_posts[from_i : from_i + num])
 
         # SLOW PATH: Search query or deep pagination -> query database
@@ -52,9 +52,9 @@ class PlacementBlogViewset(viewsets.ViewSet):
         from_i = int(from_q) if from_q is not None and str.isdigit(from_q) else 0
         num = int(num_q) if num_q is not None and str.isdigit(num_q) else 20
 
-        # FAST PATH: Serve slice from Redis (Top 100, no search query)
-        if not search_query and (from_i + num <= 100):
-            cached_posts = get_top_100_blogs("training", settings.TRAINING_BLOG_URL_VAL)
+        # FAST PATH: Serve slice from Redis (Top 200, no search query)
+        if not search_query and num <= 100 and (from_i + num <= 200):
+            cached_posts = get_top_200_blogs("training", settings.TRAINING_BLOG_URL_VAL)
             return Response(cached_posts[from_i : from_i + num])
 
         # SLOW PATH: Search query or deep pagination -> query database
